@@ -303,13 +303,13 @@ $ ( | atoken, buffer, CBuffer buffer0 )
         }
     }
 } 
-void sp () { stack ; pause ; }
+//void sp () { stack ; pause ; }
 'void.$ find wdiss sp
 void
 c_syntaxOff 
 #if doScript2 
 "\n\nnew $ test\n" ps
-d: $ls -al . ;
+$ls -al . ;
 $ etc/script ; 
 $$ etc/lispScript ; 
 $$ls -al /usr/local ; 

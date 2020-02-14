@@ -1,4 +1,4 @@
-: sp stack pause ; sp
+//: sp stack pause ; sp
 /* test comment */ 5  // for stack checking see last lines
 "\nclassTest.csl" ps sp //pause
 #if "_ClassTest_" defined not sp // prevent including this file twice
@@ -8,9 +8,8 @@ sp
 Int Logic C
 Compiler
 hex
-: sl nl location nl stk _pause ; //sl
 Class C
-: sp stack pause ; sp
+: sp ; //stack pause ; sp
 
 using
 Class // "class" works like "namespace" so here we switch back to namespace 'Class' else following words would be in class 'Pointer'

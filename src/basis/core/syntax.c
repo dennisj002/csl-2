@@ -686,8 +686,9 @@ Word_ClassStructure_PrintData ( Word * word, byte * typedefString )
     {
         //ReadLine_GetNextCharFromString ( ReadLiner * rl ) ;
         Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
-        ReadLine_SetRawInputFunction ( cntx->ReadLiner0, ReadLine_GetNextCharFromString ) ;
-        ReadLine_SetInputString ( cntx->ReadLiner0, typedefString ) ;
+        //ReadLine_SetRawInputFunction ( cntx->ReadLiner0, ReadLine_GetNextCharFromString ) ;
+        //ReadLine_SetInputString ( cntx->ReadLiner0, typedefString ) ;
+        Readline_Setup_OneStringInterpret ( cntx->ReadLiner0, typedefString ) ;
         CSL_Parse_Typedef_Field ( TDSCI_PRINT, ( byte* ) word ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;
         // reset ReadLiner to normal

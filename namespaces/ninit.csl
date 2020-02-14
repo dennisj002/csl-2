@@ -11,4 +11,4 @@ doDemo @ { demo0 } if1 //stack pause
 : sp ; //stack pause ;    
 lispOff
 sp 
-d: 2 + 7 assertStkChk // stack checking
+2 + 7 assertStkChk // stack checking

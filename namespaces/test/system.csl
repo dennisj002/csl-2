@@ -84,7 +84,7 @@ String Shell C
 : $ streol _sh ;  
 
 bnOff
-: sp stack pause ; sp
+: sp ; //stack pause ; sp
 #if 0 //doScript
 $$ls -al /usr/local ; $$ls -al . ; 
 $etc/script 
