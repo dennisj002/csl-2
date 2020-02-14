@@ -136,21 +136,21 @@ TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 size )
         case 1:
         {
             format = ( byte* ) "\n0x%016lx\t%s\t%s = 0x%02x" ;
-            value = *( ( int8* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+            value = * ( ( int8* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
             //_Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, token, *( ( int8* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ) ;
             break ;
         }
         case 2:
         {
             format = ( byte* ) "\n0x%016lx\t%s\t%s = 0x%04x" ;
-            value = *( ( int16* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+            value = * ( ( int16* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
             //_Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, token, *( ( int16* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ) ;
             break ;
         }
         case 4:
         {
             format = ( byte* ) "\n0x%016lx\t%s\t%s = 0x%08x" ;
-            value = *( ( int32* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+            value = * ( ( int32* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
             //_Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, token, *( ( int32* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ) ;
             break ;
         }
@@ -158,7 +158,7 @@ TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 size )
         case CELL:
         {
             format = ( byte* ) "\n0x%016lx\t%s\t%s = 0x%016lx" ;
-            value = *( ( int64* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+            value = * ( ( int64* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
             break ;
         }
     }
@@ -821,13 +821,15 @@ Parse_Macro ( int64 type )
     return value ;
 }
 
-void
-Lexer_ParseDoubleQuoteMacro ( Lexer * lexer )
+byte *
+_Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTermChar )
 {
     ReadLiner * rl = _ReadLiner_ ;
+    byte * token ;
     if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_csl ) ) ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) )
         CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 0 ) ;
     _CSL_->SC_QuoteMode = true ;
+    if ( ! includeTermChar ) Lexer_UnAppendCharacterToTokenBuffer ( lexer ) ;
     do
     {
         lexer->TokenInputByte = ReadLine_NextChar ( rl ) ;
@@ -835,13 +837,21 @@ Lexer_ParseDoubleQuoteMacro ( Lexer * lexer )
             _BackSlash ( lexer, 1 ) ;
         else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
     }
-    while ( lexer->TokenInputByte != '"' ) ;
+    while ( lexer->TokenInputByte != termChar ) ;
+    if ( ! includeTermChar ) Lexer_UnAppendCharacterToTokenBuffer ( lexer ) ;
+    _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
     _CSL_->SC_QuoteMode = false ;
     SetState ( lexer, LEXER_DONE, true ) ;
-    if ( GetState ( _CSL_, STRING_MACROS_ON ) && GetState ( &_CSL_->Sti, STI_INITIALIZED ) ) _CSL_StringMacros_Do ( lexer->TokenBuffer ) ;
-    Word * word = Lexer_ParseToken_ToWord ( lexer, String_New ( lexer->TokenBuffer, STRING_MEM ), - 1, - 1 ) ;
-    Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ;
+    token = String_New ( lexer->TokenBuffer, STRING_MEM ) ;
+    if ( termChar == '\"' )
+    {
+        if ( GetState ( _CSL_, STRING_MACROS_ON ) && GetState ( &_CSL_->Sti, STI_INITIALIZED ) ) _CSL_StringMacros_Do ( lexer->TokenBuffer ) ;
+        Word * word = Lexer_ParseToken_ToWord ( lexer, token, - 1, - 1 ) ;
+        Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ;
+    }
+    return token ;
 }
+
 // ?? seems way to complicated and maybe should be integrated with Lexer_ParseObject
 
 void
@@ -854,9 +864,9 @@ _CSL_SingleQuote ( )
     byte c0, c1, c2 ;
     uint64 charLiteral = 0 ;
 
-    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_csl ) ) ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) )
-        CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 0 ) ;
     _CSL_->SC_QuoteMode = true ;
+    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_csl ) ) ) )
+        && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) ) CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 0 ) ;
     c0 = _ReadLine_PeekOffsetChar ( rl, 0 ) ; // parse a char type, eg. 'c' 
     c1 = _ReadLine_PeekOffsetChar ( rl, 1 ) ;
     if ( sqWord && sqWord->Name[0] == '\'' && ( c1 == '\'' ) || ( c0 == '\\' ) ) // parse a char type, eg. 'c' 
@@ -891,12 +901,13 @@ _CSL_SingleQuote ( )
     else
     {
         if ( ! Compiling ) CSL_InitSourceCode_WithName ( _CSL_, lexer->OriginalToken, 0 ) ;
-        byte * token ; //= ( byte* ) "" ;
+        byte * token, nchar ;
+#if 1     
         while ( 1 )
         {
             int64 i = lexer->TokenEnd_ReadLineIndex ;
             while ( ( i < rl->MaxEndPosition ) && ( rl->InputLine [ i ] == ' ' ) ) i ++ ;
-            if ( ( rl->InputLine [ i ] == '.' ) || _Lexer_IsTokenForwardDotted ( _Lexer_, i + 1 ) ) // 1 : pre-adjust for an adjustment in _Lexer_IsTokenForwardDotted
+            if ( ( rl->InputLine [ i ] == '.' ) || _Lexer_IsTokenForwardDotted ( _Lexer_, i + 1 ) ) // 1 : pre-adjust for an adjustment in                              _Lexer_IsTokenForwardDotted
             {
                 token = Lexer_ReadToken ( lexer ) ;
                 word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
@@ -910,8 +921,20 @@ _CSL_SingleQuote ( )
             }
             else break ;
         }
-        if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) ) CSL_InitSourceCode_WithName ( _CSL_, lexer->OriginalToken, 0 ) ;
         CSL_Token ( ) ;
+#else        
+        if ( ( nchar = ReadLine_PeekNextChar ( rl ) ) == ' ' )
+        {
+            while ( nchar = ReadLine_NextChar ( rl ) == ' ' ) ;
+            ReadLine_UnGetChar ( rl ) ;
+        }
+        if ( sqWord->Definition != CSL_SingleQuote )
+            token = _Lexer_ParseTerminatingMacro ( lexer, ' ', 0 ) ;
+        else token = Lexer_ReadToken ( lexer ) ; // in case of 'quote' instead of '\''
+        DataStack_Push ( ( int64 ) token ) ;
+#endif        
+        if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) )
+            CSL_InitSourceCode_WithName ( _CSL_, token, 0 ) ;
     }
 done:
     _CSL_->SC_QuoteMode = false ;

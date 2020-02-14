@@ -21,10 +21,10 @@ optimizeOn inlineOn
 optimizeOff inlineOff
 #endif
 Root 
-: ' _tick ; immediate
 'find '_findUsing _findUsing alias immediate
 : findAny _findAny ; immediate
 'tick ' _tick find alias immediate
+: ' _tick ; immediate
 'ndrop '_ndrop find alias immediate 
 'forth 'postfixOn find alias
 'C_On 'c_syntaxOn find alias
@@ -469,10 +469,10 @@ rtw
 #endif 
 #if 0
 : wtdInclude "namespaces/wordTypeDef.csl" include ;
-wtdInclude 
-C.Experimental
+//wtdInclude 
+d: C.Experimental
 'wtdInclude find 100 dump
-'wtdInclude find C.Experimental d: 'Word find wordStructPrint 
+'wtdInclude find C.Experimental 'Word find wordStructPrint 
 C 'Experimental notUsing 
 #endif
 2 + 7 assertStkChk // stack checking 

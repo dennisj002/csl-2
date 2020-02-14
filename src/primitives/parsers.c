@@ -66,7 +66,7 @@ Parse_SkipUntil_EitherToken_OrNewline ( byte * end1, byte* end2 )
 }
 
 void
-CSL_Parse ( )
+CSL_ParseObject ( )
 {
     Lexer * lexer = _Context_->Lexer0 ;
     byte * token = ( byte* ) DataStack_Pop ( ) ;
@@ -77,7 +77,7 @@ CSL_Parse ( )
 void
 CSL_DoubleQuoteMacro ( )
 {
-    Lexer_ParseDoubleQuoteMacro ( _Lexer_ ) ;
+    _Lexer_ParseTerminatingMacro ( _Lexer_, '\"', 1 ) ;
 }
 
 void

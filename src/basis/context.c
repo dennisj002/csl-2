@@ -154,14 +154,9 @@ _Context_InterpretString ( Context * cntx, byte *str )
     _SetEcho ( 0 ) ;
     int64 interpState = interp->State ;
     int64 lexerState = interp->Lexer0->State ;
-    int64 svIndex = rl->ReadIndex ;
-    int64 svState = rl->State ;
-    Readline_SaveInputLine ( rl ) ;
     Readline_Setup_OneStringInterpret ( rl, str ) ;
     Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_STRING ) ;
-    rl->ReadIndex = svIndex ;
-    rl->State = svState ;
-    Readline_RestoreInputLine ( rl ) ;
+    Readline_Restore_InputLine_State ( rl ) ;
     interp->Lexer0->State = lexerState ;
     interp->State = interpState ;
 }

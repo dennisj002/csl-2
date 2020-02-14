@@ -191,6 +191,9 @@
 #define ReadLiner_SetLastChar( chr ) if (_ReadLiner_) _ReadLiner_->InputKeyedCharacter = chr
 #define _Lexer_IsCharDelimiter( lexer, c ) lexer->DelimiterCharSet [ c ]
 #define _Lexer_IsCharDelimiterOrDot( lexer, c ) lexer->DelimiterOrDotCharSet [ c ]
+#define TokenBuffer_AppendPoint( lexer ) &lexer->TokenBuffer [ lexer->TokenWriteIndex ]
+#define _AppendCharacterToTokenBuffer( lex, character ) lexer->TokenBuffer [ lex->TokenWriteIndex ] = character
+
 
 #define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE | OBJECT )
 #define NAMESPACE_RELATED_TYPE ( NAMESPACE_TYPE | OBJECT_FIELD )

@@ -565,10 +565,10 @@ typedef
 byte( *ReadLiner_KeyFunction ) (struct ReadLiner *) ;
 typedef struct ReadLiner
 {
-    uint64 State ;
+    uint64 State, svState ;
     int64 InputKeyedCharacter ;
     int64 FileCharacterNumber, LineNumber, OutputLineCharacterNumber ; // set by _CSL_Key
-    int64 ReadIndex, EndPosition ; // index where the next input character is put
+    int64 ReadIndex, svReadIndex, EndPosition ; // index where the next input character is put
     int64 MaxEndPosition ; // index where the next input character is put
     int64 CursorPosition, EscapeModeFlag, InputStringIndex, InputStringLength, LineStartFileIndex ;
     byte *Filename, LastCheckedInputKeyedCharacter, * DebugPrompt, * DebugAltPrompt, * NormalPrompt, * AltPrompt, * Prompt ;

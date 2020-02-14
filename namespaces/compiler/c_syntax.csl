@@ -304,7 +304,7 @@ $ ( | atoken, buffer, CBuffer buffer0 )
     }
 } 
 //void sp () { stack ; pause ; }
-'void.$ find wdiss sp
+d: 'void.$ find wdiss sp
 void
 c_syntaxOff 
 #if doScript2 

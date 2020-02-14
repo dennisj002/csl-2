@@ -446,14 +446,6 @@ ReadLine_IsReverseTokenQualifiedID ( ReadLiner * rl )
 }
 
 void
-Readline_Setup_OneStringInterpret ( ReadLiner * rl, byte * str )
-{
-    ReadLine_Set_ReadIndex ( rl, 0 ) ;
-    SetState ( rl, STRING_MODE, true ) ;
-    ReadLine_SetInputLine ( rl, str ) ;
-}
-
-void
 Readline_SaveInputLine ( ReadLiner * rl )
 {
     byte * svLine = Buffer_Data ( _CSL_->InputLineB ) ;
@@ -461,10 +453,26 @@ Readline_SaveInputLine ( ReadLiner * rl )
 }
 
 void
+Readline_Save_InputLine_State ( ReadLiner * rl )
+{
+    rl->svReadIndex = rl->ReadIndex ;
+    rl->svState = rl->State ;
+    Readline_SaveInputLine ( rl ) ;
+}
+
+void
 Readline_RestoreInputLine ( ReadLiner * rl )
 {
     byte * svLine = Buffer_Data ( _CSL_->InputLineB ) ;
     strcpy ( ( char* ) rl->InputLine, ( char* ) svLine ) ;
+}
+
+void
+Readline_Restore_InputLine_State ( ReadLiner * rl )
+{
+    rl->ReadIndex = rl->svReadIndex ;
+    rl->State = rl->svState ;
+    Readline_RestoreInputLine ( rl ) ;
 }
 
 Boolean
@@ -531,6 +539,17 @@ ReadLine_SetRawInputFunction ( ReadLiner * rl, ReadLiner_KeyFunction ripf )
 }
 
 void
+ReadLine_SetInputString ( ReadLiner * rl, byte * string, int64 size )
+{
+    rl->InputStringOriginal = string ;
+    rl->InputStringCurrent = rl->InputStringOriginal ;
+    rl->InputStringIndex = 0 ;
+    rl->InputStringLength = size ? size : Strlen ( ( char* ) string ) ;
+}
+
+// probably the next three functions should be integrated or reworked considering/using each other
+
+void
 ReadLine_ReadFileIntoAString ( ReadLiner * rl, FILE * file )
 {
     int64 size, result ;
@@ -542,19 +561,24 @@ ReadLine_ReadFileIntoAString ( ReadLiner * rl, FILE * file )
         fstr = 0 ;
         size = 0 ;
     }
-    rl->InputStringOriginal = fstr ;
-    rl->InputStringCurrent = rl->InputStringOriginal ;
-    rl->InputStringIndex = 0 ;
-    rl->InputStringLength = size ;
+    ReadLine_SetInputString ( rl, fstr, size ) ;
 }
 
 void
-ReadLine_SetInputString ( ReadLiner * rl, byte * string )
+_Readline_Setup_OneStringInterpret ( ReadLiner * rl, byte * str )
 {
-    rl->InputStringOriginal = string ;
-    rl->InputStringCurrent = rl->InputStringOriginal ;
-    rl->InputStringIndex = 0 ;
-    rl->InputStringLength = Strlen ( ( char* ) string ) ;
+    ReadLine_Set_ReadIndex ( rl, 0 ) ;
+    SetState ( rl, STRING_MODE, true ) ;
+    ReadLine_SetInputLine ( rl, str ) ;
+}
+
+void
+Readline_Setup_OneStringInterpret ( ReadLiner * rl, byte * str )
+{
+    Readline_Save_InputLine_State ( rl ) ;
+    ReadLine_SetRawInputFunction ( rl, ReadLine_GetNextCharFromString ) ;
+    ReadLine_SetInputString ( rl, str, 0 ) ;
+    _Readline_Setup_OneStringInterpret ( rl, str ) ;
 }
 
 void
@@ -647,14 +671,14 @@ ReadLine_CheckForLocalVariables ( ReadLiner * rl )
     Word * word = _Context_->CurrentlyRunningWord ;
     boolean result ;
     int64 i, si ;
-    if ( ! word ) word = _Interpreter_->w_Word ; 
-    si = word->W_RL_Index + strlen ( (char*) word->Name ) ; 
-    i = 0 ; 
+    if ( ! word ) word = _Interpreter_->w_Word ;
+    si = word->W_RL_Index + strlen ( ( char* ) word->Name ) ;
+    i = 0 ;
     ReadLine_Set_ReadIndex ( rl, si ) ;
     do
     {
         c = _ReadLine_PeekOffsetChar ( rl, i ) ;
-        if ( c == ')' ) 
+        if ( c == ')' )
         {
             ReadLine_Set_ReadIndex ( rl, si + i + 1 ) ;
             c2 = ReadLine_PeekNextNonWhitespaceChar ( rl ) ;

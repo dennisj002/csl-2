@@ -2,15 +2,13 @@
 // lexer.c has been strongly influenced by the ideas in the lisp reader algorithm 
 // "http://www.ai.mit.edu/projects/iiip/doc/CommonLISP/HyperSpec/Body/sec_2-2.html"
 // although it doesn't fully conform to them yet the intention is to be eventually somewhat of a superset of them
+
 /*
 //    !, ", #, $, %, &, ', (, ), *, +, ,, -, ., /, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, :, ;, <, =, >, ?,
 // @, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, [, \, ], ^, _,
 // `, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, {, |, }, ~,
  */
 
-
-#define TokenBuffer_AppendPoint( lexer ) &lexer->TokenBuffer [ lexer->TokenWriteIndex ]
-#define _AppendCharacterToTokenBuffer( lex, character ) lexer->TokenBuffer [ lex->TokenWriteIndex ] = character
 
 void
 Lexer_Exception ( byte * token, uint64 exceptionNumber, byte * message )
@@ -31,6 +29,7 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
     if ( token )
     {
         word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
+        //word = _Finder_QID_Find ( cntx->Finder0, word ) ;
         if ( word && compiler->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
         //_DEBUG_SETUP ( word, token, 0, 0 ) ;
         if ( ! word )

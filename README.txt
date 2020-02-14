@@ -1,4 +1,4 @@
-CSL really has no grammar, just one word after another with namespaces - forth like. It may be theoretically higher on the Chomsky hierachy than a context-sensitive language. It is based on openvmtil64.
+CSL really has no grammar, just one word after another with namespaces - forth like - with some words being defined as operating infix or prefix. It may be more powerful and flexible than a context-sensitive language in the Chomsky hierarchy of language types. It is a renamed outgrowth of openVm and openvmtil64.
 
 openVm : Tookit for Implementing (and exploring) Languages - a bottom-up, optimizing native code vm, that is an extensible, contatenative, RPN, scripting language 
 
@@ -10,7 +10,7 @@ openVm : Tookit for Implementing (and exploring) Languages - a bottom-up, optimi
 
 *Vision* <: < forth, lisp, smalltalk, self, prolog, yacc > (c, machine code) :=> maru, joy, teyjus, ometa, ocaml, haskell (w/debugger) :> : a distilled computational semantics essence as a vm common ground; inclusive, bottom-up (from machine code not assembly) vm that is also a forth-like (rpn) scripting language upon which to build an elegant parser (cf. ometa) for any language or vm (nlp, llvm, ocaml, haskell, jvm, clr, arm, etc), and libraries -> ai/game engine, os, browser, etc., ... ; sufficiently fine grain semantic primitives that can be combined to form the keywords and semantics of any high level language; the keywords and grammar specifics for each language in separate namespaces, for example. *A cross-platform, extensible vm that can be as fast as hand-coded assembly (as fast as or faster than -O3 C/C++) and is also a scripting language - a universal, extensible language* with optional compilation to .o files for c linkage or stand alone executables. Recognizing the incredible utility of the list data structure and set theory makes *lisp - lambda calculus* the interface here to human language and thinking; *"forth"* is the interface to the hardware, with C and machine code in the middle. A sort of high level, rpn, macro assembler, a "Turing tarpit" explorer/miner - *(really, exploring new runtime implementation ideas in computer science)* ; bringing ideas from forth together with  smalltalk, self, lisp and prolog in c and machine code is *a long term goal*. 
 
-The *Turing Machine*, the *Lambda Calculus* and *Type/Category Theory* are the theoretical foundations.  Levels : 0/1 : Hardware -> MachineCode - Intel - ARM - Turing -> Forth - Concatenative - Joy - Moore - von Thun ->  Lisp - Church - McCarthy -> yacc - Generative Grammar - Panini - Chomsky - -> Prolog - Curry - Logic -> Smalltalk - Category Theory - Eilenberg - MacClane -> Type Theory - Milner - Harper - Sml - Ocaml - Haskell -> Nonduality -> Integral - Wilber -> Infinity - ...
+The *Turing Machine*, Language Theory, the *Lambda Calculus* and *Type/Category Theory* are the theoretical foundations.  Levels : 0/1 : Hardware -> MachineCode - Intel - ARM - Turing -> Forth - Concatenative - (Joy) - Moore - von Thun ->  Lisp - Church - McCarthy -> yacc - Generative Grammar - Panini - Chomsky - -> Prolog - Curry - Logic -> Smalltalk - Category Theory - Eilenberg - MacClane -> Type Theory - Milner - Harper - Sml - Ocaml - Haskell -> Nonduality -> Integral - Wilber -> Infinity - ...
 
 With an ideal that the best (cross platform) virtual machine or common language runtime is a minimal but maximally extensible, optimally and simply compiled (rpn) language, certainly "human readable", but also maintainable, learnable and extensible. But not as fundamentally one huge tool rather several small, relatively easily understood (groups of) tools working "organically" together - maybe most like forth but not limited by its assumptions with an action, constructive, granular, transparent, operational semantics of a higher level functional, denotational semantics. This, we feel, would also have the potential to be a step toward more cooperation in the (linux) programming world. Ometa, Yacc, uml, categorical logic, etc. with whatever syntax on top of this.
 
@@ -48,8 +48,8 @@ Important points/words (in primitives.c) :
 '<dbg>' turns on runtime debugger 
 
 'csls' is the static version which needs only libc to run independent of other linked libraries
-'cslo3' is the -03 optimized version
+'cslo3' would be an C -03 optimized version
 
-Type 'test' and then 'demo' (without the single quotes, of course) for some examples.
+Type 'test' or 'tc' and then 'demo' (without the single quotes, of course) for some examples.
 "init.csl" is the startup initialization file. Follow what it does and you will be led to all the internals of the program.
 I use netbeans (cpp) for debugging.

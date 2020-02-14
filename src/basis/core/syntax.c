@@ -671,7 +671,7 @@ CSL_Parse_Typedef_Field ( Boolean printFlag, byte * codeData )
         tdsci->DataPtr = codeData ;
         SetState ( tdsci, TDSCI_PRINT, true ) ;
         token = TDSCI_ReadToken ( tdsci ) ; // read 'typedef' token
-        if ( ! String_Equal ( token, "typedef")) return 0 ;
+        if ( ! String_Equal ( token, "typedef" ) ) return 0 ;
     }
     Parse_A_Typedef_Field ( tdsci ) ;
     CSL_Finish_WordSourceCode ( _CSL_, tdsci->Tdsci_TotalStructureNamespace ) ;
@@ -686,10 +686,10 @@ Word_ClassStructure_PrintData ( Word * word, byte * typedefString )
     {
         //ReadLine_GetNextCharFromString ( ReadLiner * rl ) ;
         Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
-        //ReadLine_SetRawInputFunction ( cntx->ReadLiner0, ReadLine_GetNextCharFromString ) ;
-        //ReadLine_SetInputString ( cntx->ReadLiner0, typedefString ) ;
+        ReadLiner * rl = cntx->ReadLiner0 ;
         Readline_Setup_OneStringInterpret ( cntx->ReadLiner0, typedefString ) ;
         CSL_Parse_Typedef_Field ( TDSCI_PRINT, ( byte* ) word ) ;
+        Readline_Restore_InputLine_State ( rl ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;
         // reset ReadLiner to normal
     }

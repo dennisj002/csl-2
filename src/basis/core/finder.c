@@ -102,47 +102,58 @@ _Finder_FindWord_InOneNamespace ( Finder * finder, Namespace * ns, byte * name )
     return 0 ;
 }
 
-// QID : (q)ualified (id) identifer
 Word *
-Finder_QID_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
+_Finder_QID_Find ( Finder * finder, Word * qidWord ) //, int64 flag, int64 saveQns )
 {
-#if 0    
-{
-    byte * token ;
-    Word * word ;
-    while ( 1 )
+    if ( qidWord )
     {
-        token = Lexer_ReadToken ( _Lexer_ ) ;
-        word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
-        if ( word )
+        Word * svQidWord = qidWord ;
+        Context * cntx = _Context_ ;
+        byte * token ;
+        Boolean isForwardDotted ;
+        do
         {
-            Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
-            if ( ( isForwardDotted ) || ( token[0] == '.' ) ) Word_Eval ( word ) ;
+            isForwardDotted = ReadLiner_IsTokenForwardDotted ( cntx->ReadLiner0, qidWord->W_RL_Index ) ;
+            if ( isForwardDotted && Is_NamespaceType ( qidWord ) )
+            {
+                token = Lexer_ReadToken ( cntx->Lexer0 ) ; // the '.' 
+                token = Lexer_ReadToken ( cntx->Lexer0 ) ;
+                qidWord = _Finder_FindWord_InOneNamespace ( finder, qidWord, token ) ;
+                if ( ! qidWord ) return svQidWord ;
+            }
             else break ;
         }
+        while ( qidWord ) ;
     }
-    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ; //necessary to update interpreter state since we are pushing the last token
-    DataStack_Push ( ( int64 ) token ) ;
+    return qidWord ;
 }
-#endif
+// QID : (q)ualified (id) identifer
+
+Word *
+Finder_QID_Find ( Finder * finder, byte * qid ) //, int64 flag, int64 saveQns )
+{
     Word * rword = 0 ;
-    if ( name )
+    if ( qid )
     {
-        // the InNamespace takes precedence with this one exception but is this the best logic ??               
-        if ( finder->QualifyingNamespace )
+        Context * cntx = _Context_ ;
+        byte * token ;
+        Word * rword ;
+        Readline_Setup_OneStringInterpret ( cntx->ReadLiner0, qid ) ;
+        token = Lexer_ReadToken ( cntx->Lexer0 ) ;
+        rword = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
+        do
         {
-            if ( String_Equal ( ".", ( char* ) name ) ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ; 
-            else
+            Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( cntx->ReadLiner0, rword->W_RL_Index ) ;
+            if ( isForwardDotted && Is_NamespaceType ( rword ) )
             {
-                rword = _Finder_FindWord_InOneNamespace ( _Finder_, finder->QualifyingNamespace, name ) ;
-                if ( rword && ( rword->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( finder, rword ) ;
-                else if ( ( ! saveQns ) && ( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) )
-                {
-                    Finder_SetQualifyingNamespace ( finder, 0 ) ; // nb. QualifyingNamespace is only good for one find unless we are in a quid
-                }
+                token = Lexer_ReadToken ( cntx->Lexer0 ) ; // the '.' 
+                token = Lexer_ReadToken ( cntx->Lexer0 ) ;
+                rword = _Finder_FindWord_InOneNamespace ( finder, rword, token ) ;
             }
+            else break ;
         }
-        if ( ! rword ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
+        while ( rword ) ;
+        Readline_Restore_InputLine_State ( cntx->ReadLiner0 ) ;
         CSL_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
     }
     return rword ;
@@ -157,7 +168,7 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
         // the InNamespace takes precedence with this one exception but is this the best logic ??               
         if ( finder->QualifyingNamespace )
         {
-            if ( String_Equal ( ".", ( char* ) name ) ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ; 
+            if ( String_Equal ( ".", ( char* ) name ) ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
             else
             {
                 rword = _Finder_FindWord_InOneNamespace ( _Finder_, finder->QualifyingNamespace, name ) ;
