@@ -209,7 +209,7 @@ Location_New ( )
 void
 _Location_Printf ( Location * loc )
 {
-    if ( loc ) _Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
+    if ( loc ) Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
 }
 
 void
@@ -384,13 +384,13 @@ CSL_DebugWord ( void )
 void
 Symbol_Print ( Symbol * symbol )
 {
-    _Printf ( ( byte* ) "%s", symbol->Name ) ;
+    Printf ( ( byte* ) "%s", symbol->Name ) ;
 }
 
 void
 Symbol_List_Print ( dllist * list )
 {
-    _Printf ( ( byte* ) "\nSymbol List : " ) ;
+    Printf ( ( byte* ) "\nSymbol List : " ) ;
     dllist_Map ( list, ( MapFunction0 ) Symbol_Print ) ;
 }
 
@@ -406,7 +406,7 @@ void
 _Words ( Symbol * symbol, MapFunction1 mf, int64 n )
 {
     Namespace * ns = ( Namespace * ) symbol ;
-    _Printf ( ( byte* ) "\n - %s :> ", ns->Name ) ;
+    Printf ( ( byte* ) "\n - %s :> ", ns->Name ) ;
     dllist_Map1 ( ns->Lo_List, mf, n ) ;
 }
 
@@ -421,23 +421,23 @@ _CSL_PrintWords ( int64 state )
 {
     int64 n = 0 ;
     _CSL_NamespacesMap ( ( MapSymbolFunction2 ) _DoWords, state, ( int64 ) & n, 0 ) ;
-    if ( _O_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
+    if ( _O_->Verbosity > 3 ) Printf ( ( byte* ) "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
     return n ;
 }
 
 void
 CSL_Words ( )
 {
-    _Printf ( ( byte* ) "\nWords :\n - <namespace> ':>' <word list>" ) ;
+    Printf ( ( byte* ) "\nWords :\n - <namespace> ':>' <word list>" ) ;
     int64 n = _CSL_PrintWords ( USING ) ;
-    _Printf ( ( byte* ) "\n" INT_FRMT " words on the 'using' Namespaces List ::", n ) ;
-    if ( _O_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
+    Printf ( ( byte* ) "\n" INT_FRMT " words on the 'using' Namespaces List ::", n ) ;
+    if ( _O_->Verbosity > 3 ) Printf ( ( byte* ) "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
 }
 
 void
 _Variable_Print ( Word * word )
 {
-    _Printf ( ( byte* ) c_ud ( " %s = %x ;" ), word->Name, word->W_Value ) ;
+    Printf ( ( byte* ) c_ud ( " %s = %x ;" ), word->Name, word->W_Value ) ;
 }
 
 void
@@ -456,9 +456,9 @@ _Variables ( Symbol * symbol, MapFunction1 mf, int64 n )
 {
     int64 pre_n = * ( int64* ) n ;
     Namespace * ns = ( Namespace * ) symbol ;
-    _Printf ( ( byte* ) "\n - %s :> ", ns->Name ) ;
+    Printf ( ( byte* ) "\n - %s :> ", ns->Name ) ;
     dllist_Map1 ( ns->Lo_List, mf, n ) ;
-    if ( *( int64* ) n == pre_n ) _Printf ( ( byte* ) "\r" ) ;
+    if ( *( int64* ) n == pre_n ) Printf ( ( byte* ) "\r" ) ;
 }
 
 void
@@ -478,9 +478,9 @@ _CSL_PrintVariables ( int64 nsStatus )
 void
 CSL_Variables ( )
 {
-    _Printf ( ( byte* ) "\nGlobal Variables :\n - <namespace> ':>' <variable '=' value ';'>*" ) ;
+    Printf ( ( byte* ) "\nGlobal Variables :\n - <namespace> ':>' <variable '=' value ';'>*" ) ;
     int64 n = _CSL_PrintVariables ( USING ) ;
-    _Printf ( ( byte* ) "\n" INT_FRMT " global variables on the 'using' Namespaces List", n ) ;
+    Printf ( ( byte* ) "\n" INT_FRMT " global variables on the 'using' Namespaces List", n ) ;
 }
 
 void
@@ -491,9 +491,9 @@ _CSL_NamespaceWords ( )
     if ( ns )
     {
         _DoWords ( ( Symbol * ) ns, &n ) ;
-        _Printf ( ( byte* ) "\n" INT_FRMT " words in %s namespace", n, ns->Name ) ;
+        Printf ( ( byte* ) "\n" INT_FRMT " words in %s namespace", n, ns->Name ) ;
     }
-    else _Printf ( ( byte* ) "\nError : can't find that namespace" ) ;
+    else Printf ( ( byte* ) "\nError : can't find that namespace" ) ;
 }
 
 void
@@ -508,15 +508,15 @@ CSL_NamespaceWords ( )
 void
 CSL_AllWords ( )
 {
-    _Printf ( ( byte* ) "\n - <namespace> ':>' <word list>" ) ;
-    _Printf ( ( byte* ) "\n'using' Namespaces List ::" ) ;
+    Printf ( ( byte* ) "\n - <namespace> ':>' <word list>" ) ;
+    Printf ( ( byte* ) "\n'using' Namespaces List ::" ) ;
     int64 n = _CSL_PrintWords ( USING ) ;
-    _Printf ( ( byte* ) "\n" INT_FRMT " words on the Currently 'using' Namespaces List", n ) ;
-    _Printf ( ( byte* ) "\n'notUsing' Namespaces List ::" ) ;
+    Printf ( ( byte* ) "\n" INT_FRMT " words on the Currently 'using' Namespaces List", n ) ;
+    Printf ( ( byte* ) "\n'notUsing' Namespaces List ::" ) ;
     int64 usingWords = _CSL_->FindWordCount ;
     int64 m = _CSL_PrintWords ( NOT_USING ) ;
-    _Printf ( ( byte* ) "\n" INT_FRMT " words on the 'notUsing' List", m ) ;
-    _Printf ( ( byte* ) "\n" INT_FRMT " total words", n + m ) ;
+    Printf ( ( byte* ) "\n" INT_FRMT " words on the 'notUsing' List", m ) ;
+    Printf ( ( byte* ) "\n" INT_FRMT " total words", n + m ) ;
     int64 notUsingWords = _CSL_->FindWordCount ;
     _CSL_->FindWordCount = usingWords + notUsingWords ;
     CSL_WordAccounting ( ( byte* ) "CSL_AllWords" ) ;

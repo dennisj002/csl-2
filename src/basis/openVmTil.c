@@ -1,6 +1,7 @@
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.905.124" ) 
-// inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), CT/Oop (Category Theory, Object Oriented Programming) 
+#define VERSION ((byte*) "0.905.210" ) 
+// inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), 
+// CT/Oop (Category Theory, Object Oriented Programming), Formal Language Theory (Chomsky) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // State Machines, Push Down Automata (PDA), Turing Machines :: 
 // Also Laws of Form, by G.S. Brown and Kurt Goedel's work.
@@ -83,7 +84,7 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
     }
     if ( ovt->Verbosity > 1 )
     {
-        _Printf ( ( byte* ) "\nRestart : All memory freed, allocated and initialized as at startup. "
+        Printf ( ( byte* ) "\nRestart : All memory freed, allocated and initialized as at startup. "
             "termios, verbosity and memory category allocation sizes preserved. verbosity = %d.", ovt->Verbosity ) ;
         OpenVmTil_Print_DataSizeofInfo ( 0 ) ;
     }
@@ -104,7 +105,7 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
 {
     if ( ovt )
     {
-        if ( ovt->Verbosity > 2 ) _Printf ( ( byte* ) "\nAll allocated memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
+        if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
         FreeChunkList ( &ovt->PermanentMemList ) ;
         mmap_FreeMem ( ( byte* ) ovt->MemorySpace0, sizeof ( MemorySpace ) ) ;
         mmap_FreeMem ( ( byte* ) ovt, sizeof ( OpenVmTil ) ) ;
@@ -215,10 +216,10 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
 void
 OVT_PrintStartupOptions ( OpenVmTil * ovt )
 {
-    _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [0] = %s\n\n", ovt->Argv [0] ) ;
-    _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [1] = %s\n\n", ovt->Argv [1] ) ;
-    _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [2] = %s\n\n", ovt->Argv [2] ) ;
-    _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->StartupFilename = %s\n\n", ovt->StartupFilename ) ;
+    Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [0] = %s\n\n", ovt->Argv [0] ) ;
+    Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [1] = %s\n\n", ovt->Argv [1] ) ;
+    Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [2] = %s\n\n", ovt->Argv [2] ) ;
+    Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->StartupFilename = %s\n\n", ovt->StartupFilename ) ;
     //if ( ovt->Verbosity > 1 ) Pause ( ) ;
 }
 

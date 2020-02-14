@@ -1037,7 +1037,7 @@ _Buffer_New ( int64 size, int64 flag )
         {
             nextNode = dlnode_Next ( node ) ;
             b = ( Buffer* ) node ;
-            d0 ( if ( b->InUseFlag != N_PERMANENT ) _Printf ( "\n_Buffer_New : buffer = 0x%08x : flag = 0x%08x : size = %d : length = %d : data = %s\n", b, b->InUseFlag, b->B_Size, strlen ( b->B_Data ), b->B_Data ) ) ;
+            d0 ( if ( b->InUseFlag != N_PERMANENT ) Printf ( "\n_Buffer_New : buffer = 0x%08x : flag = 0x%08x : size = %d : length = %d : data = %s\n", b, b->InUseFlag, b->B_Size, strlen ( b->B_Data ), b->B_Data ) ) ;
             if ( ( b->InUseFlag & ( N_FREE | N_UNLOCKED ) ) && ( b->B_Size >= size ) ) goto init ;
             else if ( b->InUseFlag == N_PERMANENT ) break ;
         }
@@ -1078,7 +1078,7 @@ Buffers_SetAsUnused ( int64 force )
             total ++ ;
         }
     }
-    d0 ( if ( setFree > 2 ) _Printf ( "\nBuffers_SetAsUnused : total = %d : freed = %d", total, setFree ) ) ;
+    d0 ( if ( setFree > 2 ) Printf ( "\nBuffers_SetAsUnused : total = %d : freed = %d", total, setFree ) ) ;
 }
 
 void
@@ -1092,7 +1092,7 @@ Buffer_PrintBuffers ( )
         for ( node = dllist_First ( ( dllist* ) _O_->MemorySpace0->BufferList ) ; node ; node = nextNode )
         {
             b = ( Buffer* ) node ;
-            d0 ( _Printf ( "\nBuffer_PrintBuffers : buffer = 0x%08x : nextNode = 0x%08x : flag = 0x%08x : size = %d : length = %d : data = %s\n", b, dlnode_Next ( node ), b->InUseFlag, b->B_Size, strlen ( b->B_Data ), b->B_Data ) ) ;
+            d0 ( Printf ( "\nBuffer_PrintBuffers : buffer = 0x%08x : nextNode = 0x%08x : flag = 0x%08x : size = %d : length = %d : data = %s\n", b, dlnode_Next ( node ), b->InUseFlag, b->B_Size, strlen ( b->B_Data ), b->B_Data ) ) ;
             nextNode = dlnode_Next ( node ) ;
             if ( b->InUseFlag & N_FREE ) free ++ ;
             else if ( b->InUseFlag & N_UNLOCKED ) unlocked ++ ;
@@ -1101,7 +1101,7 @@ Buffer_PrintBuffers ( )
             total ++ ;
         }
     }
-    if ( _O_->Verbosity > 1 ) _Printf ( ( byte* ) "\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
+    if ( _O_->Verbosity > 1 ) Printf ( ( byte* ) "\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
 }
 
 Buffer *

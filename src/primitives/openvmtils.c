@@ -96,31 +96,31 @@ OpenVmTil_Print_DataSizeofInfo ( int64 flag )
 {
     if ( flag || ( _O_->Verbosity > 1 ) )
     {
-        _Printf ( ( byte* ) "\nOpenVimTil size : %d bytes, ", sizeof (OpenVmTil ) ) ;
-        _Printf ( ( byte* ) "Object size : %d bytes, ", sizeof (Object ) ) ;
-        _Printf ( ( byte* ) "dobject size : %d bytes, ", sizeof ( dobject ) ) ;
-        _Printf ( ( byte* ) "DLNode size : %d bytes, ", sizeof ( DLNode ) ) ;
-        _Printf ( ( byte* ) "PropInfo size : %d bytes, ", sizeof (AttributeInfo ) ) ;
+        Printf ( ( byte* ) "\nOpenVimTil size : %d bytes, ", sizeof (OpenVmTil ) ) ;
+        Printf ( ( byte* ) "Object size : %d bytes, ", sizeof (Object ) ) ;
+        Printf ( ( byte* ) "dobject size : %d bytes, ", sizeof ( dobject ) ) ;
+        Printf ( ( byte* ) "DLNode size : %d bytes, ", sizeof ( DLNode ) ) ;
+        Printf ( ( byte* ) "PropInfo size : %d bytes, ", sizeof (AttributeInfo ) ) ;
         //_Printf ( ( byte* ) "\nCAttribute0 size : %d bytes, ", sizeof (struct _T_CAttribute0 ) ) ;
-        _Printf ( ( byte* ) "\nCSL size : %d bytes, ", sizeof (CSL ) ) ;
-        _Printf ( ( byte* ) "Context size : %d bytes, ", sizeof (Context ) ) ;
-        _Printf ( ( byte* ) "System size : %d bytes, ", sizeof (System ) ) ;
-        _Printf ( ( byte* ) "Debugger size : %d bytes, ", sizeof (Debugger ) ) ;
-        _Printf ( ( byte* ) "\nMemorySpace size : %d bytes, ", sizeof (MemorySpace ) ) ;
-        _Printf ( ( byte* ) "ReadLiner size : %d bytes, ", sizeof (ReadLiner ) ) ;
-        _Printf ( ( byte* ) "Lexer size : %d bytes, ", sizeof (Lexer ) ) ;
-        _Printf ( ( byte* ) "Interpreter size : %d bytes, ", sizeof (Interpreter ) ) ;
-        _Printf ( ( byte* ) "\nFinder size : %d bytes, ", sizeof (Finder ) ) ;
-        _Printf ( ( byte* ) "Compiler size : %d bytes, ", sizeof (Compiler ) ) ;
-        _Printf ( ( byte* ) "Word size : %d bytes, ", sizeof (Word ) ) ;
-        _Printf ( ( byte* ) "Symbol size : %d bytes, ", sizeof (Symbol ) ) ;
-        _Printf ( ( byte* ) "\ndlnode size : %d bytes, ", sizeof (dlnode ) ) ;
-        _Printf ( ( byte* ) "dllist size : %d bytes, ", sizeof (dllist ) ) ;
-        _Printf ( ( byte* ) "WordData size : %d bytes, ", sizeof (WordData ) ) ;
-        _Printf ( ( byte* ) "ListObject size : %d bytes, ", sizeof ( ListObject ) ) ;
-        _Printf ( ( byte* ) "\nByteArray size : %d bytes, ", sizeof (ByteArray ) ) ;
-        _Printf ( ( byte* ) "NamedByteArray size : %d bytes, ", sizeof (NamedByteArray ) ) ;
-        _Printf ( ( byte* ) "MemChunk size : %d bytes", sizeof ( MemChunk ) ) ;
+        Printf ( ( byte* ) "\nCSL size : %d bytes, ", sizeof (CSL ) ) ;
+        Printf ( ( byte* ) "Context size : %d bytes, ", sizeof (Context ) ) ;
+        Printf ( ( byte* ) "System size : %d bytes, ", sizeof (System ) ) ;
+        Printf ( ( byte* ) "Debugger size : %d bytes, ", sizeof (Debugger ) ) ;
+        Printf ( ( byte* ) "\nMemorySpace size : %d bytes, ", sizeof (MemorySpace ) ) ;
+        Printf ( ( byte* ) "ReadLiner size : %d bytes, ", sizeof (ReadLiner ) ) ;
+        Printf ( ( byte* ) "Lexer size : %d bytes, ", sizeof (Lexer ) ) ;
+        Printf ( ( byte* ) "Interpreter size : %d bytes, ", sizeof (Interpreter ) ) ;
+        Printf ( ( byte* ) "\nFinder size : %d bytes, ", sizeof (Finder ) ) ;
+        Printf ( ( byte* ) "Compiler size : %d bytes, ", sizeof (Compiler ) ) ;
+        Printf ( ( byte* ) "Word size : %d bytes, ", sizeof (Word ) ) ;
+        Printf ( ( byte* ) "Symbol size : %d bytes, ", sizeof (Symbol ) ) ;
+        Printf ( ( byte* ) "\ndlnode size : %d bytes, ", sizeof (dlnode ) ) ;
+        Printf ( ( byte* ) "dllist size : %d bytes, ", sizeof (dllist ) ) ;
+        Printf ( ( byte* ) "WordData size : %d bytes, ", sizeof (WordData ) ) ;
+        Printf ( ( byte* ) "ListObject size : %d bytes, ", sizeof ( ListObject ) ) ;
+        Printf ( ( byte* ) "\nByteArray size : %d bytes, ", sizeof (ByteArray ) ) ;
+        Printf ( ( byte* ) "NamedByteArray size : %d bytes, ", sizeof (NamedByteArray ) ) ;
+        Printf ( ( byte* ) "MemChunk size : %d bytes", sizeof ( MemChunk ) ) ;
     }
 }
 
@@ -133,7 +133,7 @@ OVT_ShowMemoryAllocated ( )
 void
 OVT_Exit ( )
 {
-    if ( _O_->Verbosity > 0 ) _Printf ( ( byte* ) "bye\n" ) ;
+    if ( _O_->Verbosity > 0 ) Printf ( ( byte* ) "bye\n" ) ;
     exit ( 0 ) ;
 }
 
@@ -151,9 +151,9 @@ OVT_StartupMessage ( Boolean promptFlag )
         }
         if ( _O_->Verbosity > 1 )
         {
-            _Printf ( ( byte* ) "\nOpenVmTil : csl comes with ABSOLUTELY NO WARRANTY; for details type `license' in the source directory." ) ;
-            _Printf ( ( byte* ) "\nType 'tc' 'demo' for starters" ) ;
-            _Printf ( ( byte* ) "\nType 'bye' to exit" ) ;
+            Printf ( ( byte* ) "\nOpenVmTil : csl comes with ABSOLUTELY NO WARRANTY; for details type `license' in the source directory." ) ;
+            Printf ( ( byte* ) "\nType 'tc' 'demo' for starters" ) ;
+            Printf ( ( byte* ) "\nType 'bye' to exit" ) ;
         }
     }
     else if ( promptFlag && ( _O_->Restarts < 2 ) ) _O_->Verbosity = 1 ;
@@ -165,7 +165,7 @@ _OVT_Ok ( Boolean promptFlag )
     if ( _O_->Verbosity > 3 )
     {
         _CSL_SystemState_Print ( 0 ) ;
-        _Printf ( ( byte* ) "\n<Esc> - break, <Ctrl-C> - quit, <Ctrl-D> - restart, \'bye\'/\'exit\' - leave." ) ;
+        Printf ( ( byte* ) "\n<Esc> - break, <Ctrl-C> - quit, <Ctrl-D> - restart, \'bye\'/\'exit\' - leave." ) ;
     }
     _Context_Prompt ( _O_->Verbosity && promptFlag ) ;
 }

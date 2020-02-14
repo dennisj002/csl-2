@@ -15,7 +15,7 @@ Word_Disassemble ( Word * word )
         int64 size = _Debugger_Disassemble ( _Debugger_, start, word->S_CodeSize ? word->S_CodeSize : 128, ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ) ;
         //_Debugger_->LastSourceCodeWord = word ;
         if ( ( ! word->S_CodeSize ) && ( size > 0 ) ) word->S_CodeSize = size ;
-        _Printf ( ( byte* ) "\nWord_Disassemble : word - \'%s\' :: codeSize = %d", word->Name, size ) ;
+        Printf ( ( byte* ) "\nWord_Disassemble : word - \'%s\' :: codeSize = %d", word->Name, size ) ;
         _Context_->CurrentDisassemblyWord = 0 ;
     }
 }
@@ -26,13 +26,13 @@ _CSL_Word_Disassemble ( Word * word )
     if ( word )
     {
         _CSL_SetSourceCodeWord ( word ) ;
-        _Printf ( ( byte* ) "\nWord :: %s.%s : definition = 0x%016lx : disassembly at %s :", word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->Definition, Context_Location ( ) ) ;
+        Printf ( ( byte* ) "\nWord :: %s.%s : definition = 0x%016lx : disassembly at %s :", word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->Definition, Context_Location ( ) ) ;
         Word_Disassemble ( word ) ;
         //_Printf ( ( byte* ) "\n" ) ;
     }
     else
     {
-        _Printf ( ( byte* ) "\nWordDisassemble : word = 0x%016lx", word ) ;
+        Printf ( ( byte* ) "\nWordDisassemble : word = 0x%016lx", word ) ;
     }
 }
 

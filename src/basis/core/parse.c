@@ -25,7 +25,7 @@
 void
 TDSCI_DebugPrintWord ( TypeDefStructCompileInfo *tdsci, Word * word )
 {
-    if ( word ) _Printf ( ( byte* ) "\n%s.%s : field size = %ld : structure size = %ld : total size = %ld : offset == %ld : at %s",
+    if ( word ) Printf ( ( byte* ) "\n%s.%s : field size = %ld : structure size = %ld : total size = %ld : offset == %ld : at %s",
         ( word->TypeNamespace ? word->TypeNamespace->Name : word->S_ContainingNamespace->Name ), word->Name, tdsci->Tdsci_Field_Size, tdsci->Tdsci_StructureUnion_Size,
         tdsci->Tdsci_TotalSize, tdsci->Tdsci_Offset, Context_Location ( ) ) ;
 }
@@ -118,8 +118,6 @@ Parse_ArrayField ( TypeDefStructCompileInfo * tdsci )
                 tdsci->Tdsci_Field_Object->ArrayDimensions = ( int64 * ) Mem_Allocate ( tdsci->Tdsci_Field_Size, DICTIONARY ) ;
                 MemCpy ( tdsci->Tdsci_Field_Object->ArrayDimensions, arrayDimensions, tdsci->Tdsci_Field_Size ) ;
                 tdsci->Tdsci_Field_Object->ArrayNumberOfDimensions = i ;
-                // print array field
-                //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s [ %d ]" = %lx", token0, token1, arrayDimensionSize, (sizeof token0) data [ aoffset ]) ;
             }
             break ;
         }
@@ -135,36 +133,34 @@ TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 size )
     {
         case 1:
         {
-            format = ( byte* ) "\n0x%016lx\t%s\t%s = 0x%02x" ;
+            format = ( byte* ) "\n0x%016lx\t%s%s\t%s = 0x%02x" ;
             value = * ( ( int8* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-            //_Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, token, *( ( int8* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ) ;
             break ;
         }
         case 2:
         {
-            format = ( byte* ) "\n0x%016lx\t%s\t%s = 0x%04x" ;
+            format = ( byte* ) "\n0x%016lx\t%s%s\t%s = 0x%04x" ;
             value = * ( ( int16* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-            //_Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, token, *( ( int16* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ) ;
             break ;
         }
         case 4:
         {
-            format = ( byte* ) "\n0x%016lx\t%s\t%s = 0x%08x" ;
+            format = ( byte* ) "\n0x%016lx\t%s%s\t%s = 0x%08x" ;
             value = * ( ( int32* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-            //_Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, token, *( ( int32* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ) ;
             break ;
         }
         default:
         case CELL:
         {
-            format = ( byte* ) "\n0x%016lx\t%s\t%s = 0x%016lx" ;
+            format = ( byte* ) "\n0x%016lx\t%s%s\t%s = 0x%016lx" ;
             value = * ( ( int64* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
             break ;
         }
     }
-    //_Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, token, *( ( int64* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ) ;
-    _Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, token, value ) ;
+    Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, 
+        GetState ( tdsci, TDSCI_POINTER ) ? "*" : "", token, value ) ;
     tdsci->Tdsci_Field_Size = size ;
+    SetState ( tdsci, TDSCI_POINTER, false ) ;
 }
 
 Word *
@@ -225,7 +221,6 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
         }
     }
     if ( _O_->Verbosity > 1 ) TDSCI_DebugPrintWord ( tdsci, id ) ; // print class field
-    //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
 }
 
 void
@@ -263,9 +258,6 @@ next:
             else token = tdsci->TdsciToken ;
         }
     }
-    // print class field
-    //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
-    //return rtn ;
 }
 
 void
@@ -335,7 +327,8 @@ Parse_StructOrUnion_Type ( TypeDefStructCompileInfo * tdsci, int64 structOrUnion
         if ( token [0] == '{' )
         {
             // name will be added 'post structure'
-            if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = DataObject_New ( CLASS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = 
+                DataObject_New ( CLASS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
             if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
             Parse_Structure ( tdsci ) ;
         }
@@ -368,6 +361,7 @@ Parse_Type_Field ( TypeDefStructCompileInfo * tdsci, Namespace * type0 )
         {
             size = CELL ;
             tdsci->Tdsci_Field_Size = size ;
+            SetState ( tdsci, TDSCI_POINTER, true ) ;
             token = TDSCI_ReadToken ( tdsci ) ;
         }
         Parse_Identifier_Field ( tdsci, TYPE_NAME, size ) ;
@@ -390,8 +384,6 @@ Parse_A_Typedef_Field ( TypeDefStructCompileInfo * tdsci )
         if ( token[0] == '{' ) Parse_StructOrUnion_Type ( tdsci, TDSCI_STRUCT ) ;
         else CSL_Parse_Error ( "Can't find type field namespace", token ) ;
     }
-    // print class field
-    //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
 }
 
 void
@@ -902,7 +894,7 @@ _CSL_SingleQuote ( )
     {
         if ( ! Compiling ) CSL_InitSourceCode_WithName ( _CSL_, lexer->OriginalToken, 0 ) ;
         byte * token, nchar ;
-#if 1     
+#if 0     
         while ( 1 )
         {
             int64 i = lexer->TokenEnd_ReadLineIndex ;

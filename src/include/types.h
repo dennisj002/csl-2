@@ -572,7 +572,7 @@ typedef struct ReadLiner
     int64 MaxEndPosition ; // index where the next input character is put
     int64 CursorPosition, EscapeModeFlag, InputStringIndex, InputStringLength, LineStartFileIndex ;
     byte *Filename, LastCheckedInputKeyedCharacter, * DebugPrompt, * DebugAltPrompt, * NormalPrompt, * AltPrompt, * Prompt ;
-    byte InputLine [ BUFFER_SIZE ], * InputLineString, * InputStringOriginal, * InputStringCurrent;
+    byte InputLine [ BUFFER_SIZE ], * InputLineString, * InputStringOriginal, * InputStringCurrent, *svLine;
     ReadLiner_KeyFunction Key ; 
     FILE *InputFile, *OutputFile ;
     HistoryStringNode * HistoryNode ;
@@ -716,6 +716,7 @@ typedef struct TypeDefStructCompileInfo
 #define TDSCI_UNION                     ( (uint64) 1 << 2 ) 
 #define TDSCI_STRUCTURE_COMPLETED       ( (uint64) 1 << 3 ) 
 #define TDSCI_PRINT                     ( (uint64) 1 << 4 ) 
+#define TDSCI_POINTER                     ( (uint64) 1 << 5 ) 
 
 typedef struct
 {
@@ -899,7 +900,7 @@ typedef struct _CSL
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
     CharacterType LexerCharacterTypeTable [ 256 ] ;
     LexerFunction LexerCharacterFunctionTable [ 24 ] ;
-    Buffer *StringB, * TokenB, *OriginalInputLineB, *InputLineB, *SourceCodeBuffer, *StringInsertB, *StringInsertB2, *StringInsertB3, *StringInsertB4, *StringInsertB5, *StrCatBuffer ;
+    Buffer *StringB, * TokenB, *OriginalInputLineB, *InputLineB, *svLineB, *SourceCodeBuffer, *StringInsertB, *StringInsertB2, *StringInsertB3, *StringInsertB4, *StringInsertB5, *StrCatBuffer ;
     Buffer *TabCompletionBuf, * LC_PrintB, * LC_DefineB, *DebugB, *DebugB1, *DebugB2, *DebugB3, *ScratchB1, *ScratchB2, *ScratchB3, *StringMacroB ; // token buffer, tab completion backup, source code scratch pad, 
     StrTokInfo Sti ;
     dllist * Compiler_N_M_Node_WordList ; //, *TokenList,  ;

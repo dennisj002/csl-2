@@ -46,7 +46,7 @@ CSL_DebugOn ( )
     Debugger * debugger = _Debugger_ ;
     if ( ! Is_DebugOn )
     {
-        if ( _O_->Verbosity > 1 ) _Printf ( ( byte* ) "\nCSL_DebugOn : at %s", Context_Location ( ) ) ;
+        if ( _O_->Verbosity > 1 ) Printf ( ( byte* ) "\nCSL_DebugOn : at %s", Context_Location ( ) ) ;
         debugger->DebugRSP = 0 ;
         Debugger_On ( debugger ) ;
     }

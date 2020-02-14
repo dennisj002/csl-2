@@ -426,6 +426,15 @@ notUsing: Experimental byteTest _byteTest abyteTest bt abt ;
 Root Experimental User
 #endif
 
+#if 1
+: wtdInclude "namespaces/wordTypeDef.csl" include ;
+wtdInclude 
+C.Experimental
+'wtdInclude find 100 dump
+'wtdInclude find C.Experimental 'Word find wordStructPrint 
+C 'Experimental notUsing 
+#endif
+
 bnOff
 infixOn
 (1 + 5) / (2 + 1) 2 _assert

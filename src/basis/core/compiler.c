@@ -125,7 +125,7 @@ void
 GotoInfo_Print ( dlnode * node )
 {
     GotoInfo * gi = ( GotoInfo * ) node ;
-    _Printf ( ( byte* ) "\nLabelName = %s : Type = %3d : CompileAtAddress = 0x%016lx : LabeledAddress = 0x%016lx : JmpOffsetPointer = : 0x%016lx",
+    Printf ( ( byte* ) "\nLabelName = %s : Type = %3d : CompileAtAddress = 0x%016lx : LabeledAddress = 0x%016lx : JmpOffsetPointer = : 0x%016lx",
         gi->pb_LabelName, gi->GI_CAttribute, gi->CompileAtAddress, gi->LabeledAddress, gi->pb_JmpOffsetPointer ) ;
 }
 
@@ -133,7 +133,7 @@ void
 Compiler_GotoList_Print ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    _Printf ( ( byte* ) "\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
+    Printf ( ( byte* ) "\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
     dllist_Map ( compiler->GotoList, ( MapFunction0 ) GotoInfo_Print ) ;
 }
 

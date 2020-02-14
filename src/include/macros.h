@@ -94,7 +94,7 @@
 // formatting
 // ansi/vt102 escape code
 #define ClearLine _ReadLine_PrintfClearTerminalLine ( )
-#define Cursor_Up( n ) _Printf ( (byte*) "%c[%dA", ESC, n )
+#define Cursor_Up( n ) Printf ( (byte*) "%c[%dA", ESC, n )
 #define Color_Black 0
 #define Color_Red 1
 #define Color_Green 2
@@ -166,16 +166,16 @@
 #define stopThisTry _OVT_PopExceptionStack ( )
 #define stopTrying _OVT_ClearExceptionStack ( )
 
-#define Assert( testBoolean ) d1 ({ if ( ! (testBoolean) ) { _Printf ( (byte*) "\n\nAssert failed : %s\n\n", _Context_Location ( _Context_ ) ) ; _throw ( QUIT ) ; }})
+#define Assert( testBoolean ) d1 ({ if ( ! (testBoolean) ) { Printf ( (byte*) "\n\nAssert failed : %s\n\n", _Context_Location ( _Context_ ) ) ; _throw ( QUIT ) ; }})
 #define Pause() OpenVmTil_Pause ()
 #define _Pause( msg ) _OpenVmTil_Pause ( msg )
-#define Pause_1( msg ) AlertColors; _Printf ( (byte*)"\n%s", msg ) ; OpenVmTil_Pause () ;
-#define Pause_2( msg, arg ) AlertColors; _Printf ( (byte*)msg, arg ) ; OpenVmTil_Pause () ;
+#define Pause_1( msg ) AlertColors; Printf ( (byte*)"\n%s", msg ) ; OpenVmTil_Pause () ;
+#define Pause_2( msg, arg ) AlertColors; Printf ( (byte*)msg, arg ) ; OpenVmTil_Pause () ;
 
 #define Error_Abort( emsg, smsg ) Throw ( emsg, smsg, ABORT )
 #define Error_1( msg, arg, state ) AlertColors; if (state & PAUSE ) Pause () ; if (state >= QUIT ) Throw ( (byte*) msg, state ) ; 
-#define Warning2( msg, str ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; 
-#define Warning( msg, str, pauseFlag ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; if ( pauseFlag ) Pause () ;
+#define Warning2( msg, str ) Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; 
+#define Warning( msg, str, pauseFlag ) Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; if ( pauseFlag ) Pause () ;
 #define ErrorWithContinuation( msg, continuation ) Throw ( (byte*) msg, continuation )
 #define Error_Quit( msg ) ErrorWithContinuation( msg, QUIT )
 #define ErrorN( n ) Throw ( (byte*) "", n )

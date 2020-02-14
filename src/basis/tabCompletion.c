@@ -200,7 +200,7 @@ _TabCompletion_Compare ( Word * word )
         byte * twn = tw->Name, *fqn ;
         if ( twn )
         {
-            d0 ( if ( String_Equal ( twn, "rsp" ) ) _Printf ( ( byte* ) "got it" ) ) ;
+            d0 ( if ( String_Equal ( twn, "rsp" ) ) Printf ( ( byte* ) "got it" ) ) ;
             slst = Strlen ( ( CString ) searchToken ), sltwn = Strlen ( twn ) ;
             if ( ! slst ) // we match anything when user ends with a dot ( '.' ) ...
             {
@@ -287,7 +287,7 @@ _TabCompletion_Compare ( Word * word )
                 {
                     //if ( tci->FoundWrapCount )
                     {
-                        _Printf ( ( byte* ) " [ Search = \'%s\' : FoundWrapCount = %d : WordWrapCount = %d : WordCount = %d : Found List Length = %d : Max List Length = %d ]",
+                        Printf ( ( byte* ) " [ Search = \'%s\' : FoundWrapCount = %d : WordWrapCount = %d : WordCount = %d : Found List Length = %d : Max List Length = %d ]",
                             ( tci->RunWord ? tci->RunWord->Name : tci->Identifier ), tci->FoundWrapCount, tci->WordWrapCount, tci->WordCount, tci->FoundCount, tci->MaxFoundCount ) ;
                     }
                 }

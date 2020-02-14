@@ -124,7 +124,7 @@ void
 CSL_DataStack_Init ( )
 {
     _CSL_DataStack_Init ( _CSL_ ) ;
-    if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\nData Stack reset." ) ;
+    if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nData Stack reset." ) ;
 }
 
 void
@@ -135,6 +135,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     // TODO : organize these buffers and their use 
     csl->OriginalInputLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->InputLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
+    csl->svLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->SourceCodeBuffer = _Buffer_NewPermanent ( SOURCE_CODE_BUFFER_SIZE ) ;
     csl->LC_PrintB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->LC_DefineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
@@ -160,7 +161,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     csl->TokenBuffer = Buffer_Data ( csl->TokenB ) ;
     SetState ( csl, CSL_RUN | OPTIMIZE_ON | INLINE_ON, true ) ;
 
-    if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\nSystem Memory is being reallocated.  " ) ;
+    if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nSystem Memory is being reallocated.  " ) ;
 
     csl->ContextDataStack = Stack_New ( 256, allocType ) ;
     //csl->ObjectStack = Stack_New ( 1 * K, allocType ) ;

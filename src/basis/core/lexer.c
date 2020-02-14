@@ -28,8 +28,10 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
     byte * token2 ;
     if ( token )
     {
+        //if ( ( token [0] != '\"') && _Lexer_IsTokenForwardDotted ( lexer, lexer->TokenEnd_ReadLineIndex ) )
+        //    word = _Finder_QID_Find ( cntx->Finder0, token ) ;
+        //else 
         word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
-        //word = _Finder_QID_Find ( cntx->Finder0, word ) ;
         if ( word && compiler->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
         //_DEBUG_SETUP ( word, token, 0, 0 ) ;
         if ( ! word )
@@ -927,10 +929,21 @@ _Lexer_DoChar ( Lexer * lexer, byte c )
 }
 
 Boolean
+_Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
+{
+    return ReadLiner_IsTokenForwardDotted ( lexer->ReadLiner0, end ? end - 1 : lexer->TokenStart_ReadLineIndex ) ;
+}
+
+Boolean
+Lexer_IsTokenForwardDotted ( Lexer * lexer )
+{
+    return _Lexer_IsTokenForwardDotted ( lexer, 0 ) ;
+}
+
+Boolean
 Lexer_IsTokenQualifiedID ( Lexer * lexer )
 {
     if ( Lexer_IsTokenReverseDotted ( lexer ) ) return true ;
-
     else return Lexer_IsTokenForwardDotted ( lexer ) ;
 }
 

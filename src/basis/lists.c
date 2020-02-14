@@ -86,10 +86,10 @@ _List_PrintNames ( dllist * list, int64 count, int64 flag )
             afterNode = ( node->afterNode == list->afterNode ? 0 : ( Word* ) dobject_Get_M_Slot ( (dobject*) node->afterNode, SCN_T_WORD ) ) ;
             afterName = afterNode ? sconvbs ( ba, afterNode->Name ) : ( byte* ) " ", node->afterNode ;
             beforeName = beforeNode ? sconvbs ( bb, ( beforeNode )->Name ) : ( byte* ) " ", node->beforeNode ;
-            _Printf ( ( byte* ) "\n\tName : %s 0x%08x \t\tBefore : %s 0x%08x : \t\tAfter : %s 0x%08x,",
+            Printf ( ( byte* ) "\n\tName : %s 0x%08x \t\tBefore : %s 0x%08x : \t\tAfter : %s 0x%08x,",
                 thisName, node, beforeName, node->beforeNode, afterName, node->afterNode ) ;
         }
-        else _Printf ( ( byte* ) "\n\tName : %s", ( ( Word* ) ( node ) )->Name ) ; //thisName ) ;
+        else Printf ( ( byte* ) "\n\tName : %s", ( ( Word* ) ( node ) )->Name ) ; //thisName ) ;
     }
 }
 

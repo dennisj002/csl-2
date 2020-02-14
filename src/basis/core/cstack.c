@@ -147,7 +147,7 @@ Stack_Push ( Stack * stack, int64 value )
     if ( _Stack_Overflow ( stack ) )
     {
         AlertColors ;
-        _Printf ( ( byte* ) "\nStack_Push : _Stack_Overflow - StackDepth = %d\n", Stack_Depth ( stack ) ) ;
+        Printf ( ( byte* ) "\nStack_Push : _Stack_Overflow - StackDepth = %d\n", Stack_Depth ( stack ) ) ;
         CSL_Exception ( STACK_OVERFLOW, 0, QUIT ) ;
     }
     _Stack_Push ( stack, value ) ;
@@ -280,7 +280,7 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
         }
     }
     else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;
-    _Printf ( ( byte* ) "\n  %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
+    Printf ( ( byte* ) "\n  %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
         stackName, i, ( uint64 ) & stackPointer [ i ], stackPointer [ i ], word ? buffer : string ? string : ( byte* ) "" ) ;
 }
 
@@ -292,7 +292,7 @@ _Stack_PrintHeader ( Stack * stack, byte * name )
     {
         uint64 * sp = stack->StackPointer ; // 0 based stack
         byte * location = c_gd ( Context_Location ( ) ) ;
-        _Printf ( ( byte* ) "\n%s at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, 
+        Printf ( ( byte* ) "\n%s at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, 
             name, location, name, depth, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CSLRsp (Rbx)" : "", ( int64 ) sp, 
             ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
     }
@@ -337,7 +337,7 @@ _PrintNStackWindow ( uint64 * reg, byte * name, byte * regName, int64 size )
     int64 saveSize = size ;
     if ( reg )
     {
-        _Printf ( ( byte* ) "\n%s   :%3i  : %s = " UINT_FRMT " : Top = " UINT_FRMT "", name, size, regName, ( uint64 ) reg, ( uint64 ) reg ) ;
+        Printf ( ( byte* ) "\n%s   :%3i  : %s = " UINT_FRMT " : Top = " UINT_FRMT "", name, size, regName, ( uint64 ) reg, ( uint64 ) reg ) ;
         // print return stack in reverse of usual order first
         while ( size -- > 1 ) Stack_Print_AValue ( reg, size, name, buffer, 0 ) ;
         _Stack_PrintValues ( ( byte* ) name, reg, saveSize, 0 ) ;
@@ -348,7 +348,7 @@ void
 _CSL_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
 {
     Debugger * debugger = _Debugger_ ;
-    _Printf ( ( byte* ) "\n_CSL_PrintNReturnStack : %s", Context_Location ( ) ) ;
+    Printf ( ( byte* ) "\n_CSL_PrintNReturnStack : %s", Context_Location ( ) ) ;
     if ( useExistingFlag )
     {
         if ( GetState ( debugger, DBG_STEPPING ) && debugger->CopyRSP )

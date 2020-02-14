@@ -26,7 +26,7 @@ _Finder_CompareDefinitionAddress ( Symbol * symbol, byte * address )
         Word * word = ( Word * ) symbol ;
         //byte * codeStart = ( byte* ) word->Definition ; // nb. this maybe more accurate ??
         byte * codeStart = word->CodeStart ;
-        d0 ( if ( String_Equal ( "iFactorialX", symbol->S_Name ) ) _Printf ( ( byte* ) "\naddress = 0x%016lx :: %s :: codeStart = 0x%016lx : codeSize = %d", address, symbol->S_Name, codeStart, word->S_CodeSize ) ) ;
+        d0 ( if ( String_Equal ( "iFactorialX", symbol->S_Name ) ) Printf ( ( byte* ) "\naddress = 0x%016lx :: %s :: codeStart = 0x%016lx : codeSize = %d", address, symbol->S_Name, codeStart, word->S_CodeSize ) ) ;
         //if ( ((byte*) symbol == address) || ( codeStart && ( address >= codeStart ) && ( address <= ( codeStart + word->S_CodeSize ) ) ) )
         if ( ( ( byte* ) symbol == address ) || ( codeStart && ( address >= codeStart ) &&
             ( word->S_CodeSize ? address < ( codeStart + word->S_CodeSize ) : address == codeStart ) ) )
@@ -103,28 +103,23 @@ _Finder_FindWord_InOneNamespace ( Finder * finder, Namespace * ns, byte * name )
 }
 
 Word *
-_Finder_QID_Find ( Finder * finder, Word * qidWord ) //, int64 flag, int64 saveQns )
+_Finder_QID_Find ( Finder * finder, byte * token ) //, int64 flag, int64 saveQns )
 {
-    if ( qidWord )
+    Context * cntx = _Context_ ;
+    Word * qidWord = Word_UnAlias ( Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ) ;
+    do
     {
-        Word * svQidWord = qidWord ;
-        Context * cntx = _Context_ ;
-        byte * token ;
-        Boolean isForwardDotted ;
-        do
+        if ( qidWord && Is_NamespaceType ( qidWord ) )
         {
-            isForwardDotted = ReadLiner_IsTokenForwardDotted ( cntx->ReadLiner0, qidWord->W_RL_Index ) ;
-            if ( isForwardDotted && Is_NamespaceType ( qidWord ) )
-            {
-                token = Lexer_ReadToken ( cntx->Lexer0 ) ; // the '.' 
-                token = Lexer_ReadToken ( cntx->Lexer0 ) ;
-                qidWord = _Finder_FindWord_InOneNamespace ( finder, qidWord, token ) ;
-                if ( ! qidWord ) return svQidWord ;
-            }
-            else break ;
+            token = Lexer_ReadToken ( cntx->Lexer0 ) ; // the '.' 
+            token = Lexer_ReadToken ( cntx->Lexer0 ) ; // next element of qid
+            if ( ! ( qidWord = _Finder_FindWord_InOneNamespace ( finder, qidWord, token ) ) ) return 0 ;
+            else if ( ! ReadLiner_IsTokenForwardDotted ( cntx->ReadLiner0, qidWord->W_RL_Index ) ) break ;
+            qidWord = Word_UnAlias ( qidWord ) ;
         }
-        while ( qidWord ) ;
+        else break ;
     }
+    while ( qidWord ) ;
     return qidWord ;
 }
 // QID : (q)ualified (id) identifer
@@ -247,7 +242,7 @@ Finder_FindToken_WithException ( Finder * finder, byte * token )
 {
     if ( Finder_Word_FindUsing ( finder, token, 0 ) == 0 )
     {
-        _Printf ( ( byte* ) "\n%s ?", ( char* ) token ) ;
+        Printf ( ( byte* ) "\n%s ?", ( char* ) token ) ;
         CSL_Using ( ) ;
         CSL_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
     }

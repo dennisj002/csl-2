@@ -49,7 +49,7 @@ GetC ( )
 void
 getCursor ( int* x, int* y )
 {
-    _Printf ( ( byte* ) "\033[6n" ) ;
+    Printf ( ( byte* ) "\033[6n" ) ;
     int out = scanf ( "\033[%d;%dR", x, y ) ;
     //fflush ( stdout ) ; 
     //fflush ( stdin ) ; 
@@ -89,7 +89,7 @@ byte
 _CSL_Key ( ReadLiner * rl )
 {
     int key = _Key ( rl->InputFile ) ;
-    return (byte) key ;
+    return ( byte ) key ;
 }
 
 void
@@ -119,7 +119,7 @@ Context_DoPrompt ( Context * cntx )
     {
         _CSL_PrintChar ( '\n' ) ; //_Printf ( ( byte* ) "\n" ) ;
     }
-    _Printf ( ( byte* ) "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
+    Printf ( ( byte* ) "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
 }
 
 void
@@ -132,6 +132,30 @@ CSL_DoPrompt ( )
 
 void
 _Printf ( byte *format, ... )
+{
+    //if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
+    //if ( _O_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
+    {
+        va_list args ;
+
+        va_start ( args, ( char* ) format ) ;
+        vprintf ( ( char* ) format, args ) ;
+        va_end ( args ) ;
+        fflush ( stdout ) ;
+
+        if ( _CSL_ && _CSL_->LogFlag && _CSL_->LogFILE )
+        {
+            va_start ( args, ( char* ) format ) ;
+            vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
+            va_end ( args ) ;
+            fflush ( _CSL_->LogFILE ) ;
+        }
+    }
+    //ReadLiner_SetLastChar ( 0 ) ; //
+}
+
+void
+Printf ( byte *format, ... )
 {
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
     if ( _O_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
@@ -153,6 +177,7 @@ _Printf ( byte *format, ... )
     }
     //ReadLiner_SetLastChar ( 0 ) ; //
 }
+
 #if 0
 // try not to (don't) print extra newlines
 // this is called on exceptions so alot of checking 

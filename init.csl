@@ -467,12 +467,4 @@ rtw
 #if forStarters 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 d: _assert
 #endif 
-#if 0
-: wtdInclude "namespaces/wordTypeDef.csl" include ;
-//wtdInclude 
-d: C.Experimental
-'wtdInclude find 100 dump
-'wtdInclude find C.Experimental 'Word find wordStructPrint 
-C 'Experimental notUsing 
-#endif
 2 + 7 assertStkChk // stack checking 

@@ -89,7 +89,7 @@ void
 BigNum_GetAndPrint_BitPrecision ( )
 {
     mpfr_prec_t precision = mpfr_get_default_prec ( ) ; // number of decimal digits
-    _Printf ( ( byte* ) "\nBigNum Internal Bit Precision = %ld", precision ) ;
+    Printf ( ( byte* ) "\nBigNum Internal Bit Precision = %ld", precision ) ;
 }
 
 // set from BigNum 
@@ -132,7 +132,7 @@ BigNum_StateShow ( )
 {
     BigNum_Info ( ) ;
     BigNum_GetAndPrint_BitPrecision ( ) ;
-    _Printf ( ( byte * ) "\nBigNum :: Width = %d : Precision = %d", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision ) ;
+    Printf ( ( byte * ) "\nBigNum :: Width = %d : Precision = %d", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision ) ;
 
 }
 
@@ -172,7 +172,7 @@ BigNum_EPrint ( )
 void
 BigNum_Info ( )
 {
-    _Printf ( ( byte* ) "\nMPFR library: %-12s\nMPFR header:  %s (based on %d.%d.%d)",
+    Printf ( ( byte* ) "\nMPFR library: %-12s\nMPFR header:  %s (based on %d.%d.%d)",
         mpfr_get_version ( ), MPFR_VERSION_STRING, MPFR_VERSION_MAJOR,
         MPFR_VERSION_MINOR, MPFR_VERSION_PATCHLEVEL ) ;
 }

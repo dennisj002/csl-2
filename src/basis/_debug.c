@@ -70,9 +70,9 @@ _CSL_ACharacterDump ( char aChar )
 {
     if ( isprint ( aChar ) )
     {
-        _Printf ( ( byte* ) "%c", aChar ) ;
+        Printf ( ( byte* ) "%c", aChar ) ;
     }
-    else _Printf ( ( byte* ) "." ) ;
+    else Printf ( ( byte* ) "." ) ;
 }
 
 void
@@ -84,14 +84,14 @@ CSL_CharacterDump ( byte * address, int64 number )
 
         _CSL_ACharacterDump ( address [ i ] ) ;
     }
-    _Printf ( ( byte* ) " " ) ;
+    Printf ( ( byte* ) " " ) ;
 }
 
 void
 _CSL_AByteDump ( byte aByte )
 {
 
-    _Printf ( ( byte* ) "%02x ", aByte ) ;
+    Printf ( ( byte* ) "%02x ", aByte ) ;
 }
 
 void
@@ -103,7 +103,7 @@ CSL_NByteDump ( byte * address, int64 number )
 
         _CSL_AByteDump ( address [ i ] ) ;
     }
-    _Printf ( ( byte* ) " " ) ;
+    Printf ( ( byte* ) " " ) ;
 }
 
 byte *

@@ -22,8 +22,8 @@ _Udis_PrintInstruction ( ud_t * ud, byte * address, byte * prefix, byte * postfi
         format = ( byte* ) c_gd ( format ) ;
         formats = ( byte* ) c_gd ( formats ) ;
     }
-    if ( GetState ( _Debugger_, DBG_STEPPING ) ) _Printf ( formats, prefix, ( int64 ) ud_insn_off ( ud ), ud_insn_hex ( ud ), c_gu ( ud_insn_asm ( ud ) ), c_gu ( postfix ) ) ;
-    else _Printf ( format, prefix, ( int64 ) ud_insn_off ( ud ), ud_insn_hex ( ud ), ud_insn_asm ( ud ), postfix ) ;
+    if ( GetState ( _Debugger_, DBG_STEPPING ) ) Printf ( formats, prefix, ( int64 ) ud_insn_off ( ud ), ud_insn_hex ( ud ), c_gu ( ud_insn_asm ( ud ) ), c_gu ( postfix ) ) ;
+    else Printf ( format, prefix, ( int64 ) ud_insn_off ( ud ), ud_insn_hex ( ud ), ud_insn_asm ( ud ), postfix ) ;
 }
 
 int64

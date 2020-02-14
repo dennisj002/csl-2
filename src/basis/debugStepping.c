@@ -61,17 +61,17 @@ _Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress )
         if ( IS_CALL_INSN ( debugger->DebugAddress ) ) _Word_ShowSourceCode ( word ) ;
         if ( ( ! word ) || ( ! Debugger_CanWeStep ( debugger, word ) ) )
         {
-            _Printf ( ( byte* ) "\ncalling thru - a non-native (C) subroutine : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
+            Printf ( ( byte* ) "\ncalling thru - a non-native (C) subroutine : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
             newDebugAddress = _Debugger_COI_StepThru ( debugger, jcAddress, size ) ;
         }
         else if ( ( debugger->Key == 'I' ) ) // force Into a subroution
         {
-            _Printf ( ( byte* ) "\nforce calling (I)nto a subroutine : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
+            Printf ( ( byte* ) "\nforce calling (I)nto a subroutine : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
             newDebugAddress = _Debugger_COI_StepInto ( debugger, word, jcAddress, size ) ;
         }
         else if ( ( debugger->Key == 'h' ) || ( debugger->Key == 'o' ) || ( debugger->Key == 'u' ) )// step 't(h)ru'/(o)ver the native code like a non-native subroutine
         {
-            _Printf ( ( byte* ) "\ncalling t(h)ru - a subroutine : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
+            Printf ( ( byte* ) "\ncalling t(h)ru - a subroutine : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
             newDebugAddress = _Debugger_COI_StepThru ( debugger, jcAddress, size ) ;
         }
         else newDebugAddress = _Debugger_COI_StepInto ( debugger, word, jcAddress, size ) ;
@@ -138,7 +138,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
         // we would at least need to save/restore our registers to step thru native c code
         if ( ! GetState ( debugger, DBG_CAN_STEP ) )
         {
-            _Printf ( ( byte* ) "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%016lx : (e)valuating",
+            Printf ( ( byte* ) "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%016lx : (e)valuating",
                 c_ud ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "<literal> " ),
                 word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_gu ( word->Name ),
                 GetState ( debugger, DBG_AUTO_MODE ) ? " : automode turned off" : "",
@@ -201,7 +201,7 @@ Debugger_AfterStep ( Debugger * debugger )
 void
 _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte * name )
 {
-    _Printf ( ( byte* ) "\nSetting up stepping : location = %s : debugger->word = \'%s\' : ...", c_gd ( _Context_Location ( _Context_ ) ), word ? word->Name : ( name ? name : ( byte* ) "" ) ) ;
+    Printf ( ( byte* ) "\nSetting up stepping : location = %s : debugger->word = \'%s\' : ...", c_gd ( _Context_Location ( _Context_ ) ), word ? word->Name : ( name ? name : ( byte* ) "" ) ) ;
     if ( word )
     {
         _CSL_Source ( debugger->w_Word, 0 ) ;
@@ -416,12 +416,12 @@ Debug_ExtraShow ( int64 size, Boolean force )
     {
         if ( force || ( _O_->Verbosity > 4 ) )
         {
-            _Printf ( ( byte* ) "\n\ndebugger->SaveCpuState" ) ;
+            Printf ( ( byte* ) "\n\ndebugger->SaveCpuState" ) ;
             _Debugger_Disassemble ( debugger, ( byte* ) debugger->SaveCpuState, 1000, 1 ) ; //137, 1 ) ;
-            _Printf ( ( byte* ) "\n\ndebugger->RestoreCpuState" ) ;
+            Printf ( ( byte* ) "\n\ndebugger->RestoreCpuState" ) ;
             _Debugger_Disassemble ( debugger, ( byte* ) debugger->RestoreCpuState, 1000, 2 ) ; //100, 0 ) ;
         }
-        _Printf ( ( byte* ) "\n\ndebugger->StepInstructionBA->BA_Data" ) ;
+        Printf ( ( byte* ) "\n\ndebugger->StepInstructionBA->BA_Data" ) ;
         _Debugger_Disassemble ( debugger, ( byte* ) debugger->StepInstructionBA->BA_Data, size, 0 ) ;
     }
 }
@@ -459,7 +459,7 @@ _Debugger_COI_StepInto ( Debugger * debugger, Word * word, byte * jcAddress, int
     while ( word->W_MorphismAttributes & ( ALIAS ) ) word = word->W_AliasOf ;
     if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
     {
-        _Printf ( ( byte* ) "\nstepping into a csl compiled function : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
+        Printf ( ( byte* ) "\nstepping into a csl compiled function : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
         _Stack_Push ( debugger->ReturnStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
         // push the return address this time around; next time code at newDebugAddress will be processed
         // when ret is the insn Debugger_StepOneInstruction will handle it 
@@ -513,7 +513,7 @@ _Debugger_CASOI_Do_JmpOrCall_Insn ( Debugger * debugger, byte * jcAddress )
     {
         SetState ( debugger, DBG_AUTO_MODE, false ) ;
         // we are already stepping here and now, so skip
-        _Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", ( char* ) c_gd ( word->Name ), debugger->DebugAddress ) ;
+        Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", ( char* ) c_gd ( word->Name ), debugger->DebugAddress ) ;
         //Pause () ;
         debugger->DebugAddress += 3 ; // 3 : sizeof call reg insn
         //goto end ; // skip it

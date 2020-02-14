@@ -614,7 +614,7 @@ ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
                     continue ;
                 }
                 case ']': case '[': return true ;
-                case ',': case ';': case '(': case ')': case '\n': case '\'': return false ;
+                case 0 : case ',': case ';': case '(': case ')': case '\n': case '\'': return false ;
                 case '.':
                 {
                     if ( i && ( *( nc + 1 ) != '.' ) )// watch for (double/triple) dot ellipsis
@@ -646,18 +646,6 @@ ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
     return false ;
 }
 
-Boolean
-_Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
-{
-    return ReadLiner_IsTokenForwardDotted ( lexer->ReadLiner0, end ? end - 1 : lexer->TokenStart_ReadLineIndex ) ;
-}
-
-Boolean
-Lexer_IsTokenForwardDotted ( Lexer * lexer )
-{
-    return _Lexer_IsTokenForwardDotted ( lexer, 0 ) ;
-}
-
 int64
 CSL_Parse_Typedef_Field ( Boolean printFlag, byte * codeData )
 {
@@ -684,14 +672,12 @@ Word_ClassStructure_PrintData ( Word * word, byte * typedefString )
 {
     if ( word && typedefString && typedefString[0] )
     {
-        //ReadLine_GetNextCharFromString ( ReadLiner * rl ) ;
         Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
         ReadLiner * rl = cntx->ReadLiner0 ;
         Readline_Setup_OneStringInterpret ( cntx->ReadLiner0, typedefString ) ;
         CSL_Parse_Typedef_Field ( TDSCI_PRINT, ( byte* ) word ) ;
         Readline_Restore_InputLine_State ( rl ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;
-        // reset ReadLiner to normal
     }
 }
 

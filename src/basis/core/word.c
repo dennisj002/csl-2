@@ -123,8 +123,8 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
         ns = addToNs ? addToNs : ins ;
         if ( ns )
         {
-            if ( word->W_MorphismAttributes & BLOCK ) _Printf ( ( byte* ) "\nnew Word :: %s.%s", ns->Name, word->Name ) ;
-            else _Printf ( ( byte* ) "\nnew DObject :: %s.%s", ns->Name, word->Name ) ;
+            if ( word->W_MorphismAttributes & BLOCK ) Printf ( ( byte* ) "\nnew Word :: %s.%s", ns->Name, word->Name ) ;
+            else Printf ( ( byte* ) "\nnew DObject :: %s.%s", ns->Name, word->Name ) ;
         }
     }
 }
@@ -197,13 +197,13 @@ Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
     byte * name = String_ConvertToBackSlash ( word->Name ) ;
     if ( String_Equal ( "]", name ) && cntx->Interpreter0->BaseObject )
     {
-        _Printf ( ( byte* ) "\n\'%s\' = array end :: base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx => address = 0x%lx",
+        Printf ( ( byte* ) "\n\'%s\' = array end :: base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx => address = 0x%lx",
             name, cntx->Interpreter0->BaseObject->Name, cntx->Interpreter0->BaseObject->W_Value, offset, totalOffset, ( ( byte* ) cntx->Interpreter0->BaseObject->W_PtrToValue ) + totalOffset ) ;
     }
     else
     {
         totalOffset = cntx->Compiler0->AccumulatedOptimizeOffsetPointer ? *cntx->Compiler0->AccumulatedOptimizeOffsetPointer : - 1 ;
-        _Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size (in bytes) = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
+        Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size (in bytes) = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
             //name, cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->Name : ( byte* ) "",
             name, word->TypeNamespace ? word->TypeNamespace->Name : ( byte* ) "",
             word->ObjectByteSize,
@@ -225,7 +225,7 @@ _Word_SourceCodeLocation_pbyte ( Word * word )
 void
 Word_PrintName ( Word * word )
 {
-    if ( word ) _Printf ( ( byte* ) "%s ", word->Name ) ;
+    if ( word ) Printf ( ( byte* ) "%s ", word->Name ) ;
 }
 
 byte*
@@ -243,14 +243,14 @@ Word_Info ( Word * word )
 void
 Word_Print ( Word * word )
 {
-    if ( word ) _Printf ( ( byte* ) "\n%s", Word_Info ( word ) ) ;
+    if ( word ) Printf ( ( byte* ) "\n%s", Word_Info ( word ) ) ;
 }
 
 void
 _Word_Print ( Word * word )
 {
     _Context_->WordCount ++ ;
-    _Printf ( ( byte* ) c_ud ( " %s" ), word->Name ) ;
+    Printf ( ( byte* ) c_ud ( " %s" ), word->Name ) ;
 }
 
 void
@@ -275,7 +275,7 @@ _Word_ShowSourceCode ( Word * word0 )
         }
         else scd = ( byte* ) "C Primitive" ;
         name = c_gd ( word->Name ) ;
-        _Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "", name, scd ) ;
+        Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "", name, scd ) ;
     }
 }
 

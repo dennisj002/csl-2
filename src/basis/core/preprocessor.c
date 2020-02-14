@@ -41,11 +41,11 @@ void
 Ppibs_Print ( Ppibs * ppibs, byte * prefix )
 {
     int64 depth = List_Length ( _Context_->PreprocessorStackList ) ;
-    _Printf ( ( byte* ) "\n\nInputLineString = %s", _ReadLiner_->InputLineString ) ;
-    _Printf ( ( byte* ) "\n%s : Ppibs = 0x%016lx : depth = %d : Filename = %s : Line = %d", prefix, ppibs, depth, ppibs->Filename, ppibs->LineNumber ) ;
-    _Printf ( ( byte* ) "\nIfBlockStatus = %d", ppibs->IfBlockStatus ) ;
-    _Printf ( ( byte* ) "\nElifStatus = %d", ppibs->ElifStatus ) ;
-    _Printf ( ( byte* ) "\nElseStatus = %d", ppibs->ElseStatus ) ;
+    Printf ( ( byte* ) "\n\nInputLineString = %s", _ReadLiner_->InputLineString ) ;
+    Printf ( ( byte* ) "\n%s : Ppibs = 0x%016lx : depth = %d : Filename = %s : Line = %d", prefix, ppibs, depth, ppibs->Filename, ppibs->LineNumber ) ;
+    Printf ( ( byte* ) "\nIfBlockStatus = %d", ppibs->IfBlockStatus ) ;
+    Printf ( ( byte* ) "\nElifStatus = %d", ppibs->ElifStatus ) ;
+    Printf ( ( byte* ) "\nElseStatus = %d", ppibs->ElseStatus ) ;
     //Pause () ;
 }
 #else 

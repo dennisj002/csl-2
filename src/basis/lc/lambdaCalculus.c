@@ -91,7 +91,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
     }
     else
     {
-        _Printf ( ( byte* ) "\n%s ?\n", ( char* ) token ) ;
+        Printf ( ( byte* ) "\n%s ?\n", ( char* ) token ) ;
         CSL_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
         return 0 ;
     }
@@ -164,7 +164,7 @@ LC_FindWord ( byte * name, ListObject * locals )
 #if 0        
                 if ( Is_DebugModeOn )
                 {
-                    _Printf ( ( byte* ) "\n\nLC_FindWord : LispDefinesNamespace : can't find : name = %s\n", name ) ;
+                    Printf ( ( byte* ) "\n\nLC_FindWord : LispDefinesNamespace : can't find : name = %s\n", name ) ;
                     LC_Print_LispDefinesNamespace ( ) ;
                 }
 #endif        
@@ -174,7 +174,7 @@ LC_FindWord ( byte * name, ListObject * locals )
 #if 0        
                     if ( Is_DebugModeOn )
                     {
-                        _Printf ( ( byte* ) "\n\nLC_FindWord : LispNamespace : can't find : name = %s\n", name ) ;
+                        Printf ( ( byte* ) "\n\nLC_FindWord : LispNamespace : can't find : name = %s\n", name ) ;
                         LC_Print_LispNamespace ( ) ;
                     }
 #endif        
@@ -331,7 +331,7 @@ LO_Repl ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     SetState ( compiler, LISP_MODE, true ) ;
-    _Printf ( ( byte* ) "\ncsl lisp : (type 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.csl'\n" ) ;
+    Printf ( ( byte* ) "\ncsl lisp : (type 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.csl'\n" ) ;
     LC_ReadInitFile ( ( byte* ) "./namespaces/compiler/lcinit.csl" ) ;
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
     SetState ( compiler, LISP_MODE, false ) ;
@@ -413,17 +413,17 @@ LC_ClearDefinesNamespace ( )
 void
 LC_Print_LispDefinesNamespace ( )
 {
-    _Printf ( ( byte* ) "\n LC_Print_LispDefinesNamespace : printing ...\n" ) ;
+    Printf ( ( byte* ) "\n LC_Print_LispDefinesNamespace : printing ...\n" ) ;
     _List_PrintNames ( _LC_->LispDefinesNamespace->W_List, - 1, 0 ) ;
-    _Printf ( ( byte* ) "\n" ) ;
+    Printf ( ( byte* ) "\n" ) ;
 }
 
 void
 LC_Print_LispNamespace ( )
 {
-    _Printf ( ( byte* ) "\n LC_Print_LispNamespace : printing ...\n" ) ;
+    Printf ( ( byte* ) "\n LC_Print_LispNamespace : printing ...\n" ) ;
     _List_PrintNames ( _LC_->LispNamespace->W_List, - 1, 0 ) ;
-    _Printf ( ( byte* ) "\n" ) ;
+    Printf ( ( byte* ) "\n" ) ;
 }
 
 void

@@ -90,7 +90,7 @@ CSL_ResetAll_Init ( CSL * csl )
                 {
                     if ( strcmp ( ( char* ) _O_->ErrorFilename, "Debug Context" ) )
                     {
-                        _Printf ( ( byte* ) "\nError : \"%s\" include error!\n", _O_->SigLocation ? _O_->SigLocation : _O_->ErrorFilename ) ;
+                        Printf ( ( byte* ) "\nError : \"%s\" include error!\n", _O_->SigLocation ? _O_->SigLocation : _O_->ErrorFilename ) ;
                     }
                 }
                 DefaultColors ;
@@ -99,7 +99,7 @@ CSL_ResetAll_Init ( CSL * csl )
     }
     if ( _O_->Verbosity > 3 )
     {
-        _Printf ( ( byte* ) " \nInternal Namespaces have been initialized.  " ) ;
+        Printf ( ( byte* ) " \nInternal Namespaces have been initialized.  " ) ;
         OVT_ShowMemoryAllocated ( ) ;
     }
     //if ( ( _O_->InitSessionCoreTimes == 1 ) || ( ! _O_->Verbosity ) ) _O_->Verbosity = 1 ;

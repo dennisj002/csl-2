@@ -40,21 +40,21 @@ using
 	Pointer BeforeReference ;
 };
 using
-DLLNode size @ nl "DLLNode size = " prints Io.print nl
+DLLNode size @ nl "DLLNode size = " prints p nl
 :{ 
 	Pointer AfterReference  ; 
         int16   someJunkForTesting ; // u can reset the structure representing the class
 	Pointer BeforeReference ;
 };
-DLLNode.size @ nl "DLLNode size = " prints Io.print nl
+DLLNode.size @ nl "DLLNode size = " prints p nl
 using
 :{ // // again reset the structure representing the class
 	Pointer AfterReference ;  
 	Pointer BeforeReference ;
 };
-DLLNode.size @ nl "DLLNode size = " prints Io.print nl
+DLLNode.size @ nl "DLLNode size = " prints p nl
 sp
-"testNode" DLLNode new 
+"testNode" DLLNode d: new 
 testNode.AfterReference 1 =
 testNode.BeforeReference 2 =
 byte.size 1 = sp

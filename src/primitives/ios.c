@@ -99,7 +99,7 @@ _Print_Binary ( uint64 n )
 void
 Print_Binary ( uint64 n )
 {
-    _Printf ( ( byte* ) "\n %s", _Print_Binary ( n ) ) ;
+    Printf ( ( byte* ) "\n %s", _Print_Binary ( n ) ) ;
 }
 
 void
@@ -114,7 +114,7 @@ PrintfInt ( int64 n )
     }
     else /* if ( _Context->System0->NumberBase == 16 ) */ sprintf ( ( char* ) buffer, UINT_FRMT_0x016, n ) ; // hex
     // ?? any and all other number bases ??
-    _Printf ( ( byte* ) buffer ) ;
+    Printf ( ( byte* ) buffer ) ;
 }
 
 void

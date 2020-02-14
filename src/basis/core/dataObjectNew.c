@@ -209,7 +209,7 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     }
     else if ( ns->ObjectByteSize )
     {
-        _Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n",
+        Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n",
             Context_Location ( ), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectByteSize ) ;
         Namespace_Do_Namespace ( ns, 0 ) ;
     }

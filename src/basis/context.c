@@ -187,7 +187,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
         {
             ReadLiner * rl = cntx->ReadLiner0 ;
             rl->Filename = String_New ( filename, STRING_MEM ) ;
-            if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\nincluding %s ...\n", filename ) ;
+            if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nincluding %s ...\n", filename ) ;
             cntx->ReadLiner0->InputFile = file ;
             ReadLine_SetRawInputFunction ( rl, ReadLine_GetNextCharFromString ) ;
             SetState ( cntx->System0, ADD_READLINE_TO_HISTORY, false ) ;
@@ -200,12 +200,12 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
 
             cntx->System0->IncludeFileStackNumber -- ;
-            if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%s included\n", filename ) ;
+            if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\n%s included\n", filename ) ;
             OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
         }
         else
         {
-            _Printf ( ( byte* ) "\nError : _CSL_IncludeFile : \"%s\" : not found! :: %s\n", filename,
+            Printf ( ( byte* ) "\nError : _CSL_IncludeFile : \"%s\" : not found! :: %s\n", filename,
                 _Context_Location ( ( Context* ) _CSL_->ContextDataStack->StackPointer [0] ) ) ;
         }
     }

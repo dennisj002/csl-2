@@ -300,8 +300,8 @@ void
 Debugger_FindAny ( Debugger * debugger )
 {
     _Debugger_FindAny ( debugger ) ;
-    if ( debugger->w_Word ) _Printf ( ( byte* ) ( byte* ) "\nFound Word :: %s.%s\n", debugger->w_Word->S_ContainingNamespace->Name, debugger->w_Word->Name ) ;
-    else _Printf ( ( byte* ) ( byte* ) "\nToken not found : %s\n", debugger->Token ) ;
+    if ( debugger->w_Word ) Printf ( ( byte* ) ( byte* ) "\nFound Word :: %s.%s\n", debugger->w_Word->S_ContainingNamespace->Name, debugger->w_Word->Name ) ;
+    else Printf ( ( byte* ) ( byte* ) "\nToken not found : %s\n", debugger->Token ) ;
 }
 
 void
@@ -458,7 +458,7 @@ void
 Debugger_Quit ( Debugger * debugger )
 {
 
-    _Printf ( ( byte* ) "\nDebugger_Quit.\n" ) ;
+    Printf ( ( byte* ) "\nDebugger_Quit.\n" ) ;
     Debugger_Off ( debugger, 1 ) ;
     _Throw ( QUIT ) ;
 }
@@ -467,7 +467,7 @@ void
 Debugger_Abort ( Debugger * debugger )
 {
 
-    _Printf ( ( byte* ) "\nDebugger_Abort.\n" ) ;
+    Printf ( ( byte* ) "\nDebugger_Abort.\n" ) ;
     Debugger_Off ( debugger, 1 ) ;
     _Throw ( ABORT ) ;
 }
@@ -475,7 +475,7 @@ Debugger_Abort ( Debugger * debugger )
 void
 Debugger_Stop ( Debugger * debugger )
 {
-    _Printf ( ( byte* ) "\nDebugger_Stop.\n" ) ;
+    Printf ( ( byte* ) "\nDebugger_Stop.\n" ) ;
     Debugger_Off ( debugger, 1 ) ;
     _Throw ( STOP ) ;
 }
@@ -534,14 +534,14 @@ Debugger_AutoMode ( Debugger * debugger )
             DebugColors ;
             if ( debugger->SaveKey == 'c' )
             {
-                _Printf ( ( byte* ) "\nContinuing : automatically repeating key \'e\' ..." ) ;
+                Printf ( ( byte* ) "\nContinuing : automatically repeating key \'e\' ..." ) ;
                 debugger->SaveKey = 'e' ;
             }
-            else _Printf ( ( byte* ) "\nDebugger :: Starting AutoMode : automatically repeating key :: \'%c\' ...", debugger->SaveKey ) ;
+            else Printf ( ( byte* ) "\nDebugger :: Starting AutoMode : automatically repeating key :: \'%c\' ...", debugger->SaveKey ) ;
             DefaultColors ;
             SetState ( debugger, DBG_AUTO_MODE, true ) ;
         }
-        else _Printf ( ( byte* ) "\nDebugger :: AutoMode : does not support repeating key :: \'%c\' ...", debugger->SaveKey ) ;
+        else Printf ( ( byte* ) "\nDebugger :: AutoMode : does not support repeating key :: \'%c\' ...", debugger->SaveKey ) ;
     }
     debugger->Key = debugger->SaveKey ;
 
@@ -562,7 +562,7 @@ Debugger_CodePointerUpdate ( Debugger * debugger )
     if ( debugger->w_Word && ( ! debugger->DebugAddress ) )
     {
         debugger->DebugAddress = ( byte* ) debugger->w_Word->Definition ;
-        _Printf ( ( byte* ) "\ncodePointer = 0x%08x", ( int64 ) debugger->DebugAddress ) ;
+        Printf ( ( byte* ) "\ncodePointer = 0x%08x", ( int64 ) debugger->DebugAddress ) ;
     }
 }
 
@@ -581,8 +581,8 @@ Debugger_Dump ( Debugger * debugger )
 void
 Debugger_Default ( Debugger * debugger )
 {
-    if ( isgraph ( debugger->Key ) ) _Printf ( ( byte* ) "\ndbg :> %c <: is not an assigned key code", debugger->Key ) ;
-    else _Printf ( ( byte* ) "\ndbg :> <%d> <: is not an assigned key code", debugger->Key ) ;
+    if ( isgraph ( debugger->Key ) ) Printf ( ( byte* ) "\ndbg :> %c <: is not an assigned key code", debugger->Key ) ;
+    else Printf ( ( byte* ) "\ndbg :> <%d> <: is not an assigned key code", debugger->Key ) ;
 }
 
 void
@@ -590,7 +590,7 @@ _Debugger_State ( Debugger * debugger )
 {
     byte * buf = Buffer_Data ( _CSL_->DebugB2 ) ;
     _CSL_GetSystemState_String0 ( buf ) ;
-    _Printf ( ( byte* ) buf ) ;
+    Printf ( ( byte* ) buf ) ;
 }
 
 void

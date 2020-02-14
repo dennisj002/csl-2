@@ -105,14 +105,14 @@ _ReadLine_MoveInputStartToLineStart ( int64 fromPosition, int64 lineUpFlag )
         if ( ( fromPosition % columns ) < 2 ) n -- ; // nb : ?? -- i don't understand this but it works
         if ( n ) Cursor_Up ( n ) ; //_Printf ( "\r%c[%dA", ESC, n ) ; // move n lines up 
     }
-    else _Printf ( ( byte* ) "\r" ) ; // nb -- a workaround : ?? second sequence ( clear 2 eol ) not necessary but seems to reset things to work -- ??
+    else Printf ( ( byte* ) "\r" ) ; // nb -- a workaround : ?? second sequence ( clear 2 eol ) not necessary but seems to reset things to work -- ??
     //_Printf ( "\r%c[2K", ESC ) ; // nb -- a workaround : ?? second sequence ( clear 2 eol ) not necessary but seems to reset things to work -- ??
 }
 
 void
 _ReadLine_PrintfClearTerminalLine ( )
 {
-    _Printf ( ( byte* ) "\r%c[J", ESC ) ; // clear from cursor to end of screen -- important if we have (mistakenly) gone up an extra line
+    Printf ( ( byte* ) "\r%c[J", ESC ) ; // clear from cursor to end of screen -- important if we have (mistakenly) gone up an extra line
 }
 
 void
@@ -265,7 +265,7 @@ ReadLine_GetNormalPrompt ( ReadLiner * rl )
 void
 _ReadLine_Show ( ReadLiner * rl, byte * prompt )
 {
-    _Printf ( ( byte* ) "\r%s%s", prompt, rl->InputLine ) ;
+    Printf ( ( byte* ) "\r%s%s", prompt, rl->InputLine ) ;
 }
 
 void
@@ -345,7 +345,7 @@ ReadLine_ShowNormalPrompt ( ReadLiner * rl )
 {
     //_ReadLine_ShowStringWithCursor ( rl, ( byte* ) "", rl->NormalPrompt ) ;
     _ReadLine_PrintfClearTerminalLine ( ) ;
-    _Printf ( ( byte* ) "\r%s", rl->NormalPrompt ) ;
+    Printf ( ( byte* ) "\r%s", rl->NormalPrompt ) ;
     rl->EndPosition = 0 ;
     rl->InputLine [ 0 ] = 0 ;
 }
@@ -448,8 +448,8 @@ ReadLine_IsReverseTokenQualifiedID ( ReadLiner * rl )
 void
 Readline_SaveInputLine ( ReadLiner * rl )
 {
-    byte * svLine = Buffer_Data ( _CSL_->InputLineB ) ;
-    strcpy ( ( char* ) svLine, ( char* ) rl->InputLine ) ;
+    rl->svLine = Buffer_Data ( _CSL_->svLineB ) ;
+    strcpy ( ( char* ) rl->svLine, ( char* ) rl->InputLine ) ;
 }
 
 void
@@ -463,8 +463,7 @@ Readline_Save_InputLine_State ( ReadLiner * rl )
 void
 Readline_RestoreInputLine ( ReadLiner * rl )
 {
-    byte * svLine = Buffer_Data ( _CSL_->InputLineB ) ;
-    strcpy ( ( char* ) rl->InputLine, ( char* ) svLine ) ;
+    strcpy ( ( char* ) rl->InputLine, ( char* ) rl->svLine ) ;
 }
 
 void
@@ -521,7 +520,8 @@ ReadLine_Set_KeyedChar ( ReadLiner * rl, byte c )
 byte
 ReadLine_Get_Key ( ReadLiner * rl )
 {
-    return ReadLine_Set_KeyedChar ( rl, rl->Key ( rl ) ) ;
+    if ( ! rl->Key ) { ReadLiner_Done ( rl ) ; return 0 ; }
+    else return ReadLine_Set_KeyedChar ( rl, rl->Key ? rl->Key ( rl ) : 0 ) ;
 }
 
 byte
@@ -576,7 +576,7 @@ void
 Readline_Setup_OneStringInterpret ( ReadLiner * rl, byte * str )
 {
     Readline_Save_InputLine_State ( rl ) ;
-    ReadLine_SetRawInputFunction ( rl, ReadLine_GetNextCharFromString ) ;
+    ReadLine_SetRawInputFunction ( rl, 0 ) ; //ReadLine_GetNextCharFromString ) ;
     ReadLine_SetInputString ( rl, str, 0 ) ;
     _Readline_Setup_OneStringInterpret ( rl, str ) ;
 }

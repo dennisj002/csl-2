@@ -353,6 +353,7 @@ void Emit(byte c);
 void Context_DoPrompt(Context *cntx);
 void CSL_DoPrompt(void);
 void _Printf(byte *format, ...);
+void Printf(byte *format, ...);
 /* src/basis/core/symbol.c */
 void _Symbol_NameInit(Symbol *symbol, byte *name);
 void _Symbol_Init_AllocName(Symbol *symbol, byte *name, uint64 allocType);
@@ -382,8 +383,6 @@ Boolean Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable(Lexer *lexer, Word
 Boolean Is_LValue(Context *cntx, Word *word);
 Boolean Lexer_IsTokenReverseDotted(Lexer *lexer);
 Boolean ReadLiner_IsTokenForwardDotted(ReadLiner *rl, int64 index);
-Boolean _Lexer_IsTokenForwardDotted(Lexer *lexer, int64 end);
-Boolean Lexer_IsTokenForwardDotted(Lexer *lexer);
 int64 CSL_Parse_Typedef_Field(Boolean printFlag, byte *codeData);
 void Word_ClassStructure_PrintData(Word *word, byte *typedefString);
 /* src/basis/core/dataObjectNew.c */
@@ -711,6 +710,8 @@ int64 Lexer_CheckIfDone(Lexer *lexer, int64 flags);
 byte _Lexer_NextChar(ReadLiner *rl);
 void Lexer_SetInputFunction(Lexer *lexer, byte (*lipf)(ReadLiner *));
 void _Lexer_DoChar(Lexer *lexer, byte c);
+Boolean _Lexer_IsTokenForwardDotted(Lexer *lexer, int64 end);
+Boolean Lexer_IsTokenForwardDotted(Lexer *lexer);
 Boolean Lexer_IsTokenQualifiedID(Lexer *lexer);
 void CSL_LexerTables_Setup(CSL *csl);
 int64 Lexer_ConvertLineIndexToFileIndex(Lexer *lexer, int64 index);
@@ -1187,7 +1188,7 @@ void Finder_SetNamedQualifyingNamespace(Finder *finder, byte *name);
 Namespace *Finder_GetQualifyingNamespace(Finder *finder);
 Word *_Finder_Word_Find(Finder *finder, uint64 state, byte *name);
 Word *_Finder_FindWord_InOneNamespace(Finder *finder, Namespace *ns, byte *name);
-Word *_Finder_QID_Find(Finder *finder, Word *qidWord);
+Word *_Finder_QID_Find(Finder *finder, byte *token);
 Word *Finder_QID_Find(Finder *finder, byte *qid);
 Word *Finder_Word_Find(Finder *finder, byte *name, int64 flag, int64 saveQns);
 Word *Finder_Word_FindUsing(Finder *finder, byte *name, int64 saveQns);

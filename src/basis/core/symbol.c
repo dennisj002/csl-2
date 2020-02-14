@@ -53,12 +53,12 @@ Symbol *
 Symbol_CompareName2 ( Symbol * symbol, byte * name, Namespace * ns )
 {
     //d1 ( if ( _O_->Verbosity > 3 ) _Printf ( (byte*) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ) ;
-    d0 ( if ( Is_DebugOn && String_Equal ( symbol->S_Name, "int" ) ) { _Printf ( ( byte* ) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ; Pause ( ) ; } ) ;
-    d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n symbol name = %s.%s : name = %s",
+    d0 ( if ( Is_DebugOn && String_Equal ( symbol->S_Name, "int" ) ) { Printf ( ( byte* ) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ; Pause ( ) ; } ) ;
+    d0 ( if ( Is_DebugOn ) { Printf ( ( byte* ) "\n symbol name = %s.%s : name = %s",
             symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
     if ( name && symbol && symbol->S_Name && ( String_Equal ( symbol->S_Name, name ) ) && (symbol->S_ContainingNamespace == ns) )
     {
-        d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n FOUND : symbol name = %s.%s : name = %s",
+        d0 ( if ( Is_DebugOn ) { Printf ( ( byte* ) "\n FOUND : symbol name = %s.%s : name = %s",
             symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
             
         return symbol ;

@@ -186,7 +186,7 @@ Namespaces_PrintList ( Namespace * ns, byte * insert )
 {
     //CSL_Namespaces_PrettyPrintTree ( ) ;
     //CSL_Using ( ) ;
-    _Printf ( ( byte* ) "\n\nNamespace : %s :: %s _Namespace_SetState : \n\t", ns->Name, insert ) ;
+    Printf ( ( byte* ) "\n\nNamespace : %s :: %s _Namespace_SetState : \n\t", ns->Name, insert ) ;
     _List_PrintNames ( _CSL_->Namespaces->W_List, 5, 0 ) ;
 }
 
@@ -341,7 +341,7 @@ void
 Namespace_RemoveFromUsingList ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
-    if ( String_Equal ( ns->Name, "System" ) ) _Printf ( ( byte* ) "\n\nSystem namespace being cleared %s", Context_Location ( ) ) ;
+    if ( String_Equal ( ns->Name, "System" ) ) Printf ( ( byte* ) "\n\nSystem namespace being cleared %s", Context_Location ( ) ) ;
     if ( ns ) _Namespace_RemoveFromUsingList ( ns ) ;
 }
 
@@ -430,7 +430,7 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
         if ( word && Is_NamespaceType ( word ) ) return ( Namespace* ) Word_UnAlias ( word ) ;
         else if ( exceptionFlag )
         {
-            _Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
+            Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
             CSL_Exception ( NAMESPACE_ERROR, 0, 1 ) ;
             return 0 ;
         }

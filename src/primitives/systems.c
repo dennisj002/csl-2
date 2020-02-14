@@ -28,8 +28,8 @@ void
 TestAnd ( )
 {
     //{ doTest testDone @ not && } { testDone ++ sp basicT testX } if
-    if ( doTest && ( ! testDone ) ) _Printf ( "true" ) ;
-    else _Printf ( "false" ) ;
+    if ( doTest && ( ! testDone ) ) Printf ( "true" ) ;
+    else Printf ( "false" ) ;
 }
 
 void
@@ -222,7 +222,7 @@ shell ( )
     ReadLiner * rl = cntx->ReadLiner0 ;
     byte * svPrompt = ReadLine_GetPrompt ( rl ) ;
     ReadLine_SetPrompt ( rl, "$ " ) ;
-    _Printf ( ( byte* ) "\n type \'exit\' to exit" ) ;
+    Printf ( ( byte* ) "\n type \'exit\' to exit" ) ;
     Context_DoPrompt ( cntx ) ;
     while ( 1 )
     {
@@ -232,7 +232,7 @@ shell ( )
         ShellEscape ( str ) ; // prompt is included in ShellEscape
     }
     ReadLine_SetPrompt ( rl, svPrompt ) ;
-    _Printf ( ( byte* ) "\n leaving shell ..." ) ;
+    Printf ( ( byte* ) "\n leaving shell ..." ) ;
 }
 
 void
@@ -246,7 +246,7 @@ CSL_Filename ( )
 void
 CSL_Location ( )
 {
-    _Printf ( _Context_Location ( _Context_ ) ) ;
+    Printf ( _Context_Location ( _Context_ ) ) ;
 }
 
 void
@@ -268,7 +268,7 @@ _CSL_Version ( Boolean flag )
     if ( flag || ( _O_->Restarts < 2 ) )
     {
         //_Printf ( ( byte* ) "\ncsl %s", _O_->VersionString ) ;
-        _Printf ( ( byte* ) "\nversion %s", _O_->VersionString ) ;
+        Printf ( ( byte* ) "\nversion %s", _O_->VersionString ) ;
     }
 }
 
@@ -350,9 +350,9 @@ void
 CSL_Dump ( )
 {
     byte * location = Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "" ;
-    _Printf ( ( byte* ) "\nDump at : %s :", location ) ;
+    Printf ( ( byte* ) "\nDump at : %s :", location ) ;
     _CSL_Dump ( 16 ) ;
-    _Printf ( ( byte* ) "\n" ) ;
+    Printf ( ( byte* ) "\n" ) ;
 }
 
 void

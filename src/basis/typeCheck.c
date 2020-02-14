@@ -218,7 +218,7 @@ CSL_Typecheck ( Word * opWord )
 void
 TSI_Debug_PreTypeStatus_Print ( TSI *tsi )
 {
-    _Printf ( ( byte* ) "\n%s.%s :: type expected : %s : at %s",
+    Printf ( ( byte* ) "\n%s.%s :: type expected : %s : at %s",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>", tsi->OpWord->Name,
         Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), Context_Location ( ) ) ;
 }
@@ -231,7 +231,7 @@ _TypeMismatch_CheckError_Print ( Word * lvalueWord, Word *rvalueWord, Boolean qu
         int64 lvalueSize = lvalueWord->ObjectByteSize, rvalueSize = rvalueWord->ObjectByteSize ;
         if ( ( lvalueSize > 0 ) && ( rvalueSize > lvalueSize ) ) // for C internal lvalue size may be 0
         {
-            _Printf ( "\nTypeError : Wrong data sizes :: lvalue : %s : size == %ld :: rvalue : %s : size == %ld",
+            Printf ( "\nTypeError : Wrong data sizes :: lvalue : %s : size == %ld :: rvalue : %s : size == %ld",
                 lvalueWord->Name, lvalueSize, rvalueWord->Name, rvalueSize ) ;
             if ( quitFlag ) Error ( "\nType Error", QUIT ) ;
             return true ;
@@ -244,7 +244,7 @@ void
 TSI_TypeStatus_Print ( TSI *tsi )
 {
     if ( tsi->TypeErrorStatus & TSE_SIZE_MISMATCH ) _TypeMismatch_CheckError_Print ( tsi->StackWord1, tsi->StackWord0, 0 ) ; //TSI_TypeMismatchError_Print ( tsi ) ;
-    _Printf ( ( byte* ) "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
+    Printf ( ( byte* ) "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
         tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
     if ( GetState ( _CSL_, DBG_TYPECHECK_ON ) )

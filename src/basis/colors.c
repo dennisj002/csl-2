@@ -46,8 +46,8 @@ Console ( )
 void
 _ShowRGB ( int64 fr, int64 fg, int64 fb, int64 br, int64 bg, int64 bb )
 {
-    if ( _O_->Console == 1 ) _Printf ( (byte*) "%c[38;2;%d;%d;%dm %c[48;2;%d;%d;%dm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // Konsole mode
-    else if ( _O_->Console == 2 ) _Printf ( (byte*) "%c[38;5;%d;%d;%dm%c[48;5;%d;%d;%dm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // 'xterm' mode
+    if ( _O_->Console == 1 ) Printf ( (byte*) "%c[38;2;%d;%d;%dm %c[48;2;%d;%d;%dm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // Konsole mode
+    else if ( _O_->Console == 2 ) Printf ( (byte*) "%c[38;5;%d;%d;%dm%c[48;5;%d;%d;%dm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // 'xterm' mode
 }
 
 void

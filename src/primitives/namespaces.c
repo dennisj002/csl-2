@@ -37,9 +37,9 @@ _CSL_NamespacesMap ( MapSymbolFunction2 msf2, uint64 state, int64 one, int64 two
 void
 _CSL_ForAllNamespaces ( MapSymbolFunction2 msf2 )
 {
-    _Printf ( ( byte* ) "\nusing :" ) ;
+    Printf ( ( byte* ) "\nusing :" ) ;
     _CSL_NamespacesMap ( msf2, USING, 1, 1 ) ;
-    _Printf ( ( byte* ) "\nnotUsing :" ) ;
+    Printf ( ( byte* ) "\nnotUsing :" ) ;
     int64 usingWords = _CSL_->FindWordCount ;
     _CSL_NamespacesMap ( msf2, NOT_USING, 1, 1 ) ;
     int64 notUsingWords = _CSL_->FindWordCount ;
@@ -52,11 +52,11 @@ Namespace_PrettyPrint ( Namespace* ns, int64 indentFlag, int64 indentLevel )
 {
     if ( indentFlag )
     {
-        _Printf ( ( byte* ) "\n" ) ;
-        while ( indentLevel -- ) _Printf ( ( byte* ) "\t" ) ;
+        Printf ( ( byte* ) "\n" ) ;
+        while ( indentLevel -- ) Printf ( ( byte* ) "\t" ) ;
     }
-    if ( ns->State & NOT_USING ) _Printf ( ( byte* ) " - %s", c_gd ( ns->Name ) ) ;
-    else _Printf ( ( byte* ) " - %s", ns->Name ) ;
+    if ( ns->State & NOT_USING ) Printf ( ( byte* ) " - %s", c_gd ( ns->Name ) ) ;
+    else Printf ( ( byte* ) " - %s", ns->Name ) ;
     _Context_->NsCount ++ ;
 }
 
@@ -120,7 +120,7 @@ CSL_Namespace_SetStateAs_NotUsing ( )
 void
 CSL_PrintInNamespace ( )
 {
-    _Printf ( ( byte* ) "\nCurrent Namespace Being Compiled : %s\n",
+    Printf ( ( byte* ) "\nCurrent Namespace Being Compiled : %s\n",
         _CSL_Namespace_InNamespaceGet ( )->Name ) ;
 }
 
@@ -129,9 +129,9 @@ CSL_PrintInNamespace ( )
 void
 CSL_Namespaces ( )
 {
-    _Printf ( ( byte* ) "\nAll Namespaces : \n<list> ':' '-' <namespace>" ) ;
+    Printf ( ( byte* ) "\nAll Namespaces : \n<list> ':' '-' <namespace>" ) ;
     _CSL_ForAllNamespaces ( ( MapSymbolFunction2 ) Symbol_NamespacePrettyPrint ) ;
-    _Printf ( ( byte* ) "\n" ) ;
+    Printf ( ( byte* ) "\n" ) ;
 }
 
 int64
@@ -227,10 +227,10 @@ CSL_Namespaces_PrettyPrintTree ( )
     _Context_->NsCount = 0 ;
     _Context_->WordCount = 0 ;
     //SetState ( _O_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
-    _Printf ( ( byte* ) "\nNamespaceTree - All Namespaces : %s%s%s", c_ud ( "using" ), " : ", c_gd ( "not using" ) ) ;
+    Printf ( ( byte* ) "\nNamespaceTree - All Namespaces : %s%s%s", c_ud ( "using" ), " : ", c_gd ( "not using" ) ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_SetNonTREED, 0, 0 ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverse, ( int64 ) _CSL_->Namespaces, 1 ) ;
-    _Printf ( ( byte* ) "\nTotal namespaces = %d :: Total words = %d\n", _Context_->NsCount, _Context_->WordCount ) ;
+    Printf ( ( byte* ) "\nTotal namespaces = %d :: Total words = %d\n", _Context_->NsCount, _Context_->WordCount ) ;
 }
 
 void
@@ -239,10 +239,10 @@ CSL_Namespaces_PrettyPrintTreeWithWords ( )
     _Context_->NsCount = 0 ;
     _Context_->WordCount = 0 ;
     //SetState ( _O_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
-    _Printf ( ( byte* ) "%s%s%s%s%s%s%s", "\nNamespaceTree - All Namespaces : ", "using", " : ", c_gd ( "not using" ), " :: ", "with", c_ud ( " : words" ) ) ;
+    Printf ( ( byte* ) "%s%s%s%s%s%s%s", "\nNamespaceTree - All Namespaces : ", "using", " : ", c_gd ( "not using" ), " :: ", "with", c_ud ( " : words" ) ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_SetNonTREED, 0, 0 ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverseWithWords, ( int64 ) _CSL_->Namespaces, 1 ) ;
-    _Printf ( ( byte* ) "\nTotal namespaces = %d :: Total words = %d\n", _Context_->NsCount, _Context_->WordCount ) ;
+    Printf ( ( byte* ) "\nTotal namespaces = %d :: Total words = %d\n", _Context_->NsCount, _Context_->WordCount ) ;
 }
 
 void
@@ -253,7 +253,7 @@ _Namespace_Symbol_Print ( Symbol * symbol, int64 printFlag, int64 str )
     sprintf ( buffer, "%s ", ns->Name ) ;
     if ( printFlag )
     {
-        _Printf ( ( byte* ) "%s", buffer ) ;
+        Printf ( ( byte* ) "%s", buffer ) ;
     }
     else strcat ( ( char* ) str, buffer ) ;
 }
@@ -274,9 +274,9 @@ _CSL_UsingToString ( )
 void
 CSL_Using ( )
 {
-    _Printf ( ( byte* ) "\nUsing Namespaces :> " ) ;
+    Printf ( ( byte* ) "\nUsing Namespaces :> " ) ;
     Tree_Map_Namespaces_State_2Args ( _CSL_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 1, 0 ) ;
-    _Printf ( ( byte* ) "\n" ) ;
+    Printf ( ( byte* ) "\n" ) ;
 }
 
 // this namespace is will be taken out of the system
