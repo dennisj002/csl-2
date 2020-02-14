@@ -1,4 +1,4 @@
-CSL really has no grammar, just one word after another with namespaces - forth like. So more powerful than context-sensitive, imho. It is based on openvmtil64.
+CSL really has no grammar, just one word after another with namespaces - forth like. It may be more powerful than a context-sensitive language. It is based on openvmtil64.
 
 openVm : Tookit for Implementing (and exploring) Languages - a bottom-up, optimizing native code vm, that is an extensible, contatenative, RPN, scripting language 
 
