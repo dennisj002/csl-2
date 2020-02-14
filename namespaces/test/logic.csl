@@ -1,0 +1,87 @@
+5 
+Root.Int C
+// logic test
+Logic Bits
+: sp ; //stack pause ;
+
+sp
+: lt 1 2 < dup p ; lt 1 _assert sp
+: lt2 1 2 > dup p ; lt2 0 _assert sp
+// ' lt2 find wdiss
+
+: lnt ( n -- TOS ) n @ 7 < dup p ; 
+' lnt find wdiss 
+1 lnt 1 _assert sp 7 lnt 0 _assert 8 sp lnt 0 _assert sp
+: lnt2 ( n m -- TOS ) n @ m @ < dup p ; 
+1 2 lnt2 1 _assert sp 2 2 lnt2 0 _assert sp 2 1 lnt2 0 _assert sp
+// ' lnt find wdiss
+sp
+: lnt3 ( n -- TOS ) n @ 2 == dup p ; 1 lnt3 0 _assert 2 lnt3 1 _assert
+: lnt4 ( n m -- TOS ) n @ m @ != dup p ; 1 1 lnt4 0 _assert 2 1 lnt4 1 _assert
+
+: lnt ( n -- TOS ) n @ 7 <= dup p ; 1 lnt 1 _assert  7 lnt 1 _assert 8 lnt 0 _assert
+: lnt2 ( n m -- TOS ) n @ m @ <= dup p ; 1 2 lnt2 1 _assert 2 2 lnt2 1 _assert 2 1 lnt2 0 _assert
+: lnt ( n -- TOS ) n @ 7 >= dup p ; 1 lnt 0 _assert  7 lnt 1 _assert 8 lnt 1 _assert
+: lnt2 ( n m -- TOS ) n @ m @ >= dup p ; 3 2 lnt2 1 _assert 2 2 lnt2 1 _assert 2 3 lnt2 0 _assert
+' lnt2 find wdiss
+sp
+nl
+: lnt5 ( n | m ) m 1 = n m == p ; 1 lnt5 2 lnt5
+: lnt5 ( n | m ) m 1 = n m <= p ; 1 lnt5 2 lnt5
+: lnt5 ( n | m ) m 1 = n m > p ; 2 lnt5 1 lnt5
+: lnt5 ( n | m ) m 1 = n m >= p ; 2 lnt5 1 lnt5
+: lnt5 ( n | m ) m 1 = m n != p ; 2 lnt5 1 lnt5
+// ' lnt6 find wdiss
+sp
+nl
+//: lt7 1 1 - not dup p ; lt7 1 _assert sp
+: lt7 ( n m -- TOS ) n @ m @ - not dup p ; 1 1 lt7 1 _assert sp
+: lt7b ( ) 1 1 + not 0 _assert ; lt7b sp
+: lt8 ( ) 1 not 0 _assert ; lt8
+sp
+: lt9 0 not p ; lt9
+: lt10 ( n ) n not p ;
+sp  
+1 lt10 0 lt10
+: tnot ( n -- n ) n @ not dup n store n @ p ; "I.I" typeSignature
+' tnot find wdiss //pause
+1 not 0 "tnot1_assert" assert
+0 not 1 "tnot2_assert" assert
+0 tnot 1 "tnot3_assert" assert
+1 tnot 0 "tnot4_assert" assert 
+sp
+: tnot2 ( n m | v -- v ) n @ m @ | not dup v store p ;  
+' tnot2 find wdiss 
+0 0 tnot2 1 _assert 
+1 1 tnot2 0 _assert
+: tnot3 ( n -- TOS ) n @ not dup p ;
+' tnot3 find wdiss
+1 tnot3 0 _assert 
+sp
+: tAnd ( n m -- TOS ) n @ m @ && dup p ; "II.I" typeSignature
+' tAnd find wdiss
+1 0 tAnd 0 "1 0" assert 
+1 1 tAnd 1 "1 1" assert 
+0 0 tAnd 0 "0 0" assert 
+0 1 tAnd 0 "0 1" assert 
+sp
+: tNotAnd ( n m -- TOS ) n @ m @ not && dup p ; "II.I" typeSignature
+' tNotAnd find wdiss //pause
+1 0 tNotAnd 1 "tNotAnd1 1 0" assert 
+1 1 tNotAnd 0 "tNotAnd2 1 1" assert 
+0 0 tNotAnd 0 "tNotAnd3 0 0" assert 
+0 1 tNotAnd 0 "tNotAnd4 0 1" assert 
+// test 64 bit cmp
+hex 
+: tcmp ( n m -- TOS ) n @ p " > " ps m @ p n @ m @ > dup decimal p ; nl 0x100000000 0xffffffff tcmp 1 _assert 
+s hex nl 0xffffffff 0x100000000 tcmp 0 _assert 
+decimal
+Logic 
+: nt ( n -- TOS ) n @ ! ! ! ; 
+1 nt 0 _assert 
+0 nt 1 _assert
+'nt find wdiss
+sp
+2 + 7 assertStkChk sp // stack checking
+
+

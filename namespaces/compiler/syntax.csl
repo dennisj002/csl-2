@@ -1,0 +1,85 @@
+5
+User Compiler
+infixOn 
+: _assert1 _assert s ;
+: sp ; //stack pause ; sp
+: hi ( | x -- TOS ) x = ( 2 + ( 3 * 4 ) ), x dup p ; // x p : infix mode 
+' hi find wdiss
+hi 14 _assert1 //pause
+sp
+dscOn
+: hi1 ( a b | x -- x ) x = 2 + ( ( a ) / ( b ) ) * ( 3 * 4 ) ; 
+' hi1 find wdiss
+6 3 hi1 dup p 48 _assert //pause
+: hi1 ( a b | x -- x ) x = ( 2 + ( a / b ) * ( 3 * 4 ) ) ; 
+' hi1 find wdiss
+6 3 hi1 dup p 48 _assert //pause
+
+10 5 hi1 dup p 48 _assert1
+: hi2 ( a b | x -- x ) ( x = ( ( ( ( 2 + ( a / b ) ) * ( ( 3 * 4 ) ) ) ) ) ) ; 
+' hi2 find wdiss
+6 3 hi2 dup p 48 _assert1
+sp
+10 5 hi2 dup p 48 _assert1
+: h3 ( a b | x -- x ) ( x = ( ( ( ( 2 + ( ( 3 * 4 ) ) - ( (a) / (b) ) ) ) ) ) ) ; 
+' h3 find wdiss
+6 3 h3 dup p 12 "6 3 h3_assert1" assert
+10 5 h3 dup p 12 _assert1
+: h4 ( a b | x -- x ) x = ( 20 - ( 3 * 4 ) - ( a / b ) ) ; 
+' h4 find wdiss
+6 3 h4 dup p 6 _assert1
+10 5 h4 dup p 6 _assert1
+sp
+//infixOff // must be off to correctly interpret '(' below //but not with '(|'
+3 ( x ) { stack x @ dup p 3 _assert0 } ix 
+"\nabove line should read 3" ps //pause
+nl
+c_syntaxOn
+void thi42 ( n ) { n == 1 ? "hi1" ps : n == 2 ? "hi2" ps : n == 3 ? "hi3" ps : n == 4 ? "hi42" ps : "err" ps ; } 
+c_syntaxOff
+C_Syntax
+//'thi42 find wdiss
+1 thi42 
+2 thi42 
+3 thi42 
+4 thi42 
+//pause
+Interpreter
+0 ? "hi" ps : 0 ? "hi2" ps : 0 ? "hi3" ps : 1 ? "hi42\n" ps : "err" ps 
+: thi2 ( n ) n @ 1 == ? "hi1" ps : n @ 2 == ? "hi2" ps : "err" ps ; 
+//'thi2 find wdiss
+2 thi2
+: thi3 ( n ) n @ 1 == ? "hi1" ps : n @ 2 == ? "hi2" ps : n @ 3 == ? "hi3" ps : "err" ps ; 
+//'thi3 find wdiss
+3 thi3
+: thi42 ( n ) n @ 1 == ? "hi1" ps : n @ 2 == ? "hi2" ps : n @ 3 == ? "hi3" ps : n @ 4 == ? "hi42" ps : "err" ps ; 
+//'thi42 find wdiss
+4 thi42
+nl
+1 ? "hi1" ps 
+1 ? "hi2" ps : "er2" ps 
+0 ? "er" ps : "hi3" ps  
+{ 0 ? "er" ps : "hi42" ps } call
+nl
+0 ? "hi1" ps : 0 ? "hi2" ps : 0 ? "hi3" ps : 1 ? "hi42\n" ps : "err" ps 
+c_syntaxOn
+void thi41 () { 0 ? "hi1" ps : 0 ? "hi2" ps : 0 ? "hi3" ps : 1 ? "hi42\n" ps : "err" ps ; } // not yet??
+c_syntaxOff
+C_Syntax
+//'thi41 find wdiss
+thi41
+c_syntaxOn
+void thi42 ( n ) { n == 1 ? "hi1" ps : n == 2 ? "hi2" ps : n == 3 ? "hi3" ps : n == 4 ? "hi42" ps : "err" ps ; } 
+c_syntaxOff
+C_Syntax
+//'thi42 find wdiss
+4 thi42 
+c_syntaxOff
+0 ? "er" ps : "ok" ps   
+1 ? "ok" ps : "er" ps   
+//pause
+infixOff 
+: hi ( n ) 1 2 + infixOn + n @ + 3 infixOff n ! return n ; 3 hi 9 _assert
+: hip ( n ) 1 2 + {| infixOn |} + n @ + 3 infixOff n ! return n ; 3 hip 9 _assert
+2 + 7 assertStkChk // stack checking
+sp

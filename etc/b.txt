@@ -1,0 +1,15 @@
+0x7ffff7f4208b    49b96e355b5555550000    mov r9, 0x5555555b356e                                 
+0x7ffff7f42095    488bc4                  mov rax, rsp                                           
+0x7ffff7f42098    a808                    test al, 0x8                                           
+0x7ffff7f4209a    0f8410000000            jz 0x7ffff7f420b0             < C compiler code >        
+0x7ffff7f420a0    4883ec08                sub rsp, 0x8                                           
+0x7ffff7f420a4    49ffd1                  call r9                       < OpenVmTil.verbosity >
+0x7ffff7f420a7    4883c408                add rsp, 0x8                                           
+0x7ffff7f420ab    e903000000              jmp 0x7ffff7f420b3            < C compiler code >        
+0x7ffff7f420b0    49ffd1                  call r9                       < OpenVmTil.verbosity >
+0x7ffff7f420b3    498b06                  mov rax, [r14]                                         
+0x7ffff7f420b6    488b00                  mov rax, [rax]                                         
+0x7ffff7f420b9    4983ee08                sub r14, 0x8                                           
+0x7ffff7f420bd    498b4ff0                mov rcx, [r15-0x10]                                    
+0x7ffff7f420c1    483bc1                  cmp rax, rcx                                           
+0

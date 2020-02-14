@@ -1,0 +1,94 @@
+5
+Int 
+//dbgOff 
+C
+//jcc8_Off
+: sp ; //stack pause ;
+sp
+// testing before bignum starts // - tail recursion ideas from http://c2.com/cgi/wiki?TailCallOptimization
+: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+'factorial find wdiss //pause
+7 factorial dup p 5040 "factorial" _assert1 
+: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+'factorial find wdiss 
+7 factorial dup p 5040 "factorial" _assert1
+//verbosity 3 =
+sp
+c_syntaxOn
+int 
+factorial ( n | rec )
+{
+    rec = 1;
+    while ( n > 1 ) rec *= (n--) ;
+    return rec ;
+} 
+c_syntaxOff
+pwi factorial
+7 factorial dup p 5040 _assert sp //pause
+sp
+
+Combinators
+#if 0
+BigNum 
+//dlsym: mpfr_sum /usr/local/lib/libmpfr.so ; void_return
+dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
+: mpfrp ( value ) mpfr_printf ( "%*.*Rf", 16, 16, value ) ;
+: p mpfrp ;
+: !! qexp p nl ;
+d: 7 !! pause
+#endif
+
+
+BigNum 
+'x var
+bnInit ( 16 16 )
+: sp ; //stack pause ;
+
+: qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse ;
+'qexp find wdiss //pause
+"!" ' qexp find alias
+nl "64 ! = " ps 64 ! p nl 
+x 1000 ! =
+nl "1000 ! = " ps x @ fprint nl 
+: aexp ( -t N.N ) { dup 1 <= } { drop 1 } { dup -- aexp * } ifElse ;
+'aexp find wdiss //sp
+: bexp ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexp * } ifElse ; 
+: bexp0 ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup -- bexp0 * } ifElse ; 
+' bexp find wdiss ' bexp0 find wdiss
+7 bexp0 p //pause
+7 ! p 8 ! p 8 ! p
+nl 7 ! p
+
+//"!" ' qexp find alias
+//"!" ' aexp find alias
+//"!" ' bexp find alias
+"!" ' bexp0 find alias
+7 ! p 8 ! p
+: !! ! p nl ;
+'!! find wdiss
+7 !! 8 !! 8 !!   
+sp
+1000 ! p
+//pause
+1000 ! 
+x store
+x @ p 
+//pause
+//: bexpl ( n | l ) { l x @ = n @ 1 <= } { 1 l @ p } { n @ dup 1 - bexpl * } ifElse ; 
+//: bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ; 
+: bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ;
+'bexpl find wdiss
+7 bexpl dup p 
+5040 _bassert
+//sp pause
+
+nl "starting BigNum" ps nl
+BigNum
+bnInit ( 16 16 ) 
+1 3 / fprint 
+3 sqrt dup fprint dup * fprint //pause
+sp
+bigNumOff
+Int
+2 + 7 assertStkChk // stack checking
+//pause

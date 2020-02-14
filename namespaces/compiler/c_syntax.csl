@@ -1,0 +1,436 @@
+
+5 
+User
+C
+#if 0 // debug
+: sp stack pause ; sp
+#else
+: sp ; //stack pause ; sp
+#endif 
+location
+//dbgOn 
+//verbosity 4 =
+
+// maybe we're shooting for a "smart syntactic language" that will parse "poetic" syntactic arrangements
+#if 1 // if 0
+optimizeOn inlineOn 
+System Interpreter Combinators PrefixCombinators
+C String
+"Dlsym" namespace Dlsym "libc" namespace libc
+#if 1 //Zenfone2 @ not
+libc.printf ("\nhello %d\n", 7) //pause
+#endif
+C
+User
+Class
+: sp ; //stack pause ; 
+//verbosity 3 =
+
+c_syntaxOn
+libc C
+typedef struct _CObj
+{
+    int64 hi ;
+    char chars [ 32 ] ;
+    int64 hey ;
+    int64 heey2 ;
+    char chars2 [ 32 ] ;
+    int64 heey ;
+    int64 heey1 ;
+} cobj, CObj ;
+"CObj.size =" ps p ( CObj.size ) ; // 104
+"chey" CObj new ;
+CObj 
+C_Syntax
+sp
+chey.hi = 1234 ;
+_assert0 ( chey.hi 1234 ) ; sp
+dump ( chey, chey.size ) ; sp
+printf ( "\n\tchey.hi = %d", chey.hi ) ; sp
+chey.chars [2] = 255 ;
+sp 
+chey.heey = #x0123456789abcdef ; 
+dump ( chey, chey.size ) ;
+printf ( "\n\tchey.heey = %lx", chey.heey ) ; sp
+chey.heey #x0123456789abcdef _assert0
+dump ( chey, chey.size ) ;
+sp
+chey.heey1 = chey.heey ;
+chey.heey = chey.heey1 ; // #x0123456789abcdef ;
+chey.heey2 = chey.heey1 ; // #x0123456789abcdef ; 
+chey.heey2 = chey.heey1 ; // #x0123456789abcdef ;
+chey.hey = chey.heey1 ; // #x0123456789abcdef ;
+chey.hey chey.heey1 _assert0
+dump ( chey, chey.size ) ;
+printf ( "\n\tchey.hey = %lx", chey.hey ) ; 
+
+sp
+chey.chars [23] = 255 ;
+chey.chars [18] = #b10110 ; // #x16
+//chey.hey = #x12345678 ;
+dump ( chey, cobj.size ) ; 
+sp
+printf ( "\ncobj.size = %d",cobj.size ) ; 
+printf ( "\n%s%lx", "\nchey = ", &chey ) ;
+printf ( "\n%s%lx", "\nchey.hey = ", chey.hey ) ; sp 
+printf ( "\n%s%lx", "\n&chey.hey = ", &chey.hey ) ; sp
+hp ( chey.hey ) ; 
+hp ( &chey.hey ) ;
+sp
+C
+decimal
+var ( "x7" ) ;
+x7 = &chey.chars [ 18 ] ;
+sprintf ( x7, "%s", "\n\thoot" ) ;
+printf ( "%s", x7 ) ;
+//pause
+sprintf ( &chey.chars, "%s", "well" ) ;
+dump ( chey, cobj.size ) ; 
+//sprintf ( &chey.chars [ 24 ], "%s", "do or don't" ) ;
+sprintf ( &chey.chars [ 24 ], "%s", "don't" ) ;
+dump ( chey, cobj.size ) ; 
+sprintf ( &chey.chars, "%s", "hoot" ) ;
+dump ( chey, cobj.size ) ; 
+sprintf ( &chey.chars, "%s", "ok! don't hoot" ) ;
+dump ( chey, cobj.size ) ; 
+sprintf ( &chey.chars, "%s", "well, do or don't hoot" ) ;
+dump ( chey, cobj.size ) ; 
+
+printf ( "\n\t%s\n", &chey.chars [ 24 ] ) ;
+printf ( "\n\t%s\n", "hoot" ) ; //&chey.chars [ 24 ] ) ;
+dump ( chey, cobj.size ) ; // add '&' within parentheses for lvalue
+//pause
+sp
+scOn
+libc
+void
+chi ( CObj chey0, d | a b c )
+{
+    c = 1 + 2 ;
+    b = c + 2 ;
+    a = b + c ;
+    nl
+    p ( c ) ; c 3 "c should be 3" assert // 3
+    p ( b ) ; b 5 "b should be 5" assert // 5
+    p ( a ) ; a 8 "a should be 8" assert // 8
+    dump ( &chey0, cobj.size ) ; 
+    d = cobj.chey0.hey ;
+    hex p ( d ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
+    sprintf ( &cobj.chey0.chars, "\n\t\they = %lx", d ) ; // add '&' within parentheses for lvalue
+    printf ( "\n chi : d = %lx\n", d ) ;
+    sprintf ( &cobj.chey0.chars2, "\n\t\they hey = %lx", cobj.chey0.hey ) ;
+    printf ( "\n cobj.chey0.chars = %s\n", &cobj.chey0.chars ) ;
+    printf ( "\n cobj.chey0.chars2 = %s\n", &cobj.chey0.chars2 ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
+    d = cobj.chey0.hey ;
+    printf ( "\n%lx\n", d ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
+    _assert ( d #x0123456789abcdef ) ; 
+    printf ( "\n%x\n", cobj.chey0.hey ) ;
+    sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
+    dump ( &chey0, cobj.size ) ; 
+} prefix
+wdiss ( ' chi find ) ;
+chi ( chey, 7 ) ;
+sp
+#if 1
+void
+interpret2 ( | atoken aword ) 
+{
+    //testc1 () ; pause () ;
+    nl tab () ; ps ( "interpret2 :> " ) ; nl
+    while ( 1 )
+    {   
+        atoken = token () ; 
+        if (  (! atoken) || ! ( strcmp ( atoken, "i2halt" ) ) ) 
+        { 
+            return ; 
+        }
+        // test comment here
+        else
+        // test comment here
+        {
+            if ( atoken )
+            {       
+                aword = tokenToWord ( atoken ) ;
+                doWord ( aword ) ;
+            }       
+        }
+    }
+}
+#else
+void
+interpret2 ( | atoken aword ) 
+{
+    //testc1 () ; pause () ;
+    //nl () ; tab () ; 
+    ps ( "interpret2 :> " ) ; nl () ;
+    while ( 1 )
+    {   
+        atoken = token () ; 
+        //printf ( "\n\ttoken = %s", atoken ) ; 
+        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) { sp () ; return ; }
+        else 
+        {       
+            aword = tokenToWord ( atoken ) ;
+            doWord ( aword ) ;
+        }       
+    }
+}
+#endif // if 1 : endif
+
+wdiss ( ' interpret2 find ) ; 
+C
+sp
+#if 1
+//verbosity = 3 ;
+interpret2 
+using sp
+#if 1
+int
+fac4 ( n  | facc -- TOS ) 
+{ 
+    int facc = 1 ;
+#if 1
+    while ( n > 1 ) facc = n -- * facc ;
+#else
+    while ( n > 1 ) facc *= n -- ;
+#endif
+    return facc ;
+} prefix
+wdiss ( ' fac4 find ) ; 
+fac4 ( 7 ) ; dup p 5040 _assert sp
+//'interpret3 'interpret2 find alias
+c_syntaxOff
+' fac4 find wdiss
+#endif
+
+User
+words // i2halt code to exit interpret2
+sp 
+
+: hi1 1 2 + p ;  
+: hey1 hi1 hi1 ; 
+: heey1 hey1 hey1 hey1 ;
+nl heey1 
+
+#if 1 
+c_syntaxOn
+int
+faccs2 ( n | rec ) 
+{
+    for ( rec = 1 ; n > 1 ; n-- )
+    { 
+        rec = rec * n ; 
+    } 
+    return rec ;
+} prefix
+' faccs2 find wdiss
+faccs2 ( 7 ) dup p 5040 _assert0 
+sp 
+optimizeOff
+void
+interpret4 ( | atoken aword ) 
+{
+    //nl() ; tab () ; ps ( "interpret2 :> " ) ; nl () ;
+    while ( 1 )
+    {   
+        atoken = token () ; 
+        //printf ( "\n\ttoken = %s", atoken ) ; 
+        if ( ( ! atoken ) || ( ! ( strcmp ( atoken, "i2halt" ) ) ) )
+        { 
+            printf ( "\n\n\ttoken = %s :: interpret4 exiting ...", atoken ) ; 
+            return ; 
+        }
+        else
+        {
+            aword = tokenToWord ( atoken ) ;
+            doWord ( aword ) ;
+        }
+    }
+}
+
+interpret4
+c_syntaxOn
+C
+int
+faccs3 ( n | rec ) 
+{
+    for ( rec = 1 ; n > 1 ; n-- )
+    { 
+        rec = rec * n ; 
+    } 
+    return rec ;
+}
+' faccs3 find wdiss
+faccs3 ( 7 ) p sp
+c_syntaxOff
+//verbosity 2 = verbosity @ p pause
+i2halt // see above in interpret2
+#endif // if 2 : endif
+sp
+//i2halt // for second interpret3 
+//i2halt // for third interpret2
+#endif // if 1 : endif
+#endif // if 0 : endif
+C
+sp
+c_syntaxOn
+C String libc
+typedef _CBuffer { byte buf [ 256 ] ; } CBuffer ;
+void
+$ ( | atoken, buffer, CBuffer buffer0 ) 
+{
+    buffer = &buffer0.buf ;
+    memset ( buffer, 0, CBuffer.size ) ; 
+    while ( atoken = token () ) 
+    {   
+        printf ( "\n\ttoken = %s\n", atoken ) ; //pause () ;
+        if ( ! strcmp ( atoken, ";" ) ) 
+        { 
+            printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
+            sh ( buffer ) ;
+            break ; 
+        }
+        else 
+        { 
+            if ( strcmp ( atoken, "." ) )
+            {
+                strcat ( buffer, " " ) ; // for shell '.' which means current directory - needs the space after
+            }
+            strcat ( buffer, atoken ) ;
+        }
+    }
+} 
+void sp () { stack ; pause ; }
+'void.$ find wdiss sp
+void
+c_syntaxOff 
+#if doScript2 
+"\n\nnew $ test\n" ps
+d: $ls -al . ;
+$ etc/script ; 
+$$ etc/lispScript ; 
+$$ls -al /usr/local ; 
+$$ ls -al . ;
+#endif
+C
+sp
+verbosity 1 =
+infixOff
+1 opOn
+//stack pause
+: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ; 1 2 hi //pause
+sp
+c_syntaxOn
+sp
+int
+fac5 ( REG n  | REG facc ) 
+{ 
+    facc = 1 ;
+    while ( n > 1 ) 
+    {
+        //facc *= (n --) ; // parenthesis a must for now ??
+        facc *= n -- ;
+    }
+    return facc ;
+}
+wdiss ( ' fac5 find ) 
+fac5 ( 7 ) dup p 5040 _assert  
+#if 1
+c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
+: wtdinclude "namespaces/wordTypeDef.csl" include ;
+wtdinclude 
+c_syntaxOn
+int
+faccs ( REG int32 n | REG in64 rec -- RAX ) 
+{
+    rec = 1 ; 
+    while ( n > 1 )
+    { 
+        rec = rec * n ;  n-- ; 
+    } 
+    return rec ;
+}
+pwi faccs 
+faccs ( 7 ) ; 5040 _assert 
+//pause
+// test byte size objects
+C Experimental
+typedef struct _byteTest 
+{
+    byte a8_123 ; 
+    int64 a64_123 ;
+    byte b8_123 ;
+    byte c8_123 ; // test comment
+    union
+    {
+        int64 u64_123 ;
+        int32 u32_123 ;
+        int8 u8_123 ;
+    } ; //size = 8 
+    int32 a32_123 ;
+    byte d8_123 ;
+    int16 a16_123 ; // size = 26
+} byteTest, abyteTest ;
+'bt byteTest new ;
+ps ( "\nbt.size =" ) ; p ( bt.size ) ;
+bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
+var ( 'btt ) ;
+bt.a16_123 = 0x498 ;  
+void bttt ( byteTest bt ) 
+{ 
+    btt = bt.a8_123 ; bt.a8_123 = 36 ; bt.a16_123 = 0x1234 ; bt.a32_123 = 0x12345678 ; bt.a64_123 = 0x123456789abcdef0 ; //pause
+    printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
+    printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
+    printf ( "\nbt.a16_123 = 0x%x ", bt.a16_123 ) ; 
+    printf ( "\nbt.a32_123 = 0x%x ", bt.a32_123 ) ; 
+    printf ( "\nbt.a64_123 = 0x%lx ", bt.a64_123 ) ; 
+    printf ("\nbtt = %x", btt ) ; 
+    dump ( &bt, bt.size ) ; 
+    p ( bt.a8_123 ) ;
+} 
+'bt byteTest new ;
+bttt ( bt ) ; pwi bttt //pause // error size not considered
+bt.a8_123 = 255 ; dump ( bt, bt.size ) ; //pause
+'bt byteTest new ;
+binary () ; p ( bt.b8_123 ) ; decimal () ; bt.b8_123 = 123 ; binary () ; p ( bt.b8_123 ) ; decimal () ; //pause
+p (bt.a8_123) ; p (bt.b8_123) ; p (bt.a32_123) ; p (bt.d8_123) ; 
+bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 1234 ; bt.a64_123 = 0x123456789abcdef ;
+dump ( bt, bt.size ) ; //pause
+bt.a8_123 1 _assert 
+_assert ( bt.a8_123 1 ) ;
+_assert ( bt.a32_123, 2147483647 ) ;
+void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; }
+'abt byteTest new ;
+btest ( abt 46 456 234567 2345566 ) ;
+pwi btest ;
+void btest1 ( byteTest bt, byte i8 ) { bt.c8_123 = i8 ; }
+btest1 ( abt, 0x42 ) ;
+pwi btest1 //pause
+dump ( abt abt.size ) ;
+_assert ( abt.c8_123, 0x42 ) ;
+pwi btest1 ;
+p ( abt.size ) ; 
+p ( bt.size ) ; 
+dump ( abt abt.size ) ;
+bt.a8_123 1 _assert 
+_assert ( bt.a32_123, 2147483647 ) ;
+_assert ( abt.a16_123 456 ) ; 
+_assert ( abt.b8_123 46 ) ;
+_assert ( abt.a32_123 234567 ) ;
+_assert ( abt.a64_123 2345566 ) ;
+c_syntaxOff 
+notUsing: Experimental byteTest _byteTest abyteTest bt abt ; 
+Root Experimental User
+#endif
+
+bnOff
+infixOn
+(1 + 5) / (2 + 1) 2 _assert
+infixOff
+sp
+2 + 7 assertStkChk // stack checking
+sp
+

@@ -1,0 +1,90 @@
+5
+
+: apause ; //s pause ;
+"ppx" var "ppxe" var
+#if 0 // if 0
+
+#if 1 // if 1
+
+#if 0 // if 2
+"\npreprocessor test error 0.0\n" ps pause
+#endif // if 2 endif
+
+"\npreprocessor test error 0.1\n" ps pause
+
+#if 1 // if 3
+"\npreprocessor test error 0.2\n" ps pause
+#endif // if 3 endif
+
+#endif // if 1 endif
+
+#else // if 0 else -> true
+
+#if 0 // if 4
+#else // t 
+#if 0 // if 5
+#else // if 5 else t preprocessor testing ...
+#elif 0
+
+#elif 1 // t
+
+#if 0  // if 6
+#else // t
+"\npreprocessor test ok1\n" ps apause
+ppx dup @ 1 + =
+#endif // if 6 endif
+
+#if 0 // if 7
+#elif 0
+#elif 0
+#elif 1 // t
+"\npreprocessor test ok2\n" ps apause
+ppx dup @ 1 + =
+#endif // if 7 endif
+
+#if 1 // if 8
+"\npreprocessor test ok3\n" ps apause
+ppx dup @ 1 + =
+#endif // if 8 endif
+
+#elif 0 // if 5 : elif no 0  : if 3,4,5 remain 
+
+#if 0 // if 9
+#else
+"\npreprocessor test error 1\n" ps pause
+ppxe dup @ 1 + =
+#endif // if 9 endif
+
+#if 0 // if 10
+#else
+"\npreprocessor test error 2\n" ps pause
+ppxe dup @ 1 + =
+#endif // if 10 endif
+
+#elif 1 // if 5 : elif no 0  : if 3,4,5 remain 
+
+#if 0
+#else
+"\npreprocessor test ok 4\n" ps apause
+ppx dup @ 1 + =
+#endif
+
+#elif 1
+
+#if 0
+#else
+"\npreprocessor test error 3\n" ps pause
+ppxe dup @ 1 + =
+#endif
+
+#endif // if 5 : endif
+
+#endif // if 4 : endif 
+
+ppx @ dup "ppx =" ps p 4 _assert nl
+ppxe @ dup "ppxe =" ps p 0 _assert 
+#endif // if 3 : endif
+apause
+
+2 + 7 assertStkChk // stack checking
+

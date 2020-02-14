@@ -1,0 +1,4 @@
+infixOn
+: itestf ( n m | -- TOS ) (n + m) / 2 dup p ; 
+2 4 itestf 3 _assert
+
