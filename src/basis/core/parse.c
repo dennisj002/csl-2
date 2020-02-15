@@ -844,6 +844,42 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
     return token ;
 }
 
+int64
+_CSL_ParseQid ( byte * token0 )
+{
+    Context * cntx = _Context_ ;
+    Lexer * lexer = cntx->Lexer0 ;
+    Finder * finder = cntx->Finder0 ;
+    Boolean nst ;
+    Word * word = 0 ;
+    byte * token = token0 ; // token0 is also a flag : (token0 > 0) ? finder : parser
+    while ( 1 )
+    {
+        if ( ! token )
+        {
+            token = Lexer_ReadToken ( lexer ) ;
+            if ( token && ( token [0] == '.' ) ) token = Lexer_ReadToken ( lexer ) ;
+        }
+        if ( token && _Lexer_IsTokenForwardDotted ( lexer, 0 ) )
+        {
+            if ( token0 ) cntx->Interpreter0->BaseObject = 0 ;
+            word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+            if ( word && ( nst = word->W_ObjectAttributes & ( token0 ? NAMESPACE_TYPE : ( C_TYPE | C_CLASS | NAMESPACE ) ) ) )
+            {
+                Finder_SetQualifyingNamespace ( finder, word ) ;
+            }
+            else if ( token0 )
+            {
+                if ( ! nst ) _CSL_Do_Dot ( cntx, word ) ;
+                break ; //return (int64) word ;
+            }
+            token = 0 ;
+        }
+        else break ;
+    }
+    if ( token0 ) return ( int64 ) word ;
+    else return ( int64 ) token ;
+}
 // ?? seems way to complicated and maybe should be integrated with Lexer_ParseObject
 
 void
@@ -895,20 +931,7 @@ _CSL_SingleQuote ( )
     else
     {
         if ( ! Compiling ) CSL_InitSourceCode_WithName ( _CSL_, lexer->OriginalToken, 0 ) ;
-        byte * token ;
-        while ( 1 )
-        {
-            token = Lexer_ReadToken ( lexer ) ;
-            if ( token && ( token [0] == '.' ) ) token = Lexer_ReadToken ( lexer ) ;
-            else if ( ! _Lexer_IsTokenForwardDotted ( lexer, 0 ) ) break ;
-            word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-            if ( _Lexer_IsTokenForwardDotted ( lexer, 0 ) )
-            {
-                if ( word && ( word->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( finder, word ) ;
-                else break ;
-            }
-            else break ;
-        }
+        byte * token = ( byte* ) _CSL_ParseQid ( 0 ) ;
         DataStack_Push ( ( int64 ) token ) ;
         if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) )
             CSL_InitSourceCode_WithName ( _CSL_, token, 0 ) ;

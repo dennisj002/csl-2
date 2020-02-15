@@ -186,9 +186,9 @@ tar.xz :
 	tar -c --xz --exclude=lib/* --exclude=bin/* --exclude=nbproject --exclude=objects --exclude=archive --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=csl-gdb  --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * *.*
 
 xz : 
-	-rm ~/openvmtil64/core
-	-rm -rf /home/backup/openvmtil64/
-	-cp -r ~/openvmtil64/ /home/backup/openvmtil64/
+	-rm ~/csl/core
+	-rm -rf /home/backup/csl/
+	-cp -r ~/csl/ /home/backup/csl/
 	make tar.xz
 
 _all : realClean install
@@ -197,9 +197,9 @@ _all : realClean install
 _install : 
 	-cp ./init.csl ./namespaces/
 	-sudo rm -rf /usr/local/lib/csl/
-	-sudo cp -r ~/openvmtil64 /usr/local/lib/csl/
-	-sudo cp -r ~/openvmtil64/etc /usr/local/
-	-sudo cp ~/openvmtil64/lib/lib*.* /usr/lib
+	-sudo cp -r ~/csl /usr/local/lib/csl/
+	-sudo cp -r ~/csl/etc /usr/local/
+	-sudo cp ~/csl/lib/lib*.* /usr/lib
 	-sudo cp bin/* /usr/local/bin
 	-sudo ldconfig
 	ls -l /usr/local/bin/csl*

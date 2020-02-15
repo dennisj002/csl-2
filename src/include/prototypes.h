@@ -452,6 +452,7 @@ void _Lexer_ParseDecimal(Lexer *lexer, byte *token);
 void Lexer_ParseObject(Lexer *lexer, byte *token);
 byte *Parse_Macro(int64 type);
 byte *_Lexer_ParseTerminatingMacro(Lexer *lexer, byte termChar, Boolean includeTermChar);
+int64 _CSL_ParseQid(byte *token0);
 void _CSL_SingleQuote(void);
 /* src/basis/core/memSpace.c */
 byte *_mmap_AllocMem(int64 size);
@@ -1190,7 +1191,6 @@ void Finder_SetNamedQualifyingNamespace(Finder *finder, byte *name);
 Namespace *Finder_GetQualifyingNamespace(Finder *finder);
 Word *_Finder_Word_Find(Finder *finder, uint64 state, byte *name);
 Word *_Finder_FindWord_InOneNamespace(Finder *finder, Namespace *ns, byte *name);
-Word *_Finder_QID_Find(Finder *finder, byte *token);
 Word *Finder_QID_Find(Finder *finder, byte *token);
 Word *Finder_Word_Find(Finder *finder, byte *name, int64 flag, int64 saveQns);
 Word *Finder_Word_FindUsing(Finder *finder, byte *name, int64 saveQns);

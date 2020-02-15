@@ -142,15 +142,17 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
         if ( ! word ) snprintf ( ( char* ) buffer, 128, "%s< %s >", prePostfix, ( char * ) "C compiler code" ) ;
         postfix = buffer ;
     }
+#if 0    
     else
     {
-        str = String_CheckForAtAdddress ( *( ( byte ** ) ( address + 2 ) ) ) ;
+        str = String_CheckForAtAdddress ( *( ( byte ** ) ( address + 2 ) ) ) ; // ???
         if ( str )
         {
             snprintf ( ( char* ) buffer, 128, "%s%s", prePostfix, str ) ;
             postfix = buffer ;
         }
     }
+#endif    
     return postfix ;
 }
 

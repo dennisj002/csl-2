@@ -101,28 +101,6 @@ _Finder_FindWord_InOneNamespace ( Finder * finder, Namespace * ns, byte * name )
     if ( ns && name ) return finder->FoundWord = DLList_FindName_InOneNamespace ( ns, name ) ;
     return 0 ;
 }
-#if 0
-Word *
-_Finder_QID_Find ( Finder * finder, byte * token ) //, int64 flag, int64 saveQns )
-{
-    Context * cntx = _Context_ ;
-    Word * qidWord = Word_UnAlias ( Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ) ;
-    do
-    {
-        if ( qidWord && Is_NamespaceType ( qidWord ) )
-        {
-            token = Lexer_ReadToken ( cntx->Lexer0 ) ; // the '.' 
-            token = Lexer_ReadToken ( cntx->Lexer0 ) ; // next element of qid
-            if ( ! ( qidWord = _Finder_FindWord_InOneNamespace ( finder, qidWord = Word_UnAlias ( qidWord ), token ) ) ) return 0 ;
-            else if ( ! ReadLiner_IsTokenForwardDotted ( cntx->ReadLiner0, qidWord->W_RL_Index ) ) break ;
-            qidWord = Word_UnAlias ( qidWord ) ;
-        }
-        else break ;
-    }
-    while ( qidWord ) ;
-    return qidWord ;
-}
-#endif
 // QID : (q)ualified (id) identifer
 
 Word *
@@ -131,28 +109,7 @@ Finder_QID_Find ( Finder * finder, byte * token ) //, int64 flag, int64 saveQns 
     Word * word = 0 ;
     if ( token )
     {
-        Context * cntx = _Context_ ;
-        Lexer * lexer = cntx->Lexer0 ;
-        Boolean nst ;
-        while ( _Lexer_IsTokenForwardDotted ( lexer, 0 ) )
-        {
-            cntx->Interpreter0->BaseObject = 0 ;
-            word = _Finder_Word_Find ( _Finder_, USING, token ) ;  //Finder_Word_FindUsing ( finder, token, 0 ) ;
-            word = Word_UnAlias ( word ) ;
-            if ( word && ( nst = ( word->W_ObjectAttributes & NAMESPACE_TYPE ) ) ) Finder_SetQualifyingNamespace ( _Finder_, word ) ;
-            else 
-            {
-                if ( ! nst ) _CSL_Do_Dot ( cntx, word ) ;
-                return word ;
-            }
-            token = Lexer_ReadToken ( lexer ) ;
-            if ( token && ( token [0] == '.' ) )
-            {
-                SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
-                token = Lexer_ReadToken ( lexer ) ;
-            }
-        }
-        word = Finder_Word_FindUsing ( finder, token, 0 ) ;
+        if ( ! ( word = ( Word* ) _CSL_ParseQid ( token ) ) ) word = Finder_Word_FindUsing ( finder, token, 0 ) ;
         CSL_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
     }
     return word ;

@@ -1,4 +1,4 @@
-5 // stack checking marker
+_dbgOn 5 // stack checking marker
 Root 
 jcc8_Off
 typecheckOn dbgTypecheckOn

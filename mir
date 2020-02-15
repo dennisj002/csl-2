@@ -13,6 +13,6 @@ mv ../csl.$1.tar.xz  ~/workspace/backup/
 ls -al /home/backup/csl.$1.tar.xz
 ls -al /home/backup/archive/csl.$1.tar.xz
 make _install
-cd ~/openvmtil64/
+cd ~/csl/
 csl
 
