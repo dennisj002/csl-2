@@ -585,67 +585,6 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
     return false ;
 }
 
-// char sets would be better here ??
-
-Boolean
-ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
-{
-    int64 i = 0, space = 0 ;
-    Boolean escSeqFlag = false ;
-    byte * nc = & rl->InputLineString [ index ] ;
-    for ( i = 0 ; 1 ; i ++, nc ++ )
-    {
-        if ( escSeqFlag )
-        {
-            if ( ( *nc ) != 'm' ) continue ;
-            else
-            {
-                escSeqFlag = false ;
-                continue ;
-            }
-        }
-        else
-        {
-            switch ( *nc )
-            {
-                case ESC:
-                {
-                    escSeqFlag = true ;
-                    continue ;
-                }
-                case ']': case '[': return true ;
-                case 0 : case ',': case ';': case '(': case ')': case '\n': case '\'': return false ;
-                case '.':
-                {
-                    if ( i && ( *( nc + 1 ) != '.' ) )// watch for (double/triple) dot ellipsis
-                        return true ;
-                    break ;
-                }
-                case '"':
-                {
-                    if ( i > index ) return false ;
-                    break ;
-                }
-                case ' ':
-                {
-                    space ++ ;
-                    break ;
-                }
-                default:
-                {
-                    if ( ( ! GetState ( _Compiler_, ARRAY_MODE ) ) && space && isgraph ( *nc ) ) return false ;
-                    else
-                    {
-                        space = 0 ;
-                        break ;
-                    }
-                }
-            }
-        }
-    }
-    return false ;
-}
-
 int64
 CSL_Parse_Typedef_Field ( Boolean printFlag, byte * codeData )
 {

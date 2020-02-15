@@ -304,7 +304,7 @@ $ ( | atoken, buffer, CBuffer buffer0 )
     }
 } 
 //void sp () { stack ; pause ; }
-d: 'void.$ find wdiss sp
+'void.$ find wdiss sp
 void
 c_syntaxOff 
 #if doScript2 
@@ -431,8 +431,8 @@ Root Experimental User
 wtdInclude 
 C.Experimental
 'wtdInclude find 100 dump
-'wtdInclude find C.Experimental 'Word find wordStructPrint 
-C 'Experimental notUsing 
+'wtdInclude find 'C.Experimental.Word find wordStructPrint 
+'C.Experimental notUsing 
 #endif
 
 bnOff

@@ -54,7 +54,7 @@ using
 };
 DLLNode.size @ nl "DLLNode size = " prints p nl
 sp
-"testNode" DLLNode d: new 
+"testNode" DLLNode new 
 testNode.AfterReference 1 =
 testNode.BeforeReference 2 =
 byte.size 1 = sp

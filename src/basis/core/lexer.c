@@ -20,18 +20,40 @@ Lexer_Exception ( byte * token, uint64 exceptionNumber, byte * message )
 }
 
 Word *
-Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
+Lexer_Do_MakeItAutoVar ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
+// ... ??? ... make it a 'variable' 
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     Word * word = 0 ;
     byte * token2 ;
+    if ( Compiling && GetState ( cntx, C_SYNTAX ) )
+    {
+        //if ( ! _Compiler_->AutoVarTypeNamespace ) 
+        _Namespace_ActivateAsPrimary ( compiler->LocalsNamespace ) ;
+        word = DataObject_New ( LOCAL_VARIABLE, 0, token, 0, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
+        token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
+        if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
+    }
+    else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
+    word->W_ObjectAttributes |= ( RAW_STRING ) ;
+    return word ;
+}
+
+Word *
+Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
+{
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
+    Word * word = 0 ;
     if ( token )
     {
-        //if ( ( token [0] != '\"') && _Lexer_IsTokenForwardDotted ( lexer, lexer->TokenEnd_ReadLineIndex ) )
-        //    word = _Finder_QID_Find ( cntx->Finder0, token ) ;
-        //else 
-        word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
+#if 1       
+        //if ( ( token [0] != '\"' ) && _Lexer_IsTokenForwardDotted ( lexer, lexer->TokenEnd_ReadLineIndex ) )
+            word = Finder_QID_Find ( cntx->Finder0, token ) ;
+#else
+            word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
+#endif            
         if ( word && compiler->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
         //_DEBUG_SETUP ( word, token, 0, 0 ) ;
         if ( ! word )
@@ -41,22 +63,13 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
             if ( lexer->L_ObjectAttributes & T_RAW_STRING )
             {
                 if ( GetState ( _O_, AUTO_VAR ) && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) )
-                    // ... ??? ... make it a 'variable' 
                 {
-                    if ( Compiling && GetState ( cntx, C_SYNTAX ) )
-                    {
-                        //if ( ! _Compiler_->AutoVarTypeNamespace ) 
-                        _Namespace_ActivateAsPrimary ( compiler->LocalsNamespace ) ;
-                        word = DataObject_New ( LOCAL_VARIABLE, 0, token, 0, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
-                        token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
-                        if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
-                    }
-                    else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
-                    word->W_ObjectAttributes |= ( RAW_STRING ) ;
+                    if ( ! ( word = Lexer_Do_MakeItAutoVar ( lexer, token, tsrli, scwi ) ) ) return 0 ;
                 }
                 else Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, "\nLexer_ObjectToken_New : unknown token" ) ;
             }
-            else word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, lexer->Literal, 0, 0, tsrli, scwi ) ;
+            else word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, 
+                lexer->Literal, 0, 0, tsrli, scwi ) ;
             Word_SetTypeNamespace ( word, lexer->L_ObjectAttributes ) ;
             word->ObjectByteSize = lexer->TokenObjectSize ;
         }
@@ -66,17 +79,6 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
     return word ;
 }
 
-void
-Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word, int64 tsrli, int64 scwi )
-{
-    if ( word )
-    {
-
-        word->W_RL_Index = ( tsrli != - 1 ) ? tsrli : lexer->TokenStart_ReadLineIndex ;
-        word->W_SC_Index = ( scwi != - 1 ) ? scwi : lexer->SC_Index ;
-    }
-}
-
 byte *
 _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
 {
@@ -84,7 +86,8 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
     byte inChar ;
     if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
     {
-        Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ;
+        Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ; // preserve state across init ??
+        //Lexer_Init ( lexer, delimiters, lexer->State & (~LEXER_FORWARD_DOTTED), CONTEXT ) ; // preserve state across init ??
         lexer->State |= state ;
         lexer->SC_Index = _CSL_->SC_Index ;
         while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
@@ -106,6 +109,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         lexer->TokenStart_FileIndex = rl->LineStartFileIndex + lexer->TokenStart_ReadLineIndex ; //- lexer->Token_Length ;
         if ( peekFlag && reAddPeeked ) CSL_PushToken_OnTokenList ( lexer->OriginalToken ) ;
         lexer->LastLexedChar = inChar ;
+        //if ( ReadLiner_IsTokenForwardDotted ( rl, rl->ReadIndex - 1 )) SetState ( lexer, LEXER_FORWARD_DOTTED, true ) ; // -1 : from a '\"' ??
     }
     lexer->LastToken = lexer->OriginalToken ;
 
@@ -1017,5 +1021,16 @@ int64
 Lexer_ConvertLineIndexToFileIndex ( Lexer * lexer, int64 index )
 {
     return lexer->TokenStart_FileIndex = lexer->ReadLiner0->LineStartFileIndex + index ; //- lexer->Token_Length ;
+}
+
+void
+Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word, int64 tsrli, int64 scwi )
+{
+    if ( word )
+    {
+
+        word->W_RL_Index = ( tsrli != - 1 ) ? tsrli : lexer->TokenStart_ReadLineIndex ;
+        word->W_SC_Index = ( scwi != - 1 ) ? scwi : lexer->SC_Index ;
+    }
 }
 

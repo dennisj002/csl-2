@@ -157,7 +157,7 @@ TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 size )
             break ;
         }
     }
-    Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name, 
+    Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name,
         GetState ( tdsci, TDSCI_POINTER ) ? "*" : "", token, value ) ;
     tdsci->Tdsci_Field_Size = size ;
     SetState ( tdsci, TDSCI_POINTER, false ) ;
@@ -327,7 +327,7 @@ Parse_StructOrUnion_Type ( TypeDefStructCompileInfo * tdsci, int64 structOrUnion
         if ( token [0] == '{' )
         {
             // name will be added 'post structure'
-            if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = 
+            if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace =
                 DataObject_New ( CLASS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
             if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
             Parse_Structure ( tdsci ) ;
@@ -849,8 +849,10 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
 void
 _CSL_SingleQuote ( )
 {
-    ReadLiner * rl = _ReadLiner_ ;
-    Lexer * lexer = _Lexer_ ;
+    Context * cntx = _Context_ ;
+    Lexer * lexer = cntx->Lexer0 ;
+    ReadLiner * rl = cntx->ReadLiner0 ;
+    Finder * finder = cntx->Finder0 ;
     Word *word, * sqWord = _CSL_WordList_TopWord ( ) ; //single quote word
     byte buffer [5] ;
     byte c0, c1, c2 ;
@@ -893,42 +895,24 @@ _CSL_SingleQuote ( )
     else
     {
         if ( ! Compiling ) CSL_InitSourceCode_WithName ( _CSL_, lexer->OriginalToken, 0 ) ;
-        byte * token, nchar ;
-#if 0     
+        byte * token ;
         while ( 1 )
         {
-            int64 i = lexer->TokenEnd_ReadLineIndex ;
-            while ( ( i < rl->MaxEndPosition ) && ( rl->InputLine [ i ] == ' ' ) ) i ++ ;
-            if ( ( rl->InputLine [ i ] == '.' ) || _Lexer_IsTokenForwardDotted ( _Lexer_, i + 1 ) ) // 1 : pre-adjust for an adjustment in                              _Lexer_IsTokenForwardDotted
+            token = Lexer_ReadToken ( lexer ) ;
+            if ( token && ( token [0] == '.' ) ) token = Lexer_ReadToken ( lexer ) ;
+            else if ( ! _Lexer_IsTokenForwardDotted ( lexer, 0 ) ) break ;
+            word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+            if ( _Lexer_IsTokenForwardDotted ( lexer, 0 ) )
             {
-                token = Lexer_ReadToken ( lexer ) ;
-                word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
-                if ( word && ( word->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( _Finder_, word ) ;
-                else if ( token && ( token[0] = '.' ) ) continue ;
-                else
-                {
-                    DataStack_Push ( ( int64 ) token ) ;
-                    goto done ;
-                }
+                if ( word && ( word->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( finder, word ) ;
+                else break ;
             }
             else break ;
         }
-        CSL_Token ( ) ;
-#else        
-        if ( ( nchar = ReadLine_PeekNextChar ( rl ) ) == ' ' )
-        {
-            while ( nchar = ReadLine_NextChar ( rl ) == ' ' ) ;
-            ReadLine_UnGetChar ( rl ) ;
-        }
-        if ( sqWord->Definition != CSL_SingleQuote )
-            token = _Lexer_ParseTerminatingMacro ( lexer, ' ', 0 ) ;
-        else token = Lexer_ReadToken ( lexer ) ; // in case of 'quote' instead of '\''
         DataStack_Push ( ( int64 ) token ) ;
-#endif        
         if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) )
             CSL_InitSourceCode_WithName ( _CSL_, token, 0 ) ;
     }
-done:
     _CSL_->SC_QuoteMode = false ;
 }
 

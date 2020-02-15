@@ -227,6 +227,7 @@ void CSL_Do_LispSymbol(Word *word);
 void Array_Do_AccumulatedAddress(int64 totalOffset);
 void Do_AccumulatedAddress(byte *accumulatedOffsetPointer, int64 offset, Boolean rvalueFlag, byte size);
 void CSL_Do_AccumulatedAddress(Word *word, byte *accumulatedAddress, int64 offset, Boolean rvalueFlag);
+void _CSL_Do_Dot(Context *cntx, Word *word);
 void CSL_Dot(void);
 void _Word_CompileAndRecord_PushReg(Word *word, int64 reg, Boolean recordFlag);
 void Compiler_Save_C_BackgroundNamespace(Compiler *compiler);
@@ -382,7 +383,6 @@ Boolean Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket(Lexer *lexer, Word *
 Boolean Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable(Lexer *lexer, Word *word);
 Boolean Is_LValue(Context *cntx, Word *word);
 Boolean Lexer_IsTokenReverseDotted(Lexer *lexer);
-Boolean ReadLiner_IsTokenForwardDotted(ReadLiner *rl, int64 index);
 int64 CSL_Parse_Typedef_Field(Boolean printFlag, byte *codeData);
 void Word_ClassStructure_PrintData(Word *word, byte *typedefString);
 /* src/basis/core/dataObjectNew.c */
@@ -643,8 +643,8 @@ Boolean Word_IsSyntactic(Word *word);
 void Interpreter_SetLexState(Interpreter *interp);
 /* src/basis/core/lexer.c */
 void Lexer_Exception(byte *token, uint64 exceptionNumber, byte *message);
+Word *Lexer_Do_MakeItAutoVar(Lexer *lexer, byte *token, int64 tsrli, int64 scwi);
 Word *Lexer_ParseToken_ToWord(Lexer *lexer, byte *token, int64 tsrli, int64 scwi);
-void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);
 byte *_Lexer_LexNextToken_WithDelimiters(Lexer *lexer, byte *delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state);
 void Lexer_Init(Lexer *lexer, byte *delimiters, uint64 state, uint64 allocType);
 byte Lexer_NextNonDelimiterChar(Lexer *lexer);
@@ -715,6 +715,7 @@ Boolean Lexer_IsTokenForwardDotted(Lexer *lexer);
 Boolean Lexer_IsTokenQualifiedID(Lexer *lexer);
 void CSL_LexerTables_Setup(CSL *csl);
 int64 Lexer_ConvertLineIndexToFileIndex(Lexer *lexer, int64 index);
+void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);
 /* src/basis/core/cstack.c */
 int64 _Stack_Overflow(Stack *stack);
 int64 _Stack_IsEmpty(Stack *stack);
@@ -1107,6 +1108,7 @@ void _ReadLine_CursorToEnd(ReadLiner *rl);
 void _ReadLine_CursorToStart(ReadLiner *rl);
 void _ReadLine_CursorRight(ReadLiner *rl);
 void _ReadLine_CursorLeft(ReadLiner *rl);
+Boolean ReadLiner_IsTokenForwardDotted(ReadLiner *rl, int64 index);
 /* src/basis/core/array.c */
 void _ByteArray_UnAppendSpace(ByteArray *ba, int64 size);
 void _ByteArray_DataClear(ByteArray *ba);
@@ -1189,7 +1191,7 @@ Namespace *Finder_GetQualifyingNamespace(Finder *finder);
 Word *_Finder_Word_Find(Finder *finder, uint64 state, byte *name);
 Word *_Finder_FindWord_InOneNamespace(Finder *finder, Namespace *ns, byte *name);
 Word *_Finder_QID_Find(Finder *finder, byte *token);
-Word *Finder_QID_Find(Finder *finder, byte *qid);
+Word *Finder_QID_Find(Finder *finder, byte *token);
 Word *Finder_Word_Find(Finder *finder, byte *name, int64 flag, int64 saveQns);
 Word *Finder_Word_FindUsing(Finder *finder, byte *name, int64 saveQns);
 Word *Finder_Word_FindAny(Finder *finder, byte *name, int64 saveQns);

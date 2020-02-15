@@ -12,7 +12,9 @@ Object_Run ( Word * word )
     if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) CSL_Do_LiteralWord ( word ) ;
     else
     {
-        isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ), isReverseDotted = Lexer_IsTokenReverseDotted ( cntx->Lexer0 ) ;
+        //isForwardDotted = GetState ( cntx->Lexer0, LEXER_FORWARD_DOTTED ) ; //ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ; 
+        isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
+        isReverseDotted = Lexer_IsTokenReverseDotted ( cntx->Lexer0 ) ;
         if ( GetState ( _Compiler_, LC_ARG_PARSING ) )
         {
             if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) rvalueFlag = false ;
@@ -34,7 +36,7 @@ Object_Run ( Word * word )
     }
     if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) ) )
     {
-        cntx->Interpreter0->BaseObject = 0 ;
+        //cntx->Interpreter0->BaseObject = 0 ;
         CSL_UnsetQualifyingNamespace ( ) ;
     }
 }
@@ -339,7 +341,7 @@ Namespace_Do_C_Type ( Namespace * ns, Boolean isForwardDotted )
                 LC_Delete ( _LC_ ) ;
                 if ( ! Compiling )
                 {
-                    Compiler_Init (compiler, 0) ;
+                    Compiler_Init ( compiler, 0 ) ;
                     //CSL_RightBracket ( ) ; //nb. only Compiler_Init here. We don't want to turn on compile mode!! RightBracket is a forth term.
                     CSL_SourceCode_Init ( ) ;
                     CSL_WordList_Init ( 0 ) ;
@@ -426,21 +428,22 @@ CSL_Do_AccumulatedAddress ( Word * word, byte * accumulatedAddress, int64 offset
 // nb. 'word' is the previous word to the '.' (dot) cf. CSL_Dot so it can be recompiled, a little different maybe, as an object
 
 void
+_CSL_Do_Dot ( Context * cntx, Word * word ) // .
+{
+    if ( word && ( ! cntx->Interpreter0->BaseObject ) )
+    {
+        if ( word->W_ObjectAttributes & NAMESPACE_TYPE ) Finder_SetQualifyingNamespace ( cntx->Finder0, word ) ;
+        else cntx->Interpreter0->BaseObject = word ;
+    }
+}
+
+void
 CSL_Dot ( ) // .
 {
     Context * cntx = _Context_ ;
-    if ( ! cntx->Interpreter0->BaseObject )
-    {
-        SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
-        d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( "\nCSL_Dot", 0, 0 ) ) ;
-        Word * word = Compiler_PreviousNonDebugWord ( 0 ) ; // 0 : rem: we just popped the WordStack above
-        if ( word )
-        {
-            if ( word->W_ObjectAttributes & NAMESPACE_TYPE ) Finder_SetQualifyingNamespace ( cntx->Finder0, word ) ;
-            else cntx->Interpreter0->BaseObject = word ;
-            //else if ( ! ( word->ObjectAttributes &  ) ) cntx->Interpreter0->BaseObject = word ;
-        }
-    }
+    SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
+    Word * word = Compiler_PreviousNonDebugWord ( 0 ) ; // 0 : rem: we just popped the WordStack above
+    _CSL_Do_Dot ( cntx, word ) ;
 }
 
 void

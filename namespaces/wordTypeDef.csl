@@ -1,6 +1,6 @@
 5
 c_syntaxOn
-C 'Experimental namespace
+'C.Experimental namespace
 Experimental
 type Pointer ; Pointer.size = 8 ;
 type block ; block.size = 8 ;
@@ -235,7 +235,6 @@ typedef struct _Identifier
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
 c_syntaxOff
-C
-'Experimental notUsing
+'C.Experimental notUsing
 Root Experimental User
 2 + 7 assertStkChk // stack checking

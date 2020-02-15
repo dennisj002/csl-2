@@ -562,7 +562,7 @@ _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt, Boolean useKey )
 void
 OVT_SeriousErrorPause ( )
 {
-    _OVT_SimpleFinal_Key_Pause ( 0, true ) ;
+    _OVT_SimpleFinal_Key_Pause ( _O_, true ) ;
     fflush ( stdout ) ;
     Key ( ) ;
 }
