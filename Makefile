@@ -51,7 +51,7 @@ clean :
 
 src/include/prototypes.h : $(INCLUDES)
 	cp src/include/_proto.h src/include/prototypes.h
-	bin/cproto -o proto.h $(SOURCES)
+	cproto -o proto.h $(SOURCES)
 	mv proto.h src/include/prototypes.h
 	make oclean
 

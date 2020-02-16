@@ -29,6 +29,8 @@ Root
 'forth 'postfixOn find alias
 'C_On 'c_syntaxOn find alias
 'C_Off 'c_syntaxOff find alias
+'cOn 'c_syntaxOn find alias
+'cOff 'c_syntaxOff find alias
 "log" variable 
 "User" namespace 
 Io Int
@@ -463,6 +465,22 @@ infixOn
 infixOff
 rtw
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
+
+#if 1
+Experimental
+'xyxz var
+{
+    'a var 'b var
+    a 2 = 
+    b 4 =
+    a @ b @ + 2 / s p
+} xyxz !
+xyxz @ ix xyxz @ ix
+cOn
+void yada () { d: int a, b ; a = 2 ; b = 4 ; p ( ( a + b ) / 2 ) ; d: } yada () ;
+cOff
+: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 d: _assert
+#endif
 
 #if forStarters 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 d: _assert

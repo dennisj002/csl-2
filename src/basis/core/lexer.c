@@ -48,12 +48,7 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
     Word * word = 0 ;
     if ( token )
     {
-#if 1       
-        //if ( ( token [0] != '\"' ) && _Lexer_IsTokenForwardDotted ( lexer, lexer->TokenEnd_ReadLineIndex ) )
-            word = Finder_QID_Find ( cntx->Finder0, token ) ;
-#else
-            word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
-#endif            
+        word = Finder_QID_Find ( cntx->Finder0, token ) ;
         if ( word && compiler->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
         //_DEBUG_SETUP ( word, token, 0, 0 ) ;
         if ( ! word )
