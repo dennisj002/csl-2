@@ -484,7 +484,7 @@ byte *
 DBG_PrepareSourceCodeString (Word * word, byte* token, byte* scs, int tvw, int rlIndex , Boolean useScFlag) // scs : source code string ; tvw text view window
 {
     // usingSC == 1 denotes il string is from word->W_SourceCode else il is copied from rl->InputLineString
-    Debugger * debugger = _Debugger_ ;
+    Debugger * debugger = _Debugger_ ; 
     byte * cc_line = ( byte* ) "" ;
     if ( ( word || token ) && scs )
     {
@@ -506,10 +506,8 @@ DBG_PrepareSourceCodeString (Word * word, byte* token, byte* scs, int tvw, int r
         scswci = String_FindStrnCmpIndex ( scs, token1, scswi0, slt, slt ) ;
         if ( scswci != - 1 ) // did we find token in scs
         {
-            d0 ( byte * scspp0 = & scs [ scswi0 ] ) ;
-            d0 ( byte * scspp2 = & scs [ scswci ] ) ;
-            if ( rlIndex ) cc_line = PSCS_Using_ReadlinerInputString ( scs, token1, scswci, tvw ) ; // scs : source code string
-            else cc_line = PSCS_Using_WordSC ( scs, token1, scswci ) ;
+            if ( useScFlag ) cc_line = PSCS_Using_WordSC ( scs, token1, scswci ) ;
+            else cc_line = PSCS_Using_ReadlinerInputString ( scs, token1, scswci, tvw ) ; // scs : source code string
         }
     }
     return cc_line ;

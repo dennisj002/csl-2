@@ -125,7 +125,7 @@ Parse_ArrayField ( TypeDefStructCompileInfo * tdsci )
 }
 
 void
-TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 size )
+TDSCI_Print_Field (TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )
 {
     byte *token = tdsci->TdsciToken, *format ;
     int64 value ;
@@ -134,8 +134,9 @@ TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 size )
     {
         if ( ! GetState ( tdsci, TDSCI_UNION_PRINTED ) )
         {
-            Printf ( "\n0x%016lx\t%16s : size = %d", &tdsci->DataPtr [ tdsci->Tdsci_Offset ],
-                tdsci->Tdsci_Field_Type_Namespace->Name, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ) ) ; //->ObjectByteSize ) ; //tdsci->Tdsci_Field_Size ) ;
+            //Printf ( "\n0x%016lx\t%16s : size = %d : at %016lx", &tdsci->DataPtr [ tdsci->Tdsci_Offset ],
+            Printf ( "\n\t%16s : size = %d : at %016lx", 
+                tdsci->Tdsci_Field_Type_Namespace->Name, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ), &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ; //->ObjectByteSize ) ; //tdsci->Tdsci_Field_Size ) ;
             Word_ClassStructure_PrintData ( tdsci, tdsci->Tdsci_Field_Type_Namespace, tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
             if ( GetState ( tdsci, TDSCI_UNION ) ) SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
             else SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
@@ -173,7 +174,7 @@ TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 size )
         }
         Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name,
             GetState ( tdsci, TDSCI_POINTER ) ? " * " : "", token, value ) ;
-        tdsci->Tdsci_Field_Size = size ;
+        if ( ! (t_type & (POST_STRUCTURE_NAME|PRE_STRUCTURE_NAME)) ) tdsci->Tdsci_Field_Size = size ;
         SetState ( tdsci, TDSCI_POINTER, false ) ;
     }
 }
@@ -197,7 +198,7 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
     Word * id, *addToNs ;
     if ( GetState ( tdsci, TDSCI_PRINT ) )
     {
-        if ( t_type == TYPE_NAME ) TDSCI_Print_Field ( tdsci, size ) ;
+        if ( t_type == TYPE_NAME ) TDSCI_Print_Field (tdsci, t_type, size ) ;
     }
     else if ( ( t_type == POST_STRUCTURE_NAME ) && GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
     {

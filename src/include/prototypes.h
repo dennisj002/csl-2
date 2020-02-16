@@ -432,7 +432,7 @@ void TDSCI_Init(TypeDefStructCompileInfo *tdsci);
 TypeDefStructCompileInfo *TypeDefStructCompileInfo_New(void);
 void CSL_Parse_Error(byte *msg, byte *token);
 void Parse_ArrayField(TypeDefStructCompileInfo *tdsci);
-void TDSCI_Print_Field(TypeDefStructCompileInfo *tdsci, int64 size);
+void TDSCI_Print_Field(TypeDefStructCompileInfo *tdsci, int64 t_type, int64 size);
 Word *Parse_Do_IdentifierAlias(TypeDefStructCompileInfo *tdsci, byte *token);
 void Parse_Do_Identifier(TypeDefStructCompileInfo *tdsci, int64 t_type, int64 size);
 void Parse_Identifier_Field(TypeDefStructCompileInfo *tdsci, int64 t_type, int64 size);
