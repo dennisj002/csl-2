@@ -82,7 +82,7 @@ typedef struct _dobject
         byte * do_bData ;
         int64 * do_iData ;
     } ;
-} dobject ; // size 4 x 64 bits
+} dobject ; // size : 4 cells (8 bytes each) 
 typedef struct
 {
     union

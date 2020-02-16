@@ -717,6 +717,7 @@ typedef struct TypeDefStructCompileInfo
 #define TDSCI_STRUCTURE_COMPLETED       ( (uint64) 1 << 3 ) 
 #define TDSCI_PRINT                     ( (uint64) 1 << 4 ) 
 #define TDSCI_POINTER                     ( (uint64) 1 << 5 ) 
+#define TDSCI_UNION_PRINTED              ( (uint64) 1 << 6 ) 
 
 typedef struct
 {

@@ -85,7 +85,7 @@ _CSL_Word_ClassStructure_PrintData ( Word * typedefWord, Word * word )
 {
     typedefWord = Word_UnAlias ( typedefWord ) ;
     CSL_NewLine () ;
-    if ( typedefWord && word ) Word_ClassStructure_PrintData ( word, typedefWord->W_SourceCode ) ;
+    if ( typedefWord && word ) Word_ClassStructure_PrintData (0, word, typedefWord->W_SourceCode ) ;
 }
 
 

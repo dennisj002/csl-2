@@ -44,8 +44,8 @@ I think of language design and coding as *an Art form as well as a Science*.
 I feel all computer languages are derived from (applied) logic ~ currently best represented by the Turing Machine, Category Theory, the Lambda Calculus, and Type Theory - (our one universal language?). This is currently only an independent amateur research prototype but i think this is may be a direction we need to consider in compiler design and implementation.
 
 Important points/words (in primitives.c) : 
-'d:' turns on debugger in the interpreter
-'<dbg>' turns on runtime debugger 
+'d:' is a prefix word that turns on debugger in the interpreter
+'<dbg>' is also a prefix word that turns on runtime debugger just after its runtime location
 
 'csls' is the static version which needs only libc to run independent of other linked libraries
 'cslo3' would be an C -03 optimized version

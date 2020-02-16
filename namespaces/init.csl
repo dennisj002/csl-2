@@ -417,7 +417,7 @@ dbgOff
 'forStarters 0 const 
 '_doDemo 0 const
     
-//dbgOn
+dbgOn
 // === controls ===
 
 #if Is_DebugOn 
@@ -466,7 +466,7 @@ infixOff
 rtw
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
 
-#if 1
+#if 0
 Experimental
 'xyxz var
 {

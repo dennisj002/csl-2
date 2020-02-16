@@ -129,38 +129,53 @@ TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 size )
 {
     byte *token = tdsci->TdsciToken, *format ;
     int64 value ;
-    switch ( size )
+    if ( ( tdsci->Tdsci_Field_Type_Namespace->W_ObjectAttributes && STRUCTURE )
+        && ( ! GetState ( tdsci, TDSCI_POINTER ) ) && ( tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) )
     {
-        case 1:
+        if ( ! GetState ( tdsci, TDSCI_UNION_PRINTED ) )
         {
-            format = ( byte* ) "\n0x%016lx\t%s%s\t%s = 0x%02x" ;
-            value = * ( ( int8* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-            break ;
-        }
-        case 2:
-        {
-            format = ( byte* ) "\n0x%016lx\t%s%s\t%s = 0x%04x" ;
-            value = * ( ( int16* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-            break ;
-        }
-        case 4:
-        {
-            format = ( byte* ) "\n0x%016lx\t%s%s\t%s = 0x%08x" ;
-            value = * ( ( int32* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-            break ;
-        }
-        default:
-        case CELL:
-        {
-            format = ( byte* ) "\n0x%016lx\t%s%s\t%s = 0x%016lx" ;
-            value = * ( ( int64* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-            break ;
+            Printf ( "\n0x%016lx\t%16s : size = %d", &tdsci->DataPtr [ tdsci->Tdsci_Offset ],
+                tdsci->Tdsci_Field_Type_Namespace->Name, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ) ) ; //->ObjectByteSize ) ; //tdsci->Tdsci_Field_Size ) ;
+            Word_ClassStructure_PrintData ( tdsci, tdsci->Tdsci_Field_Type_Namespace, tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
+            if ( GetState ( tdsci, TDSCI_UNION ) ) SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
+            else SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
         }
     }
-    Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name,
-        GetState ( tdsci, TDSCI_POINTER ) ? "*" : "", token, value ) ;
-    tdsci->Tdsci_Field_Size = size ;
-    SetState ( tdsci, TDSCI_POINTER, false ) ;
+    else
+    {
+        switch ( size )
+        {
+            case 1:
+            {
+                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%02x" ;
+                value = * ( ( int8* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+                break ;
+            }
+            case 2:
+            {
+                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%04x" ;
+                value = * ( ( int16* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+                break ;
+            }
+            case 4:
+            {
+                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%08lx" ;
+                value = * ( ( int32* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+                break ;
+            }
+            default:
+            case CELL:
+            {
+                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%016lx" ;
+                value = * ( ( int64* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+                break ;
+            }
+        }
+        Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name,
+            GetState ( tdsci, TDSCI_POINTER ) ? " * " : "", token, value ) ;
+        tdsci->Tdsci_Field_Size = size ;
+        SetState ( tdsci, TDSCI_POINTER, false ) ;
+    }
 }
 
 Word *
@@ -845,14 +860,14 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
 }
 
 int64
-_CSL_ParseQid ( byte * token0 )
+_CSL_ParseQid ( byte * finderToken )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Finder * finder = cntx->Finder0 ;
     Boolean nst ;
     Word * word = 0 ;
-    byte * token = token0 ; // token0 is also a flag : (token0 > 0) ? finder : parser
+    byte * token = finderToken ; // finderToken is also a flag of the caller : (finderToken > 0) ? finder : parser
     while ( 1 )
     {
         if ( ! token )
@@ -862,13 +877,13 @@ _CSL_ParseQid ( byte * token0 )
         }
         if ( token && _Lexer_IsTokenForwardDotted ( lexer, 0 ) )
         {
-            if ( token0 ) cntx->Interpreter0->BaseObject = 0 ;
+            if ( finderToken ) cntx->Interpreter0->BaseObject = 0 ;
             word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-            if ( word && ( nst = word->W_ObjectAttributes & ( token0 ? NAMESPACE_TYPE : ( C_TYPE | C_CLASS | NAMESPACE ) ) ) )
+            if ( word && ( nst = word->W_ObjectAttributes & ( finderToken ? NAMESPACE_TYPE : ( C_TYPE | C_CLASS | NAMESPACE ) ) ) )
             {
                 Finder_SetQualifyingNamespace ( finder, word ) ;
             }
-            else if ( token0 )
+            else if ( finderToken )
             {
                 if ( ! nst ) _CSL_Do_Dot ( cntx, word ) ;
                 break ; //return (int64) word ;
@@ -877,7 +892,7 @@ _CSL_ParseQid ( byte * token0 )
         }
         else break ;
     }
-    if ( token0 ) return ( int64 ) word ;
+    if ( finderToken ) return ( int64 ) word ;
     else return ( int64 ) token ;
 }
 // ?? seems way to complicated and maybe should be integrated with Lexer_ParseObject
@@ -888,7 +903,6 @@ _CSL_SingleQuote ( )
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     ReadLiner * rl = cntx->ReadLiner0 ;
-    Finder * finder = cntx->Finder0 ;
     Word *word, * sqWord = _CSL_WordList_TopWord ( ) ; //single quote word
     byte buffer [5] ;
     byte c0, c1, c2 ;

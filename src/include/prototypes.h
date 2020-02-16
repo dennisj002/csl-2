@@ -383,8 +383,8 @@ Boolean Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket(Lexer *lexer, Word *
 Boolean Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable(Lexer *lexer, Word *word);
 Boolean Is_LValue(Context *cntx, Word *word);
 Boolean Lexer_IsTokenReverseDotted(Lexer *lexer);
-int64 CSL_Parse_Typedef_Field(Boolean printFlag, byte *codeData);
-void Word_ClassStructure_PrintData(Word *word, byte *typedefString);
+int64 CSL_Parse_Typedef_Field(TypeDefStructCompileInfo *tdsci, Boolean printFlag, byte *codeData);
+void Word_ClassStructure_PrintData(TypeDefStructCompileInfo *tdsci, Word *word, byte *typedefString);
 /* src/basis/core/dataObjectNew.c */
 Word *DataObject_New(uint64 type, Word *word, byte *name, uint64 morphismAttributes, uint64 objectAttributes, uint64 lispAttributes, int64 index, int64 value, Namespace *addToNs, int allocType, int64 tsrli, int64 scwi);
 byte *_CSL_NamelessObjectNew(int64 size, int64 allocType);
@@ -452,7 +452,7 @@ void _Lexer_ParseDecimal(Lexer *lexer, byte *token);
 void Lexer_ParseObject(Lexer *lexer, byte *token);
 byte *Parse_Macro(int64 type);
 byte *_Lexer_ParseTerminatingMacro(Lexer *lexer, byte termChar, Boolean includeTermChar);
-int64 _CSL_ParseQid(byte *token0);
+int64 _CSL_ParseQid(byte *finderToken);
 void _CSL_SingleQuote(void);
 /* src/basis/core/memSpace.c */
 byte *_mmap_AllocMem(int64 size);

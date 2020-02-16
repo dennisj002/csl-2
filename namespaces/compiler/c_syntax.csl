@@ -434,7 +434,7 @@ C.Experimental
 'wtdInclude find 'C.Experimental.Word find wordStructPrint 
 'C.Experimental notUsing 
 #endif
-
+pause
 bnOff
 infixOn
 (1 + 5) / (2 + 1) 2 _assert

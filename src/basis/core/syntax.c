@@ -586,14 +586,14 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
 }
 
 int64
-CSL_Parse_Typedef_Field ( Boolean printFlag, byte * codeData )
+CSL_Parse_Typedef_Field ( TypeDefStructCompileInfo * tdsci, Boolean printFlag, byte * codeData )
 {
-    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
+    if ( ! tdsci ) tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
     Word * word = _Interpreter_->w_Word ;
     byte * token ;
     CSL_Lexer_SourceCodeOn ( ) ;
     CSL_InitSourceCode_WithName ( _CSL_, word ? word->Name : 0, 1 ) ;
-    if ( printFlag )
+    if ( printFlag && ( ! GetState ( tdsci, TDSCI_PRINT ) ) )// if we are already within a printing don't reset the pointer
     {
         tdsci->DataPtr = codeData ;
         SetState ( tdsci, TDSCI_PRINT, true ) ;
@@ -607,14 +607,17 @@ CSL_Parse_Typedef_Field ( Boolean printFlag, byte * codeData )
 }
 
 void
-Word_ClassStructure_PrintData ( Word * word, byte * typedefString )
+Word_ClassStructure_PrintData ( TypeDefStructCompileInfo * tdsci, Word * word, byte * typedefString )
 {
     if ( word && typedefString && typedefString[0] )
     {
         Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
         ReadLiner * rl = cntx->ReadLiner0 ;
-        Readline_Setup_OneStringInterpret ( cntx->ReadLiner0, typedefString ) ;
-        CSL_Parse_Typedef_Field ( TDSCI_PRINT, ( byte* ) word ) ;
+        byte * token ;
+        Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
+        if ( ! tdsci ) tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
+        else token = TDSCI_ReadToken ( tdsci ) ; // read 'typedef' token
+        CSL_Parse_Typedef_Field ( tdsci, TDSCI_PRINT, ( byte* ) word ) ;
         Readline_Restore_InputLine_State ( rl ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;
     }
