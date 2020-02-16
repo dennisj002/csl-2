@@ -236,19 +236,22 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
 {
     Compiler * compiler = _Compiler_ ;
     if ( ! allocType ) allocType = T_CSL ; // COMPILER_TEMP ;
-    word = word ? word : _CSL_->LastFinished_Word ;
-    if ( compiler->NumberOfVariables )
+    word = word ? word : _Context_->CurrentWordBeingCompiled ? _Context_->CurrentWordBeingCompiled : _CSL_->LastFinished_Word ;
+    if ( ! word->NamespaceStack ) // already done earlier
     {
-        word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ;
-        Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+        if ( compiler->NumberOfVariables )
+        {
+            word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ;
+            Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+        }
+        Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+        if ( ! word->W_SC_WordList )
+        {
+            word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
+            _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
+        }
+        else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
     }
-    Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
-    if ( ! word->W_SC_WordList )
-    {
-        word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
-        _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
-    }
-    else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
 
 }
 

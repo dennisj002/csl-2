@@ -133,7 +133,8 @@ CSL_TurnOffBlockCompiler ( )
     Compiler * compiler = cntx->Compiler0 ;
     if ( ! GetState ( compiler, LISP_MODE ) ) CSL_LeftBracket ( ) ;
     _CSL_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
-    if ( ( ! GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ) || ( ! Compiling ) ) Compiler_FreeLocalsNamespaces ( compiler ) ;
+    //if ( ( ! GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ) || ( ! Compiling ) ) Compiler_FreeLocalsNamespaces ( compiler ) ;
+    CSL_FinishWordDebugInfo ( ) ;
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
     cntx->LastCompiledWord = cntx->CurrentWordBeingCompiled ;
     cntx->CurrentWordBeingCompiled = 0 ;

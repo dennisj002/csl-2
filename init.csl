@@ -477,9 +477,10 @@ Experimental
 } xyxz !
 xyxz @ ix xyxz @ ix
 cOn
-void yada () { d: int a, b ; a = 2 ; b = 4 ; p ( ( a + b ) / 2 ) ; } yada () ;
+void yada () { int a = 2, b = 4; p ( ( a + b ) / 2 ) ; } yada () ;
+void yadaYada () { int a, b ; a = 2, b = 4; p ( ( a + b ) / 2 ) ; } yadaYada () ;
 cOff
-: hi ( n m -- TOS ) n @ m @ + dup <dbg> p d: ; 2 3 d: hi 5 d: _assert
+: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 hi 5 _assert
 #endif
 
 #if forStarters 

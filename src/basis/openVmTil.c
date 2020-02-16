@@ -1,5 +1,5 @@
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.905.640" ) 
+#define VERSION ((byte*) "0.905.700" ) 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), 
 // CT/Oop (Category Theory, Object Oriented Programming), Formal Language Theory (Panini, Chomsky) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
