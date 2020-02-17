@@ -675,6 +675,7 @@
 #define NOT_USING ( (uint64) 1 << 24 )
 #define USING ( (uint64) 1 << 25 )
 #define ANY (NOT_USING|USING)
+#define DEBUG_INFO_SAVED ( (uint64) 1 << 26 )
 
 // Lisp State flags 
 #define LC_PRINT_VALUE          ( (uint64) 1 << 0 )

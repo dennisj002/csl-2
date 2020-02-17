@@ -5,22 +5,25 @@ void
 SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
 {
     // ...source code source code TP source code source code ... EOL
+    Word * scWord, * word ;
+    dllist * list ;
+    byte *sourceCode ;
+    int64 fixed ;
     if ( ! Compiling )
     {
-        Word * scWord ;
         if ( ! scWord0 ) scWord = Get_SourceCodeWord ( ) ;
         else scWord = scWord0 ;
         if ( scWord )
         {
-            dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CSL_->Compiler_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _O_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //CSL->CompilerWordList ;
+            list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CSL_->Compiler_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _O_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //CSL->CompilerWordList ;
             if ( list )
             {
-                byte *sourceCode = scWord->W_SourceCode ; //? scWord->W_SourceCode : String_New ( CSL->SC_Buffer, TEMPORARY ) ;
+                sourceCode = scWord->W_SourceCode ; //? scWord->W_SourceCode : String_New ( CSL->SC_Buffer, TEMPORARY ) ;
                 if ( ! String_Equal ( sourceCode, "" ) )
                 {
-                    int64 fixed = 0 ;
+                    fixed = 0 ;
                     //if ( Is_DebugOn ) SC_WordList_Show ( list, scWord, 0, 0, 0 ) ;
-                    Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
+                    word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
                     if ( word )
                     {
                         if ( ( scWord->W_TypeAttributes & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )

@@ -175,18 +175,10 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     csl->cs_Cpu = CpuState_New ( allocType ) ;
     csl->cs_Cpu2 = CpuState_New ( allocType ) ;
     csl->PeekPokeByteArray = ByteArray_AllocateNew ( 32, allocType ) ;
-    if ( nss )
-    {
-        csl->Namespaces = nss ;
-    }
-    else
-    {
-        _CSL_NamespacesInit ( csl ) ;
-    }
-    if ( csl->SaveDsp && csl->DataStack ) // with _O_->RestartCondition = STOP from Debugger_Stop
-    {
-        _Dsp_ = csl->SaveDsp ;
-    }
+    if ( nss ) csl->Namespaces = nss ;
+    else _CSL_NamespacesInit ( csl ) ;
+    // with _O_->RestartCondition = STOP from Debugger_Stop
+    if ( csl->SaveDsp && csl->DataStack ) _Dsp_ = csl->SaveDsp ;
     else
     {
         csl->DataStack = Stack_New ( _O_->DataStackSize, T_CSL ) ;

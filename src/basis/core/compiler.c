@@ -237,22 +237,25 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
     Compiler * compiler = _Compiler_ ;
     if ( ! allocType ) allocType = T_CSL ; // COMPILER_TEMP ;
     word = word ? word : _Context_->CurrentWordBeingCompiled ? _Context_->CurrentWordBeingCompiled : _CSL_->LastFinished_Word ;
-    if ( ! word->NamespaceStack ) // already done earlier
+    if ( ! GetState ( word, DEBUG_INFO_SAVED ) )
     {
-        if ( compiler->NumberOfVariables )
+        if ( ! word->NamespaceStack ) // already done earlier
         {
-            word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ;
-            Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+            if ( compiler->NumberOfVariables )
+            {
+                word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ;
+                Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+            }
+            Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+            if ( ! word->W_SC_WordList )
+            {
+                word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
+                _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
+            }
+            else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
+            SetState ( word, DEBUG_INFO_SAVED, true ) ;
         }
-        Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
-        if ( ! word->W_SC_WordList )
-        {
-            word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
-            _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
-        }
-        else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
     }
-
 }
 
 void
@@ -277,6 +280,7 @@ void
 _CSL_FinishWordDebugInfo ( Word * word )
 {
     if ( ! GetState ( _CSL_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) CSL_DeleteDebugInfo ( ) ;
+
     else CSL_SaveDebugInfo ( word, 0 ) ;
 }
 
@@ -336,6 +340,7 @@ Compiler_New ( uint64 allocType )
     compiler->GotoList = _dllist_New ( allocType ) ;
     compiler->OptimizeInfoList = _dllist_New ( allocType ) ;
     Compiler_Init ( compiler, 0 ) ;
+
     return compiler ;
 }
 
@@ -344,6 +349,7 @@ Compiler_Copy ( Compiler * compiler, uint64 allocType )
 {
     Compiler * compilerCopy = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), allocType ) ;
     memcpy ( compilerCopy, compiler, sizeof (Compiler ) ) ;
+
     return compilerCopy ;
 }
 
@@ -351,30 +357,35 @@ void
 Compiler_CalculateAndSetPreviousJmpOffset ( Compiler * compiler, byte * jmpToAddress )
 {
     // we now can not compile blocks (cf. _Compile_Block_WithLogicFlag ) if their logic is not called so depth check is necessary
+
     if ( _Stack_Depth ( compiler->PointerToOffsetStack ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( compiler->PointerToOffsetStack ), jmpToAddress, 0 ) ;
 }
 
 void
 CSL_CalculateAndSetPreviousJmpOffset_ToHere ( )
 {
+
     Compiler_CalculateAndSetPreviousJmpOffset ( _Context_->Compiler0, Here ) ;
 }
 
 void
 _Stack_PointerToJmpOffset_Set ( byte * address )
 {
+
     Stack_Push ( _Context_->Compiler0->PointerToOffsetStack, ( int64 ) address ) ;
 }
 
 void
 Stack_Push_PointerToJmpOffset ( byte * compiledAtAddress )
 {
+
     _Stack_PointerToJmpOffset_Set ( compiledAtAddress + 1 ) ;
 }
 
 void
 CSL_CompileAndRecord_Word0_PushReg ( Boolean reg, Boolean recordFlag )
 {
+
     Word * word = _CSL_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, reg, recordFlag ) ;
 }
@@ -382,6 +393,7 @@ CSL_CompileAndRecord_Word0_PushReg ( Boolean reg, Boolean recordFlag )
 void
 CSL_CompileAndRecord_Word0_PushRegToUse ( )
 {
+
     Word * word = _CSL_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, word->RegToUse, true ) ;
 }

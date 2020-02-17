@@ -414,10 +414,11 @@ dbgOff
 'doTX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'forStarters 0 const 
+'forStarters var 
+forStarters 0 =
 '_doDemo 0 const
     
-dbgOn
+//dbgOn
 // === controls ===
 
 #if Is_DebugOn 
@@ -466,7 +467,7 @@ infixOff
 rtw
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
 
-#if 1
+#if 0
 Int Root.Experimental 
 'xyxz var
 {
@@ -483,11 +484,10 @@ s
 void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
 void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 s _assert s
 cOff
-s
-: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 5 hi 7 _assert
+forStarters 1 =
 #endif
 
-#if forStarters 
+#if forStarters @ 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 _assert
 #endif 
 2 + 7 assertStkChk // stack checking 
