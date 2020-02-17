@@ -1,4 +1,4 @@
-//: sp stack pause ; sp
+: sp ; //stack pause ; sp
 /* test comment */ 5  // for stack checking see last lines
 "\nclassTest.csl" ps sp //pause
 #if "_ClassTest_" defined not sp // prevent including this file twice
@@ -78,8 +78,8 @@ scOn
 ' init find wdiss //pause
 sp
 "testList" DLList new 
-testList DLList.size @ dup p dump //pause
-
+testList DLList.size @ dup p dump 
+//stack pause
 #if 1 //Is_DebugOn // test for debugger showing a long line of code
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey "\n below line should show several 15's yada yada yada yada neti" ps : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; nl hey nl "\n above line should show several 15's" ps // debugger test
 #else
@@ -98,8 +98,9 @@ using
     int64 Four ;
     int64 Accum ;
 }; // add seven elements
-
+//stack pause
 //verbosity 3 =
+scOn
 : init ( this ) 
 //<dbg>
     this.Category 12 =
@@ -154,6 +155,7 @@ using
     this.Category @ dup 12 "\nCategory should be 12 : assert10 =" assert p //_pause // 12
 ;
 ' init find wdiss 
+//stack pause
 #if 0 //Is_DebugOn
 verbosity 2 =
 "testClone" DLListClone d: new 
@@ -161,9 +163,9 @@ verbosity 2 =
 "testClone" DLListClone new 
 #endif
 "\nthis = " ps this hex p //pause
-
+sp
 C
-testClone size @ dump
+sp testClone size @ dump sp
 decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 88 "Clone size" assert sp
 testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert sp
 // test 'this' to refer to 'this' in current namespace

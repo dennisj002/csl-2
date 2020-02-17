@@ -57,7 +57,7 @@ DataObject_Run ( )
 }
 
 void
-Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
+Do_Variable (Word * word, Boolean rvalueFlag, Boolean isForwardDotted , Boolean isReverseDotted)
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -95,9 +95,13 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
             else value = ( int64 ) word->W_PtrToValue ;
         }
         Interpreter * interp = cntx->Interpreter0 ;
-        if ( interp->BaseObject && ( interp->BaseObject != word )
-            && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
-        else DataStack_Push ( value ) ;
+        //if ( isReverseDotted ) TOS = value ; //?? maybe needs more precise state logic
+        if ( isReverseDotted && ( interp->BaseObject && ( interp->BaseObject != word )  //TOS = value ; //?? maybe needs more precise state logic
+            && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
+        //if ( ( interp->BaseObject && ( interp->BaseObject != word )  //TOS = value ; //?? maybe needs more precise state logic
+        //    && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
+        else 
+        DataStack_Push ( value ) ;
     }
 done:
     if ( ( word->W_ObjectAttributes & STRUCT ) || isForwardDotted ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
@@ -128,7 +132,7 @@ CSL_Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Bool
         }
     }
     if ( ( ! GetState ( compiler, ARRAY_MODE ) ) && ( ! isForwardDotted ) && ( ! isReverseDotted ) ) interp->BaseObject = 0 ;
-    Do_Variable ( word, rvalueFlag, isForwardDotted ) ;
+    Do_Variable (word, rvalueFlag, isForwardDotted , isReverseDotted) ;
 }
 
 void

@@ -764,10 +764,10 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
 int32
 _CalculateOffsetForCallOrJump ( byte * offsetAddress, byte * jmpToAddr, byte insn )
 {
-    int32 offset ;
+    int32 offset = jmpToAddr - (offsetAddress + 1)  ;
     byte * insnAddr = offsetAddress - 1, offsetSize ;
     insn = insn ? insn : * insnAddr ; // when compiling a jmp/jcc insn *insnAddr == 0 ; nb! : insn is necessary in this case
-    offsetSize = ( ( insn == JMPI32 ) || ( insn == JCC32 ) || ( insn == CALLI32 ) || ( abs ( jmpToAddr - ( offsetAddress + 1 ) ) > 127 ) ) ? 4 : 1 ;
+    offsetSize = ( ( insn == JMPI32 ) || ( insn == JCC32 ) || ( insn == CALLI32 ) || ( abs (offset) > 127 ) ) ? 4 : 1 ;
 
     //if ( ( offsetSize == 4 ) || ( abs ( jmpToAddr - ( offsetAddress + offsetSize ) ) > 255 ) ) offset = ( jmpToAddr - ( offsetAddress + 4 ) ) ; // operandSize sizeof offset //call/jmp insn x64/x86 mode //sizeof (cell) ) ; // we have to go back the instruction size to get to the start of the insn 
     if ( offsetSize == 4 )
@@ -775,7 +775,7 @@ _CalculateOffsetForCallOrJump ( byte * offsetAddress, byte * jmpToAddr, byte ins
         if ( insn == JCC32 ) offset = ( jmpToAddr - ( offsetAddress + 1 + 4 ) ) ; // 1 : JCC32 is a 2 byte insn code
         else offset = ( jmpToAddr - ( offsetAddress + 4 ) ) ;
     }
-    else offset = ( jmpToAddr - ( offsetAddress + 1 ) ) ; //BYTE ) ) 
+    //else offset = ( jmpToAddr - ( offsetAddress + 1 ) ) ; //BYTE ) ) 
     return offset ;
 }
 
@@ -792,7 +792,7 @@ _SetOffsetForCallOrJump ( byte * offsetAddress, byte * jmpToAddr, byte insn )
     byte * insnAddr = offsetAddress - 1 ;
     insn = insn ? insn : * insnAddr ;
     int32 offset = _CalculateOffsetForCallOrJump ( offsetAddress, jmpToAddr, insn ) ;
-    if ( ( insn != JMPI32 ) && ( insn != JCC32 ) && ( offset < 128 ) ) * ( ( int8* ) offsetAddress ) = ( byte ) offset ;
+    if ( ( insn != JMPI32 ) && ( insn != JCC32 ) && ( abs (offset) < 127 ) ) * ( ( int8* ) offsetAddress ) = ( byte ) offset ;
     else if ( insn == JMPI32 ) * ( ( int32* ) offsetAddress ) = offset ; //offset ;
     else if ( insn == JCC32 ) * ( ( int32* ) ( offsetAddress + 1 ) ) = offset ; //offset ;
 }
@@ -800,12 +800,9 @@ _SetOffsetForCallOrJump ( byte * offsetAddress, byte * jmpToAddr, byte insn )
 void
 _Compile_JumpToDisp ( int64 disp, byte insn )
 {
-    if ( ( insn == JMPI32 ) || ( abs ( disp ) > 128 ) ) // with jmp instruction : disp is compiled an immediate offset
-    {
-        Compile_CalculateWrite_Instruction_X64 ( 0, JMPI32, 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ;
-    }
-    else Compile_CalculateWrite_Instruction_X64 ( 0, JMPI8, 0, 0, 0, DISP_B, 0, disp, BYTE, 0, 0 ) ;
-
+    if ( ( insn == JMPI8 ) || ( abs ( disp ) < 128 ) ) // with jmp instruction : disp is compiled as an immediate offset
+        Compile_CalculateWrite_Instruction_X64 ( 0, JMPI8, 0, 0, 0, DISP_B, 0, disp, BYTE, 0, 0 ) ;
+    else Compile_CalculateWrite_Instruction_X64 ( 0, JMPI32, 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ;
 }
 
 void

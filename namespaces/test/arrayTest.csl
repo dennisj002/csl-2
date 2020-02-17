@@ -1,5 +1,6 @@
                    
 5 
+: sp ; //stack pause ; sp
 
 #if _TestDone_ @ not // prevent including twice
 //dbgOff
@@ -7,7 +8,7 @@ lispOff
 decimal
 Int Class DLLNode
 "DLLNodeAlloc" class :{ DLLNode nodes [ 32 ] ; };
-: sp ; //stack pause ;
+: sp ; //stack pause ; sp
 
 "testna" DLLNodeAlloc new
 "DLLNode size = " prints DLLNode size @ Io.print nl 
@@ -84,7 +85,7 @@ testna4.nodes [ 3 ] [ 2 ].BeforeReference @ testna4.nodes [ 3 ] [ 2 ].AfterRefer
 tna
 testnarr2.nodes[1].AfterReference @ 1 _assert
 testnarr2.nodes[1].BeforeReference @ 2 _assert
-
+sp
 C
 : tnarr2 ( this ) 
         "tnarr2" ps nl
@@ -93,15 +94,14 @@ C
 	this . nodes [ 2 ].BeforeReference 2 =
 	this this.size @ dump
 ;
-
-
+sp
 : tnarr2a ( this ) 
         "tnarr2a" ps nl
 	this . nodes [ 2 ].AfterReference 1 =
 	this . nodes [ 2 ].BeforeReference 2 =
 	this this.size @ dump
 ;
-"testn4" DLLNodeAlloc new
+"testn4" DLLNodeAlloc new sp
 testn4 tnarr2a 
 testn4.nodes[2].AfterReference @ 1 _assert
 testn4.nodes[2].BeforeReference @ 2 _assert
@@ -112,13 +112,16 @@ testn4.nodes[2].BeforeReference @ 2 _assert
 	this.nodes [ 2 ].BeforeReference 2 =
 	this this.size @ dump
 ;
-sp
-"testn5" new
-testn5 tna3 //pause
 
+// : sp stack pause ; 
+
+"testn5" new
+sp
+testn5 tna3 
+sp
 testn5 hp
 testn5 tnarr2
-
+sp
 : tnax1 ( this ) // "tnax1 pushed" ps nl
         this nl hp nl
 	this.nodes[3].AfterReference 1 =
@@ -128,32 +131,37 @@ testn5 tnarr2
 	this.nodes[4] hp 
 	this.nodes[4].BeforeReference dup hp 16 dump
 ;
-' tnax1 find wdiss
+' tnax1 find wdiss sp
 "testnx" DLLNodeAlloc new 
+sp
 testnx tnax1
+sp
 decimal
 "Ar1" class :{ int64 ar [4] ; };
+sp
 "arr1" Ar1 new
 "arr1 : " ps location arr1 size @ dump // should be all zeroes
 arr1.ar [ 3 ] 0x89 =
 arr1.ar[0] arr1.ar[3] @ = 
 arr1.ar[0] @ 0x89 _assert
+sp
 "arr1 : " ps location arr1 size @ dump // should show 0x89 = 0x59 in first and last postion
 : arr2 ( Ar1 a ) 
     a.ar[1] a.ar[3] @ = 
     a.ar[2] a.ar[3] @ = 
     a.ar[1] @ dup decimal p 0x89 _assert 
 ;
-
+sp
 ' arr2 find wdiss
-arr1 arr2 // should print decimal 0x89
+arr1 arr2 // should print 137
 "\narr1 : " ps location arr1 size @ dump 
+sp
 : a3 ( n Ar1 a ) 
     a.ar [n @ 1 +] a.ar[n @ 2 +] @ = 
     a.ar[ n @ 1 +] @ dup hp 0x89 _assert decimal
     a.ar[2] @ dup hp 0x89 _assert decimal
 ;
-' a3 find wdiss //pause
+' a3 find wdiss sp
 1 arr1 a3
 arr1.ar[2] @ 0x89 _assert
 sp

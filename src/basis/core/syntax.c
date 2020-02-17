@@ -353,18 +353,19 @@ CSL_C_ConditionalExpression ( )
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler * compiler = cntx->Compiler0 ;
-    Word * word1 ;
+    Word * word ;
     if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0 ) ;
     SetState ( compiler, C_CONDITIONAL_IN, true ) ;
     if ( ! CompileMode ) CSL_If_ConditionalExpression ( ) ;
     else
     {
-        word1 = _CSL_WordList ( 1 ) ;
-        if ( word1 && word1->StackPushRegisterCode )
+        word = _CSL_WordList ( 1 ) ;
+        Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
+        if ( word && word->StackPushRegisterCode )
         {
             // nb. there is only one block so don't use BlockInfo code ; we may have nested conditionals
-            SetHere ( word1->StackPushRegisterCode, 1 ) ;
-            _Compile_TestCode ( word1->RegToUse, CELL ) ;
+            SetHere ( word->StackPushRegisterCode, 1 ) ;
+            _Compile_TestCode ( word->RegToUse, CELL ) ;
         }
         else
         {
@@ -568,6 +569,7 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
                 if ( graph ) space ++ ;
                 break ;
             }
+            case 0 : return false ;
             default:
             {
                 graph ++ ;

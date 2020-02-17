@@ -5,11 +5,11 @@ decimal
 : up using pause ;
 User
 #if 0
-: sp up ; //stack pause ;
+: sp stack pause ;
 C
-: sp up ; //stack pause ;
+: sp stack pause ;
 Class
-: sp up ; //stack pause ;
+: sp stack pause ;
 #else
 : sp ; //stack pause ;
 C
@@ -209,7 +209,7 @@ sp
 Combinators User
 decimal
 "\n\ntesting nested locals" ps nl
-sp
+//: sp stack pause ;
 : goedel { (| n ) n 1 = n @ 6 + dup 7 _assert p } ix { (| m ) m 3 = m @ 4 + dup 7 _assert p } ix ; 
 sp
 'goedel find wdiss

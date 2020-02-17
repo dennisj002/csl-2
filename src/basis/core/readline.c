@@ -669,7 +669,7 @@ ReadLine_CheckForLocalVariables ( ReadLiner * rl )
 {
     byte c, c2 ;
     Word * word = _Context_->CurrentlyRunningWord ;
-    boolean result ;
+    Boolean result ;
     int64 i, si ;
     if ( ! word ) word = _Interpreter_->w_Word ;
     si = word->W_RL_Index + strlen ( ( char* ) word->Name ) ;

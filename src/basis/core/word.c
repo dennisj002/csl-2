@@ -89,6 +89,7 @@ _Word_Finish ( Word * word )
     CSL_TypeStackReset ( ) ;
     _CSL_->LastFinished_Word = word ;
     _CSL_FinishWordDebugInfo ( word ) ;
+    Compiler_Init ( _Compiler_, 0 ) ;
 }
 
 void

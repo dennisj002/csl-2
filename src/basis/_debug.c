@@ -27,19 +27,18 @@ byte *
 JumpCallInstructionAddress ( byte * address )
 #if 1
 {
-    int32 offset ;
     byte *jcAddress ;
     byte insn = * address ;
 
     if ( ( insn == JMPI32 ) || ( insn == JCC32 ) )
     {
-        offset = * ( int32* ) ( address + 1 ) ; // 1 : 1 byte opCode
-        jcAddress = address + offset + 5 ; // 5 : sizeof jmp insn - includes 1 byte opcode
+        int32 offset32 = * ( int32* ) ( address + 1 ) ; // 1 : 1 byte opCode
+        jcAddress = address + offset32 + 5 ; // 5 : sizeof jmp insn - includes 1 byte opcode
     }
     else
     {
-        offset = * ( byte* ) ( address + 1 ) ;
-        jcAddress = address + offset + 2 ;
+        int8 offset8 = * ( byte* ) ( address + 1 ) ;
+        jcAddress = address + offset8 + 2 ;
     }
     return jcAddress ;
 }

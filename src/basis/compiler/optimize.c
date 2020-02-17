@@ -224,7 +224,7 @@ Compiler_Optimizer_2_Args_And_1_Literal ( Compiler * compiler )
         //if ( ( optInfo->opWord->CAttribute & CATEGORY_OP_EQUAL ) ) Compiler_Optimizer_2Args_Or_WordArg1_Op ( compiler ) ;
     else
     {
-        byte reg, rm ; // = ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg1->RegToUse : ACC ;
+        byte reg ; // = ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg1->RegToUse : ACC ;
         if ( optInfo->wordArg1->W_ObjectAttributes & REGISTER_VARIABLE ) SetHere ( optInfo->wordArg1->Coding ? optInfo->wordArg1->Coding : optInfo->wordArg2->Coding, 1 ) ;
         else if ( optInfo->wordArg1->StackPushRegisterCode ) _Set_To_Here_Word_StackPushRegisterCode ( optInfo->wordArg1, 1 ) ;
         compiler->OptInfo->Optimize_Imm = optInfo->wordArg2->S_Value ;

@@ -200,17 +200,11 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     returnValueFlag = ( Context_CurrentWord ( )->W_MorphismAttributes & C_RETURN ) 
         || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
-#if 0    
-    if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CSL_->CurrentWordBeingCompiled->S_ContainingNamespace ) &&
-        ( ! String_Equal ( _CSL_->CurrentWordBeingCompiled->S_ContainingNamespace->Name, "void" ) ) )
-    {
-        SetState ( compiler, RETURN_TOS, true ) ;
-    }
-#endif    
     // nb. these variables have no lasting lvalue - they exist on the stack - we can only return their rvalue
     if ( compiler->ReturnVariableWord )
     {
-        if ( ! ( compiler->ReturnVariableWord->W_ObjectAttributes & REGISTER_VARIABLE ) ) Compile_GetVarLitObj_RValue_To_Reg (compiler->ReturnVariableWord, ACC , 0) ; // need to copy because ReturnVariableWord may have been used within the word already
+        if ( ! ( compiler->ReturnVariableWord->W_ObjectAttributes & REGISTER_VARIABLE ) ) 
+            Compile_GetVarLitObj_RValue_To_Reg (compiler->ReturnVariableWord, ACC , 0) ; // need to copy because ReturnVariableWord may have been used within the word already
     }
     else if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
@@ -224,8 +218,9 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         else
         {
             byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ;
-            if ( memcmp ( mov_r14_rax, Here - 3, 3 ) ) Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
-#if 1   // hasn't occurred yet but maybe useful in some cases especially in connection with the below #else block        
+            if ( memcmp ( mov_r14_rax, Here - 3, 3 ) ) 
+                Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
+#if 0   // hasn't occurred yet but maybe useful in some cases especially in connection with the below #else block        
             else
             {
                 byte add_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08 } ;
@@ -249,7 +244,11 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     {
         // add a place on the stack for return value
         if ( parameterVarsSubAmount < 0 ) Compile_ADDI ( REG, DSP, 0, abs ( parameterVarsSubAmount ), 0 ) ;
-        else if ( ( ! compiler->NumberOfNonRegisterArgs ) && ( parameterVarsSubAmount == 0 ) && GetState ( compiler, RETURN_TOS ) ) //&& ( ! IsWordRecursive ) ) 
+        else if ( returnValueFlag && ( ! compiler->NumberOfNonRegisterArgs ) && ( parameterVarsSubAmount == 0 )  // && 
+            && ( ! compiler->NumberOfArgs ) )
+            //( GetState ( compiler, RETURN_TOS ) || compiler->ReturnVariableWord ) ) //&& ( ! IsWordRecursive ) ) 
+            //( GetState ( compiler, RETURN_TOS ) || compiler->ReturnVariableWord ) ) //&& ( ! IsWordRecursive ) ) 
+            //( returnValueFlag ) && ( ! IsWordRecursive ) ) 
             Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
     }
     // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables

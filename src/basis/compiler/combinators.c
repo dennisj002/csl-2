@@ -119,7 +119,7 @@ CSL_WhileCombinator ( )
         d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( ( byte* ) "\nCheckOptimize : after optimize :", 0, 0 ) ) ;
         Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 0, 0 ) ;
-        _Compile_JumpToAddress (start, 0) ; //((Here - start) < 256) ? JMPI8 : JMPI32 ) ;
+        _Compile_JumpToAddress (start, 0) ; //((Here - start) < 127) ? JMPI8 : JMPI32 ) ;
         CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ; // for testBlock
         CSL_EndCombinator ( 2, 1 ) ;
         //DBI_OFF ;
@@ -251,6 +251,7 @@ CSL_TrueFalseCombinator3 ( )
     DataStack_DropN ( 3 ) ;
     if ( CompileMode )
     {
+        //DBI_ON ;
         CSL_BeginCombinator ( 3 ) ;
         Block_CopyCompile ( ( byte* ) testBlock, 2, 1 ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 1, 0 ) ;
@@ -258,6 +259,7 @@ CSL_TrueFalseCombinator3 ( )
         Block_CopyCompile ( ( byte* ) falseBlock, 0, 0 ) ;
         CSL_EndIf ( ) ;
         CSL_EndCombinator ( 3, 1 ) ;
+        //DBI_OFF ;
     }
     else
     {

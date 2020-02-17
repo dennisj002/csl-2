@@ -1,19 +1,18 @@
 // see readme.txt for a text description
 // TODO : types, database, garbage collection : integration
-typedef unsigned char byte ;
-typedef byte Boolean ;
-typedef byte uint8 ;
 typedef char int8 ;
+typedef unsigned char uint8 ;
+typedef uint8 byte ;
 typedef short int16 ;
 typedef unsigned short uint16 ;
 typedef int int32 ;
 typedef unsigned int uint32 ;
 typedef long int int64 ;
 typedef unsigned long int uint64 ;
+typedef uint8 Boolean ;
 
 typedef char * CString ;
 typedef byte CharSet ;
-typedef Boolean boolean ;
 typedef void (* VoidFunction ) (void) ;
 typedef void (*vFunction_1_Arg ) ( int64 ) ;
 typedef void (*vFunction_1_UArg ) ( uint64 ) ;

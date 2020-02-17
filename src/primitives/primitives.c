@@ -270,6 +270,7 @@ CPrimitive CPrimitives [] = {
 
     { "dump", 0, 0, 0, CSL_Dump, 0, 0, 0, "Debug", "Root" },
     { "dis", 0, 0, 0, CSL_Disassemble, 0, 0, 0, "Debug", "Root" },
+    { "bdis", 0, 0, 0, CSL_Disassemble_Block, 0, 0, 0, "Debug", "Root" },
     { "wordDisassemble", 0, 0, 0, CSL_Word_Disassemble, 0, 0, 0, "Debug", "Root" },
     { "sourceAdd", 0, 0, 0, CSL_Source_AddToHistory, 0, 0, 0, "Debug", "Root" },
     { "source", 0, 0, 0, CSL_Source_AddToHistory, 0, 0, 0, "Debug", "Root" },

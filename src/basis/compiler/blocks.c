@@ -58,6 +58,17 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
             }
             else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
         }
+#if 0        
+        else if ( * srcAddress == JMPI8 )
+        {
+            int8 offset = * ( int8* ) ( srcAddress + 1 ) ; // 1 : 1 byte JMPI32 opCode
+            if ( offset )
+            {
+                dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustGotoJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
+            }
+            else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
+        }
+#endif        
         _CompileN ( srcAddress, isize ) ;
         //if ( _DBI || _O_->Dbi ) Debugger_UdisOneInstruction ( _Debugger_, srcAddress, ( byte* ) "", ( byte* ) "" ) ;
         //if ( _DBI  ) Debugger_UdisOneInstruction ( _Debugger_, srcAddress, ( byte* ) "", ( byte* ) "" ) ;
@@ -83,7 +94,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
             {
                 SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
-                BI_CompileRecord_TestCode_Reg (bi, bi->LogicCodeWord->RegToUse, CELL) ;
+                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
             }
@@ -91,7 +102,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
             {
                 SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
-                BI_CompileRecord_TestCode_Reg (bi, bi->LogicCodeWord->RegToUse, CELL) ;
+                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
             }
@@ -201,7 +212,7 @@ _CSL_BeginBlock2 ( BlockInfo * bi )
 }
 
 void
-CSL_BeginBlock ()
+CSL_BeginBlock ( )
 {
     BlockInfo * bi = _CSL_BeginBlock0 ( ) ;
     _CSL_BeginBlock1 ( bi ) ;

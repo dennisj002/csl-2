@@ -210,12 +210,17 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
     Word * word, *lastWord = 0, *currentlyRunning = Word_UnAlias ( _Context_->CurrentlyRunningWord ) ;
     byte * addr, *retAddr ;
     dllist * retStackList = List_New ( COMPILER_TEMP ) ;
-    int64 i0, i1, i2 ;
+    int64 i0, i1, i2, rsDepthPick = 1 ;
     if ( _O_->Verbosity > 1 ) CSL_PrintReturnStack ( ) ;
     for ( i0 = 0 ; i0 < 255 ; i0 ++ ) // 255 : sizeof ReturnStack
     {
         addr = ( ( byte* ) cpu->Rsp[i0] ) ;
         word = Word_UnAlias ( Word_GetFromCodeAddress ( addr ) ) ;
+        if ( word && String_Equal ( word->Name, "<dbg>" ) )
+        {
+            debugger->DebugAddress = ( byte* ) cpu->Rsp[i0 + 1] ; // this may be all that is needed here the rest is unnecessary ??
+            goto done ;
+        }
         if ( word )
         {
             _List_PushNew_1Value ( retStackList, COMPILER_TEMP, 0, cpu->Rsp[i0] ) ;
@@ -237,16 +242,16 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
             }
             Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
         }
-#define RS_DEPTH_PICK 1        
         if ( _O_->Verbosity > 1 )
         {
             CSL_PrintReturnStack ( ) ;
             Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
         }
-        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, RS_DEPTH_PICK ) ;
-        for ( i2 = 0 ; i2 <= RS_DEPTH_PICK ; i2 ++ ) Stack_Pop ( debugger->ReturnStack ) ; // pop the three intro functions
+        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, rsDepthPick ) ;
+        for ( i2 = 0 ; i2 <= rsDepthPick ; i2 ++ ) Stack_Pop ( debugger->ReturnStack ) ; // pop the three intro functions
     }
     else debugger->DebugAddress = ( byte* ) cpu->Rsp[0] ;
+done:
     debugger->w_Word = Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) ; // 21 : code size back to <dbg>
     return debugger->DebugAddress ;
 }

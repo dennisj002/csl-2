@@ -69,11 +69,11 @@ nl 7 ! p
 7 !! 8 !! 8 !!   
 sp
 1000 ! p
-//pause
+sp
 1000 ! 
 x store
 x @ p 
-//pause
+sp
 //: bexpl ( n | l ) { l x @ = n @ 1 <= } { 1 l @ p } { n @ dup 1 - bexpl * } ifElse ; 
 //: bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ; 
 : bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ;

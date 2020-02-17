@@ -22,6 +22,80 @@
 // TYPEDEF :: 'typedef' STRUCT_FIELD
 // TYPE :: 'type' TYPE_FIELD
 
+#if 0 // wha?? huh?? why doesn't 0 work but this is fine ??
+void
+_TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci ) //, int64 t_type, int64 size )
+{
+    //Printf ( "\n0x%016lx\t%16s : size = %d : at %016lx", &tdsci->DataPtr [ tdsci->Tdsci_Offset ],
+    Printf ( "\n\t%16s : size = %d : at %016lx",
+        tdsci->Tdsci_Field_Type_Namespace->Name, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
+        &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ; //->ObjectByteSize ) ; //tdsci->Tdsci_Field_Size ) ;
+    Word_ClassStructure_PrintData ( tdsci, tdsci->Tdsci_Field_Type_Namespace, tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
+    if ( GetState ( tdsci, TDSCI_UNION ) ) SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
+    else SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
+}
+
+#else
+void
+_TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci ) //, int64 t_type, int64 size )
+{
+    //Printf ( "\n0x%016lx\t%16s : size = %d : at %016lx", &tdsci->DataPtr [ tdsci->Tdsci_Offset ],
+    Printf ( "\n\t%16s : %s : size = %d : at %016lx",
+        tdsci->Tdsci_Field_Type_Namespace->Name, tdsci->TdsciToken, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
+        &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ; //->ObjectByteSize ) ; //tdsci->Tdsci_Field_Size ) ;
+    Word_ClassStructure_PrintData ( tdsci, tdsci->Tdsci_Field_Type_Namespace, tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
+    if ( GetState ( tdsci, TDSCI_UNION ) ) SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
+    else SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
+}
+#endif
+
+void
+TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )
+{
+    byte *token = tdsci->TdsciToken, *format ;
+    int64 value ;
+    if ( ( tdsci->Tdsci_Field_Type_Namespace->W_ObjectAttributes && STRUCTURE )
+        && ( ! GetState ( tdsci, TDSCI_POINTER ) ) && ( tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) )
+    {
+        if ( ! GetState ( tdsci, TDSCI_UNION_PRINTED ) ) _TDSCI_Print_Field ( tdsci ) ; //, t_type, size ) ;
+    }
+    else
+    {
+        switch ( size )
+        {
+            case 1:
+            {
+                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%02x" ;
+                value = * ( ( int8* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+                break ;
+            }
+            case 2:
+            {
+                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%04x" ;
+                value = * ( ( int16* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+                break ;
+            }
+            case 4:
+            {
+                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%08lx" ;
+                value = * ( ( int32* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+                break ;
+            }
+            default:
+            case CELL:
+            {
+                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%016lx" ;
+                value = * ( ( int64* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
+                break ;
+            }
+        }
+        Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name,
+            GetState ( tdsci, TDSCI_POINTER ) ? " * " : "", token, value ) ;
+        if ( ! ( t_type & ( POST_STRUCTURE_NAME | PRE_STRUCTURE_NAME ) ) ) tdsci->Tdsci_Field_Size = size ;
+        SetState ( tdsci, TDSCI_POINTER, false ) ;
+    }
+}
+
 void
 TDSCI_DebugPrintWord ( TypeDefStructCompileInfo *tdsci, Word * word )
 {
@@ -90,95 +164,6 @@ CSL_Parse_Error ( byte * msg, byte * token )
     _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
 }
 
-void
-Parse_ArrayField ( TypeDefStructCompileInfo * tdsci )
-{
-    int64 arrayDimensions [ 32 ] ; // 32 : max dimensions for now
-    int64 size = tdsci->Tdsci_Field_Size, i, arrayDimensionSize ;
-    byte *token = tdsci->TdsciToken ;
-    memset ( arrayDimensions, 0, sizeof (arrayDimensions ) ) ;
-
-    for ( i = 0 ; 1 ; i ++ )
-    {
-        if ( token && String_Equal ( ( char* ) token, "[" ) )
-        {
-            CSL_InterpretNextToken ( ) ; // next token must be an integer for the array dimension size
-            arrayDimensionSize = DataStack_Pop ( ) ;
-            size = size * arrayDimensionSize ;
-            tdsci->Tdsci_Field_Size = size ;
-            token = TDSCI_ReadToken ( tdsci ) ;
-            if ( ! String_Equal ( ( char* ) token, "]" ) ) CSL_Exception ( SYNTAX_ERROR, 0, 1 ) ;
-            else arrayDimensions [ i ] = arrayDimensionSize ;
-            token = TDSCI_ReadToken ( tdsci ) ;
-        }
-        else
-        {
-            if ( i )
-            {
-                tdsci->Tdsci_Field_Object->ArrayDimensions = ( int64 * ) Mem_Allocate ( tdsci->Tdsci_Field_Size, DICTIONARY ) ;
-                MemCpy ( tdsci->Tdsci_Field_Object->ArrayDimensions, arrayDimensions, tdsci->Tdsci_Field_Size ) ;
-                tdsci->Tdsci_Field_Object->ArrayNumberOfDimensions = i ;
-            }
-            break ;
-        }
-    }
-}
-
-void
-TDSCI_Print_Field (TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )
-{
-    byte *token = tdsci->TdsciToken, *format ;
-    int64 value ;
-    if ( ( tdsci->Tdsci_Field_Type_Namespace->W_ObjectAttributes && STRUCTURE )
-        && ( ! GetState ( tdsci, TDSCI_POINTER ) ) && ( tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) )
-    {
-        if ( ! GetState ( tdsci, TDSCI_UNION_PRINTED ) )
-        {
-            //Printf ( "\n0x%016lx\t%16s : size = %d : at %016lx", &tdsci->DataPtr [ tdsci->Tdsci_Offset ],
-            Printf ( "\n\t%16s : size = %d : at %016lx", 
-                tdsci->Tdsci_Field_Type_Namespace->Name, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ), &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ; //->ObjectByteSize ) ; //tdsci->Tdsci_Field_Size ) ;
-            Word_ClassStructure_PrintData ( tdsci, tdsci->Tdsci_Field_Type_Namespace, tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
-            if ( GetState ( tdsci, TDSCI_UNION ) ) SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
-            else SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
-        }
-    }
-    else
-    {
-        switch ( size )
-        {
-            case 1:
-            {
-                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%02x" ;
-                value = * ( ( int8* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-                break ;
-            }
-            case 2:
-            {
-                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%04x" ;
-                value = * ( ( int16* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-                break ;
-            }
-            case 4:
-            {
-                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%08lx" ;
-                value = * ( ( int32* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-                break ;
-            }
-            default:
-            case CELL:
-            {
-                format = ( byte* ) "\n0x%016lx\t%16s%s\t%24s = 0x%016lx" ;
-                value = * ( ( int64* ) ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ) ;
-                break ;
-            }
-        }
-        Printf ( format, &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->Name,
-            GetState ( tdsci, TDSCI_POINTER ) ? " * " : "", token, value ) ;
-        if ( ! (t_type & (POST_STRUCTURE_NAME|PRE_STRUCTURE_NAME)) ) tdsci->Tdsci_Field_Size = size ;
-        SetState ( tdsci, TDSCI_POINTER, false ) ;
-    }
-}
-
 Word *
 Parse_Do_IdentifierAlias ( TypeDefStructCompileInfo * tdsci, byte * token )
 {
@@ -198,7 +183,7 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
     Word * id, *addToNs ;
     if ( GetState ( tdsci, TDSCI_PRINT ) )
     {
-        if ( t_type == TYPE_NAME ) TDSCI_Print_Field (tdsci, t_type, size ) ;
+        if ( t_type == TYPE_NAME ) TDSCI_Print_Field ( tdsci, t_type, size ) ;
     }
     else if ( ( t_type == POST_STRUCTURE_NAME ) && GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
     {
@@ -237,6 +222,40 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
         }
     }
     if ( _O_->Verbosity > 1 ) TDSCI_DebugPrintWord ( tdsci, id ) ; // print class field
+}
+
+void
+Parse_ArrayField ( TypeDefStructCompileInfo * tdsci )
+{
+    int64 arrayDimensions [ 32 ] ; // 32 : max dimensions for now
+    int64 size = tdsci->Tdsci_Field_Size, i, arrayDimensionSize ;
+    byte *token = tdsci->TdsciToken ;
+    memset ( arrayDimensions, 0, sizeof (arrayDimensions ) ) ;
+
+    for ( i = 0 ; 1 ; i ++ )
+    {
+        if ( token && String_Equal ( ( char* ) token, "[" ) )
+        {
+            CSL_InterpretNextToken ( ) ; // next token must be an integer for the array dimension size
+            arrayDimensionSize = DataStack_Pop ( ) ;
+            size = size * arrayDimensionSize ;
+            tdsci->Tdsci_Field_Size = size ;
+            token = TDSCI_ReadToken ( tdsci ) ;
+            if ( ! String_Equal ( ( char* ) token, "]" ) ) CSL_Exception ( SYNTAX_ERROR, 0, 1 ) ;
+            else arrayDimensions [ i ] = arrayDimensionSize ;
+            token = TDSCI_ReadToken ( tdsci ) ;
+        }
+        else
+        {
+            if ( i )
+            {
+                tdsci->Tdsci_Field_Object->ArrayDimensions = ( int64 * ) Mem_Allocate ( tdsci->Tdsci_Field_Size, DICTIONARY ) ;
+                MemCpy ( tdsci->Tdsci_Field_Object->ArrayDimensions, arrayDimensions, tdsci->Tdsci_Field_Size ) ;
+                tdsci->Tdsci_Field_Object->ArrayNumberOfDimensions = i ;
+            }
+            break ;
+        }
+    }
 }
 
 void
@@ -879,7 +898,8 @@ _CSL_ParseQid ( byte * finderToken )
         if ( token && _Lexer_IsTokenForwardDotted ( lexer, 0 ) )
         {
             if ( finderToken ) cntx->Interpreter0->BaseObject = 0 ;
-            word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+            //word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+            word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
             if ( word && ( nst = word->W_ObjectAttributes & ( finderToken ? NAMESPACE_TYPE : ( C_TYPE | C_CLASS | NAMESPACE ) ) ) )
             {
                 Finder_SetQualifyingNamespace ( finder, word ) ;

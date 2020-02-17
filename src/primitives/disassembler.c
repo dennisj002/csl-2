@@ -46,7 +46,6 @@ CSL_Word_Disassemble ( )
 void
 Debugger_WDis ( Debugger * debugger )
 {
-    //_Printf ( ( byte* ) "\n" ) ;
     Word * word = debugger->w_Word ;
     if ( ! word ) word = _Interpreter_->w_Word ;
     _CSL_Word_Disassemble ( word ) ;
@@ -58,7 +57,14 @@ CSL_Disassemble ( )
     uint64 number = DataStack_Pop ( ) ;
     byte * address = ( byte* ) DataStack_Pop ( ) ;
     _Debugger_Disassemble ( _Debugger_, address, number, 0 ) ;
-    //_Printf ( ( byte* ) "\n" ) ;
+}
+
+void
+CSL_Disassemble_Block ( )
+{
+    //uint64 number = DataStack_Pop ( ) ;
+    byte * address = ( byte* ) DataStack_Pop ( ) ;
+    _Debugger_Disassemble ( _Debugger_, address, K, 1 ) ;
 }
 
 
