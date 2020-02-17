@@ -417,7 +417,7 @@ dbgOff
 'forStarters 0 const 
 '_doDemo 0 const
     
-//dbgOn
+dbgOn
 // === controls ===
 
 #if Is_DebugOn 

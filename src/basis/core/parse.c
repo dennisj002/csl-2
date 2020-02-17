@@ -22,20 +22,6 @@
 // TYPEDEF :: 'typedef' STRUCT_FIELD
 // TYPE :: 'type' TYPE_FIELD
 
-#if 0 // wha?? huh?? why doesn't 0 work but this is fine ??
-void
-_TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci ) //, int64 t_type, int64 size )
-{
-    //Printf ( "\n0x%016lx\t%16s : size = %d : at %016lx", &tdsci->DataPtr [ tdsci->Tdsci_Offset ],
-    Printf ( "\n\t%16s : size = %d : at %016lx",
-        tdsci->Tdsci_Field_Type_Namespace->Name, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
-        &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ; //->ObjectByteSize ) ; //tdsci->Tdsci_Field_Size ) ;
-    Word_ClassStructure_PrintData ( tdsci, tdsci->Tdsci_Field_Type_Namespace, tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
-    if ( GetState ( tdsci, TDSCI_UNION ) ) SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
-    else SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
-}
-
-#else
 void
 _TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci ) //, int64 t_type, int64 size )
 {
@@ -46,8 +32,8 @@ _TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci ) //, int64 t_type, int64 
     Word_ClassStructure_PrintData ( tdsci, tdsci->Tdsci_Field_Type_Namespace, tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
     if ( GetState ( tdsci, TDSCI_UNION ) ) SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
     else SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
+    CSL_NewLine () ;
 }
-#endif
 
 void
 TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )

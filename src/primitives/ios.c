@@ -23,7 +23,7 @@ void
 CSL_NewLine ( )
 {
     _CSL_PrintChar ( '\n' ) ;
-    ReadLiner_SetLastChar ( '\n' ) ;
+    //ReadLiner_SetLastChar ( '\n' ) ;
 }
 
 void

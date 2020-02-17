@@ -85,10 +85,10 @@ void
 _Word_Finish ( Word * word )
 {
     DObject_Finish ( word ) ;
+    _CSL_FinishWordDebugInfo ( word ) ;
     CSL_Finish_WordSourceCode ( _CSL_, word ) ;
     CSL_TypeStackReset ( ) ;
     _CSL_->LastFinished_Word = word ;
-    _CSL_FinishWordDebugInfo ( word ) ;
     Compiler_Init ( _Compiler_, 0 ) ;
 }
 

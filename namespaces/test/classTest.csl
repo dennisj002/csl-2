@@ -98,9 +98,7 @@ using
     int64 Four ;
     int64 Accum ;
 }; // add seven elements
-//stack pause
-//verbosity 3 =
-scOn
+
 : init ( this ) 
 //<dbg>
     this.Category 12 =
@@ -153,9 +151,9 @@ scOn
     decimal
     this.Accum @ dup 3 "\nAccum should be 3 : assert9 ="  assert p // 3
     this.Category @ dup 12 "\nCategory should be 12 : assert10 =" assert p //_pause // 12
-;
-' init find wdiss 
-//stack pause
+d: ;
+' init find d: wdiss 
+stack pause
 #if 0 //Is_DebugOn
 verbosity 2 =
 "testClone" DLListClone d: new 
