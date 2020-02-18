@@ -633,6 +633,7 @@
 #define C_TYPEDEC_WITH_EQUAL ( (uint64) 1 << 33 )
 #define ASM_MODE ( (uint64) 1 << 34 )
 #define TDSCI_PARSING ( (uint64) 1 << 35 )
+#define C_BLOCK_INTERPRETER ( (uint64) 1 << 36 )
 
 // Context flags
 #define C_SYNTAX ( (uint64) 1 << 20 )
@@ -736,9 +737,10 @@
 #define SCN_IN_USE_FLAG 2
 #define SCN_LAST_SLOT SCN_IN_USE_FLAG
 #define SCN_NUMBER_OF_SLOTS (SCN_LAST_SLOT + 1) //1 : remember - 0 indexed array
+#define SCN_NOT_IN_USE 0
 #define SCN_IN_USE_FOR_OPTIMIZATION 1
 #define SCN_IN_USE_FOR_SOURCE_CODE 2 
-#define SCN_IN_USE_FLAG_ALL 3
+#define SCN_IN_USE_FLAG_ALL (SCN_IN_USE_FOR_OPTIMIZATION|SCN_IN_USE_FOR_SOURCE_CODE)
 
 #define PP_SKIP 0
 #define PP_INTERPRET 1

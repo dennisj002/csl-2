@@ -174,7 +174,7 @@ byte*
 String_New_RemoveColors ( byte * str, uint64 allocType )
 {
     //printf ( "%c[%ld;%ldm", ESC, fg, bg )
-    byte * buf0 = Buffer_Data_Cleared ( _CSL_->StringInsertB ), *buf1 ;
+    byte * buf0 = Buffer_Data_QuickReset ( _CSL_->StringInsertB ), *buf1 ;
     int64 si, bi, j ;
     for ( si = 0, bi = 0 ; str[si] ; bi++, si ++ )
     {
@@ -185,6 +185,7 @@ String_New_RemoveColors ( byte * str, uint64 allocType )
         }
         else buf0[bi] = str[si] ;
     }
+    buf0[bi] = 0 ;
     buf1 = String_New ( buf0, allocType ) ;
     return buf1 ;
 }
@@ -995,10 +996,17 @@ next:
 }
 
 byte *
+Buffer_Data_QuickReset ( Buffer * b )
+{
+    b->B_Data[0] = 0 ;
+    return Buffer_Data ( b ) ;
+}
+
+byte *
 Buffer_Data_Cleared ( Buffer * b )
 {
     Mem_Clear ( b->B_Data, b->B_Size ) ;
-    return Buffer_Data ( b ) ; //b->B_Data ;
+    return Buffer_Data ( b ) ;
 }
 
 void

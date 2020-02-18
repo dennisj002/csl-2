@@ -48,6 +48,7 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
     Interpreter * interp = cntx->Interpreter0 ;
     Word * word ;
     byte * token ;
+    SetState ( compiler, C_BLOCK_INTERPRETER, true ) ;
     int64 blocksParsed = 0 ;
 
     while ( blocksParsed < blocks )
@@ -158,6 +159,7 @@ doDefault:
             else break ;
         }
     }
+    SetState ( compiler, C_BLOCK_INTERPRETER, false ) ;
     return blocksParsed ;
 }
 
@@ -292,7 +294,6 @@ CSL_IncDec ( int64 op ) // ++/--
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) ) //&& ( ! ( one->W_ObjectAttributes & REGISTER_VARIABLE )) )
                 {
-                    //List_DropN ( CSL->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable
                     _CSL_WordList_PopWords ( 1 ) ; // op
                     if ( GetState ( _CSL_, OPTIMIZE_ON ) && ( ! two ) ) SetHere ( one->Coding, 1 ) ;
                     CSL_WordList_PushWord ( one ) ; // variable
@@ -301,7 +302,6 @@ CSL_IncDec ( int64 op ) // ++/--
                     List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, COMPILER_TEMP ) ; // variable
                     List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
                     _CSL_WordList_PopWords ( 1 ) ;
-                    //List_DropN ( CSL->Compiler_N_M_Node_WordList, 1 ) ;
                     return ;
                 }
             }
@@ -590,7 +590,7 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
 int64
 CSL_Parse_Typedef_Field ( TypeDefStructCompileInfo * tdsci, Boolean printFlag, byte * codeData )
 {
-    if ( ! tdsci ) tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
+    if ( ! tdsci ) tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
     Word * word = _Interpreter_->w_Word ;
     byte * token ;
     CSL_Lexer_SourceCodeOn ( ) ;
@@ -617,7 +617,7 @@ Word_ClassStructure_PrintData ( TypeDefStructCompileInfo * tdsci, Word * word, b
         ReadLiner * rl = cntx->ReadLiner0 ;
         byte * token ;
         Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
-        if ( ! tdsci ) tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
+        if ( ! tdsci ) tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
         else token = TDSCI_ReadToken ( tdsci ) ; // read 'typedef' token
         CSL_Parse_Typedef_Field ( tdsci, TDSCI_PRINT, ( byte* ) word ) ;
         Readline_Restore_InputLine_State ( rl ) ;

@@ -23,12 +23,8 @@ Integer sp
 Pointer size @ nl "Pointer.size = " prints print nl sp
 Integer size @ nl "Integer size = " prints print nl
 int16.size @ nl "Integer.int16.size = " prints print nl sp
-Integer "byte" class
-byte size 1 = sp
-byte.size 1 = sp
+Integer "byte" class byte.size 1 = 
 byte.size @ nl "Integer.byte.size = " prints print nl
-//'int8 'byte find alias
-//Integer "int8" class int8 size 1 =
 sp
 Class
 using
@@ -116,7 +112,7 @@ using
     this.Twelve 12 =
     this.Accum this.Sum @ = 
 
-#if 1 // do> does> testing
+#if 0 // do> does> testing
     this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" do> locationPush does> locationPrint <do assert //pause
 #else
     this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" assert 

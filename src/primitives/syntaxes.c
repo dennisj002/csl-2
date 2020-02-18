@@ -85,7 +85,6 @@ CSL_C_Semi ( )
     if ( ( ! Compiling ) )
     {
         CSL_InitSourceCode ( _CSL_ ) ;
-        //CSL_DeleteDebugInfo () ;
     }
     SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
 }

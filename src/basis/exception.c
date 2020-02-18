@@ -290,7 +290,7 @@ OpenVmTil_Throw ( byte * excptMessage, byte * specialMessage, int64 restartCondi
     _O_->ExceptionSpecialMessage = specialMessage ;
 
     if ( infoFlag ) OpenVmTil_ShowExceptionInfo ( ) ;
-    OVT_Throw ( 0, restartCondition, 0 ) ;
+    OVT_Throw ( 0, restartCondition, 1 ) ;
 }
 
 void
@@ -300,7 +300,7 @@ _OpenVmTil_LongJmp_WithMsg ( int64 restartCondition, byte * msg )
 }
 
 void
-OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc ) //nb. void ptr necessary 
+OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc ) //nb. void ptr (uc) necessary 
 {
     d0 ( Printf ( ( byte* ) "\nOpenVmTil_SignalAction :: signal = %d\n", signal ) ) ;
     if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) || ( signal == SIGSTOP ) ) OVT_Exit ( ) ;
@@ -323,7 +323,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc ) //nb. void ptr 
         OVT_SeriousErrorPause ( ) ;
         _OVT_SigLongJump ( & _O_->JmpBuf0 ) ;
     }
-    else OVT_Throw ( _O_->Signal, _O_->RestartCondition, 0 ) ;
+    else OVT_Throw ( _O_->Signal, _O_->RestartCondition, 1 ) ;
 }
 
 void

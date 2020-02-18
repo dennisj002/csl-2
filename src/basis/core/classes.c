@@ -11,7 +11,7 @@ CSL_ClassStructureEnd ( void )
 void
 CSL_CloneStructureBegin ( void )
 {
-    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
+    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
     SetState ( tdsci, TDSCI_CLONE_FLAG, true ) ;
     Parse_Structure ( tdsci ) ;
     //Parse_A_Typedef_Field ( tdsci ) ; 
@@ -28,7 +28,7 @@ void
 _ClassTypedef ( Boolean cloneFlag )
 {
     Namespace * classNs ;
-    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
+    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
     tdsci->Tdsci_StructureUnion_Namespace = classNs = tdsci->BackgroundNamespace ;
     Parse_StructOrUnion_Type ( tdsci, TDSCI_STRUCT|(cloneFlag ? TDSCI_CLONE_FLAG : 0) ) ;
     Class_Size_Set ( classNs, tdsci->Tdsci_TotalSize ) ;

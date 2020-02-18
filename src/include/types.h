@@ -708,6 +708,7 @@ typedef struct TypeDefStructCompileInfo
     Namespace *BackgroundNamespace, * Tdsci_TotalStructureNamespace, * Tdsci_StructureUnion_Namespace, * Tdsci_Field_Type_Namespace ;
     Word * Tdsci_Field_Object ;
     byte *DataPtr, * TdsciToken ;
+    Stack * UnionDataStartStack ;
 } TypeDefStructCompileInfo, TDSCI ;
 //TypeDefStructCompileInfo State flags
 #define TDSCI_CLONE_FLAG                ( (uint64) 1 << 0 ) 

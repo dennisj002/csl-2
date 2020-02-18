@@ -43,6 +43,7 @@ TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )
     if ( ( tdsci->Tdsci_Field_Type_Namespace->W_ObjectAttributes && STRUCTURE )
         && ( ! GetState ( tdsci, TDSCI_POINTER ) ) && ( tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) )
     {
+        if ( ! GetState ( tdsci, TDSCI_UNION ) ) Stack_Push ( tdsci->UnionDataStartStack, (int64) &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
         if ( ! GetState ( tdsci, TDSCI_UNION_PRINTED ) ) _TDSCI_Print_Field ( tdsci ) ; //, t_type, size ) ;
     }
     else
@@ -132,12 +133,14 @@ TDSCI_Init ( TypeDefStructCompileInfo * tdsci )
     if ( tdsci->BackgroundNamespace ) memset ( tdsci, 0, sizeof (TypeDefStructCompileInfo ) ) ;
     tdsci->BackgroundNamespace = _CSL_Namespace_InNamespaceGet ( ) ;
     SetState ( _Compiler_, TDSCI_PARSING, true ) ;
+    Stack_Init ( tdsci->UnionDataStartStack ) ;
 }
 
 TypeDefStructCompileInfo *
-TypeDefStructCompileInfo_New ( )
+TypeDefStructCompileInfo_New (uint64 allocType)
 {
-    TypeDefStructCompileInfo *tdsci = ( TypeDefStructCompileInfo * ) Mem_Allocate ( sizeof (TypeDefStructCompileInfo ), CONTEXT ) ;
+    TypeDefStructCompileInfo *tdsci = ( TypeDefStructCompileInfo * ) Mem_Allocate ( sizeof (TypeDefStructCompileInfo ), allocType ) ;
+    tdsci->UnionDataStartStack = Stack_New ( 32, allocType ) ;
     TDSCI_Init ( tdsci ) ;
     return tdsci ;
 }

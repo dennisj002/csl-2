@@ -75,9 +75,8 @@ Word_LvalueObjectByteSize ( Word * lvalueWord, Word * rValueWord ) // =
 void
 Do_MoveErrorReport ( int64 value, byte * one, byte * two )
 {
-    byte buffer [128] ; //= Buffer_Data_Cleared ( CSL->ScratchB3 ) ; 
-    buffer [0] = 0 ;
-    snprintf ( buffer, 128, "\n_CSL_Move : Type Error : value == %ld : is greater than %s - max value for sizeof %s", value, one, two ) ;
+    byte *buffer = Buffer_Data_QuickReset ( _CSL_->ScratchB3 ) ; 
+    snprintf ( buffer, 127, "\n_CSL_Move : Type Error : value == %ld : is greater than %s - max value for sizeof %s", value, one, two ) ;
     Error ( buffer, QUIT ) ;
 }
 
@@ -88,36 +87,19 @@ _CSL_Move ( int64 * address, int64 value, int64 lvalueSize )
     {
         case 1:
         {
-            if ( value > 255 )
-            {
-                //snprintf ( buffer, 128, "\nType Error : value == %ld : is greater than 255 - max value for sizeof (byte)", value ) ;
-                //Error ( buffer, QUIT ) ;
-                Do_MoveErrorReport ( value, "255", "(byte)" ) ;
-            }
+            if ( value > 255 ) Do_MoveErrorReport ( value, "255", "(byte)" ) ;
             else * ( byte* ) address = ( byte ) value ;
             break ;
         }
         case 2:
         {
-            if ( value > 65535 )
-            {
-                //Error ( "\nType Error", "value is greater than 65535 - sizeof (int16)", QUIT ) ;
-                //snprintf ( buffer, 128, "\nType Error : value == %ld : is greater than 65535 - max value for sizeof (int16)", value ) ;
-                //Error ( buffer, QUIT ) ;
-                Do_MoveErrorReport ( value, "65535", "(int16)" ) ;
-            }
+            if ( value > 65535 ) Do_MoveErrorReport ( value, "65535", "(int16)" ) ;
             else * ( int16* ) address = ( int16 ) value ;
             break ;
         }
         case 4:
         {
-            if ( value > 2147483647 )
-            {
-                //Error ( "\nType Error", "value is greater than 2147483647 - sizeof (int32)", QUIT ) ;
-                //snprintf ( buffer, 128, "\nType Error : value == %ld : is greater than 2147483647 - max value for sizeof (int32)", value ) ;
-                //Error ( buffer, QUIT ) ;
-                Do_MoveErrorReport ( value, "2147483647", "(int32)" ) ;
-            }
+            if ( value > 2147483647 ) Do_MoveErrorReport ( value, "2147483647", "(int32)" ) ;
             else * ( int32* ) address = ( int32 ) value ;
             break ;
         }

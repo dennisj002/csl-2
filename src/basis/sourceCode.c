@@ -103,17 +103,17 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             aFoundWord = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
             iuFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
             //if ( ( ! aFoundWord->W_WordData ) || ( ! ( iuFlag & SCN_IN_USE_FOR_SOURCE_CODE ) ) ) continue ;
-            if ( ( ! aFoundWord->W_WordData ) || ( ! ( iuFlag ) ) ) continue ;
+            if ( ( ! aFoundWord->W_WordData ) || ( ! ( iuFlag & SCN_IN_USE_FOR_SOURCE_CODE ) ) ) continue ;
             scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
             naddress = aFoundWord->SourceCoding ;
             if ( iword && ( aFoundWord == iword ) ) return aFoundWord ;
-            if ( ( _O_->Verbosity > 3 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "afound", fDiff ) ;
+            if ( ( _O_->Verbosity > 3 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "afound", 0 ) ;
             if ( address && ( address == naddress ) )
             {
                 numFound ++ ;
                 fDiff = abs ( scwi - lastScwi ) ;
                 aFoundWord->W_SC_Index = scwi ; // not sure exactly why this is necessary but it is important for now??
-                if ( ( _O_->Verbosity > 2 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", fDiff ) ;
+                if ( ( _O_->Verbosity > 2 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", 0 ) ;
                 if ( ( aFoundWord->W_ObjectAttributes & LITERAL ) && ( aFoundWord->Coding[1] == 0xb9 ) )
                 {
                     foundWord = aFoundWord ;
@@ -145,7 +145,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
         if ( ( foundWord ) && ( _O_->Verbosity > 2 ) )
         {
             //_Printf ( ( byte* ) "\nNumber Found = %d :: minDiffFound = %d : window = %d : Chosen word = \'%s\' : LastSourceCodeWord = \'%s\'", numFound, minDiffFound, fDiff, foundWord->Name, _Debugger_->LastSourceCodeWord ? _Debugger_->LastSourceCodeWord->Name : ( byte* ) "" ) ;
-            _DWL_ShowWord_Print ( foundWord, 0, ( byte* ) "CHOSEN", foundWord->Coding, foundWord->SourceCoding, 0, foundWord->W_SC_Index, 1 ) ; //_DWL_ShowWord ( foundWord, "CHOSEN", minDiffFound ) ;
+            _DWL_ShowWord_Print ( foundWord, 0, ( byte* ) "CHOSEN", foundWord->Coding, foundWord->SourceCoding, 0, foundWord->W_SC_Index, -1 ) ; //_DWL_ShowWord ( foundWord, "CHOSEN", minDiffFound ) ;
         }
         if ( address ) _Debugger_->LastSourceCodeAddress = address ;
         if ( foundWord ) _Debugger_->LastScwi = foundWord->W_SC_Index ;
@@ -303,6 +303,7 @@ _CSL_WordList_TopWord ( )
     return word ;
 }
 
+#if 0
 Word *
 _CSL_WordList_PopWords ( int64 n )
 {
@@ -322,11 +323,66 @@ _CSL_WordList_PopWords ( int64 n )
     return wordn ;
 }
 
+#else
+#define WL_GET_NODE 1
+#define WL_SET_IN_USE_FLAG 2
+// zero indexed list notation : ie. the first node is zero - 0
+Word *
+CSL_WordList_DoOp ( int64 n, int64 op, int64 condition )
+{
+    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
+    dlnode * node, *nextNode ;
+    Word * wordn = 0 ;
+    int64 inUseFlag, numDone = 0 ;
+    if ( list )
+    {
+        for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+        {
+            nextNode = dlnode_Next ( node ) ;
+            dobject * dobj = ( dobject * ) node ;
+            wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) dobj, SCN_T_WORD ) ;
+            inUseFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
+            if (( op == WL_SET_IN_USE_FLAG ) && ( inUseFlag & SCN_IN_USE_FOR_OPTIMIZATION ) )
+            {
+                dobject_Set_M_Slot ( dobj, SCN_IN_USE_FLAG, condition ) ;
+                if ( ( ++ numDone ) >= n ) return 0 ;
+            }
+            else if ( ( op == WL_GET_NODE ) && ( inUseFlag & condition ) ) 
+            {
+                if (( numDone ++ ) >= n ) return wordn ;
+            }
+        }
+    }
+    return 0 ; //wordn ;
+}
+
+Word *
+_CSL_WordList_PopWords ( int64 n )
+{
+    Word * rword = CSL_WordList_DoOp ( n, WL_SET_IN_USE_FLAG, SCN_IN_USE_FOR_SOURCE_CODE ) ;
+    return rword ;
+}
+#endif
+
 Word *
 CSL_WordLists_PopWord ( )
 {
     Word * word = _CSL_WordList_PopWords ( 1 ) ;
     return word ;
+}
+
+Word *
+_CSL_WordList ( int64 n )
+{
+    //Word * rword = ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CSL_->Compiler_N_M_Node_WordList, n, SCN_T_WORD ) ;
+    Word * rword = CSL_WordList_DoOp ( n, WL_GET_NODE, SCN_IN_USE_FOR_OPTIMIZATION ) ;
+    return rword ;
+}
+
+Word *
+CSL_WordList ( int64 n )
+{
+    return ( Word * ) _CSL_WordList ( n ) ;
 }
 
 void
@@ -336,7 +392,7 @@ CSL_WordList_Push ( Word * word, Boolean inUseFlag )
 }
 
 void
-_CSL_WordList_PushWord ( Word * word, int64 inUseFlag )
+_CSL_WordList_PushWord ( Word * word, Boolean inUseFlag )
 {
     CSL_WordList_Push ( word, inUseFlag ? SCN_IN_USE_FLAG_ALL : 0 ) ;
 }
@@ -344,16 +400,16 @@ _CSL_WordList_PushWord ( Word * word, int64 inUseFlag )
 void
 CSL_WordList_PushWord ( Word * word )
 {
-    _CSL_WordList_PushWord ( word,
-#if 0 // old        
-        ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT | NAMESPACE_VARIABLE ) ) ) ;
-#elif 0 // new        
-        ( ! ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) )
-        || ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE | OBJECT_FIELD | NAMESPACE_VARIABLE ) ) ) ) ;
-#elif 1 // working ??    
-        ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE ) ) || ( ! ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) )
-        || ( word->W_ObjectAttributes & ( NAMESPACE | OBJECT_FIELD ) ) ) ) ) ) ;
-#endif    
+    int64 inUseFlag = 0 ;
+    if ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) ) ) inUseFlag = 0 ;
+    else
+    {
+        // not the clearest logic ??
+        if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE ) ) || ( ! ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) )
+            || ( word->W_ObjectAttributes & ( NAMESPACE | OBJECT_FIELD ) ) ) ) ) inUseFlag |= SCN_IN_USE_FLAG_ALL ;
+        if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE | NAMESPACE | OBJECT_FIELD | LOCAL_OBJECT ) ) ) inUseFlag |= SCN_IN_USE_FOR_SOURCE_CODE ;
+    }
+    CSL_WordList_Push ( word, inUseFlag ) ;
 }
 
 // too many showWord functions ??
@@ -365,7 +421,20 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
     if ( word )
     {
         //int64 lastScwi = _Debugger_->LastSourceCodeWord ? _Debugger_->LastSourceCodeWord->W_SC_Index : 0 ;
-        byte * name = String_ConvertToBackSlash ( word->Name ), *biuFlag = iuFlag ? ( byte* ) "true" : ( byte* ) "false" ;
+        byte * name = String_ConvertToBackSlash ( word->Name ), biuFlag [32] ;
+        biuFlag[0] = 0 ;
+        if ( iuFlag == - 1 ) strncat ( biuFlag, ( byte* ) "", 31 ) ;
+        else
+        {
+            if ( iuFlag & SCN_IN_USE_FOR_SOURCE_CODE ) strncat ( biuFlag, ( byte* ) "sc", 31 ) ;
+            if ( iuFlag & SCN_IN_USE_FOR_OPTIMIZATION )
+            {
+                if ( biuFlag [0] ) strncat ( biuFlag, ( byte* ) "|", 31 ) ;
+                strncat ( biuFlag, ( byte* ) "opt", 31 ) ;
+            }
+            if ( iuFlag == SCN_IN_USE_FLAG_ALL ) strncpy ( biuFlag, ( byte* ) "all", 31 ) ;
+            if ( ! iuFlag ) strncat ( biuFlag, ( byte* ) "false", 31 ) ;
+        }
         if ( newSourceCoding )
         {
             Printf ( ( byte* ) "\n %s :: word = 0x%08x : \'%-12s\' : coding  = 0x%08x : oldCoding  = 0x%08x : newCoding = 0x%08x : scwi = %03d, inUse = %s",
@@ -385,7 +454,7 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
 }
 
 void
-DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag, int64 prefix, int64 scwiDiff )
+DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag, int64 prefix, int64 four )
 {
     if ( anode )
     {

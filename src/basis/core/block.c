@@ -150,13 +150,12 @@ _CSL_EndBlock2 ( BlockInfo * bi )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     byte * first = bi->bp_First ;
-    _Namespace_RemoveFromUsingListAndClear ( bi->BI_LocalsNamespace ) ;
     if ( ! Compiler_BlockLevel ( compiler ) )
     {
         _CSL_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
         CSL_TurnOffBlockCompiler ( ) ;
-        CSL_TypeStackReset ( ) ;
     }
+    else if ( ! GetState ( compiler, C_BLOCK_INTERPRETER ) ) _Namespace_RemoveFromUsingListAndClear ( bi->BI_LocalsNamespace ) ;
     return first ;
 }
 

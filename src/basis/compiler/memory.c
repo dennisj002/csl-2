@@ -8,9 +8,9 @@
 void
 Compile_TosRmToTOS ( )
 {
-    Compile_Move_Rm_To_Reg (ACC, DSP, 0 , 0) ;
-    Compile_Move_Rm_To_Reg (ACC, ACC, 0 , 0) ;
-    Compile_Move_Reg_To_Rm (DSP, ACC, 0 , 0) ;
+    Compile_Move_Rm_To_Reg ( ACC, DSP, 0, 0 ) ;
+    Compile_Move_Rm_To_Reg ( ACC, ACC, 0, 0 ) ;
+    Compile_Move_Reg_To_Rm ( DSP, ACC, 0, 0 ) ;
 }
 
 void
@@ -62,15 +62,15 @@ Compile_Peek ( Compiler * compiler, Boolean stackReg ) // @
         if ( ( ! ( one->W_ObjectAttributes & OBJECT ) ) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
         {
             SetHere ( one->StackPushRegisterCode, 1 ) ;
-            Compile_Move_Rm_To_Reg (ACC, ACC, 0 , 0) ;
+            Compile_Move_Rm_To_Reg ( ACC, ACC, 0, 0 ) ;
             Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
-            Compile_Move_Reg_To_Rm (stackReg, ACC, 0 , 0) ;
+            Compile_Move_Reg_To_Rm ( stackReg, ACC, 0, 0 ) ;
             return ;
         }
-        else Compile_Move_Rm_To_Reg (ACC, stackReg, 0 , 0) ;
+        else Compile_Move_Rm_To_Reg ( ACC, stackReg, 0, 0 ) ;
     }
-    Compile_Move_Rm_To_Reg (ACC, ACC, 0 , 0) ;
-    Compile_Move_Reg_To_Rm (stackReg, ACC, 0 , 0) ;
+    Compile_Move_Rm_To_Reg ( ACC, ACC, 0, 0 ) ;
+    Compile_Move_Reg_To_Rm ( stackReg, ACC, 0, 0 ) ;
 }
 
 void
@@ -83,7 +83,7 @@ Compiler_ShowOptimizeArgs ( Compiler * compiler )
 }
 
 void
-Compile_Store (Compiler * compiler, int lvalueSize) // !
+Compile_Store ( Compiler * compiler, int lvalueSize ) // !
 {
     if ( GetState ( _CSL_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, STORE, lvalueSize ) ;
     else // when optimize is off, eg with arrays
@@ -93,9 +93,9 @@ Compile_Store (Compiler * compiler, int lvalueSize) // !
         Word * word ;
         d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( "\nCompile_Store : not optimized", 0, 0 ) ) ;
         if ( ( word = ( Word* ) _CSL_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
-        else Compile_Move_Rm_To_Reg (ACC, stackReg, 0 , 0) ;
-        Compile_Move_Rm_To_Reg (OREG, stackReg, ( word && word->StackPushRegisterCode ) ? 0 : ( - CELL_SIZE ) , 0) ;
-        Compile_Move_Reg_To_Rm (( ( word && word->StackPushRegisterCode ) ? word->RegToUse : ACC, 0), OREG, 0, 0 ) ;
+        else Compile_Move_Rm_To_Reg ( ACC, stackReg, 0, 0 ) ;
+        Compile_Move_Rm_To_Reg ( OREG, stackReg, ( word && word->StackPushRegisterCode ) ? 0 : ( - CELL_SIZE ), 0 ) ;
+        Compile_Move_Reg_To_Rm ( ( ( word && word->StackPushRegisterCode ) ? word->RegToUse : ACC, 0 ), OREG, 0, 0 ) ;
         Compile_SUBI ( REG, stackReg, 0, ( ( word && word->StackPushRegisterCode ) ? 1 : 2 ) * CELL_SIZE, 0 ) ;
         //DBI_OFF ;
     }
@@ -105,15 +105,15 @@ Compile_Store (Compiler * compiler, int lvalueSize) // !
 }
 
 void
-Compile_Poke (Compiler * compiler, int lvalueSize) // =
+Compile_Poke ( Compiler * compiler, int lvalueSize ) // =
 {
     if ( GetState ( _CSL_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, EQUAL, lvalueSize ) ;
     else // when optimize is off, eg with arrays
     {
         int64 stackReg = DSP ;
-        Compile_Move_Rm_To_Reg (OREG, stackReg, 0 , 0) ;
-        Compile_Move_Rm_To_Reg (ACC, stackReg, - CELL_SIZE , 0) ;
-        Compile_Move_Reg_To_Rm (ACC, OREG, 0 , 0) ;
+        Compile_Move_Rm_To_Reg ( OREG, stackReg, 0, 0 ) ;
+        Compile_Move_Rm_To_Reg ( ACC, stackReg, - CELL_SIZE, 0 ) ;
+        Compile_Move_Reg_To_Rm ( ACC, OREG, 0, 0 ) ;
         //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
         Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }
@@ -129,10 +129,10 @@ Compile_Poke (Compiler * compiler, int lvalueSize) // =
 void
 Compile_AtEqual ( Boolean stackReg ) // !
 {
-    Compile_Move_Rm_To_Reg (ACC, stackReg, 0 , 0) ;
-    Compile_Move_Rm_To_Reg (ACC, ACC, 0 , 0) ;
-    Compile_Move_Rm_To_Reg (OREG, stackReg, - CELL_SIZE , 0) ;
-    Compile_Move_Reg_To_Rm (OREG, ACC, 0 , 0) ;
+    Compile_Move_Rm_To_Reg ( ACC, stackReg, 0, 0 ) ;
+    Compile_Move_Rm_To_Reg ( ACC, ACC, 0, 0 ) ;
+    Compile_Move_Rm_To_Reg ( OREG, stackReg, - CELL_SIZE, 0 ) ;
+    Compile_Move_Reg_To_Rm ( OREG, ACC, 0, 0 ) ;
     Compile_SUBI ( REG, stackReg, 0, CELL_SIZE * 2, BYTE ) ;
 #if ARRAY_MODE_CHECK    
     CSL_ArrayModeOff ( ) ;
@@ -144,7 +144,7 @@ Compile_AtEqual ( Boolean stackReg ) // !
 // '!' ( value address  -- ) // store value at address - dpans94 - address is on top - value was pushed first, leftmost in rpn, then address
 
 void
-Compile_Store (Compiler * compiler, 0) // !
+Compile_Store ( Compiler * compiler, 0 ) // !
 {
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
@@ -162,7 +162,7 @@ Compile_Store (Compiler * compiler, 0) // !
             //Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSize, uint8 sib, int64 disp, uint8 dispSize, int64 imm, uint8 immSize )
             Compile_Move ( compiler->OptInfo->Optimize_Dest_RegOrMem, 0, compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Rm, 0, 0, 0, 0, 0, 0 ) ;
         }
-        else Compile_Move_Reg_To_Rm (compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Disp , 0) ;
+        else Compile_Move_Reg_To_Rm ( compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Disp, 0 ) ;
     }
     else
     {
@@ -170,9 +170,9 @@ Compile_Store (Compiler * compiler, 0) // !
         Word * word ;
         d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( "\nCompile_Store : not optimized", 0, 0 ) ) ;
         if ( ( word = ( Word* ) _CSL_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
-        else Compile_Move_Rm_To_Reg (ACC, stackReg, 0 , 0) ;
-        Compile_Move_Rm_To_Reg (OREG, stackReg, ( word && word->StackPushRegisterCode ) ? 0 : ( - CELL_SIZE ) , 0) ;
-        Compile_Move_Reg_To_Rm (( ( word && word->StackPushRegisterCode ) ? word->RegToUse : ACC, 0), OREG, 0 ) ;
+        else Compile_Move_Rm_To_Reg ( ACC, stackReg, 0, 0 ) ;
+        Compile_Move_Rm_To_Reg ( OREG, stackReg, ( word && word->StackPushRegisterCode ) ? 0 : ( - CELL_SIZE ), 0 ) ;
+        Compile_Move_Reg_To_Rm ( ( ( word && word->StackPushRegisterCode ) ? word->RegToUse : ACC, 0 ), OREG, 0 ) ;
         Compile_SUBI ( REG, stackReg, 0, ( ( word && word->StackPushRegisterCode ) ? 1 : 2 ) * CELL_SIZE, 0 ) ;
         //DBI_OFF ;
     }
@@ -185,7 +185,7 @@ Compile_Store (Compiler * compiler, 0) // !
 // ( addr n -- ) // (*addr) = n
 
 void
-Compile_Poke (Compiler * compiler, 0) // =
+Compile_Poke ( Compiler * compiler, 0 ) // =
 {
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
@@ -208,13 +208,13 @@ Compile_Poke (Compiler * compiler, 0) // =
             //Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSize, uint8 sib, int64 disp, uint8 dispSize, int64 imm, uint8 immSize )
             Compile_Move ( compiler->OptInfo->Optimize_Dest_RegOrMem, 0, compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Rm, 0, 0, 0, 0, 0, 0 ) ;
         }
-        else Compile_Move_Reg_To_Rm (compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Disp , 0) ;
+        else Compile_Move_Reg_To_Rm ( compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Disp, 0 ) ;
     }
     else // when optimize is off, eg with arrays
     {
-        Compile_Move_Rm_To_Reg (OREG, stackReg, 0 , 0) ;
-        Compile_Move_Rm_To_Reg (ACC, stackReg, - CELL_SIZE , 0) ;
-        Compile_Move_Reg_To_Rm (ACC, OREG, 0 , 0) ;
+        Compile_Move_Rm_To_Reg ( OREG, stackReg, 0, 0 ) ;
+        Compile_Move_Rm_To_Reg ( ACC, stackReg, - CELL_SIZE, 0 ) ;
+        Compile_Move_Reg_To_Rm ( ACC, OREG, 0, 0 ) ;
         //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
         Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }

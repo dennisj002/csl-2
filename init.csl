@@ -487,6 +487,95 @@ cOff
 forStarters 1 =
 #endif
 
+#if 0
+c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
+: wtdinclude "namespaces/wordTypeDef.csl" include ;
+wtdinclude 
+c_syntaxOn
+int
+faccs ( REG int32 n | REG in64 rec -- RAX ) 
+{
+    rec = 1 ; 
+    while ( n > 1 )
+    { 
+        rec = rec * n ;  n-- ; 
+    } 
+    return rec ;
+}
+pwi faccs 
+faccs ( 7 ) ; 5040 _assert 
+//pause
+// test byte size objects
+C Experimental
+typedef struct _byteTest 
+{
+    byte a8_123 ; 
+    int64 a64_123 ;
+    byte b8_123 ;
+    byte c8_123 ; // test comment
+    union
+    {
+        int64 u64_123 ;
+        int32 u32_123 ;
+        int8 u8_123 ;
+    } ; //size = 8 
+    int32 a32_123 ;
+    byte d8_123 ;
+    int16 a16_123 ; // size = 26
+} byteTest, abyteTest ;
+'bt byteTest new ;
+ps ( "\nbt.size =" ) ; p ( bt.size ) ;
+bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
+var ( 'btt ) ;
+bt.a16_123 = 0x498 ;  
+void bttt ( byteTest bt ) 
+{ 
+    btt = bt.a8_123 ; bt.a8_123 = 36 ; bt.a16_123 = 0x1234 ; bt.a32_123 = 0x12345678 ; bt.a64_123 = 0x123456789abcdef0 ; //pause
+    printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
+    printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
+    printf ( "\nbt.a16_123 = 0x%x ", bt.a16_123 ) ; 
+    printf ( "\nbt.a32_123 = 0x%x ", bt.a32_123 ) ; 
+    printf ( "\nbt.a64_123 = 0x%lx ", bt.a64_123 ) ; 
+    printf ("\nbtt = %x", btt ) ; 
+    dump ( &bt, bt.size ) ; 
+    p ( bt.a8_123 ) ;
+} 
+'bt byteTest new ;
+bttt ( bt ) ; pwi bttt //pause // error size not considered
+bt.a8_123 = 255 ; dump ( bt, bt.size ) ; //pause
+'bt byteTest new ;
+binary () ; p ( bt.b8_123 ) ; decimal () ; bt.b8_123 = 123 ; binary () ; p ( bt.b8_123 ) ; decimal () ; //pause
+p (bt.a8_123) ; p (bt.b8_123) ; p (bt.a32_123) ; p (bt.d8_123) ; 
+bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 1234 ; bt.a64_123 = 0x123456789abcdef ;
+dump ( bt, bt.size ) ; //pause
+bt.a8_123 1 _assert 
+_assert ( bt.a8_123 1 ) ;
+_assert ( bt.a32_123, 2147483647 ) ;
+void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; }
+'abt byteTest new ;
+btest ( abt 46 456 234567 2345566 ) ;
+pwi btest ;
+//verbosity = 3 ;
+void btest1 ( byteTest bt, byte i8 ) { bt.c8_123 = i8 ; hex ; p ( bt.c8_123 ) ; }
+btest1 ( abt, 0x42 ) ;
+pwi btest1 
+dump ( abt abt.size ) ;
+_assert ( abt.c8_123, 0x42 ) ;
+p ( abt.size ) ; 
+p ( bt.size ) ; 
+dump ( abt abt.size ) ;
+bt.a8_123 1 _assert 
+_assert ( bt.a32_123, 2147483647 ) ;
+_assert ( abt.a16_123 456 ) ; 
+_assert ( abt.b8_123 46 ) ;
+_assert ( abt.a32_123 234567 ) ;
+_assert ( abt.a64_123 2345566 ) ;
+c_syntaxOff 
+notUsing: Experimental byteTest _byteTest abyteTest bt abt ; 
+Root Experimental User
+'C.Experimental notUsing
+#endif
+
 #if forStarters @ 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 _assert
 #endif 

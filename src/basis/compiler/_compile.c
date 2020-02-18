@@ -94,7 +94,7 @@ void
 _Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
 {
     if ( ! size ) size = CSL_Get_ObjectByteSize ( word ) ;
-    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
+    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
     if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
@@ -167,7 +167,7 @@ void
 _Compile_GetVarLitObj_LValue_To_Reg (Word * word, int64 reg , int size)
 {
     if ( ! size ) size = CSL_Get_ObjectByteSize ( word ) ;
-    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
+    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
     if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;

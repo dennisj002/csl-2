@@ -9,10 +9,11 @@ Object_Run ( Word * word )
     Context * cntx = _Context_ ;
     Boolean rvalueFlag, isForwardDotted, isReverseDotted ;
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
+    Compiler_Word_SCHCPUSCA( word, 0 ) ;
     if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) CSL_Do_LiteralWord ( word ) ;
     else
     {
-        //isForwardDotted = GetState ( cntx->Lexer0, LEXER_FORWARD_DOTTED ) ; //ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ; 
+        //isForwardDotted = GetState ( cntx->Lexer0, LEXER_FORWARD_DOTTED ) ; 
         isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
         isReverseDotted = Lexer_IsTokenReverseDotted ( cntx->Lexer0 ) ;
         if ( GetState ( _Compiler_, LC_ARG_PARSING ) )
@@ -146,7 +147,7 @@ _Do_Compile_Variable ( Word * word, Boolean rvalueFlag )
         if ( rvalueFlag ) Compile_GetVarLitObj_RValue_To_Reg ( word, ACC, size ) ;
         else
         {
-            Word_SetCodingAndSourceCoding ( word, Here ) ;
+            Compiler_Word_SCHCPUSCA( word, 1 ) ;
             if ( ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) ) _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC, size ) ;
             else // this compilation is delayed to _CSL_C_Infix_Equal/Op
             {
@@ -366,15 +367,18 @@ CSL_Do_ClassField ( Word * word, Boolean isForwardDotted, Boolean rvalueFlag )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
+    byte * offsetPtr = 0 ;
     cntx->Interpreter0->CurrentObjectNamespace = word ; // update this namespace 
     compiler->ArrayEnds = 0 ;
 
     if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! compiler->LHS_Word ) && ( ! isForwardDotted ) && ( ! rvalueFlag ) ) compiler->LHS_Word = word ;
-    if ( word->Offset ) Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
+    if ( word->Offset ) offsetPtr = Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
     if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) ) CSL_Do_AccumulatedAddress ( word, ( byte* ) TOS, word->Offset, rvalueFlag ) ;
     if ( isForwardDotted ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
     word->BaseObject = cntx->Interpreter0->BaseObject ;
     CSL_TypeStack_SetTop ( word ) ;
+    Word_SetSourceCoding ( word, offsetPtr - 3  ) ; // 3 : sizeof add immediate insn with rex
+
 }
 
 // a constant is, of course, a literal

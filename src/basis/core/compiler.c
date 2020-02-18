@@ -58,12 +58,13 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
     return wordp ;
 }
 
-void
+byte *
 Compiler_IncrementCurrentAccumulatedOffset ( Compiler * compiler, int64 increment )
 {
     if ( compiler->AccumulatedOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) += ( increment ) ;
     if ( compiler->AccumulatedOptimizeOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) += ( increment ) ;
     _Debugger_->PreHere = ( ( byte* ) compiler->AccumulatedOffsetPointer ) - 3 ; // 3 : sizeof add immediate insn with rex
+    return (byte*) compiler->AccumulatedOffsetPointer ; // 3 : sizeof add immediate insn with rex
 }
 
 void
@@ -135,18 +136,6 @@ Compiler_GotoList_Print ( )
     Compiler * compiler = _Context_->Compiler0 ;
     Printf ( ( byte* ) "\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
     dllist_Map ( compiler->GotoList, ( MapFunction0 ) GotoInfo_Print ) ;
-}
-
-Word *
-_CSL_WordList ( int64 n )
-{
-    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CSL_->Compiler_N_M_Node_WordList, n, SCN_T_WORD ) ;
-}
-
-Word *
-CSL_WordList ( int64 n )
-{
-    return ( Word * ) _CSL_WordList ( n ) ;
 }
 
 void
@@ -265,7 +254,7 @@ Compiler_FreeLocalsNamespaces ( Compiler * compiler )
     {
         Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
         _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
-        CSL_NonCompilingNs_Clear ( compiler ) ;
+        //CSL_NonCompilingNs_Clear ( compiler ) ;
     }
 }
 
@@ -280,7 +269,6 @@ void
 _CSL_FinishWordDebugInfo ( Word * word )
 {
     if ( ! GetState ( _CSL_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) CSL_DeleteDebugInfo ( ) ;
-
     else CSL_SaveDebugInfo ( word, 0 ) ;
 }
 
