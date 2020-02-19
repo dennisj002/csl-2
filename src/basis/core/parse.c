@@ -183,31 +183,9 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type )
     {
         if ( tdsci->Tdsci_TotalStructureNamespace )
         {
-#if 0 // doesn't seem to help in         
-            do
-            {
-                if ( ! tdsci->Tdsci_TotalStructureNamespace->Name )
-                    tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( identifier, DICTIONARY ) ;
-                Parse_Do_IdentifierAlias ( tdsci, identifier ) ; //else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
-
-                //identifier = TDSCI_ReadToken ( tdsci ) ;
-                identifier = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-                if ( ( identifier [0] == '*' ) )
-                {
-                    identifier = TDSCI_ReadToken ( tdsci ) ;
-                    tdsci->Tdsci_Field_Size = CELL ;
-                    SetState ( tdsci, TDSCI_POINTER, true ) ;
-                    identifier = TDSCI_ReadToken ( tdsci ) ;
-                }
-                if ( ( identifier ) && ( identifier[0] == ',' ) ) TDSCI_ReadToken ( tdsci ), identifier = TDSCI_ReadToken ( tdsci ) ;
-                else break ;
-            }
-            while ( 1 ) ;
-#else
             if ( ! tdsci->Tdsci_TotalStructureNamespace->Name )
                 tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( identifier, DICTIONARY ) ;
             Parse_Do_IdentifierAlias ( tdsci, identifier ) ; //else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
-#endif            
         }
         else
         {

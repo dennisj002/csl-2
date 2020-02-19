@@ -345,15 +345,18 @@ _CSL_TypedefAlias ( Word * word, byte * name, Namespace * addToNs )
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
         alias->Size = word->Size ;
-        //alias->NamespaceStack = word->NamespaceStack ;
+        alias->NamespaceStack = word->NamespaceStack ;
         //Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 8 ) ;
+        //alias->W_SC_WordList = word->W_SC_WordList ;
+#if 0        
         if ( ! word->W_SourceCode )
         {
             CSL_Finish_WordSourceCode ( _CSL_, word ) ;
             alias->W_SourceCode = word->W_SourceCode ;
         }
         else CSL_Finish_WordSourceCode ( _CSL_, alias ) ;
-        //alias->W_SourceCode = _CSL_GetSourceCode ( ) ;
+#endif        
+        alias->W_SourceCode = _CSL_GetSourceCode ( ) ;
     }
     else Exception ( USEAGE_ERROR, ABORT ) ;
     return alias ;
@@ -375,6 +378,7 @@ _CSL_Alias ( Word * word, byte * name, Namespace * addToNs )
         alias->Size = word->Size ;
         alias->NamespaceStack = word->NamespaceStack ;
         Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 8 ) ;
+        alias->W_SC_WordList = word->W_SC_WordList ;
     }
     else Exception ( USEAGE_ERROR, ABORT ) ;
     return alias ;
