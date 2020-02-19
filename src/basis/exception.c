@@ -248,7 +248,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         {
             jb = & _O_->JmpBuf0 ;
             OVT_SetRestartCondition ( _O_, INITIAL_START ) ;
-            _OVT_SimpleFinal_Key_Pause ( _O_, true ) ;
+            _OVT_SimpleFinal_Key_Pause (_O_) ;
             goto jump ;
         }
         if ( ( restartCondition > QUIT ) || ( _O_->Signal == SIGFPE ) )
@@ -277,7 +277,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         ( jb == & _CSL_->JmpBuf0 ) ? "reseting csl" : "restarting OpenVmTil",
         ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ; //( _O_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
     if ( pauseFlag && ( _O_->SignalExceptionsHandled < 2 ) && ( _O_->SigSegvs < 2 ) ) OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
-    else if ( _O_->SigSegvs < 3 ) _OVT_SimpleFinal_Key_Pause ( _O_, 1 ) ; //( _O_->Signal != SIGSEGV ) ) ;
+    else if ( _O_->SigSegvs < 3 ) _OVT_SimpleFinal_Key_Pause (_O_) ; //( _O_->Signal != SIGSEGV ) ) ;
 jump:
     _OVT_SigLongJump ( jb ) ;
 }
@@ -548,21 +548,29 @@ OVT_ExceptionState_Print ( )
         Convert_RestartCondtion ( _O_->RestartCondition ) ) ;
 }
 
-void
-_OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt, Boolean useKey )
+int64
+_OVT_SimpleFinal_Key_Pause (OpenVmTil * ovt)
 {
     byte * msg = ovt->ThrowBuffer->Data ;
-    byte key, * instr = ".: (p)ause, <key> restart" ;
+    byte key, * instr = ".: (p)ause, e(x)it, <key> restart" ;
     printf ( "%s\n%s : (SIGSEGVs == %ld)", msg, instr, ovt->SigSegvs ) ;
     fflush ( stdout ) ;
-    if ( useKey ) key = Key ( ) ;
-    if ( key == 'p' ) Pause ( ) ;
+    {
+        key = Key ( ) ;
+        if ( key == 'p' ) 
+        {
+            Pause ( ) ;
+            return false ;
+        }
+        else if ( key == 'x' ) OVT_Exit ( ) ;
+        else return false ;
+    }
 }
 
 void
 OVT_SeriousErrorPause ( )
 {
-    _OVT_SimpleFinal_Key_Pause ( _O_, true ) ;
+    _OVT_SimpleFinal_Key_Pause (_O_) ;
     fflush ( stdout ) ;
     Key ( ) ;
 }

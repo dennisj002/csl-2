@@ -673,6 +673,12 @@ Debugger_ShowTypeWordStack ( Debugger * debugger )
 }
 
 void
+Debugger_Exit ( Debugger * debugger )
+{
+    if ( _OVT_SimpleFinal_Key_Pause (_O_) ) OVT_Exit ( ) ;
+}
+
+void
 Debugger_Wdiss ( Debugger * debugger )
 {
     DataStack_Push ( ( int64 ) debugger->w_Word ) ;
@@ -732,6 +738,7 @@ Debugger_TableSetup ( Debugger * debugger )
     //debugger->CharacterTable [ 'T' ] = 36 ;
     debugger->CharacterTable [ 'y' ] = 36 ;
     debugger->CharacterTable [ 'w' ] = 37 ;
+    debugger->CharacterTable [ 'x' ] = 38 ;
 
     // debugger : system related
     debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
@@ -773,5 +780,6 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 35 ] = Debugger_Print_LispDefinesNamespace ;
     debugger->CharacterFunctionTable [ 36 ] = Debugger_ShowTypeWordStack ;
     debugger->CharacterFunctionTable [ 37 ] = Debugger_Wdiss ;
+    debugger->CharacterFunctionTable [ 38 ] = Debugger_Exit ;
 }
 

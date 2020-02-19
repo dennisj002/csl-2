@@ -11,40 +11,42 @@
 // _ID :: ALPHA_NUMERIC *
 // DIGIT :: NUMERIC *
 // ALIAS_ID :: _ID "," ID
-// ID :: _ID | ALIAS_ID
-// ID_FIELD : ID | ARRAY_FIELD
-// ARRAY :: ('[' DIGIT ] ']') | ARRAY*
-// ARRAY_FIELD :: ( _ID ARRAY ) | ARRAY_FIELD ',' ARRAY_FIELD
-// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
-// STRUCTURE :: '{' FIELD * '}'
-// STRUCT_FIELD :: ('struct' | 'union') ( _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ) ';'
-// FIELD :: STRUCT_FIELD | TYPE_FIELD
-// TYPEDEF :: 'typedef' STRUCT_FIELD
+// ID :: _ID | ('*'? _ID) 
+// ARRAY :: ('[' DIGIT ] ']')*
+// ARRAY_FIELD :: ID ARRAY
+// ARRAY_FIELDS :: ARRAY_FIELD (',' ARRAY_FIELD)*
+// _ID_OR_ARRAY_FIELD : ID | ARRAY_FIELD
+// ID_FIELD : _ID_OR_ARRAY_FIELD ( ',' _ID_OR_ARRAY_FIELD )*
+// TYPE_FIELD :: TYPE_NAME ID_FIELD ';'
+// STRUCTURE :: '{' FIELD* '}'
+// STRUCT_OR_UNION_FIELD :: ('struct' | 'union') ( _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ) ';'
+// FIELD :: STRUCT_OR_UNION_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_OR_UNION_FIELD
 // TYPE :: 'type' TYPE_FIELD
 
 void
-_TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci ) //, int64 t_type, int64 size )
+_TDSCI_Print_StructField ( TypeDefStructCompileInfo * tdsci )
 {
     //Printf ( "\n0x%016lx\t%16s : size = %d : at %016lx", &tdsci->DataPtr [ tdsci->Tdsci_Offset ],
     Printf ( "\n\t%16s : %s : size = %d : at %016lx",
         tdsci->Tdsci_Field_Type_Namespace->Name, tdsci->TdsciToken, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
-        &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ; //->ObjectByteSize ) ; //tdsci->Tdsci_Field_Size ) ;
+        &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
     Word_ClassStructure_PrintData ( tdsci, tdsci->Tdsci_Field_Type_Namespace, tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
-    if ( GetState ( tdsci, TDSCI_UNION ) ) SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
-    else SetState ( tdsci, TDSCI_UNION_PRINTED, true ) ;
-    CSL_NewLine () ;
+    CSL_NewLine ( ) ;
 }
 
 void
 TDSCI_Print_Field ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )
 {
     byte *token = tdsci->TdsciToken, *format ;
-    int64 value ;
+    int64 value ; //, state ;
+    //if ( GetState ( tdsci, TDSCI_UNION ) ) Stack_Push ( tdsci->UnionDataStartStack, (int64) &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
+    //state = Stack_Top ( tdsci->StateStack ) ;
+    if ( Stack_Depth ( tdsci->UnionDataPtrStartStack ) ) tdsci->DataPtr = ( byte* ) Stack_Top ( tdsci->UnionDataPtrStartStack ) ; //, (int64) &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
     if ( ( tdsci->Tdsci_Field_Type_Namespace->W_ObjectAttributes && STRUCTURE )
         && ( ! GetState ( tdsci, TDSCI_POINTER ) ) && ( tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) )
     {
-        if ( ! GetState ( tdsci, TDSCI_UNION ) ) Stack_Push ( tdsci->UnionDataStartStack, (int64) &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
-        if ( ! GetState ( tdsci, TDSCI_UNION_PRINTED ) ) _TDSCI_Print_Field ( tdsci ) ; //, t_type, size ) ;
+        _TDSCI_Print_StructField ( tdsci ) ; //, t_type, size ) ;
     }
     else
     {
@@ -133,14 +135,15 @@ TDSCI_Init ( TypeDefStructCompileInfo * tdsci )
     if ( tdsci->BackgroundNamespace ) memset ( tdsci, 0, sizeof (TypeDefStructCompileInfo ) ) ;
     tdsci->BackgroundNamespace = _CSL_Namespace_InNamespaceGet ( ) ;
     SetState ( _Compiler_, TDSCI_PARSING, true ) ;
-    Stack_Init ( tdsci->UnionDataStartStack ) ;
+    Stack_Init ( tdsci->UnionDataPtrStartStack ) ;
 }
 
 TypeDefStructCompileInfo *
-TypeDefStructCompileInfo_New (uint64 allocType)
+TypeDefStructCompileInfo_New ( uint64 allocType )
 {
     TypeDefStructCompileInfo *tdsci = ( TypeDefStructCompileInfo * ) Mem_Allocate ( sizeof (TypeDefStructCompileInfo ), allocType ) ;
-    tdsci->UnionDataStartStack = Stack_New ( 32, allocType ) ;
+    tdsci->UnionDataPtrStartStack = Stack_New ( 32, allocType ) ;
+    tdsci->StateStack = Stack_New ( 32, allocType ) ;
     TDSCI_Init ( tdsci ) ;
     return tdsci ;
 }
@@ -166,27 +169,49 @@ Parse_Do_IdentifierAlias ( TypeDefStructCompileInfo * tdsci, byte * token )
 // we have read the idField name = token
 
 void
-Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )
+Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type )
 {
-    byte *token = tdsci->TdsciToken ;
+    byte *identifier = tdsci->TdsciToken ;
     Word * id, *addToNs ;
+    //if ( String_Equal ( identifier, "SC_WordIndex" ) )
+    //    Printf ( "" ) ;
     if ( GetState ( tdsci, TDSCI_PRINT ) )
     {
-        if ( t_type == TYPE_NAME ) TDSCI_Print_Field ( tdsci, t_type, size ) ;
+        if ( t_type == TYPE_NAME ) TDSCI_Print_Field ( tdsci, t_type, tdsci->Tdsci_Field_Size ) ;
     }
     else if ( ( t_type == POST_STRUCTURE_NAME ) && GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
     {
-        //Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_TotalStructureNamespace ) ;
         if ( tdsci->Tdsci_TotalStructureNamespace )
         {
+#if 0 // doesn't seem to help in         
+            do
+            {
+                if ( ! tdsci->Tdsci_TotalStructureNamespace->Name )
+                    tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( identifier, DICTIONARY ) ;
+                Parse_Do_IdentifierAlias ( tdsci, identifier ) ; //else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
+
+                //identifier = TDSCI_ReadToken ( tdsci ) ;
+                identifier = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+                if ( ( identifier [0] == '*' ) )
+                {
+                    identifier = TDSCI_ReadToken ( tdsci ) ;
+                    tdsci->Tdsci_Field_Size = CELL ;
+                    SetState ( tdsci, TDSCI_POINTER, true ) ;
+                    identifier = TDSCI_ReadToken ( tdsci ) ;
+                }
+                if ( ( identifier ) && ( identifier[0] == ',' ) ) TDSCI_ReadToken ( tdsci ), identifier = TDSCI_ReadToken ( tdsci ) ;
+                else break ;
+            }
+            while ( 1 ) ;
+#else
             if ( ! tdsci->Tdsci_TotalStructureNamespace->Name )
-                tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
-            Parse_Do_IdentifierAlias ( tdsci, token ) ; //else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
+                tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( identifier, DICTIONARY ) ;
+            Parse_Do_IdentifierAlias ( tdsci, identifier ) ; //else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
+#endif            
         }
         else
         {
-            //_CSL_Namespace_InNamespaceSet ( tdsci->Tdsci_StructureUnion_Namespace ) ;
-            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS_CLONE, 0, token, 0, 0, 0, 0, 0,
+            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS_CLONE, 0, identifier, 0, 0, 0, 0, 0,
                 tdsci->Tdsci_TotalStructureNamespace, 0, - 1, - 1 ) ;
             Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
             id->W_ObjectAttributes |= ( STRUCTURE ) ; //??
@@ -197,7 +222,7 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
     {
         if ( t_type == PRE_STRUCTURE_NAME )
         {
-            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS, 0, token, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS, 0, identifier, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
             tdsci->Tdsci_TotalStructureNamespace = id ;
             id->W_ObjectAttributes |= ( STRUCTURE ) ;
 
@@ -205,9 +230,8 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
         else // if ( t_type == TYPE_NAME )
         {
             addToNs = tdsci->Tdsci_StructureUnion_Namespace->Name ? tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_TotalStructureNamespace ;
-            tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, token, 0, 0, 0, tdsci->Tdsci_Offset, size, addToNs, 0, 0, 0 ) ;
+            tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, identifier, 0, 0, 0, tdsci->Tdsci_Offset, tdsci->Tdsci_Field_Size, addToNs, 0, 0, 0 ) ;
             TypeNamespace_Set ( id, tdsci->Tdsci_Field_Type_Namespace ) ;
-            tdsci->Tdsci_Field_Size = size ;
         }
     }
     if ( _O_->Verbosity > 1 ) TDSCI_DebugPrintWord ( tdsci, id ) ; // print class field
@@ -223,7 +247,7 @@ Parse_ArrayField ( TypeDefStructCompileInfo * tdsci )
 
     for ( i = 0 ; 1 ; i ++ )
     {
-        if ( token && String_Equal ( ( char* ) token, "[" ) )
+        if ( token && ( token[0] == '[' ) )
         {
             CSL_InterpretNextToken ( ) ; // next token must be an integer for the array dimension size
             arrayDimensionSize = DataStack_Pop ( ) ;
@@ -247,47 +271,84 @@ Parse_ArrayField ( TypeDefStructCompileInfo * tdsci )
     }
 }
 
+// _ID :: ALPHA_NUMERIC *
+// DIGIT :: NUMERIC *
+// ALIAS_ID :: _ID "," ID
+// ID :: _ID | ('*'? _ID) 
+// ARRAY :: ('[' DIGIT ] ']')*
+// ARRAY_FIELD :: ID ARRAY
+// ARRAY_FIELDS :: ARRAY_FIELD (',' ARRAY_FIELD)*
+// _ID_OR_ARRAY_FIELD : ID | ARRAY_FIELD
+// ID_FIELD : _ID_OR_ARRAY_FIELD ( ',' _ID_OR_ARRAY_FIELD )*
+// TYPE_FIELD :: TYPE_NAME ID_FIELD ';'
+// STRUCTURE :: '{' FIELD* '}'
+// STRUCT_OR_UNION_FIELD :: ('struct' | 'union') ( _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ) ';'
+// FIELD :: STRUCT_OR_UNION_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_OR_UNION_FIELD
+// TYPE :: 'type' TYPE_FIELD
+
 void
-Parse_Identifier_Field ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )
+Parse_Do_Identifier_Field ( TypeDefStructCompileInfo * tdsci, int64 t_type )
 {
-    byte *token ;
-    token = tdsci->TdsciToken ;
-next:
-    while ( token && ( token [0] != ';' ) && ( token [0] != '}' ) )
+    byte *token = TDSCI_ReadToken ( tdsci ) ;
+    if ( ( token [0] == '*' ) )
     {
-        Parse_Do_Identifier ( tdsci, t_type, size ) ;
+        tdsci->Tdsci_Field_Size = CELL ;
+        SetState ( tdsci, TDSCI_POINTER, true ) ;
         token = TDSCI_ReadToken ( tdsci ) ;
-        while ( token && ( token [0] == ',' ) )
-        {
-            token = TDSCI_ReadToken ( tdsci ) ;
-            if ( token && ( token [0] == '*' ) )
-            {
-                size = CELL ;
-                tdsci->Tdsci_Field_Size = size ;
-                token = TDSCI_ReadToken ( tdsci ) ;
-                Parse_Identifier_Field ( tdsci, TYPE_NAME, size ) ;
-                token = tdsci->TdsciToken ;
-                goto next ;
-            }
-            else
-            {
-                Parse_Do_Identifier ( tdsci, t_type, 0 ) ;
-                token = TDSCI_ReadToken ( tdsci ) ;
-            }
-        }
+    }
+    if ( token [0] == '[' )
+    {
+        Parse_ArrayField ( tdsci ) ;
+    }
+    else
+    {
+        Parse_Do_Identifier ( tdsci, t_type ) ;
+        token = TDSCI_ReadToken ( tdsci ) ;
         if ( token && ( token [0] == '[' ) )
         {
             Parse_ArrayField ( tdsci ) ;
-            if ( tdsci->TdsciToken[0] != ';' ) token = TDSCI_ReadToken ( tdsci ) ;
-            else token = tdsci->TdsciToken ;
         }
     }
+}
+
+void
+Parse_Identifier_Fields ( TypeDefStructCompileInfo * tdsci, int64 t_type )
+{
+    byte * token ;
+    do Parse_Do_Identifier_Field ( tdsci, t_type ) ;
+    while ( ( token = tdsci->TdsciToken ) && ( token[0] == ',' ) ) ; //&& (token[0] == ';')) ) ;
+}
+
+void
+Parse_Type_Field ( TypeDefStructCompileInfo * tdsci, Namespace * type0 )
+{
+    byte * token ; //= tdsci->TdsciToken ;
+    if ( type0 )
+    {
+        tdsci->Tdsci_Field_Type_Namespace = type0 ;
+        tdsci->Tdsci_Field_Size = CSL_Get_Namespace_SizeVar_Value ( type0 ) ;
+        Parse_Identifier_Fields ( tdsci, TYPE_NAME ) ;
+    }
+    else CSL_Parse_Error ( "No type in type field", token ) ;
+}
+
+void
+Parse_Field ( TypeDefStructCompileInfo * tdsci )
+{
+    Namespace *type0 ;
+    byte * token ;
+    if ( ! ( token = tdsci->TdsciToken ) || ( String_Equal ( tdsci->TdsciToken, "typedef" ) ) ) token = TDSCI_ReadToken ( tdsci ) ;
+    if ( type0 = _Namespace_Find ( token, 0, 0 ) ) Parse_Type_Field ( tdsci, type0 ) ;
+    else Parse_StructOrUnion_Type ( tdsci ) ;
 }
 
 void
 Parse_Structure ( TypeDefStructCompileInfo * tdsci )
 {
     Lexer * lexer = _Lexer_ ;
+    byte * token ;
+    int64 state ;
     if ( GetState ( tdsci, TDSCI_CLONE_FLAG ) ) //cloneFlag )
     {
         tdsci->Tdsci_Offset = _Namespace_VariableValueGet ( tdsci->BackgroundNamespace, ( byte* ) "size" ) ; // allows for cloning - prototyping
@@ -296,13 +357,10 @@ Parse_Structure ( TypeDefStructCompileInfo * tdsci )
     }
     Lexer_SetTokenDelimiters ( lexer, ( byte* ) " ,\n\r\t", COMPILER_TEMP ) ;
     tdsci->Tdsci_StructureUnion_Size = 0 ;
-
-    TDSCI_ReadToken ( tdsci ) ;
-
     do
     {
-        Parse_A_Typedef_Field ( tdsci ) ; // a structure can other struct/unions as fields
-        if ( GetState ( tdsci, TDSCI_UNION ) )
+        Parse_Field ( tdsci ) ;
+        if ( Stack_Depth ( tdsci->StateStack ) && ( state = Stack_Top ( tdsci->StateStack ) ) && ( state & TDSCI_UNION ) )
         {
             if ( tdsci->Tdsci_Field_Size > tdsci->Tdsci_StructureUnion_Size ) tdsci->Tdsci_StructureUnion_Size = tdsci->Tdsci_Field_Size ;
         }
@@ -314,7 +372,11 @@ Parse_Structure ( TypeDefStructCompileInfo * tdsci )
         if ( tdsci->TdsciToken && ( tdsci->TdsciToken [0] == ';' ) ) TDSCI_ReadToken ( tdsci ) ;
     }
     while ( tdsci->TdsciToken && ( tdsci->TdsciToken [0] != '}' ) ) ;
-    if ( GetState ( tdsci, TDSCI_UNION ) ) tdsci->Tdsci_Offset += tdsci->Tdsci_StructureUnion_Size ;
+    if ( GetState ( tdsci, TDSCI_UNION ) )
+    {
+        tdsci->Tdsci_Offset += tdsci->Tdsci_StructureUnion_Size ;
+        tdsci->State = Stack_Pop ( tdsci->StateStack ) ;
+    }
     if ( GetState ( tdsci, TDSCI_STRUCT ) ) tdsci->Tdsci_StructureUnion_Size = tdsci->Tdsci_Offset ;
     tdsci->Tdsci_StructureUnion_Namespace->ObjectByteSize = tdsci->Tdsci_StructureUnion_Size ;
     tdsci->Tdsci_StructureUnion_Namespace = tdsci->Tdsci_TotalStructureNamespace ;
@@ -322,15 +384,35 @@ Parse_Structure ( TypeDefStructCompileInfo * tdsci )
     tdsci->Tdsci_TotalSize = tdsci->Tdsci_Offset ;
     if ( tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace->ObjectByteSize = tdsci->Tdsci_Offset ;
     SetState_TrueFalse ( tdsci, TDSCI_STRUCTURE_COMPLETED, ( TDSCI_UNION | TDSCI_STRUCT ) ) ;
+    if ( ( token = tdsci->TdsciToken ) && ( token[0] != ';' ) && ( ! String_Equal ( token, "};" ) ) )// return ;
+    {
+        byte * token1 = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+        if ( token1 && ( token1[0] != ';' ) )
+            Parse_Identifier_Fields ( tdsci, POST_STRUCTURE_NAME ) ; //TDSCI_ReadToken ( tdsci ) ;
+        else token = TDSCI_ReadToken ( tdsci ) ; // read 'typedef' token
+    }
+    else return ; //break ;
 }
 
 void
-Parse_StructOrUnion_Type ( TypeDefStructCompileInfo * tdsci, int64 structOrUnionState )
+Parse_StructOrUnion_Type ( TypeDefStructCompileInfo * tdsci )
 {
     byte * token ;
-    Namespace * type0 ;
-    SetState ( tdsci, structOrUnionState, true ) ;
+    int64 structOrUnionState = 0 ;
+    Namespace * type0 = 0 ;
     token = TDSCI_ReadToken ( tdsci ) ;
+    if ( String_Equal ( ( char* ) token, "struct" ) ) structOrUnionState = TDSCI_STRUCT ;
+    else if ( String_Equal ( ( char* ) token, "union" ) )
+    {
+        structOrUnionState = TDSCI_UNION ;
+        Stack_Push ( tdsci->StateStack, tdsci->State ) ;
+        if ( tdsci->DataPtr ) Stack_Push ( tdsci->UnionDataPtrStartStack, ( int64 ) & tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
+    }
+    if ( structOrUnionState )
+    {
+        SetState ( tdsci, structOrUnionState, true ) ;
+        token = TDSCI_ReadToken ( tdsci ) ;
+    }
     if ( token )
     {
         if ( token [0] != '{' )
@@ -339,12 +421,12 @@ Parse_StructOrUnion_Type ( TypeDefStructCompileInfo * tdsci, int64 structOrUnion
             if ( ( token1 [0] == '*' ) && ( type0 = _Namespace_Find ( token, 0, 0 ) ) )
             {
                 Parse_Type_Field ( tdsci, type0 ) ;
-                return ;
+                return ; //goto doFinalAndExtraIdentifiers ;
             }
             else
             {
                 // pre-structure identifiers
-                Parse_Do_Identifier ( tdsci, PRE_STRUCTURE_NAME, 0 ) ;
+                Parse_Do_Identifier ( tdsci, PRE_STRUCTURE_NAME ) ;
                 token = TDSCI_ReadToken ( tdsci ) ;
             }
         }
@@ -354,60 +436,73 @@ Parse_StructOrUnion_Type ( TypeDefStructCompileInfo * tdsci, int64 structOrUnion
             if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace =
                 DataObject_New ( CLASS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
             if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
+            TDSCI_ReadToken ( tdsci ) ;
             Parse_Structure ( tdsci ) ;
+            if ( ( GetState ( tdsci, TDSCI_UNION ) && tdsci->DataPtr ) ) Stack_Pop ( tdsci->UnionDataPtrStartStack ) ;
         }
         else CSL_Parse_Error ( "No \'{\' token in struct/union field", token ) ;
-        // prost-structure identifiers
-        if ( tdsci->TdsciToken && ( tdsci->TdsciToken [0] != ';' ) )
+    }
+#if 0        
+    // prost-structure identifiers
+    // and "};" keyword
+doFinalAndExtraIdentifiers:
+    token = tdsci->TdsciToken ;
+    if ( token )
+    {
+        if ( ! String_Equal ( token, "};" ) )
         {
-            if ( tdsci->TdsciToken [1] != ';' ) // consider case of "};" token
+            if ( ( ! type0 ) && ( token[0] != ';' ) )
             {
-                TDSCI_ReadToken ( tdsci ) ;
-                Parse_Identifier_Field ( tdsci, POST_STRUCTURE_NAME, 0 ) ;
+                byte * token1 = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+                if ( token1 && ( token1[0] != ';' ) )
+                    Parse_Identifier_Fields ( tdsci, POST_STRUCTURE_NAME ) ;
             }
         }
-
     }
 }
-
-void
-Parse_Type_Field ( TypeDefStructCompileInfo * tdsci, Namespace * type0 )
-{
-    byte * token = tdsci->TdsciToken ;
-    int64 size = 0 ;
-    tdsci->Tdsci_Field_Size = 0 ;
-    if ( type0 )
-    {
-        tdsci->Tdsci_Field_Type_Namespace = type0 ;
-        size = CSL_Get_Namespace_SizeVar_Value ( type0 ) ;
-        token = TDSCI_ReadToken ( tdsci ) ;
-        if ( ( token [0] == '*' ) )
-        {
-            size = CELL ;
-            tdsci->Tdsci_Field_Size = size ;
-            SetState ( tdsci, TDSCI_POINTER, true ) ;
-            token = TDSCI_ReadToken ( tdsci ) ;
-        }
-        Parse_Identifier_Field ( tdsci, TYPE_NAME, size ) ;
-    }
-    else CSL_Parse_Error ( "No type in type field", token ) ;
+#endif    
 }
 
-void
-Parse_A_Typedef_Field ( TypeDefStructCompileInfo * tdsci )
+#define PT_TYPEDEF 1
+#define PT_TYPE 2
+
+int64
+_CSL_Parse_Typedef_Field ( TypeDefStructCompileInfo * tdsci, int64 ptType, Boolean printFlag, byte * codeData )
 {
-    Namespace *type0 ;
+    if ( ! tdsci ) tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
+    Word * word = _Interpreter_->w_Word ;
     byte * token ;
-    if ( ! ( token = tdsci->TdsciToken ) || ( String_Equal ( tdsci->TdsciToken, "typedef" ) ) ) token = TDSCI_ReadToken ( tdsci ) ;
-    if ( String_Equal ( ( char* ) token, "struct" ) ) Parse_StructOrUnion_Type ( tdsci, TDSCI_STRUCT ) ;
-    else if ( String_Equal ( ( char* ) token, "union" ) ) Parse_StructOrUnion_Type ( tdsci, TDSCI_UNION ) ;
-    else if ( type0 = _Namespace_Find ( token, 0, 0 ) ) Parse_Type_Field ( tdsci, type0 ) ;
-    else
+    Namespace * type0 ;
+    CSL_Lexer_SourceCodeOn ( ) ;
+    CSL_InitSourceCode_WithName ( _CSL_, word ? word->Name : 0, 1 ) ;
+    if ( printFlag && ( ! GetState ( tdsci, TDSCI_PRINT ) ) )// if we are already within a printing don't reset the pointer
     {
-        token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 1, 0 ) ;
-        if ( token[0] == '{' ) Parse_StructOrUnion_Type ( tdsci, TDSCI_STRUCT ) ;
-        else CSL_Parse_Error ( "Can't find type field namespace", token ) ;
+        tdsci->DataPtr = codeData ;
+        SetState ( tdsci, TDSCI_PRINT, true ) ;
+        token = TDSCI_ReadToken ( tdsci ) ; // read 'typedef' token
+        if ( ! String_Equal ( token, "typedef" ) ) return 0 ;
     }
+    if ( ptType == PT_TYPEDEF ) Parse_StructOrUnion_Type ( tdsci ) ;
+    else if ( ptType == PT_TYPE )
+    {
+        if ( type0 = _Namespace_Find ( token, 0, 0 ) ) Parse_Type_Field ( tdsci, type0 ) ;
+        else CSL_Parse_Error ( "_CSL_Parse_Typedef_Field : Can't find namespace", token ) ;
+    }
+    CSL_Finish_WordSourceCode ( _CSL_, tdsci->Tdsci_TotalStructureNamespace ) ;
+    SetState ( _Compiler_, TDSCI_PARSING, false ) ;
+    return tdsci->Tdsci_TotalSize ;
+}
+
+int64
+CSL_Parse_Typedef_Field ( TypeDefStructCompileInfo * tdsci, Boolean printFlag, byte * codeData )
+{
+    return _CSL_Parse_Typedef_Field ( tdsci, PT_TYPEDEF, printFlag, codeData ) ;
+}
+
+int64
+CSL_Parse_Type_Field ( TypeDefStructCompileInfo * tdsci, Boolean printFlag, byte * codeData )
+{
+    return _CSL_Parse_Typedef_Field ( tdsci, 0, printFlag, codeData ) ;
 }
 
 void
@@ -874,8 +969,8 @@ _CSL_ParseQid ( byte * finderToken )
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Finder * finder = cntx->Finder0 ;
-    Boolean nst ;
-    Word * word = 0 ;
+    int64 nst ;
+    Word * word = 0, *ns = 0 ;
     byte * token = finderToken ; // finderToken is also a flag of the caller : (finderToken > 0) ? finder : parser
     while ( 1 )
     {
@@ -888,10 +983,15 @@ _CSL_ParseQid ( byte * finderToken )
         {
             if ( finderToken ) cntx->Interpreter0->BaseObject = 0 ;
             //word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-            word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
-            if ( word && ( nst = word->W_ObjectAttributes & ( finderToken ? NAMESPACE_TYPE : ( C_TYPE | C_CLASS | NAMESPACE ) ) ) )
+            if ( ns ) word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
+            else word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
+            if ( word && ( nst = word->W_ObjectAttributes & THIS ) ) ns = word, _CSL_SetAsInNamespace ( ns ), Finder_SetQualifyingNamespace ( finder, ns ) ;
+            else if ( word && ( nst = word->W_ObjectAttributes & ( finderToken ? ( NAMESPACE_TYPE | THIS ) : ( C_TYPE | C_CLASS | NAMESPACE | THIS ) ) ) )
             {
-                Finder_SetQualifyingNamespace ( finder, word ) ;
+                ns = word ;
+                Finder_SetQualifyingNamespace ( finder, ns ) ;
+                _CSL_SetAsInNamespace ( ns ) ;
+
             }
             else if ( finderToken )
             {
@@ -902,8 +1002,17 @@ _CSL_ParseQid ( byte * finderToken )
         }
         else break ;
     }
-    if ( finderToken ) return ( int64 ) word ;
-    else return ( int64 ) token ;
+    if ( ns )
+    {
+        word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
+        if ( finderToken ) return ( int64 ) word ;
+        else return ( int64 ) ( word ? word->Name : token ) ;
+    }
+    else
+    {
+        if ( finderToken ) return ( int64 ) word ;
+        else return ( int64 ) token ;
+    }
 }
 // ?? seems way to complicated and maybe should be integrated with Lexer_ParseObject
 

@@ -340,8 +340,8 @@ wdiss ( ' fac5 find )
 fac5 ( 7 ) dup p 5040 _assert  
 #if 1
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
-: wtdinclude "namespaces/wordTypeDef.csl" include ;
-wtdinclude 
+//: wtdinclude "namespaces/wordTypeDef.csl" include ;
+//wtdinclude 
 c_syntaxOn
 int
 faccs ( REG int32 n | REG in64 rec -- RAX ) 
@@ -406,7 +406,7 @@ _assert ( bt.a32_123, 2147483647 ) ;
 void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; }
 'abt byteTest new ;
 btest ( abt 46 456 234567 2345566 ) ;
-pwi btest ; pause
+pwi btest ; //pause
 void btest1 ( byteTest bt, byte i8 ) { bt.c8_123 = i8 ; }
 btest1 ( abt, 0x42 ) ;
 pwi btest1 //pause
@@ -432,10 +432,11 @@ Root Experimental User
 wtdInclude 
 C.Experimental
 'wtdInclude find 100 dump
-'wtdInclude find 'C.Experimental.Word find wordStructPrint 
+//'wtdInclude find 'C.Experimental.Word find d: wordStructPrint 
 'C.Experimental notUsing 
+//pause
 #endif
-pause
+
 bnOff
 infixOn
 (1 + 5) / (2 + 1) 2 _assert

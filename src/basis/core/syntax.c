@@ -587,27 +587,6 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
     return false ;
 }
 
-int64
-CSL_Parse_Typedef_Field ( TypeDefStructCompileInfo * tdsci, Boolean printFlag, byte * codeData )
-{
-    if ( ! tdsci ) tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
-    Word * word = _Interpreter_->w_Word ;
-    byte * token ;
-    CSL_Lexer_SourceCodeOn ( ) ;
-    CSL_InitSourceCode_WithName ( _CSL_, word ? word->Name : 0, 1 ) ;
-    if ( printFlag && ( ! GetState ( tdsci, TDSCI_PRINT ) ) )// if we are already within a printing don't reset the pointer
-    {
-        tdsci->DataPtr = codeData ;
-        SetState ( tdsci, TDSCI_PRINT, true ) ;
-        token = TDSCI_ReadToken ( tdsci ) ; // read 'typedef' token
-        if ( ! String_Equal ( token, "typedef" ) ) return 0 ;
-    }
-    Parse_A_Typedef_Field ( tdsci ) ;
-    CSL_Finish_WordSourceCode ( _CSL_, tdsci->Tdsci_TotalStructureNamespace ) ;
-    SetState ( _Compiler_, TDSCI_PARSING, false ) ;
-    return tdsci->Tdsci_TotalSize ;
-}
-
 void
 Word_ClassStructure_PrintData ( TypeDefStructCompileInfo * tdsci, Word * word, byte * typedefString )
 {

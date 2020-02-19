@@ -571,6 +571,7 @@ _dllist_Get_N_Node ( dllist * list, int64 n )
     return node ;
 }
 
+#if 0
 int64
 _dllist_Get_N_InUse_Node_M_Slot ( dllist * list, int64 n, int64 m )
 {
@@ -583,6 +584,7 @@ _dllist_Get_N_InUse_Node_M_Slot ( dllist * list, int64 n, int64 m )
     }
     return node ? dobject_Get_M_Slot ( ( dobject* ) node, m ) : 0 ; // LIST_EMPTY
 }
+#endif
 
 int64
 _dllist_Get_N_Node_M_Slot ( dllist * list, int64 n, int64 m )

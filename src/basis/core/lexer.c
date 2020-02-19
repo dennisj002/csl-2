@@ -48,7 +48,8 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
     Word * word = 0 ;
     if ( token )
     {
-        word = Finder_QID_Find ( cntx->Finder0, token ) ;
+        //word = Finder_QID_Find ( cntx->Finder0, token ) ;
+        word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
         if ( word && compiler->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
         //_DEBUG_SETUP ( word, token, 0, 0 ) ;
         if ( ! word )
@@ -736,7 +737,7 @@ void
 Star ( Lexer * lexer ) // '*':
 {
     byte nextChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
-    if ( ( nextChar == '/' ) && ( ! lexer->TokenWriteIndex ) ) // comment
+    if ( ( nextChar == '/' ) && ( ! lexer->TokenWriteIndex ) ) // '*/' comment
     {
         Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
         lexer->TokenInputByte = ReadLine_NextChar ( lexer->ReadLiner0 ) ;
@@ -747,9 +748,7 @@ Star ( Lexer * lexer ) // '*':
         Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
         SetState ( lexer, LEXER_DONE, true ) ;
     }
-#if 1    
     else Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
-#endif    
 }
 
 void

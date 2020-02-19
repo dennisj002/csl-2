@@ -175,23 +175,6 @@ CSL_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
     if ( list ) dllist_Map2 ( list, ( MapFunction2 ) SC_List_AdjustAddress, ( int64 ) address, ( int64 ) newAddress ) ;
 }
 
-#if 0
-
-void
-SC_List_Set_NotInUseForSC ( dlnode * node, byte * address )
-{
-    Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    if ( word->SourceCoding >= address ) dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_OPTIMIZATION ) ;
-}
-
-void
-CSL_AdjustDbgSourceCode_ScInUseFalse ( byte * address )
-{
-    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
-    if ( list ) dllist_Map1 ( list, ( MapFunction1 ) SC_List_Set_NotInUseForSC, ( int64 ) address ) ;
-}
-#endif
-
 void
 CheckRecycleWord ( Node * node )
 {
@@ -303,27 +286,6 @@ _CSL_WordList_TopWord ( )
     return word ;
 }
 
-#if 0
-Word *
-_CSL_WordList_PopWords ( int64 n )
-{
-    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
-    dlnode * node, *nextNode ;
-    Word * wordn = 0 ;
-    if ( list )
-    {
-        for ( node = dllist_First ( ( dllist* ) list ) ; node && n ; node = nextNode, n -- )
-        {
-            nextNode = dlnode_Next ( node ) ;
-            dobject * dobj = ( dobject * ) node ;
-            wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) dobj, SCN_T_WORD ) ;
-            if ( dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ) dobject_Set_M_Slot ( dobj, SCN_IN_USE_FLAG, 0 ) ;
-        }
-    }
-    return wordn ;
-}
-
-#else
 #define WL_GET_NODE 1
 #define WL_SET_IN_USE_FLAG 2
 // zero indexed list notation : ie. the first node is zero - 0
@@ -340,29 +302,31 @@ CSL_WordList_DoOp ( int64 n, int64 op, int64 condition )
         {
             nextNode = dlnode_Next ( node ) ;
             dobject * dobj = ( dobject * ) node ;
-            wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) dobj, SCN_T_WORD ) ;
             inUseFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
             if (( op == WL_SET_IN_USE_FLAG ) && ( inUseFlag & SCN_IN_USE_FOR_OPTIMIZATION ) )
             {
                 dobject_Set_M_Slot ( dobj, SCN_IN_USE_FLAG, condition ) ;
                 if ( ( ++ numDone ) >= n ) return 0 ;
             }
+            // since we don't remove words and just reset the flags when we 'pop' a word
+            // we need to check that the word hasn't already be popped from its SCN_IN_USE_FLAG ...
             else if ( ( op == WL_GET_NODE ) && ( inUseFlag & condition ) ) 
             {
-                if (( numDone ++ ) >= n ) return wordn ;
+                // zero indexed list notation : ie. the first node is zero - 0
+                if (( numDone ++ ) >= n ) return  wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) dobj, SCN_T_WORD ) ;
+
             }
         }
     }
-    return 0 ; //wordn ;
+    return 0 ;
 }
 
 Word *
 _CSL_WordList_PopWords ( int64 n )
 {
-    Word * rword = CSL_WordList_DoOp ( n, WL_SET_IN_USE_FLAG, SCN_IN_USE_FOR_SOURCE_CODE ) ;
+    Word * rword = CSL_WordList_DoOp ( n, WL_SET_IN_USE_FLAG, SCN_IN_USE_FOR_SOURCE_CODE ) ; // we don't remove just reset the flag
     return rword ;
 }
-#endif
 
 Word *
 CSL_WordLists_PopWord ( )
@@ -665,7 +629,6 @@ CSL_Finish_WordSourceCode ( CSL * csl, Word * word )
 {
     if ( ! word->W_SourceCode ) word->W_SourceCode = _CSL_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
-    //csl->SCI.SciFileIndexScEnd = _ReadLiner_->FileCharacterNumber ;
     word->SC_FileIndex_Start = csl->SCI.SciFileIndexScStart ;
     word->SC_FileIndex_End = csl->SCI.SciFileIndexScEnd ;
     _CSL_SourceCode_Init ( csl ) ;
@@ -775,5 +738,22 @@ CSL_DbgSourceCodeEndBlock ( )
     CSL_DbgSourceCodeOff ( ) ;
 }
 
+#endif
+
+#if 0
+
+void
+SC_List_Set_NotInUseForSC ( dlnode * node, byte * address )
+{
+    Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
+    if ( word->SourceCoding >= address ) dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_OPTIMIZATION ) ;
+}
+
+void
+CSL_AdjustDbgSourceCode_ScInUseFalse ( byte * address )
+{
+    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
+    if ( list ) dllist_Map1 ( list, ( MapFunction1 ) SC_List_Set_NotInUseForSC, ( int64 ) address ) ;
+}
 #endif
 

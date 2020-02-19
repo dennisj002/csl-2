@@ -231,7 +231,7 @@ typedef struct _Identifier
     dllist * DebugWordList ;
     int64 StartCharRlIndex ;
     int64 SC_WordIndex, SC_FileIndex_Start, SC_FileIndex_End ;
-    struct _Identifier * CSLWord, *BaseObject ;
+    struct _Identifier * CSLWord, * BaseObject ;
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
 c_syntaxOff

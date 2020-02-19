@@ -30,7 +30,8 @@ _ClassTypedef ( Boolean cloneFlag )
     Namespace * classNs ;
     TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
     tdsci->Tdsci_StructureUnion_Namespace = classNs = tdsci->BackgroundNamespace ;
-    Parse_StructOrUnion_Type ( tdsci, TDSCI_STRUCT|(cloneFlag ? TDSCI_CLONE_FLAG : 0) ) ;
+    SetState ( tdsci, TDSCI_STRUCT | (cloneFlag ? TDSCI_CLONE_FLAG : 0), true ) ;
+    Parse_StructOrUnion_Type ( tdsci ) ; //, TDSCI_STRUCT|(cloneFlag ? TDSCI_CLONE_FLAG : 0) ) ;
     Class_Size_Set ( classNs, tdsci->Tdsci_TotalSize ) ;
     classNs->W_ObjectAttributes |= STRUCTURE ;    
     SetState ( _Compiler_, TDSCI_PARSING, true ) ;

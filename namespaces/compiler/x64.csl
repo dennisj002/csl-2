@@ -226,6 +226,7 @@ Compile_CalculateWrite_Instruction_X64 ( code0, code1, mod, reg, rm, controlFlag
 } prefix
 'Compile_CalculateWrite_Instruction_X64 find wdiss //pause
 #if 1
+
 void
 Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize )
 {

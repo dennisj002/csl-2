@@ -493,7 +493,8 @@ c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpre
 wtdinclude 
 c_syntaxOn
 int
-faccs ( REG int32 n | REG in64 rec -- RAX ) 
+//faccs ( REG int32 n | REG in64 rec -- RAX ) 
+faccs ( REG n | REG rec ) 
 {
     rec = 1 ; 
     while ( n > 1 )
@@ -503,7 +504,7 @@ faccs ( REG int32 n | REG in64 rec -- RAX )
     return rec ;
 }
 pwi faccs 
-faccs ( 7 ) ; 5040 _assert 
+faccs ( 7 ) ; dup p 5040 _assert 
 //pause
 // test byte size objects
 C Experimental
