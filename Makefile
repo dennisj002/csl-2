@@ -9,8 +9,8 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/basis/core/dllist.c src/basis/core/interpret.c src/basis/core/lexer.c src/basis/core/cstack.c src/basis/core/classes.c src/basis/debugOutput.c\
 	src/basis/core/namespace.c src/basis/history.c src/basis/core/readline.c src/basis/core/dataStack.c src/basis/context.c\
 	src/basis/core/word.c src/basis/core/readTable.c src/basis/bigNum.c src/basis/core/_readline.c src/basis/core/array.c\
-	src/basis/core/compiler.c src/basis/core/dllnodes.c src/basis/core/finder.c src/basis/interpreters.c\
-	src/basis/tabCompletion.c src/basis/colors.c src/basis/sourceCode.c src/basis/debugStepping.c\
+	src/basis/core/compiler.c src/basis/core/dllnodes.c src/basis/core/finder.c src/basis/core/typedef.c\
+	src/basis/interpreters.c src/basis/tabCompletion.c src/basis/colors.c src/basis/sourceCode.c src/basis/debugStepping.c\
 	src/basis/core/string.c src/basis/openVmTil.c src/basis/core/dobject.c src/basis/core/preprocessor.c\
 	src/basis/lists.c src/basis/debugDisassembly.c src/basis/typeCheck.c\
 	src/basis/linux.c src/basis/exception.c src/basis/compiler/locals.c\

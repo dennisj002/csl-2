@@ -203,7 +203,7 @@ _dlnode_New ( uint64 allocType )
 #define Is_NotHeadOrTailNode( node ) ( node && _dlnode_Next ( node ) && _dlnode_Previous ( node ) ) ? node : 0
 //#define Is_NotHeadNode( node ) ( node && _dlnode_Previous ( node ) ) ? node : 0
 
-dlnode *
+inline dlnode *
 Is_NotHeadNode ( dlnode * anode )
 {
     if ( anode && anode->beforeNode )
@@ -212,25 +212,20 @@ Is_NotHeadNode ( dlnode * anode )
     }
     else return 0 ;
 }
-#if 0
-#define Is_NotTailNode( node ) ( node && _dlnode_Next ( node ) ) ? node : 0
-#define _dlnode_Next( node ) node ? node->afterNode : 0
-#else
 
-dlnode *
+inline dlnode *
 _dlnode_Next ( dlnode * anode )
 {
     if ( anode && anode->afterNode ) return anode->afterNode ;
     return 0 ;
 }
 
-dlnode *
+inline dlnode *
 Is_NotTailNode ( dlnode * anode )
 {
     if ( anode && _dlnode_Next ( anode ) ) return anode ;
     return 0 ;
 }
-#endif
 
 // toward the TailNode
 

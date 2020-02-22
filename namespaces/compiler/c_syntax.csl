@@ -39,12 +39,12 @@ typedef struct _CObj
     int64 heey1 ;
 } cobj, CObj ;
 "CObj.size =" ps p ( CObj.size ) ; // 104
-"chey" CObj new ;
+"chey" CObj d: new ;
 CObj 
 C_Syntax
 sp
 chey.hi = 1234 ;
-_assert0 ( chey.hi 1234 ) ; sp
+d: _assert0 ( chey.hi 1234 ) ; sp
 dump ( chey, chey.size ) ; sp
 printf ( "\n\tchey.hi = %d", chey.hi ) ; sp
 chey.chars [2] = 255 ;

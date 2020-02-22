@@ -163,7 +163,7 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
         int64 dimSize = CalculateArrayDimensionSize ( arrayBaseObject, dimNumber ) ; // dimNumber is used as an array index so it is also zero base indexed
         compiler->ArrayEnds ++ ; // after, because arrayBaseObject->ArrayDimensions is a zero based array
 
-        Debugger_PreSetup (_Debugger_, word, 0, 0, 0 ) ;
+        Debugger_PreSetup (_Debugger_, word, 0, 0, 0 , 0) ;
         if ( CompileMode && * variableFlag ) Compile_ArrayDimensionOffset ( _Context_CurrentWord ( cntx ), dimSize, objSize ) ;
         else
         {
@@ -259,7 +259,7 @@ _CSL_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
                 else _Word_CompileAndRecord_PushReg (baseObject, ACC , true) ;
             }
             else _CSL_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
-            _DEBUG_SHOW ( baseObject, 1 ) ;
+            _DEBUG_SHOW ( baseObject, 1, 0 ) ;
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         }
         if ( lispMode ) interp->BaseObject = 0 ;

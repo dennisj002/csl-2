@@ -226,7 +226,9 @@ __CSL_Dump ( byte * address, int64 number, int64 dumpMod )
             Printf ( ( byte* ) "\n" UINT_FRMT " : ", address + i ) ;
             if ( ! ( i % dumpMod ) )
             {
+/*
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) Printf ( ( byte* ) UINT_FRMT " ", *( int64* ) ( address + i + n ) ) ;
+*/
                 Printf ( ( byte* ) " " ) ;
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CSL_NByteDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CSL_CharacterDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
@@ -249,6 +251,10 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
         if ( word->W_ObjectAttributes & OBJECT )
         {
             Printf ( ( byte* ) "%s <:> %s", name, "object" ) ;
+        }
+        if ( word->W_ObjectAttributes & STRUCTURE )
+        {
+            Printf ( ( byte* ) "%s <:> %s : size = %d", name, "structure",  word->ObjectByteSize ) ;
         }
         else if ( word->W_ObjectAttributes & NAMESPACE )
         {

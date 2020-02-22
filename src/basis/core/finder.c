@@ -92,7 +92,9 @@ Finder_GetQualifyingNamespace ( Finder * finder )
 Word *
 _Finder_Word_Find ( Finder * finder, uint64 state, byte * name )
 {
-    return finder->FoundWord = Tree_Map_State_OneArg ( state, ( MapFunction_1 ) Symbol_CompareName, ( int64 ) name ) ;
+    finder->FoundWord = Tree_Map_State_OneArg ( state, ( MapFunction_1 ) Symbol_CompareName, ( int64 ) name ) ;
+    CSL_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
+    return finder->FoundWord ;
 }
 
 Word *
@@ -136,7 +138,6 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
             }
         }
         if ( ! rword ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
-        CSL_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
     }
     return rword ;
 }

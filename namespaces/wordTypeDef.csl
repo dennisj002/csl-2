@@ -9,10 +9,10 @@ typedef struct _dlnode
 {
     struct
     { 
-        // test
-        struct _dlnode * n_After ; // test
+        // test comment
+        struct _dlnode * n_After ; // test comment
         struct _dlnode * n_Before ;
-    } ;
+    }  ;
 } dlnode, node ;
 typedef struct _dllist
 {
@@ -62,7 +62,7 @@ typedef struct
         uint64 T_Size ;
         uint64 T_ChunkSize ; // remember MemChunk is prepended at memory allocation time
     } ;
-} AttributeInfo, AttributeInfo, TypeInfo, TI ;
+} AttributeInfo, TypeInfo, TI ;
 typedef struct _dobject
 {
     struct

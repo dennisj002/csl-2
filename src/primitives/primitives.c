@@ -5,7 +5,7 @@ CPrimitive CPrimitives [] = {
     { "locationPrint", 0, 0, 0, CSL_Location_Printf, 0, 0, 0, "Experimental", "Root" },
     { "do>", 0, 0, 0, CSL_Do, IMMEDIATE, 0, 0, "Experimental", "Root" },
     { "does>", 0, 0, 0, CSL_Does, IMMEDIATE, 0, 0, "Experimental", "Root" },
-    { "<do", 0, 0, 0, CSL_NoOp, IMMEDIATE, 0, 0, "Experimental", "Root" },
+    { "<do", 0, 0, 0, CSL_NoOp, IMMEDIATE, 0, 0, "Experimental", "Root" }, 
 
     { "(", 0, 0, 0, ( block ) LC_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD | LEFT_PAREN, 0, 0, "Lisp", "Root" },
     { "_(", 0, 0, 0, ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
@@ -408,6 +408,7 @@ CPrimitive CPrimitives [] = {
     { "inlineOn", 0, 0, 0, CSL_InlineOn, 0, 0, 0, "OpenVmTil", "Root" },
     { "debugOff", 0, 0, 0, CSL_DebugOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "debugOn", 0, 0, 0, CSL_DebugOn, 0, 0, 0, "OpenVmTil", "Root" },
+    { "debugLevel", 0, 0, 0, CSL_DebugLevel, IMMEDIATE, 0, 0, "OpenVmTil", "Root" },
     { "verbosity", 0, 0, 0, OpenVmTil_Verbosity, IMMEDIATE, 0, 0, "OpenVmTil", "Root" },
     { "dbi", 0, 0, 0, OpenVmTil_ShowMachineCodeInstructions, IMMEDIATE, 0, 0, "OpenVmTil", "Root" },
     { "codeSize", 0, 0, 0, OpenVmTil_CodeSize, 0, 0, 0, "OpenVmTil", "Root" },

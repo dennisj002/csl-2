@@ -20,7 +20,7 @@ Dbg_Block_Eval ( Word * word, block blck )
 {
     if ( blck )
     {
-        _DEBUG_SETUP ( word, 0, ( byte* ) blck, 1 ) ;
+        _DEBUG_SETUP (word, 0, ( byte* ) blck, 1 , 0) ;
         if ( ! GetState ( _Debugger_->w_Word, STEPPED ) )
         {
             _Block_Eval ( blck ) ;

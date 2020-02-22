@@ -89,7 +89,9 @@ _Stack_Drop ( Stack * stack )
 int64
 Stack_Top ( Stack * stack )
 {
-    return *stack->StackPointer ;
+    int64 sd = Stack_Depth ( stack ) ;
+    if ( sd == 0 ) return 0 ;
+    else return *stack->StackPointer ;
 }
 
 int64

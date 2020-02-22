@@ -145,7 +145,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
         if ( ( foundWord ) && ( _O_->Verbosity > 2 ) )
         {
             //_Printf ( ( byte* ) "\nNumber Found = %d :: minDiffFound = %d : window = %d : Chosen word = \'%s\' : LastSourceCodeWord = \'%s\'", numFound, minDiffFound, fDiff, foundWord->Name, _Debugger_->LastSourceCodeWord ? _Debugger_->LastSourceCodeWord->Name : ( byte* ) "" ) ;
-            _DWL_ShowWord_Print ( foundWord, 0, ( byte* ) "CHOSEN", foundWord->Coding, foundWord->SourceCoding, 0, foundWord->W_SC_Index, -1 ) ; //_DWL_ShowWord ( foundWord, "CHOSEN", minDiffFound ) ;
+            _DWL_ShowWord_Print ( foundWord, 0, ( byte* ) "CHOSEN", foundWord->Coding, foundWord->SourceCoding, 0, foundWord->W_SC_Index, - 1 ) ; //_DWL_ShowWord ( foundWord, "CHOSEN", minDiffFound ) ;
         }
         if ( address ) _Debugger_->LastSourceCodeAddress = address ;
         if ( foundWord ) _Debugger_->LastScwi = foundWord->W_SC_Index ;
@@ -289,6 +289,7 @@ _CSL_WordList_TopWord ( )
 #define WL_GET_NODE 1
 #define WL_SET_IN_USE_FLAG 2
 // zero indexed list notation : ie. the first node is zero - 0
+
 Word *
 CSL_WordList_DoOp ( int64 n, int64 op, int64 condition )
 {
@@ -303,17 +304,17 @@ CSL_WordList_DoOp ( int64 n, int64 op, int64 condition )
             nextNode = dlnode_Next ( node ) ;
             dobject * dobj = ( dobject * ) node ;
             inUseFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
-            if (( op == WL_SET_IN_USE_FLAG ) && ( inUseFlag & SCN_IN_USE_FOR_OPTIMIZATION ) )
+            if ( ( op == WL_SET_IN_USE_FLAG ) && ( inUseFlag & SCN_IN_USE_FOR_OPTIMIZATION ) )
             {
                 dobject_Set_M_Slot ( dobj, SCN_IN_USE_FLAG, condition ) ;
                 if ( ( ++ numDone ) >= n ) return 0 ;
             }
-            // since we don't remove words and just reset the flags when we 'pop' a word
-            // we need to check that the word hasn't already be popped from its SCN_IN_USE_FLAG ...
-            else if ( ( op == WL_GET_NODE ) && ( inUseFlag & condition ) ) 
+                // since we don't remove words and just reset the flags when we 'pop' a word
+                // we need to check that the word hasn't already be popped from its SCN_IN_USE_FLAG ...
+            else if ( ( op == WL_GET_NODE ) && ( inUseFlag & condition ) )
             {
                 // zero indexed list notation : ie. the first node is zero - 0
-                if (( numDone ++ ) >= n ) return  wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) dobj, SCN_T_WORD ) ;
+                if ( ( numDone ++ ) >= n ) return wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) dobj, SCN_T_WORD ) ;
 
             }
         }
@@ -627,11 +628,14 @@ CSL_SetSourceCodeWord ( )
 void
 CSL_Finish_WordSourceCode ( CSL * csl, Word * word )
 {
-    if ( ! word->W_SourceCode ) word->W_SourceCode = _CSL_GetSourceCode ( ) ;
-    Lexer_SourceCodeOff ( _Lexer_ ) ;
-    word->SC_FileIndex_Start = csl->SCI.SciFileIndexScStart ;
-    word->SC_FileIndex_End = csl->SCI.SciFileIndexScEnd ;
-    _CSL_SourceCode_Init ( csl ) ;
+    if ( word )
+    {
+        if ( ! word->W_SourceCode ) word->W_SourceCode = _CSL_GetSourceCode ( ) ;
+        Lexer_SourceCodeOff ( _Lexer_ ) ;
+        word->SC_FileIndex_Start = csl->SCI.SciFileIndexScStart ;
+        word->SC_FileIndex_End = csl->SCI.SciFileIndexScEnd ;
+        _CSL_SourceCode_Init ( csl ) ;
+    }
 }
 
 void

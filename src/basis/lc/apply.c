@@ -177,7 +177,7 @@ LO_PrepareReturnObject ( )
     byte * name ;
     if ( ! CompileMode )
     {
-        Namespace * ns = _CSL_InNamespace ( ) ;
+        Namespace * ns = CSL_In_Namespace ( ) ;
         name = ns->Name ;
         if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) type = T_BIG_NUM ;
         return DataObject_New (T_LC_NEW, 0, 0, 0, LITERAL | type, LITERAL | type, 0, DataStack_Pop ( ), 0, 0, 0, - 1 ) ;
@@ -324,7 +324,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
         _Debugger_->PreHere = Here ;
         if ( ! l2 || ( l2->W_LispAttributes & T_NIL ) ) Compile_MoveImm_To_Reg ( RegParameterOrder ( (*i) ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         else Compile_MoveImm_To_Reg ( RegParameterOrder ( (*i) ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
-        _DEBUG_SHOW ( l2, 1 ) ;
+        _DEBUG_SHOW ( l2, 1, 0 ) ;
     }
     else if ( ( l1->W_ObjectAttributes & NON_MORPHISM_TYPE ) ) _LO_Apply_NonMorphismArg ( pl1, i ) ;
     else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
@@ -333,9 +333,9 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
     else
     {
         word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
-        DEBUG_SETUP ( word ) ;
+        DEBUG_SETUP ( word, 0 ) ;
         _Compile_Move_StackN_To_Reg ( RegParameterOrder ( (*i) ++ ), DSP, 0 ) ;
-        _DEBUG_SHOW ( word, 1 ) ;
+        _DEBUG_SHOW ( word, 1, 0 ) ;
     }
 done:
     _Debugger_->PreHere = Here ;
@@ -379,8 +379,8 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
             Set_CompileMode ( svcm ) ;
             Set_CompilerSpace ( scs ) ;
             _Debugger_->PreHere = Here ; // prevent debugger from showing the 1 byte ret for 'word'
-            _DEBUG_SETUP ( word, 0, (byte*) 0, 1 ) ;
-            _DEBUG_SHOW ( word, 1 ) ;
+            _DEBUG_SETUP (word, 0, (byte*) 0, 1 , 0) ;
+            _DEBUG_SHOW ( word, 1, 0 ) ;
             Dbg_Block_Eval (word, b) ;
         }
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;

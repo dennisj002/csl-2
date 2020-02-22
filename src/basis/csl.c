@@ -311,3 +311,11 @@ CSL_InlineOff ( )
     SetState ( _CSL_, INLINE_ON, false ) ;
 }
 
+void
+CSL_DebugLevel ( )
+{
+    if ( Compiling ) _Compile_Stack_Push ( DSP, ACC, ( int64 ) &_CSL_->DebugLevelBar ) ; //CSL_CompileAndRecord_Word0_PushReg ( ACC ) ; //_Compile_Stack_Push ( DSP, ( int64 ) & _O_->Verbosity ) ;
+    else DataStack_Push ( ( int64 ) & _CSL_->DebugLevelBar ) ;
+}
+
+

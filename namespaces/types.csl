@@ -1,3 +1,9 @@
+5
+c_syntaxOn
+'C.Experimental namespace
+Experimental
+
+#if 0
 // see readme.txt for a text description
 // TODO : types, database, garbage collection : integration
 typedef char int8 ;
@@ -22,6 +28,7 @@ typedef int64( *cFunction_1_Arg ) ( int64 ) ;
 typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;
 typedef VoidFunction block ; // code block
 typedef byte AsciiCharSet [ 256 ] ;
+#endif
 
 typedef struct
 {
@@ -30,7 +37,7 @@ typedef struct
     uint64 *StackMin ;
     uint64 *StackMax ;
     uint64 *InitialTosPointer ;
-    uint64 StackData [] ;
+    uint64 StackData [ 0 ] ;
 } Stack ;
 
 typedef byte * function, * object, * type, * slot ;
@@ -54,6 +61,7 @@ typedef struct
         uint64 T_ChunkSize ; // remember MemChunk is prepended at memory allocation time
     } ;
 } AttributeInfo, TypeInfo, TI ;
+#if 0
 typedef struct
 {
     union
@@ -73,6 +81,8 @@ typedef struct
 
 typedef object * ( *primop ) ( object * ) ;
 typedef Object * ( *Primop ) ( Object * ) ;
+#endif
+
 typedef struct _dlnode
 {
     struct
@@ -90,6 +100,8 @@ typedef struct _dllist
     } ;
     node * n_CurrentNode ;
 } dllist ; //, list ;
+
+#if 0
 #define after_ptr n_After
 #define before_ptr n_Before
 #define head after_ptr
@@ -98,6 +110,8 @@ enum types
 {
     BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, CARTESIAN_PRODUCT
 } ;
+#endif
+
 typedef struct _dobject
 {
     struct
@@ -187,7 +201,7 @@ typedef struct
     } ;
     AttributeInfo n_Attributes ;
 } DLNode, Node, ListNode, DLList, List ;
-
+#if 0
 #define afterNode n_After 
 #define beforeNode n_Before 
 #define n_Car afterNode 
@@ -202,6 +216,22 @@ typedef void ( *MapFunction4 ) ( dlnode *, int64, int64, int64, int64 ) ;
 typedef void ( *MapFunction5 ) ( dlnode *, int64, int64, int64, int64, int64 ) ;
 typedef
 Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
+#endif
+
+typedef struct location
+{
+    byte * Filename ;
+    int32 LineNumber ;
+    int32 CursorPosition ;
+    byte * LocationWord ;
+    byte * LocationAddress ;
+} Location ;
+
+typedef union 
+{
+        byte TypeSignatureCodes [8] ;
+        byte * TypeNamespace ;
+} TypeSignatureInfo ;
 typedef struct _Identifier // _Symbol
 {
     DLNode S_Node ;
@@ -242,8 +272,66 @@ typedef struct _Identifier // _Symbol
     int64 StartCharRlIndex ;
     int64 SC_WordIndex, SC_FileIndex_Start, SC_FileIndex_End ;
     struct _Identifier * CSLWord, * BaseObject ;
-    struct _WordData * W_WordData ;
+struct _WordData
+{
+    uint64 RunType ;
+    Namespace * TypeNamespace ;
+    byte * CodeStart ; // set at Word allocation 
+    byte * Coding ; // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
+    byte * Filename ; // ?? should be made a part of a accumulated string table ??
+    int64 LineNumber ;
+    int64 CursorPosition ;
+    int64 NumberOfNonRegisterArgs ;
+    int64 NumberOfNonRegisterLocals ;
+    int64 NumberOfVariables ;
+
+    byte * ObjectCode ; // used by objects/class words
+    byte * StackPushRegisterCode ; // used by the optInfo
+    Word * AliasOf, *OriginalWord ;
+    int64 Offset ; // used by ClassField
+    struct
+    {
+        uint8 RegToUse ;
+        uint8 Opt_Rm ;
+        uint8 Opt_Reg ; 
+        uint8 SrcReg ;
+        uint8 DstReg ;
+        uint8 RegFlags ; // future uses available here !!
+        uint8 OpInsnGroup ;
+        uint8 OpInsnCode ;
+    } ;
+    byte TypeSignature [16] ;
+    Namespace * TypeObjectsNamespaces [16] ; // 16 : increase if need more than 15 objects as args
+    union
+    {
+        dllist * LocalNamespaces ;
+        Location * OurLocation ;
+    } ;
+    union
+    {
+        int64 * WD_ArrayDimensions ;
+        byte *WD_SourceCode ; // arrays don't have source code
+    } ;
+    int64 WD_ArrayNumberOfDimensions ;
+    Stack * WD_NamespaceStack ; // arrays don't have runtime debug code
+    union
+    {
+        byte * LambdaBody ;
+        int64 AccumulatedOffset ; // used by Do_Object 
+    } ;
+    union
+    {
+        byte * LambdaArgs ;
+        int64 Index ; // used by Variable and LocalWord
+        //byte * LogicTestCode ;
+    } ;
+    dllist * SourceCodeWordList ;
+    byte * SourceCoding ; //
+    int64 SourceCodeMemSpaceRandMarker ;
+} WordData ; // try to put all compiler related data here so in the future we can maybe delete WordData at runtime
+
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
+#if 0
 #define S_Car S_Node.n_Car
 #define S_Cdr S_Node.n_Cdr
 #define S_After S_Cdr
@@ -334,20 +422,7 @@ typedef void ( *MapSymbolFunction ) ( Symbol * ) ;
 typedef void ( *VMapNodeFunction ) ( dlnode * ) ;
 typedef void ( *MapSymbolFunction2 ) ( Symbol *, int64, int64 ) ;
 typedef Word* ( *MapNodeFunction ) ( dlnode * node ) ;
-typedef struct location
-{
-    byte * Filename ;
-    int32 LineNumber ;
-    int32 CursorPosition ;
-    Word * LocationWord ;
-    byte * LocationAddress ;
-} Location ;
 
-typedef union 
-{
-        byte TypeSignatureCodes [8] ;
-        Word * TypeNamespace ;
-} TypeSignatureInfo ;
 typedef struct _WordData
 {
     uint64 RunType ;
@@ -646,9 +721,7 @@ typedef struct
         } ;
         Word * COIW [8] ; // CompileOptimizeInfo Word array
     } ;
-#if NEW_CPU_PIPELINE_STATE    
-    CpuPipelineState CPState ;
-#endif   
+#if 0 
     // ArgXLocation    
 #define ASSUMED_LOC_LITERAL     ( (uint64) 1 << 0 )
 #define ASSUMED_STACK_0         ( (uint64) 1 << 1 )
@@ -700,7 +773,9 @@ typedef struct
 #define ARG2_L                   ( 1 << 2 )
 #define ARG2_R                   ( 1 << 3 )
 #define OP_RESULT                ( 1 << 4 )
+#endif
 } CompileOptimizeInfo, COI ;
+
 
 typedef struct TypeDefStructCompileInfo
 {
@@ -884,7 +959,7 @@ typedef struct _StringTokenInfo
 typedef struct _CSL
 {
     uint64 State, SavedState, * SaveDsp ;
-    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount, DebugLevelBar ; // SC_Index == SC_Buffer Index ;
+    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ; // SC_Index == SC_Buffer Index ;
     Stack *ReturnStack, * DataStack ;
     Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace ;
     Context * Context0 ;
@@ -1068,4 +1143,9 @@ typedef struct typeStatusInfo
     Boolean TypeErrorStatus, OpWord_ReturnsACodedValue_Flag ;
     byte OpWordReturnSignatureLetterCode ;
 } TypeStatusInfo, TSI ;
+#endif
 
+c_syntaxOff
+'C.Experimental notUsing
+Root Experimental User
+2 + 7 assertStkChk // stack checking

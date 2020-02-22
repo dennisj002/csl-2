@@ -80,24 +80,24 @@ Debugger_Setup_SaveState ( Debugger * debugger, Word * word )
 }
 
 Boolean
-DBG_SHOULD_WE_DO_SETUP ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean forceFlag )
+DBG_SHOULD_WE_DO_SETUP ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean force, int64 debugLevel )
 {
-    Boolean rtn = ( forceFlag || GetState ( _Compiler_, LC_ARG_PARSING ) || address || token
+    Boolean rtn = ( (_CSL_->DebugLevelBar >= debugLevel) && (force || GetState ( _Compiler_, LC_ARG_PARSING ) || address || token
         || ( word && ( ( word != debugger->LastPreSetupWord )
-        && ( word->WL_OriginalWord ? ( word->WL_OriginalWord != debugger->LastPreSetupWord ) : 1 ) || debugger->RL_ReadIndex != word->W_RL_Index ) ) ) ;
+        && ( word->WL_OriginalWord ? ( word->WL_OriginalWord != debugger->LastPreSetupWord ) : 1 ) || debugger->RL_ReadIndex != word->W_RL_Index ) ) )) ;
     return rtn ;
 }
 
 Boolean
-Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean forceFlag )
+Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean force, int64 debugLevel )
 {
     Boolean rtn = false ;
-    if ( Is_DebugModeOn && Is_DebugShowOn ) // quick check for interpret //|| forceFlag )
+    if ( Is_DebugModeOn && Is_DebugShowOn )
     {
-        if ( DBG_SHOULD_WE_DO_SETUP ( debugger, word, token, address, forceFlag ) )
+        if ( DBG_SHOULD_WE_DO_SETUP ( debugger, word, token, address, force, debugLevel ) )
         {
             if ( ( ! word ) && ( ! token ) ) word = Context_CurrentWord ( ) ;
-            if ( forceFlag || ( word && word->Name[0] ) || token )
+            if ( force || ( word && word->Name[0] ) || token )
             {
                 Debugger_Setup_RecordState ( debugger, word, token, address ) ;
 
@@ -114,15 +114,15 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
 }
 
 void
-_Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force )
+_Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force, int64 debugLevel )
 {
-    _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
+    _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force, debugLevel ) ;
 }
 
 void
 Debugger_PostShow ( Debugger * debugger )
 {
-    _Debugger_PostShow ( debugger, debugger->w_Word, 0 ) ;
+    _Debugger_PostShow ( debugger, debugger->w_Word, 0, 0 ) ;
 }
 
 void
@@ -675,7 +675,7 @@ Debugger_ShowTypeWordStack ( Debugger * debugger )
 void
 Debugger_Exit ( Debugger * debugger )
 {
-    if ( _OVT_SimpleFinal_Key_Pause (_O_) ) OVT_Exit ( ) ;
+    if ( _OVT_SimpleFinal_Key_Pause ( _O_ ) ) OVT_Exit ( ) ;
 }
 
 void

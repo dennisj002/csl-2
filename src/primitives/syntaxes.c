@@ -212,13 +212,6 @@ CSL_While_PrefixCombinators ( )
 }
 
 void
-_CSL_Typedef ( void )
-{
-    int64 size = CSL_Parse_Typedef_Field (0, 0, 0) ;
-    //DataStack_Push ( size ) ;
-}
-
-void
 CSL_TypedefStructEnd ( void )
 {
     Namespace_SetAsNotUsing ( ( byte* ) "C_Typedef" ) ;

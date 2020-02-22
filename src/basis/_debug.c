@@ -25,7 +25,6 @@ JccInstructionAddress_1Byte ( byte * address )
 
 byte *
 JumpCallInstructionAddress ( byte * address )
-#if 1
 {
     byte *jcAddress ;
     byte insn = * address ;
@@ -42,24 +41,13 @@ JumpCallInstructionAddress ( byte * address )
     }
     return jcAddress ;
 }
-#else
-{
-    // calculate jmp or call address
-    int32 offset = * ( int32* ) ( address + 1 ) ; // 1 : 1 byte opCode
-    byte * jcAddress = address + offset + 5 ; // 5 : sizeof jmp insn - includes 1 byte opcode
-    return jcAddress ;
-}
-#endif
 
 byte *
 JumpCallInstructionAddress_X64ABI ( byte * address )
 {
     int64 offset ;
-    //if ( ( * ( address - 5 ) ) == 0xe9 ) offset = 35 ;
-    //else 
     if ( ( ( * ( address - 20 ) ) == 0x49 ) && ( ( * ( address - 19 ) ) == 0xb8 ) ) offset = 18 ;
-    else offset = 8 ; //if ( ( * ( address - 10 ) ) == 0x49 ) offset = 8 ;
-    //else offset = 23 ;
+    else offset = 8 ; 
     byte * jcAddress = * ( byte** ) ( address - offset ) ; //JumpCallInstructionAddress ( debugger->DebugAddress ) ;
     return jcAddress ;
 }
@@ -67,10 +55,7 @@ JumpCallInstructionAddress_X64ABI ( byte * address )
 void
 _CSL_ACharacterDump ( char aChar )
 {
-    if ( isprint ( aChar ) )
-    {
-        Printf ( ( byte* ) "%c", aChar ) ;
-    }
+    if ( isprint ( aChar ) ) Printf ( ( byte* ) "%c", aChar ) ;
     else Printf ( ( byte* ) "." ) ;
 }
 
@@ -78,18 +63,13 @@ void
 CSL_CharacterDump ( byte * address, int64 number )
 {
     int64 i ;
-    for ( i = 0 ; i < number ; i ++ )
-    {
-
-        _CSL_ACharacterDump ( address [ i ] ) ;
-    }
+    for ( i = 0 ; i < number ; i ++ ) _CSL_ACharacterDump ( address [ i ] ) ;
     Printf ( ( byte* ) " " ) ;
 }
 
 void
 _CSL_AByteDump ( byte aByte )
 {
-
     Printf ( ( byte* ) "%02x ", aByte ) ;
 }
 
@@ -97,11 +77,7 @@ void
 CSL_NByteDump ( byte * address, int64 number )
 {
     int64 i ;
-    for ( i = 0 ; i < number ; i ++ )
-    {
-
-        _CSL_AByteDump ( address [ i ] ) ;
-    }
+    for ( i = 0 ; i < number ; i ++ ) _CSL_AByteDump ( address [ i ] ) ;
     Printf ( ( byte* ) " " ) ;
 }
 

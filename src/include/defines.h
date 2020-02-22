@@ -502,7 +502,7 @@
 #define DBG_RUNTIME ( (uint64) 1 << 21 )
 #define DBG_COMPILE_MODE ( (uint64) 1 << 22 )
 #define DBG_SKIP_INNER_SHOW ( (uint64) 1 << 23 )
-#define DBG_FORCE_SHOW_WRITTEN_CODE ( (uint64) 1 << 24 )
+#define DBG_debugLevel_SHOW_WRITTEN_CODE ( (uint64) 1 << 24 )
 #define DBG_JCC_INSN ( (uint64) 1 << 25 )
 #define DBG_INTERPRET_LOOP_DONE ( (uint64) 1 << 26 )
 #define DBG_REGS_SAVED ( (uint64) 1 << 27 )
@@ -532,7 +532,7 @@
 #define GLOBAL_SOURCE_CODE_MODE ( (uint64) 1 << 10 )
 #define _DEBUG_SHOW_ ( (uint64) 1 << 11 )
 #define DEBUG_SHTL_OFF ( (uint64) 1 << 12 ) // SHTL == _String_HighlightTokenInputLine
-#define SC_FORCE_PUSH ( (uint64) 1 << 13 )
+#define SC_debugLevel_PUSH ( (uint64) 1 << 13 )
 #define DBG_TYPECHECK_ON ( (uint64) 1 << 14 )
 //#define TYPECHECK_OFF ( (uint64) 1 << 15 )
 
@@ -651,8 +651,8 @@
 #define DONE true
 
 // block flag values
-#define FORCE_COMPILE 1
-#define FORCE_RUN 2
+#define debugLevel_COMPILE 1
+#define debugLevel_RUN 2
 
 // Word - Namespace State flags
 #define TREED ( (uint64) 1 << 2 )

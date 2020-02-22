@@ -27,10 +27,10 @@ Word_Eval ( Word * word )
             {
                 _Context_->CurrentEvalWord = word ;
                 if ( IS_MORPHISM_TYPE ( word ) ) CSL_Typecheck ( word ) ;
-                DEBUG_SETUP ( word ) ;
+                DEBUG_SETUP ( word, 0 ) ;
                 if ( ( word->W_MorphismAttributes & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
                 else _Word_Compile ( word ) ;
-                _DEBUG_SHOW ( word, 0 ) ;
+                _DEBUG_SHOW ( word, 0, 0 ) ;
                 _Context_->CurrentEvalWord = 0 ;
                 _Context_->LastEvalWord = word ;
             }
@@ -115,7 +115,7 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
     {
         if ( ! ( word->W_ObjectAttributes & ( LITERAL ) ) )
         {
-            Namespace * ins = _CSL_InNamespace ( ) ; //_CSL_Namespace_InNamespaceGet ( ) ;
+            Namespace * ins = CSL_In_Namespace ( ) ; //_CSL_Namespace_InNamespaceGet ( ) ;
             Namespace_DoAddWord ( ins, word ) ;
         }
     }

@@ -12,7 +12,10 @@ typecheckOn dbgTypecheckOn
 // logOn
 verbosity 1 = 
 Debug
-: d: _dbgOn dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
+// lower debugLevel bar turns on more debugging
+: d: _dbgOn debugLevel 0 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
+: d1: _dbgOn debugLevel 1 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
+: d2: _dbgOn debugLevel 2 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
 "OptimizeOn" variable
 OptimizeOn 1 = 
 #if OptimizeOn @
@@ -490,7 +493,12 @@ forStarters 1 =
 #if 1
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
 : wtdinclude "namespaces/wordTypeDef.csl" include ;
-wtdinclude 
+: typesInclude "namespaces/types.csl" include ;
+typesInclude 
+//wtdinclude 
+'wtdInclude find 100 dump
+//'wtdIncmlude find 'C.Experimental.Word find d: wordStructPrint 
+'C.Experimental notUsing 
 c_syntaxOn
 int
 //faccs ( REG int32 n | REG in64 rec -- RAX ) 
@@ -519,11 +527,11 @@ typedef struct _byteTest
         int64 u64_123 ;
         int32 u32_123 ;
         int8 u8_123 ;
-    } ; //size = 8 
+    } ; //size = 11 
     int32 a32_123 ;
     byte d8_123 ;
-    int16 a16_123 ; // size = 26
-} byteTest, abyteTest ;
+    int16 a16_123 ; 
+} byteTest, abyteTest ; // size = 26
 'bt byteTest new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
 bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
@@ -572,11 +580,11 @@ _assert ( abt.b8_123 46 ) ;
 _assert ( abt.a32_123 234567 ) ;
 _assert ( abt.a64_123 2345566 ) ;
 c_syntaxOff 
-notUsing: Experimental byteTest _byteTest abyteTest bt abt ; 
-Root Experimental User
+notUsing: byteTest _byteTest abyteTest bt abt ; 
 'C.Experimental notUsing
+Root Experimental User
 #endif
-
+tc
 #if forStarters @ 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 _assert
 #endif 

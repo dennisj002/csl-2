@@ -248,7 +248,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         {
             jb = & _O_->JmpBuf0 ;
             OVT_SetRestartCondition ( _O_, INITIAL_START ) ;
-            _OVT_SimpleFinal_Key_Pause (_O_) ;
+            _OVT_SimpleFinal_Key_Pause ( _O_ ) ;
             goto jump ;
         }
         if ( ( restartCondition > QUIT ) || ( _O_->Signal == SIGFPE ) )
@@ -272,12 +272,13 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         else jb = & _CSL_->JmpBuf0 ;
     }
     //OVT_SetExceptionMessage ( _O_ ) ;
-
-    snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUF_IX_SIZE, "\n%s\n%s %s from %s -> ...", _O_->ExceptionMessage,
+    Word * eword = _Context_->CurrentEvalWord ;
+    snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUF_IX_SIZE, "\n%s\n%s %s from %s : evalWord = %s.%s -> ...", _O_->ExceptionMessage,
         ( jb == & _CSL_->JmpBuf0 ) ? "reseting csl" : "restarting OpenVmTil",
-        ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ; //( _O_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
+        ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ),
+        ( eword ? ( eword->S_ContainingNamespace ? eword->S_ContainingNamespace->Name : ( byte* ) "" ) : ( byte* ) "" ), ( eword ? eword->Name : ( byte* ) "" ) ) ;
     if ( pauseFlag && ( _O_->SignalExceptionsHandled < 2 ) && ( _O_->SigSegvs < 2 ) ) OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
-    else if ( _O_->SigSegvs < 3 ) _OVT_SimpleFinal_Key_Pause (_O_) ; //( _O_->Signal != SIGSEGV ) ) ;
+    else if ( _O_->SigSegvs < 3 ) _OVT_SimpleFinal_Key_Pause ( _O_ ) ;
 jump:
     _OVT_SigLongJump ( jb ) ;
 }
@@ -549,7 +550,7 @@ OVT_ExceptionState_Print ( )
 }
 
 int64
-_OVT_SimpleFinal_Key_Pause (OpenVmTil * ovt)
+_OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
 {
     byte * msg = ovt->ThrowBuffer->Data ;
     byte key, * instr = ".: (p)ause, e(x)it, <key> restart" ;
@@ -557,7 +558,7 @@ _OVT_SimpleFinal_Key_Pause (OpenVmTil * ovt)
     fflush ( stdout ) ;
     {
         key = Key ( ) ;
-        if ( key == 'p' ) 
+        if ( key == 'p' )
         {
             Pause ( ) ;
             return false ;
@@ -570,11 +571,23 @@ _OVT_SimpleFinal_Key_Pause (OpenVmTil * ovt)
 void
 OVT_SeriousErrorPause ( )
 {
-    _OVT_SimpleFinal_Key_Pause (_O_) ;
+    _OVT_SimpleFinal_Key_Pause ( _O_ ) ;
     fflush ( stdout ) ;
     Key ( ) ;
 }
 
+void
+OVT_Assert ( Boolean testBoolean, byte * msg )
+{
+    d1
+    (
+    if ( ! ( testBoolean ) )
+    {
+        Printf ( ( byte* ) "\nAssert failed : %s : at %s", msg ? msg : (byte*) "", _Context_Location ( _Context_ ) ) ;
+        _Throw ( QUIT ) ;
+    }
+    ) ;
+}
 #if 0
 
 void

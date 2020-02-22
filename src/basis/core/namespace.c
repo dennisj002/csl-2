@@ -102,7 +102,7 @@ _CSL_Namespace_InNamespaceGet ( )
 }
 
 Namespace *
-_CSL_InNamespace ( )
+CSL_In_Namespace ( )
 {
     Namespace * ins ;
     if ( ( ins = Finder_GetQualifyingNamespace ( _Context_->Finder0 ) ) ) return ins ;
@@ -483,7 +483,7 @@ Namespace_FindOrNew_Local ( Stack * nsStack, Boolean setBlockFlag )
     if ( setBlockFlag )
     {
         BlockInfo * bi = ( BlockInfo * ) Stack_Top ( _Context_->Compiler0->BlockStack ) ;
-        bi->BI_LocalsNamespace = ns ;
+        if ( bi ) bi->BI_LocalsNamespace = ns ;
     }
     return ns ;
 }

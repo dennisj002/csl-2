@@ -50,9 +50,11 @@ CSL_DebugOn ( )
         debugger->DebugRSP = 0 ;
         Debugger_On ( debugger ) ;
     }
+#if 0  // makes debugger ineffective for words that aren't on the using list
     byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0, 0 ) ;
     debugger->EntryWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
     _Context_->SourceCodeWord = debugger->EntryWord ;
+#endif     
 }
 
 void
@@ -111,7 +113,7 @@ CSL_DebugRuntimeBreakpoint_IsDebugOn ( )
 }
 
 void
-_DEBUG_SETUP ( Word * word, byte * token, byte * address, Boolean force )
+_DEBUG_SETUP (Word * word, byte * token, byte * address, Boolean force , int64 debugLevel)
 {
-    Debugger_PreSetup ( _Debugger_, word, token, address, force ) ;
+    Debugger_PreSetup (_Debugger_, word, token, address, force, debugLevel) ;
 }

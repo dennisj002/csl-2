@@ -569,7 +569,7 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
                 if ( graph ) space ++ ;
                 break ;
             }
-            case 0 : return false ;
+            case 0: return false ;
             default:
             {
                 graph ++ ;
@@ -588,17 +588,18 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
 }
 
 void
-Word_ClassStructure_PrintData ( TypeDefStructCompileInfo * tdsci, Word * word, byte * typedefString )
+Word_ClassStructure_PrintData ( Context * cntx, Word * word, byte * typedefString )
 {
     if ( word && typedefString && typedefString[0] )
     {
         Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
+        Compiler * compiler = cntx->Compiler0 ;
         ReadLiner * rl = cntx->ReadLiner0 ;
-        byte * token ;
+        
         Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
-        if ( ! tdsci ) tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
-        else token = TDSCI_ReadToken ( tdsci ) ; // read 'typedef' token
-        CSL_Parse_Typedef_Field ( tdsci, TDSCI_PRINT, ( byte* ) word ) ;
+        TypeDefStructCompileInfo_New ( cntx, CONTEXT ) ;
+        byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
+        CSL_Parse_A_Typed_Field ( cntx, TDSCI_PRINT, ( byte* ) word ) ;
         Readline_Restore_InputLine_State ( rl ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;
     }

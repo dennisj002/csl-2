@@ -9,37 +9,32 @@ CSL_ClassStructureEnd ( void )
 }
 
 void
-CSL_CloneStructureBegin ( void )
-{
-    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
-    SetState ( tdsci, TDSCI_CLONE_FLAG, true ) ;
-    Parse_Structure ( tdsci ) ;
-    //Parse_A_Typedef_Field ( tdsci ) ; 
-}
-
-void
 Class_Size_Set ( Namespace * classNs, int64 size )
 {
-    _Namespace_VariableValueSet ( classNs, ( byte* ) "size", size ) ;
-    classNs->ObjectByteSize = size ;
+    OVT_Assert ( classNs > 0, "Class_Size_Set : No classNs." ) ;
+    if ( classNs )
+    {
+        _Namespace_VariableValueSet ( classNs, ( byte* ) "size", size ) ;
+        classNs->ObjectByteSize = size ;
+    }
 }
 
 void
-_ClassTypedef ( Boolean cloneFlag )
+_ClassTypedef ( Context * cntx, Namespace * ns, Boolean cloneFlag )
 {
-    Namespace * classNs ;
-    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( CONTEXT ) ;
-    tdsci->Tdsci_StructureUnion_Namespace = classNs = tdsci->BackgroundNamespace ;
-    SetState ( tdsci, TDSCI_STRUCT | (cloneFlag ? TDSCI_CLONE_FLAG : 0), true ) ;
-    Parse_StructOrUnion_Type ( tdsci ) ; //, TDSCI_STRUCT|(cloneFlag ? TDSCI_CLONE_FLAG : 0) ) ;
-    Class_Size_Set ( classNs, tdsci->Tdsci_TotalSize ) ;
-    classNs->W_ObjectAttributes |= STRUCTURE ;    
-    SetState ( _Compiler_, TDSCI_PARSING, true ) ;
+    TDSCI * tdsci = TDSCI_Start ( cntx, ns, ( cloneFlag ? TDSCI_CLONE_FLAG : 0 ) ) ;
+    Parse_Structure ( cntx ) ;
+    tdsci = TDSCI_Finalize ( cntx ) ;
+}
+
+void
+CSL_CloneStructureBegin ( void )
+{
+    _ClassTypedef ( _Context_, 0, 1 ) ;
 }
 
 void
 CSL_ClassTypedef ( )
 {
-    CSL_PushToken_OnTokenList ( "{" ) ;
-    _ClassTypedef ( 0 ) ;
+    _ClassTypedef ( _Context_, 0, 0 ) ;
 }

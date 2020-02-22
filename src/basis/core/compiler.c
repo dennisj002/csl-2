@@ -300,6 +300,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     Stack_Init ( compiler->PointerToOffsetStack ) ;
     Stack_Init ( compiler->CombinatorInfoStack ) ;
     Stack_Init ( compiler->InfixOperatorStack ) ;
+    Stack_Init ( compiler->TDSCI_StructUnionStack ) ; 
     Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
     _dllist_Init ( compiler->GotoList ) ;
     _dllist_Init ( compiler->CurrentSwitchList ) ;
@@ -308,7 +309,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     CSL_TypeStackReset ( ) ;
     SetState ( _CSL_, RT_DEBUG_ON, false ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
-    SetBuffersUnused ( 1 ) ;
+    //SetBuffersUnused ( 0 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
     if ( compiler->NonCompilingNs != compiler->LocalsNamespace ) CSL_NonCompilingNs_Clear ( compiler ) ; // for special syntax : we have a namespace but not while compiling
 }
@@ -320,6 +321,7 @@ Compiler_New ( uint64 allocType )
     compiler->BlockStack = Stack_New ( 64, allocType ) ;
     compiler->CombinatorInfoStack = Stack_New ( 64, allocType ) ;
     compiler->InfixOperatorStack = Stack_New ( 64, allocType ) ;
+    compiler->TDSCI_StructUnionStack = Stack_New ( 64, allocType ) ;
     compiler->PointerToOffsetStack = Stack_New ( 64, allocType ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, allocType ) ;
     compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, allocType ) ;

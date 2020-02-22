@@ -94,7 +94,7 @@ DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes
         }
         case C_TYPEDEF:
         {
-            _CSL_Typedef ( ) ;
+            _CSL_Typedef ( word ) ;
             break ;
         }
         case PARAMETER_VARIABLE: case LOCAL_VARIABLE: case (PARAMETER_VARIABLE | REGISTER_VARIABLE ): case (LOCAL_VARIABLE | REGISTER_VARIABLE ):
@@ -183,7 +183,7 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     Namespace * ns = _Namespace_Find ( name, 0, 0 ), * sns ;
     int64 size = 0 ;
     byte * token ;
-    if ( ! ns )
+    if ( ( ! ns ) ) //|| ( ! String_Equal ( ns->S_ContainingNamespace->Name, CSL_In_Namespace () )) )
     {
         sns = _CSL_Namespace_InNamespaceGet ( ) ;
         if ( cloneFlag )
@@ -201,16 +201,14 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
         {
             if ( ! GetState ( _Compiler_, TDSCI_PARSING ) )
             {
-                Lexer_ReadToken ( _Lexer_ ) ; // in case of ":{" 
-                CSL_PushToken_OnTokenList ( "{" ) ;
-                _ClassTypedef ( cloneFlag ) ;
+                _ClassTypedef (_Context_, cloneFlag ? sns : ns, cloneFlag ) ;
             }
         }
     }
     else if ( ns->ObjectByteSize )
     {
-        Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n",
-            Context_Location ( ), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectByteSize ) ;
+        Printf ( ( byte* ) "\nNamespace Error? : \'%s\' already exists! : \n  %s : size = %d : this namespace is %s.%s : size = %d : at %s\n",
+            ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectByteSize, ns->S_ContainingNamespace->Name, ns->Name, ns->ObjectByteSize, Context_Location ( ) ) ;
         Namespace_Do_Namespace ( ns, 0 ) ;
     }
     CSL_WordList_Init ( 0 ) ;

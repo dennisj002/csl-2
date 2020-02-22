@@ -155,8 +155,8 @@
 #define _try( object ) if ( _OpenVmTil_Try ( &object->JmpBuf0 ) ) 
 //#define _catch( e ) if ( _OpenVmTil_Catch () ) // nb. : if no _throw in _catch block don't use 'return'
 #define _finally _OpenVmTil_Finally () // nb. : ! use only once and after the first _try block !
-#define _throw( e ) _Throw (e) // _longjmp( *(jmp_buf*) _Stack_PopOrTop ( _O_->ExceptionStack ), e ) 
 #define _Throw( e ) OpenVmTil_Throw ((e == QUIT) ? (byte*) "\nQuit?\n" : (e == ABORT) ? (byte*) "\nAbort?\n" : (byte*) "", 0, e, 1 )
+#define _throw( e ) _Throw (e) _longjmp( *(jmp_buf*) _Stack_PopOrTop ( _O_->ExceptionStack ), e ) 
 #define _ThrowIt OpenVmTil_Throw ((byte*) "", (byte*) "", 0,  _O_->Thrown, 1 )
 #define Throw( emsg, smsg, e ) OpenVmTil_Throw (((byte*) emsg), ((byte*) smsg), (e), 1 )
 #define ThrowIt( msg ) OpenVmTil_Throw (((byte*) msg),  _O_->Thrown, 1 )
@@ -166,7 +166,6 @@
 #define stopThisTry _OVT_PopExceptionStack ( )
 #define stopTrying _OVT_ClearExceptionStack ( )
 
-#define Assert( testBoolean ) d1 ({ if ( ! (testBoolean) ) { Printf ( (byte*) "\n\nAssert failed : %s\n\n", _Context_Location ( _Context_ ) ) ; _throw ( QUIT ) ; }})
 #define Pause() OpenVmTil_Pause ()
 #define _Pause( msg ) _OpenVmTil_Pause ( msg )
 #define Pause_1( msg ) AlertColors; Printf ( (byte*)"\n%s", msg ) ; OpenVmTil_Pause () ;
@@ -227,15 +226,15 @@
 #define DebugModeOff SetState ( _CSL_, DEBUG_MODE, false )
 #define DebugShow_Off SetState ( _CSL_, _DEBUG_SHOW_, false ) 
 #define DebugShow_On SetState ( _CSL_, _DEBUG_SHOW_, true ) 
-#define Is_DebugModeOn ( _CSL_ && GetState ( _CSL_, DEBUG_MODE ) ) 
-#define Is_DebugShowOn ( _CSL_ && GetState ( _CSL_, _DEBUG_SHOW_ ) ) 
+#define Is_DebugModeOn ( GetState ( _CSL_, DEBUG_MODE ) ) 
+#define Is_DebugShowOn ( GetState ( _CSL_, _DEBUG_SHOW_ ) ) 
 #define _Is_DebugOn GetState ( _CSL_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
 #define DEBUG_PRINTSTACK if ( GetState ( _CSL_, DEBUG_MODE )  ) CSL_PrintDataStack () ;
-#define DEBUG_SETUP_TOKEN( token ) _DEBUG_SETUP ( 0, token, 0 ) ;
-#define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force ) ;
-#define DEBUG_SETUP( word ) _DEBUG_SETUP ( word, 0, 0, 0 )
-#define _DEBUG_SHOW( word, force ) _Debugger_PostShow ( _Debugger_, word, force ) ; //, token, word ) ;
+#define DEBUG_SETUP_TOKEN( token, debugLevel ) _DEBUG_SETUP (0, token, 0, 0, debugLevel) ;
+#define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force, 0) ;
+#define DEBUG_SETUP( word, debugLevel ) _DEBUG_SETUP (word, 0, 0, 0, debugLevel)
+#define _DEBUG_SHOW( word, force, debugLevel ) _Debugger_PostShow (_Debugger_, word, force, debugLevel) ; //, token, word ) ;
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) 
 #define DEBUG_ASM_SHOW_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 
 #define DEBUG_ASM_SHOW_OFF SetState ( _Debugger_, DBG_ASM_SHOW_ON, false ) 
@@ -283,6 +282,16 @@
 #define StringLength( s ) Strlen ( s )
 #define String_Init( s ) s[0]=0 ; 
 #define Map0( dllist, mf ) dllist_Map ( dllist, (MapFunction0) mf )
+
+// typedef/parse defines
+#define P_DEBUG 0
+#define PP_DEBUG 1
+#define PRE_STRUCTURE_IDENTIFIER 1
+#define POST_STRUCTURE_NAME 2
+#define TYPE_NAME 4
+#define PT_TYPEDEF 1
+#define PT_TYPE 2
+#define CONTEXT_TDSCI_STACK( cntx ) ((Context*) cntx) ? cntx->Compiler0->TDSCI_StructUnionStack : _Context_->Compiler0->TDSCI_StructUnionStack
 
 
 

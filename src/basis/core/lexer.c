@@ -334,8 +334,9 @@ _Lexer_ReadToken ( Lexer * lexer, byte * delimiters )
 byte *
 Lexer_ReadToken ( Lexer * lexer )
 {
-    _Lexer_ReadToken ( lexer, 0 ) ;
-    return lexer->OriginalToken ;
+    byte * token = _Lexer_ReadToken ( lexer, 0 ) ;
+    DEBUG_SETUP_TOKEN (token, 1) ;
+    return token ;
 }
 
 void
