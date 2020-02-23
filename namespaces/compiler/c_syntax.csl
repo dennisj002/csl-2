@@ -39,12 +39,12 @@ typedef struct _CObj
     int64 heey1 ;
 } cobj, CObj ;
 "CObj.size =" ps p ( CObj.size ) ; // 104
-"chey" CObj d: new ;
+CObj 'chey new ;
 CObj 
 C_Syntax
 sp
 chey.hi = 1234 ;
-d: _assert0 ( chey.hi 1234 ) ; sp
+_assert0 ( chey.hi 1234 ) ; sp
 dump ( chey, chey.size ) ; sp
 printf ( "\n\tchey.hi = %d", chey.hi ) ; sp
 chey.chars [2] = 255 ;
@@ -113,10 +113,10 @@ chi ( CObj chey0, d | a b c )
     p ( c ) ; c 3 "c should be 3" assert // 3
     p ( b ) ; b 5 "b should be 5" assert // 5
     p ( a ) ; a 8 "a should be 8" assert // 8
-    dump ( &chey0, cobj.size ) ; 
-    d = cobj.chey0.hey ;
+    dump ( chey0, cobj.size ) ; 
+    d = d: cobj.chey0.hey ;
     hex p ( d ) ;
-    printf ( "\n chi : d = %lx\n", d ) ;
+    <dbg> printf ( "\n chi : d = %lx\n", d ) ;
     sprintf ( &cobj.chey0.chars, "\n\t\they = %lx", d ) ; // add '&' within parentheses for lvalue
     printf ( "\n chi : d = %lx\n", d ) ;
     sprintf ( &cobj.chey0.chars2, "\n\t\they hey = %lx", cobj.chey0.hey ) ;
@@ -129,10 +129,10 @@ chi ( CObj chey0, d | a b c )
     _assert ( d #x0123456789abcdef ) ; 
     printf ( "\n%x\n", cobj.chey0.hey ) ;
     sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
-    dump ( &chey0, cobj.size ) ; 
+    dump ( chey0, cobj.size ) ; 
 } prefix
 wdiss ( ' chi find ) ;
-chi ( chey, 7 ) ;
+d: chi ( chey, 7 ) ;
 sp
 #if 1
 void
