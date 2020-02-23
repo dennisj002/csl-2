@@ -12,8 +12,8 @@ typecheckOn dbgTypecheckOn
 // logOn
 verbosity 1 = 
 Debug
-// lower debugLevel bar turns on more debugging
-: d: _dbgOn debugLevel 0 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
+// higher debugLevel turns on more debugging
+: d: _dbgOn dbgSourceCodeOn ; immediate debugWord // use a possibly user set level : a debugWord has special behavior : doesn't interfere with optimization
 : d1: _dbgOn debugLevel 1 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
 : d2: _dbgOn debugLevel 2 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
 "OptimizeOn" variable
