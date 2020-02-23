@@ -27,7 +27,6 @@ Parse_Do_IdentifierAlias ( Context * cntx, byte * token )
     Compiler * compiler = cntx->Compiler0 ;
     TDSCI * tdsci = ( TDSCI * ) Stack_Top ( compiler->TDSCI_StructUnionStack ) ;
     Namespace * alias = _CSL_TypedefAlias ( tdsci->Tdsci_StructureUnion_Namespace, token, tdsci->Tdsci_InNamespace ) ;
-    Class_Size_Set ( alias, tdsci->Tdsci_StructureUnion_Size ) ;
     TypeNamespace_Set ( alias, tdsci->Tdsci_StructureUnion_Namespace ) ;
     return alias ;
 }
@@ -337,13 +336,7 @@ Parse_PreStruct_Accounting ( Context * cntx, Namespace * ns, int64 state )
         tdsci->Tdsci_InNamespace = ctdsci->Tdsci_StructureUnion_Namespace ? ctdsci->Tdsci_StructureUnion_Namespace : _CSL_Namespace_InNamespaceGet ( ) ;
         if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = ctdsci->Tdsci_StructureUnion_Namespace ;
     }
-    else
-    {
-        if ( state & TDSCI_CLONE_FLAG ) //GetState ( tdsci, TDSCI_CLONE_FLAG ) )
-        {
-            tdsci->Tdsci_Offset = _Namespace_VariableValueGet ( tdsci->Tdsci_InNamespace, ( byte* ) "size" ) ; // allows for cloning - prototyping
-        }
-    }
+    //else
     if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace =
         DataObject_New ( CLASS, 0, "<unnamed namespace>", 0, 0, 0, 0, 0, tdsci->Tdsci_InNamespace, 0, 0, - 1 ) ;
     tdsci->State |= state ;
@@ -357,7 +350,6 @@ Parse_PostStruct_Accounting ( Context * cntx )
     int64 depth = Stack_Depth ( cntx->Compiler0->TDSCI_StructUnionStack ) ;
     if ( depth > 1 ) ctdsci = TDSCI_Pop ( cntx ) ;
     tdsci = TDSCI_GetTop ( cntx ) ;
-    //OVT_Assert ( ctdsci > 0, "Parse_PostStruct_Accounting : No current tdsci." ) ;
     if ( ctdsci ) // always should be there but check anyway
     {
         if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = ctdsci->Tdsci_StructureUnion_Namespace ;
@@ -413,7 +405,14 @@ TDSCI_Start ( Context * cntx, Word * word, int64 stateFlags )
     TypeDefStructCompileInfo * tdsci ;
     TDSCI_STACK_INIT ( cntx ) ;
     tdsci = TDSCI_Push_New ( cntx ) ;
-    tdsci->Tdsci_InNamespace = Is_NamespaceType ( word ) ? word : _CSL_Namespace_InNamespaceGet ( ) ;
+    if ( stateFlags & TDSCI_CLONE_FLAG )
+    {
+        tdsci->Tdsci_StructureUnion_Namespace = word ;
+        tdsci->Tdsci_InNamespace = _CSL_Namespace_InNamespaceGet ( ) ;
+        tdsci->Tdsci_Offset = _Namespace_VariableValueGet ( tdsci->Tdsci_InNamespace, ( byte* ) "size" ) ; // allows for cloning - prototyping
+        tdsci->Tdsci_StructureUnion_Size = tdsci->Tdsci_Offset ;
+    }
+    else tdsci->Tdsci_InNamespace = Is_NamespaceType ( word ) ? word : _CSL_Namespace_InNamespaceGet ( ) ;
     tdsci->State |= stateFlags ;
     SetState ( _Compiler_, TDSCI_PARSING, true ) ;
     Lexer_SetTokenDelimiters ( cntx->Lexer0, ( byte* ) " ,\n\r\t", CONTEXT ) ;
@@ -426,7 +425,7 @@ TDSCI *
 TDSCI_Finalize ( Context * cntx )
 {
     TypeDefStructCompileInfo * tdsci = Parse_PostStruct_Accounting ( cntx ) ;
-    CSL_Finish_WordSourceCode ( _CSL_, tdsci->Tdsci_StructureUnion_Namespace ) ; //>Tdsci_BackgroundStructureNamespace ) ;
+    CSL_Finish_WordSourceCode ( _CSL_, tdsci->Tdsci_StructureUnion_Namespace ) ;
     Class_Size_Set ( tdsci->Tdsci_StructureUnion_Namespace ? tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_InNamespace, tdsci->Tdsci_StructureUnion_Size ) ;
     SetState ( _Compiler_, TDSCI_PARSING, false ) ;
     return tdsci ; // should return the initial tdsci from TDSCI_Start with the final fields filled in

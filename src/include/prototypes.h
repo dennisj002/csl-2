@@ -84,6 +84,7 @@ void Do_ObjectOffset(Word *word, int64 reg);
 void Compile_GetVarLitObj_RValue_To_Reg(Word *word, int64 reg, int size);
 void _Compile_SetVarLitObj_With_Reg(Word *word, int64 reg, int64 thruReg);
 void _Compile_GetVarLitObj_LValue_To_Reg(Word *word, int64 reg, int size);
+void Compile_C_Pointer_StackAccess(byte *ptr);
 /* src/basis/compiler/memory.c */
 void Compile_TosRmToTOS(void);
 void _Compile_Set_C_LValue_WithImm_ThruReg(byte *address, int64 value, Boolean rm, byte operandSize);
@@ -1603,6 +1604,7 @@ Boolean DBG_Intrp_Loop_Test(Debugger *debugger);
 void Debugger_InterpreterLoop(Debugger *debugger);
 void Debugger_Setup_RecordState(Debugger *debugger, Word *word, byte *token, byte *address);
 void Debugger_Setup_SaveState(Debugger *debugger, Word *word);
+void Debugger_Interpret(Debugger *debugger, Word *word, byte *token, byte *address);
 Boolean DBG_SHOULD_WE_DO_SETUP(Debugger *debugger, Word *word, byte *token, byte *address, Boolean force, int64 debugLevel);
 Boolean Debugger_PreSetup(Debugger *debugger, Word *word, byte *token, byte *address, Boolean force, int64 debugLevel);
 void _Debugger_PostShow(Debugger *debugger, Word *word, Boolean force, int64 debugLevel);
@@ -2190,7 +2192,7 @@ void CFactorial3(void);
 void ctct(void);
 /* src/primitives/dataObjectNews.c */
 void CSL_Class_New(void);
-void CSL_Class_Value_New(void);
+void CSL_Class_Object_New(void);
 void CSL_Class_Clone(void);
 void CSL_DObject_New(void);
 Namespace *CSL_Type_New(void);

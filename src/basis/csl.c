@@ -136,7 +136,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     csl->OriginalInputLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->InputLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->svLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
-    csl->SourceCodeBuffer = _Buffer_NewPermanent ( SOURCE_CODE_BUFFER_SIZE ) ;
+    csl->SourceCodeBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->LC_PrintB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->LC_DefineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->TokenB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
@@ -314,8 +314,18 @@ CSL_InlineOff ( )
 void
 CSL_DebugLevel ( )
 {
-    if ( Compiling ) _Compile_Stack_Push ( DSP, ACC, ( int64 ) &_CSL_->DebugLevelBar ) ; //CSL_CompileAndRecord_Word0_PushReg ( ACC ) ; //_Compile_Stack_Push ( DSP, ( int64 ) & _O_->Verbosity ) ;
-    else DataStack_Push ( ( int64 ) & _CSL_->DebugLevelBar ) ;
+#if 0    
+    if ( Compiling ) 
+    {
+        _Compile_Stack_Push ( DSP, ACC, ( int64 ) &_CSL_->DebugLevel ) ; 
+        _Set_To_Here_Word_StackPushRegisterCode ( _Context_->CurrentEvalWord, 1 ) ;
+    }
+    //if ( Compiling ) Compile_MoveImm_To_Reg ( RAX, ( int64 ) & _CSL_->DebugLevel, CELL ) ;
+    else DataStack_Push ( ( int64 ) & _CSL_->DebugLevel ) ;
+    //else 
+    //DataStack_Push ( ( int64 ) & _CSL_->DebugLevel ) ;
+#endif    
+    Compile_C_Pointer_StackAccess ( (byte* )& _CSL_->DebugLevel );
 }
 
 

@@ -157,7 +157,7 @@ CSL_Word ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    DataObject_New (csl_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
+    DataObject_New (CSL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
 }
 
 void

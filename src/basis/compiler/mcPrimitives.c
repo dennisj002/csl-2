@@ -41,15 +41,15 @@ CSL_MachineCodePrimitive_AddWords ( CSL * csl )
 {
     Debugger * debugger = _Debugger_ ;
     // this form (below) can and should replace the loop because we need to have variables for some elements
-    _CSL_MachineCodePrimitive_NewAdd ( "call_ToAddressThruR8_TestAlignRSP", csl_WORD|csl_ASM_WORD, 0, & csl->Call_ToAddressThruR8_TestAlignRSP, ( byte* ) Compile_Call_ToAddressThruR8_TestAlignRSP, - 1, "System", "Root" ) ;
-    _CSL_MachineCodePrimitive_NewAdd ( "restoreCpuState", csl_WORD|csl_ASM_WORD, 0, & debugger->RestoreCpuState, ( byte* ) Compile_CpuState_Restore, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
-    _CSL_MachineCodePrimitive_NewAdd ( "saveCpuState", csl_WORD|csl_ASM_WORD, 0, & debugger->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
-    _CSL_MachineCodePrimitive_NewAdd ( "restoreCpuState", csl_WORD|csl_ASM_WORD, 0, & csl->RestoreCpuState, ( byte* ) Compile_CpuState_Restore, ( int64 ) csl->cs_Cpu, "System", "Root" ) ;
-    _CSL_MachineCodePrimitive_NewAdd ( "saveCpuState", csl_WORD|csl_ASM_WORD, 0, & csl->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) csl->cs_Cpu, "System", "Root" ) ;
-    _CSL_MachineCodePrimitive_NewAdd ( "restoreCpu2State", csl_WORD|csl_ASM_WORD, 0, & csl->RestoreCpu2State, ( byte* ) Compile_CpuState_Restore, ( int64 ) csl->cs_Cpu2, "System", "Root" ) ;
-    _CSL_MachineCodePrimitive_NewAdd ( "saveCpu2State", csl_WORD|csl_ASM_WORD, 0, & csl->SaveCpu2State, ( byte* ) Compile_CpuState_Save, ( int64 ) csl->cs_Cpu2, "System", "Root" ) ;
-    _CSL_MachineCodePrimitive_NewAdd ( "wrun", csl_WORD|csl_ASM_WORD|INLINE, 0, & csl->WordRun, ( byte* ) Compile_WordRun, ( int64 ) -1, "System", "Root" ) ;
-    _CSL_MachineCodePrimitive_NewAdd ( "<dbg>", csl_WORD|csl_ASM_WORD|RT_STEPPING_DEBUG|DEBUG_WORD, 0, 0, ( byte* ) _CSL_DebugRuntimeBreakpoint, - 1, "Debug", "Root" ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "call_ToAddressThruR8_TestAlignRSP", CSL_WORD|csl_ASM_WORD, 0, & csl->Call_ToAddressThruR8_TestAlignRSP, ( byte* ) Compile_Call_ToAddressThruR8_TestAlignRSP, - 1, "System", "Root" ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "restoreCpuState", CSL_WORD|csl_ASM_WORD, 0, & debugger->RestoreCpuState, ( byte* ) Compile_CpuState_Restore, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "saveCpuState", CSL_WORD|csl_ASM_WORD, 0, & debugger->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "restoreCpuState", CSL_WORD|csl_ASM_WORD, 0, & csl->RestoreCpuState, ( byte* ) Compile_CpuState_Restore, ( int64 ) csl->cs_Cpu, "System", "Root" ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "saveCpuState", CSL_WORD|csl_ASM_WORD, 0, & csl->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) csl->cs_Cpu, "System", "Root" ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "restoreCpu2State", CSL_WORD|csl_ASM_WORD, 0, & csl->RestoreCpu2State, ( byte* ) Compile_CpuState_Restore, ( int64 ) csl->cs_Cpu2, "System", "Root" ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "saveCpu2State", CSL_WORD|csl_ASM_WORD, 0, & csl->SaveCpu2State, ( byte* ) Compile_CpuState_Save, ( int64 ) csl->cs_Cpu2, "System", "Root" ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "wrun", CSL_WORD|csl_ASM_WORD|INLINE, 0, & csl->WordRun, ( byte* ) Compile_WordRun, ( int64 ) -1, "System", "Root" ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "<dbg>", CSL_WORD|csl_ASM_WORD|RT_STEPPING_DEBUG|DEBUG_WORD, 0, 0, ( byte* ) _CSL_DebugRuntimeBreakpoint, - 1, "Debug", "Root" ) ;
     //{ "<rt-dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CSL_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
     //{ "<dso>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CSL_DebugRuntimeBreakpoint_IsDebugShowOn, - 1, "Debug", "Root" },
     //{ "<d:dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CSL_DebugRuntimeBreakpoint_IsDebugOn, - 1, "Debug", "Root" },

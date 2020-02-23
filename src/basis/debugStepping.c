@@ -400,7 +400,7 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
     int64 result = true ;
     //if ( ( ! debugger->DebugAddress ) || ( GetState ( debugger, DBG_SETUP_ADDRESS ) ) )
     if ( ! word ) result = false ;
-    else if ( word->W_MorphismAttributes & ( csl_WORD | csl_ASM_WORD ) ) result = true ;
+    else if ( word->W_MorphismAttributes & ( CSL_WORD | csl_ASM_WORD ) ) result = true ;
     else if ( ! word->CodeStart ) result = false ;
     else if ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | C_PREFIX_RTL_ARGS ) ) result = false ;
     else if ( ! NamedByteArray_CheckAddress ( _O_CodeSpace, word->CodeStart ) ) result = false ;

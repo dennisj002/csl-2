@@ -9,7 +9,7 @@ ListObject *
 LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
 {
     SetState ( lc, LC_APPLY, true ) ;
-    if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | csl_WORD ) ) 
+    if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) 
         || ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD ) ) ) )
     {
         if ( GetState ( lc, LC_DEFINE_MODE ) && ( ! CompileMode ) ) return lfirst ;
@@ -46,7 +46,7 @@ _LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs )
     ListObject *vReturn ;
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte * ) "\n_LO_Apply : \n\tl0 =%s", _LO_PRINT_TO_STRING ( l0 ) ) ) ;
     if ( lfunction->W_LispAttributes & LIST_FUNCTION ) return (( ListFunction ) lfunction->Lo_CSLWord->Definition )( lfirst ) ;
-    else if ( lfunction->W_MorphismAttributes & csl_WORD ) // this case is hypothetical for now
+    else if ( lfunction->W_MorphismAttributes & CSL_WORD ) // this case is hypothetical for now
     {
         if ( lfunction->W_LispAttributes & T_LISP_csl_COMPILED )
         {

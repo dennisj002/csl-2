@@ -42,7 +42,6 @@ CSL_DebugInfo ( )
 void
 CSL_DebugOn ( )
 {
-    Context * cntx = _Context_ ;
     Debugger * debugger = _Debugger_ ;
     if ( ! Is_DebugOn )
     {
@@ -50,7 +49,7 @@ CSL_DebugOn ( )
         debugger->DebugRSP = 0 ;
         Debugger_On ( debugger ) ;
     }
-#if 0  // makes debugger ineffective for words that aren't on the using list
+#if 0  // no : because it makes debugger ineffective for words that aren't on the using list
     byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0, 0 ) ;
     debugger->EntryWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
     _Context_->SourceCodeWord = debugger->EntryWord ;
@@ -71,7 +70,7 @@ DebugRuntimeBreakpoint ( )
     {
         if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) //|DBG_CONTINUE_MODE ) ) )
         {
-            if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )
+            //if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )
             {
                 SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
                 if ( ! GetState ( debugger, ( DBG_STEPPING | DBG_AUTO_MODE ) ) )
@@ -89,7 +88,8 @@ DebugRuntimeBreakpoint ( )
             if ( GetState ( debugger, ( DBG_CONTINUE_MODE ) ) ) SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
         }
         SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_CONTINUE_MODE ), false ) ;
-        Debugger_InterpreterLoop ( debugger ) ;
+        //Debugger_InterpreterLoop ( debugger ) ;
+        Debugger_Interpret ( debugger, 0, 0, debugger->DebugAddress ) ;
         SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
     }
 }

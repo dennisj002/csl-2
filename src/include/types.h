@@ -884,7 +884,7 @@ typedef struct _StringTokenInfo
 typedef struct _CSL
 {
     uint64 State, SavedState, * SaveDsp ;
-    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount, DebugLevelBar ; // SC_Index == SC_Buffer Index ;
+    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount, DebugLevel ; // SC_Index == SC_Buffer Index ;
     Stack *ReturnStack, * DataStack ;
     Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace ;
     Context * Context0 ;

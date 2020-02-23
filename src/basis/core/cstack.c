@@ -268,7 +268,7 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
     else word = Word_GetFromCodeAddress ( ( byte* ) ( stackPointer [ i ] ) ) ;
     if ( word )
     {
-        if ( IS_NON_MORPHISM_TYPE ( word ) && (!(word->W_MorphismAttributes & csl_WORD )) && (!tsl) ) 
+        if ( IS_NON_MORPHISM_TYPE ( word ) && (!(word->W_MorphismAttributes & CSL_WORD )) && (!tsl) ) 
         {
             sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx >",
                 word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( String_ConvertToBackSlash ( word->Name ) ),

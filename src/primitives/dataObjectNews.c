@@ -9,7 +9,7 @@ CSL_Class_New ( void )
 }
 
 void //Word *
-CSL_Class_Value_New ( )
+CSL_Class_Object_New ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = DataObject_New ( OBJECT, 0, name, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;

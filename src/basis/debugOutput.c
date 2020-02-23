@@ -92,7 +92,7 @@ _Debugger_ShowEffects (Debugger * debugger, Word * word, Boolean stepFlag, Boole
 {
     uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _Dsp_ = debugger->cs_Cpu->R14d ) : _Dsp_ ;
     if ( ! dsp ) CSL_Exception ( STACK_ERROR, 0, QUIT ) ;
-    if ( Is_DebugOn && (_CSL_->DebugLevelBar >= debugLevel) && ( force || stepFlag || ( word && ( word != debugger->LastShowInfoWord ) ) ||
+    if ( Is_DebugOn && (_CSL_->DebugLevel >= debugLevel) && ( force || stepFlag || ( word && ( word != debugger->LastShowInfoWord ) ) ||
         ( debugger->PreHere && ( Here > debugger->PreHere ) ) ) )
     {
         DebugColors ;
@@ -118,7 +118,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         byte signalAscii [ 128 ] ;
         Word * word = debugger->w_Word ? debugger->w_Word : 0 ; //_Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentTokenWord ;
         byte wordName [256] ;
-        snprintf ( wordName, 256, "%s%s%s", word ? word->Name : ( byte* ) "", ( ( char* ) debugger->w_AliasOf ? " -> " : "" ),
+        snprintf ( wordName, 255, "%s%s%s", word ? word->Name : ( byte* ) "", ( ( char* ) debugger->w_AliasOf ? " -> " : "" ),
             ( debugger->w_AliasOf ? debugger->w_AliasOf->Name : ( byte* ) "" ) ) ;
         byte * token0 = debugger->w_AliasOf ? wordName : word ? word->Name : debugger->Token ;
         if ( debugger->w_Word == cntx->LastEvalWord ) word = 0, debugger->w_Word = 0, token0 = cntx->CurrentToken ;
@@ -126,10 +126,10 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         if ( ! ( cntx && cntx->Lexer0 ) ) Throw ( ( byte* ) "\n_CSL_ShowInfo:", ( byte* ) "\nNo token at _CSL_ShowInfo\n", QUIT ) ;
         if ( ( signal == 11 ) || _O_->SigAddress )
         {
-            snprintf ( ( char* ) signalAscii, 128, ( char * ) "Error : signal " INT_FRMT ":: attempting address : \n" UINT_FRMT, signal, ( uint64 ) _O_->SigAddress ) ;
+            snprintf ( ( char* ) signalAscii, 127, ( char * ) "Error : signal " INT_FRMT ":: attempting address : \n" UINT_FRMT, signal, ( uint64 ) _O_->SigAddress ) ;
             debugger->DebugAddress = ( byte* ) _O_->SigAddress ;
         }
-        else if ( signal ) snprintf ( ( char* ) signalAscii, 128, ( char * ) "Error : signal " INT_FRMT " ", signal ) ;
+        else if ( signal ) snprintf ( ( char* ) signalAscii, 127, ( char * ) "Error : signal " INT_FRMT " ", signal ) ;
         else signalAscii[0] = 0 ;
 
         DebugColors ;
@@ -581,7 +581,7 @@ Debugger_ShowInfo_Token ( Debugger * debugger, Word * word, byte * prompt, int64
     }
     else
     {
-        Printf ( ( byte* ) "\n%s%s:: %s : %03ld.%03ld : %s :> %s <::> ", // <:: " INT_FRMT "." INT_FRMT " ",
+        snprintf ( ( char* ) obuffer, BUF_IX_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <::> ", // <:: " INT_FRMT "." INT_FRMT " ",
             prompt, signal ? signalAscii : ( byte* ) " ", cc_location, rl->LineNumber, rl->ReadIndex,
             "<literal>", cc_Token ) ; //, _O_->StartedTimes, _O_->SignalExceptionsHandled ) ;
     }

@@ -25,7 +25,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
     }
     while ( DBG_Intrp_Loop_Test ( debugger ) ) ;
     debugger->LastPreSetupWord = debugger->w_Word ;
-    SetState ( debugger, DBG_STACK_OLD, true ) ;
+    SetState ( debugger, (DBG_STACK_OLD|DBG_INTERPRET_LOOP_DONE), true ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
     if ( GetState ( debugger, ( DBG_SETUP_ADDRESS ) ) )
     {
@@ -79,12 +79,24 @@ Debugger_Setup_SaveState ( Debugger * debugger, Word * word )
     debugger->LastPreSetupWord = word ;
 }
 
+void
+Debugger_Interpret ( Debugger * debugger, Word * word, byte * token, byte * address )
+{
+    Debugger_Setup_RecordState ( debugger, word, token, address ) ;
+
+    DebugColors ;
+    Debugger_InterpreterLoop ( debugger ) ; // core of this function
+    DefaultColors ;
+
+    Debugger_Setup_SaveState ( debugger, word ) ;
+}
+
 Boolean
 DBG_SHOULD_WE_DO_SETUP ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean force, int64 debugLevel )
 {
-    Boolean rtn = ( (_CSL_->DebugLevelBar >= debugLevel) && (force || GetState ( _Compiler_, LC_ARG_PARSING ) || address || token
+    Boolean rtn = ( ( _CSL_->DebugLevel >= debugLevel ) && ( force || GetState ( _Compiler_, LC_ARG_PARSING ) || address || token
         || ( word && ( ( word != debugger->LastPreSetupWord )
-        && ( word->WL_OriginalWord ? ( word->WL_OriginalWord != debugger->LastPreSetupWord ) : 1 ) || debugger->RL_ReadIndex != word->W_RL_Index ) ) )) ;
+        && ( word->WL_OriginalWord ? ( word->WL_OriginalWord != debugger->LastPreSetupWord ) : 1 ) || debugger->RL_ReadIndex != word->W_RL_Index ) ) ) ) ;
     return rtn ;
 }
 

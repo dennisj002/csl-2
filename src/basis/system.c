@@ -46,7 +46,7 @@ Word *
 Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
-    Word * word = DataObject_New (csl_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
+    Word * word = DataObject_New (CSL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
     word->W_TypeAttributes |= WT_C_PREFIX_RTL_ARGS ;
     return word ;
 }
@@ -293,7 +293,7 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
         {
             Printf ( ( byte* ) "%s <:> %s", name, "lambdaCalculus compiled word" ) ;
         }
-        else if ( word->W_MorphismAttributes & csl_WORD )
+        else if ( word->W_MorphismAttributes & CSL_WORD )
         {
             Printf ( ( byte* ) "%s <:> %s", name, "csl compiled word" ) ;
         }

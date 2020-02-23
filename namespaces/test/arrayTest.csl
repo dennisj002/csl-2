@@ -139,7 +139,7 @@ sp
 decimal
 "Ar1" class :{ int64 ar [4] ; };
 sp
-"arr1" Ar1 new
+'arr1 new
 "arr1 : " ps location arr1 size @ dump // should be all zeroes
 arr1.ar [ 3 ] 0x89 =
 arr1.ar[0] arr1.ar[3] @ = 

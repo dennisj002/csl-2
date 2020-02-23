@@ -186,7 +186,7 @@ _Word_New ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispType
 Word *
 Word_New ( byte * name )
 {
-    Word * word = _Word_New ( name, csl_WORD | WORD_CREATE, 0, 0, 1, 0, DICTIONARY ) ;
+    Word * word = _Word_New ( name, CSL_WORD | WORD_CREATE, 0, 0, 1, 0, DICTIONARY ) ;
     return word ;
 }
 

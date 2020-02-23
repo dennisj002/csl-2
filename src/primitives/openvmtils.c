@@ -4,8 +4,9 @@
 void
 OpenVmTil_Verbosity ( )
 {
-    if ( Compiling ) _Compile_Stack_Push ( DSP, ACC, ( int64 ) &_O_->Verbosity ) ; //CSL_CompileAndRecord_Word0_PushReg ( ACC ) ; //_Compile_Stack_Push ( DSP, ( int64 ) & _O_->Verbosity ) ;
-    else DataStack_Push ( ( int64 ) & _O_->Verbosity ) ;
+    //if ( Compiling ) Compile_MoveImm_To_Reg ( RAX, ( int64 ) & _O_->Verbosity, CELL ) ;
+    //else DataStack_Push ( ( int64 ) & _O_->Verbosity ) ;
+    Compile_C_Pointer_StackAccess ( (byte* )& _O_->Verbosity );
 }
 
 void

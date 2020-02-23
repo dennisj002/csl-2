@@ -366,7 +366,7 @@ Debug
 #if ( DebugFlag @ )
 : s stack alertColors location defaultColors ;
 : include include1 debugColors "location :" ps location nl defaultColors ;
-d: vb3
+vb3
 #endif
 Interpreter
 '_defined '_findUsing find alias 
@@ -492,13 +492,17 @@ forStarters 1 =
 
 #if 1
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
+#if 1
 : wtdinclude "namespaces/wordTypeDef.csl" include ;
 : typesInclude "namespaces/types.csl" include ;
-typesInclude 
-//wtdinclude 
+//typesInclude 
+wtdinclude 
 'wtdInclude find 100 dump
-//'wtdIncmlude find 'C.Experimental.Word find d: wordStructPrint 
+C.Experimental 
+//'wtdIncmlude find d: 'Word find d: wordStructPrint 
+pwi Word //pause
 'C.Experimental notUsing 
+#endif
 c_syntaxOn
 int
 //faccs ( REG int32 n | REG in64 rec -- RAX ) 
@@ -584,8 +588,9 @@ notUsing: byteTest _byteTest abyteTest bt abt ;
 'C.Experimental notUsing
 Root Experimental User
 #endif
-tc
-#if forStarters @ 
-: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 _assert
+
+#if 1 //forStarters @ 
+: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 hi 5 _assert
 #endif 
+tc
 2 + 7 assertStkChk // stack checking 

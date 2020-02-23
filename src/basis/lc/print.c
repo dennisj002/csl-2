@@ -87,7 +87,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
                 LC_snprintf1 ( lc->buffer, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
             else LC_snprintf1 ( lc->buffer, ( ( l0->Lo_Integer < 0 ) ? " 0x%016lx" : " %ld" ), l0->Lo_Integer ) ;
         }
-        else if ( l0->W_MorphismAttributes & ( CPRIMITIVE | csl_WORD ) ) LC_sprintName ( lc->buffer, l0 ) ;
+        else if ( l0->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) LC_sprintName ( lc->buffer, l0 ) ;
         else if ( l0->W_LispAttributes & ( T_HEAD | T_TAIL ) ) ;
         else
         {

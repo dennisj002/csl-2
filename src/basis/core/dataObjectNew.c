@@ -29,7 +29,7 @@ DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes
             word = _LO_New_RawStringOrLiteral ( _Context_->Lexer0, name, index, tsrli, scwi ) ;
             break ;
         }
-        case csl_WORD:
+        case CSL_WORD:
         {
             word = _DObject_New ( name, value, morphismAttributes | BLOCK, objectAttributes, lispAttributes | BLOCK, BLOCK, 0, 0, 1, 0, DICTIONARY ) ;
             break ;
@@ -197,11 +197,12 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
         Word *wt = _CSL_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
         wt->W_ObjectAttributes |= THIS | OBJECT ;
         token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-        if ( ( token[0] == '{' ) || ( token[1] == '{' )  || ( token[2] == '{' ) ) // consider ":{" and +:{" tokens
+        if ( ( token[0] == '{' ) || ( token[1] == '{' )  || ( token[2] == '{' ) ) // consider "{", ":{" and +:{" tokens
         {
             if ( ! GetState ( _Compiler_, TDSCI_PARSING ) )
             {
-                _ClassTypedef (_Context_, cloneFlag ? sns : ns, cloneFlag ) ;
+                _ClassTypedef (_Context_, ns, cloneFlag ) ;
+                ns->W_ObjectAttributes |= STRUCT ;
             }
         }
     }

@@ -64,7 +64,7 @@ _LO_EvalSymbol ( LambdaCalculus * lc, ListObject *l0, ListObject *locals )
             {
                 l0 = ( ListObject * ) w->Lo_Value ;
             }
-            else if ( ( w->W_MorphismAttributes & ( CPRIMITIVE | csl_WORD ) )
+            else if ( ( w->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) )
                 || ( w->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
                 || ( w->W_LispAttributes & ( T_LISP_COMPILED_WORD ) ) )
             {

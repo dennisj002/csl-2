@@ -593,13 +593,15 @@ Word_ClassStructure_PrintData ( Context * cntx, Word * word, byte * typedefStrin
     if ( word && typedefString && typedefString[0] )
     {
         Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
-        Compiler * compiler = cntx->Compiler0 ;
         ReadLiner * rl = cntx->ReadLiner0 ;
         
         Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
-        TypeDefStructCompileInfo_New ( cntx, CONTEXT ) ;
-        byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
+        //TypeDefStructCompileInfo_New ( cntx, CONTEXT ) ;
+        //byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
+    TDSCI * tdsci = TDSCI_Start ( cntx, 0, 0 ) ;
+    //Parse_Structure ( cntx ) ;
         CSL_Parse_A_Typed_Field ( cntx, TDSCI_PRINT, ( byte* ) word ) ;
+    tdsci = TDSCI_Finalize ( cntx ) ;
         Readline_Restore_InputLine_State ( rl ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;
     }

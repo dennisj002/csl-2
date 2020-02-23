@@ -162,8 +162,7 @@
 #define M MB
 
 #define BUFFER_SIZE (2 * K)
-#define BUF_IX_SIZE BUFFER_SIZE //(BUFFER_SIZE - 1)
-#define SOURCE_CODE_BUFFER_SIZE BUFFER_SIZE
+#define BUF_IX_SIZE (BUFFER_SIZE - 1)
 
 #define DICTIONARY_SIZE ( (uint64) 1 * MB )
 #define OBJECTS_SIZE ( (uint64) 1 * MB )
@@ -216,7 +215,7 @@
 
 // MorphismAttributes & LispAttributes -shared in common 
 #define CPRIMITIVE      ( (uint64) 1 << 0 )
-#define csl_WORD     ( (uint64) 1 << 1 )
+#define CSL_WORD     ( (uint64) 1 << 1 )
 #define csl_ASM_WORD  ( (uint64) 1 << 2 ) // machine code words
 #define T_LISP_SYMBOL   ( (uint64) 1 << 3 )
 #define NOT_A_KNOWN_OBJECT ( (uint64) 1 << 6 )  

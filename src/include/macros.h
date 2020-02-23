@@ -201,7 +201,7 @@
 #define NON_MORPHISM_TYPE ( OBJECT_TYPE | VARIABLE_TYPE | NAMESPACE_RELATED_TYPE )
 #define IS_NON_MORPHISM_TYPE(word) (word->W_MorphismAttributes & NON_MORPHISM_TYPE)
 #define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->W_ObjectAttributes & ( NON_MORPHISM_TYPE ) ) ) \
-        && ( ! ( word->W_MorphismAttributes & ( DEBUG_WORD | OBJECT_OPERATOR ) ) ) \
+        && ( ! ( word->W_MorphismAttributes & ( IMMEDIATE | DEBUG_WORD | OBJECT_OPERATOR ) ) ) \
         && ( ! ( word->W_LispAttributes & (T_LISP_SYMBOL ) ) ) ) || ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK ) ))
 
 #define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->W_ObjectAttributes & NAMESPACE_TYPE) : 0 )

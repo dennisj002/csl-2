@@ -45,7 +45,7 @@ DLLNode size @ dup 16 _assert nl "DLLNode size = " prints p nl
 };
 DLLNode.size @ dup 18 _assert nl "DLLNode size = " prints p nl
 using
-:{ // // again reset the structure representing the class
+:{ // again reset the structure representing the class
 	Pointer AfterReference ;  
 	Pointer BeforeReference ;
 };
@@ -73,18 +73,18 @@ scOn
 ;
 ' init find wdiss //pause
 sp
-"testList" DLList new 
+DLList 'testList new 
 testList DLList.size @ dup p dump 
-//stack pause
+sp
 #if 1 //Is_DebugOn // test for debugger showing a long line of code
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey "\n below line should show several 15's yada yada yada yada neti" ps : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; nl hey nl "\n above line should show several 15's" ps // debugger test
 #else
 testList.HeadNode.AfterReference testList.TailNode.BeforeReference  "class init test : " assert 
 #endif
-//stack pause
+sp
 DLList
 using
-"DLListClone" clone // clones DLList class
+'DLListClone clone // clones DLList class
 +:{ // adds to the DLList class structure
     int64 Category ;
     Pointer Prototype ;
@@ -112,8 +112,8 @@ using
     this.Twelve 12 =
     this.Accum this.Sum @ = 
 
-#if 0 // do> does> testing
-    this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" d1: do> locationPush does> locationPrint <do assert //pause
+#if 1 // do> does> testing
+    this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" do> locationPush does> locationPrint <do assert //pause
 #else
     this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" assert 
 #endif
@@ -138,9 +138,8 @@ using
     "\n 12 3 testing yada 36 9 1 0 15 4 12 4 3 : output above should (approximately) read" ddps //_pause
     hex
     "\nthis = " ps this p
-    "\nthis @ = " ps this @  p
-    "\nthis.size = " ps this.size @ p
-    this @ dup p this.size @ dump
+    "\nthis @ = " ps this @ p
+    "\nthis.size = " ps this.size @ p nl
     this dup p this.size @ dump
     this.Accum this.Prototype @ dup p =
     this this.size @ dump
@@ -149,18 +148,14 @@ using
     this.Category @ dup 12 "\nCategory should be 12 : assert10 =" assert p //_pause // 12
 ;
 ' init find wdiss 
-//stack pause
-#if 0 //Is_DebugOn
-//verbosity 2 =
-"testClone" DLListClone d: new 
-#else
-"testClone" DLListClone new 
-#endif
+sp
+DLListClone 'testClone new 
+//"testClone" DLListClone new 
 "\nthis = " ps this hex p //pause
 sp
 C
 sp testClone size @ dump sp
-decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 88 "Clone size" assert sp
+decimal nl s "DLListClone size =" ps DLListClone.size @ dup p nl 88 "Clone size" assert sp
 testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert sp
 // test 'this' to refer to 'this' in current namespace
 // d: this.TailNode.BeforeReference @ this "DLListClone init test2 : " assert

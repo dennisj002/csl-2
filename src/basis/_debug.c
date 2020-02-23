@@ -142,6 +142,7 @@ void
 CSL_SetRtDebugOn ( )
 {
     SetState ( _CSL_, RT_DEBUG_ON, true ) ;
+    SetState ( _Debugger_, (DBG_INTERPRET_LOOP_DONE), true ) ;
 }
 
 void

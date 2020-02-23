@@ -195,3 +195,15 @@ _Compile_GetVarLitObj_LValue_To_Reg (Word * word, int64 reg , int size)
     if ( word->W_ObjectAttributes & ( OBJECT | THIS ) ) Do_ObjectOffset ( word, reg ) ;
 }
 
+void
+Compile_C_Pointer_StackAccess (  byte * ptr )
+{
+    if ( Compiling ) 
+    {
+        Compile_MoveImm_To_Reg ( RAX, ( int64 ) ptr, CELL ) ;
+        Word_Set_StackPushRegisterCode_To_Here ( _Context_->CurrentEvalWord ) ;
+        _Compile_Stack_PushReg ( DSP, ACC ) ;
+    }
+    else DataStack_Push ( ( int64 ) ptr ) ;
+}
+
