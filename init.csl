@@ -141,6 +141,7 @@ Debug
 "DebugFlag" variable
 DebugFlag 0 =
 : dbiOn dbi 1 = ;
+: DbiOn dbi 2 = ;
 : dbiOff dbi 0 = ;
 
 Compiler 
@@ -331,6 +332,7 @@ dscOn
         }
         ifElse
     } if2
+    //stack pause
 ; 
 //' _assertStkChk find wdiss //pause
 #if 0
@@ -470,7 +472,7 @@ infixOff
 rtw
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
 
-#if 0
+#if 1
 Int Root.Experimental 
 'xyxz var
 {
@@ -480,8 +482,10 @@ Int Root.Experimental
     a @ b @ + 2 / p
 } xyxz store
 xyxz @ bdis
+nl
 xyxz @ ix 
 xyxz @ ix 
+"\nabove line should show 3 3" ps
 cOn
 s
 void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
@@ -491,15 +495,16 @@ forStarters 1 =
 #endif
 
 #if 1
+: sp ; //stack pause ;
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
-#if 1
+#if 0
 : wtdinclude "namespaces/wordTypeDef.csl" include ;
 : typesInclude "namespaces/types.csl" include ;
 //typesInclude 
 wtdinclude 
 'wtdInclude find 100 dump
 C.Experimental 
-//'wtdIncmlude find d: 'Word find d: wordStructPrint 
+'wtdIncmlude find d: 'Word find d: wordStructPrint 
 pwi Word //pause
 'C.Experimental notUsing 
 #endif
@@ -517,9 +522,9 @@ faccs ( REG n | REG rec )
 }
 pwi faccs 
 faccs ( 7 ) ; dup p 5040 _assert 
-//pause
 // test byte size objects
-C.Experimental //using pause
+//dbiOn
+C.Experimental 
 typedef struct _byteTest 
 {
     byte a8_123 ; 
@@ -536,12 +541,13 @@ typedef struct _byteTest
     byte d8_123 ;
     int16 a16_123 ; 
 } byteTest, abyteTest ; // size = 26
-'bt byteTest new ;
+byteTest 'bt new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
 bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
-var ( 'btt ) ;
+//var ( 'btt ) ;
 bt.a16_123 = 0x498 ;  
-void bttt ( byteTest bt ) 
+hp ( bt.a16_123 ) ;
+void bttt ( byteTest bt | btt ) 
 { 
     btt = bt.a8_123 ; bt.a8_123 = 36 ; bt.a16_123 = 0x1234 ; bt.a32_123 = 0x12345678 ; bt.a64_123 = 0x123456789abcdef0 ; //pause
     printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
@@ -549,48 +555,56 @@ void bttt ( byteTest bt )
     printf ( "\nbt.a16_123 = 0x%x ", bt.a16_123 ) ; 
     printf ( "\nbt.a32_123 = 0x%x ", bt.a32_123 ) ; 
     printf ( "\nbt.a64_123 = 0x%lx ", bt.a64_123 ) ; 
-    printf ("\nbtt = %x", btt ) ; 
-    dump ( &bt, bt.size ) ; 
-    p ( bt.a8_123 ) ;
+    printf ("\nbtt = 0x%lx", btt ) ; 
+    dump ( bt, bt.size ) ; 
+    hp ( bt.a8_123 ) ;
 } 
-'bt byteTest new ;
-bttt ( bt ) ; pwi bttt //pause // error size not considered
-bt.a8_123 = 255 ; dump ( bt, bt.size ) ; //pause
-'bt byteTest new ;
+byteTest 'bt new ;
+pwi bttt
+sp
+bttt ( bt ) ;  // error size not considered
+sp
+bt.a8_123 = 255 ; dump ( bt, bt.size ) ; 
+sp
 binary () ; p ( bt.b8_123 ) ; decimal () ; bt.b8_123 = 123 ; binary () ; p ( bt.b8_123 ) ; decimal () ; //pause
 p (bt.a8_123) ; p (bt.b8_123) ; p (bt.a32_123) ; p (bt.d8_123) ; 
 bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 1234 ; bt.a64_123 = 0x123456789abcdef ;
-dump ( bt, bt.size ) ; //pause
+sp
+dump ( bt, bt.size ) ; 
+sp
 bt.a8_123 1 _assert 
 _assert ( bt.a8_123 1 ) ;
 _assert ( bt.a32_123, 2147483647 ) ;
-void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; }
-'abt byteTest new ;
-btest ( abt 46 456 234567 2345566 ) ;
+void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) 
+{ bt.a8_123 = i8 ; bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; dump ( bt, bt.size ) ; }
+byteTest 'abt new ;
+btest ( abt 0x12 0x123 0x1234567 0x123456789abcdef ) ;
 pwi btest ;
-//verbosity = 3 ;
+sp
 void btest1 ( byteTest bt, byte i8 ) { bt.c8_123 = i8 ; hex ; p ( bt.c8_123 ) ; }
-btest1 ( abt, 0x42 ) ;
+btest1 ( abt, 0x12 ) ;
 pwi btest1 
 dump ( abt abt.size ) ;
-_assert ( abt.c8_123, 0x42 ) ;
+_assert ( abt.c8_123, 0x12 ) ;
 p ( abt.size ) ; 
 p ( bt.size ) ; 
 dump ( abt abt.size ) ;
-bt.a8_123 1 _assert 
-_assert ( bt.a32_123, 2147483647 ) ;
-_assert ( abt.a16_123 456 ) ; 
-_assert ( abt.b8_123 46 ) ;
-_assert ( abt.a32_123 234567 ) ;
-_assert ( abt.a64_123 2345566 ) ;
+_assert ( abt.a8_123,  0x12 ) ;
+_assert ( abt.a32_123, 0x1234567 ) ;
+_assert ( abt.a16_123 0x123 ) ; 
+_assert ( abt.b8_123 0x12 ) ;
+_assert ( abt.a32_123 0x1234567 ) ;
+_assert ( abt.a64_123 0x123456789abcdef ) ;
 c_syntaxOff 
 notUsing: byteTest _byteTest abyteTest bt abt ; 
 'C.Experimental notUsing
 Root Experimental User
+//dbiOff
 #endif
 
-#if 1 //forStarters @ 
+#if 0 //forStarters @ 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 hi 5 _assert
 #endif 
 tc
 2 + 7 assertStkChk // stack checking 
+s

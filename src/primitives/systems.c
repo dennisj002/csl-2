@@ -21,33 +21,6 @@ emit ( int64 c )
 }
 #endif
 
-#if 0
-int64 doTest = 3, testDone = 1 ;
-
-void
-TestAnd ( )
-{
-    //{ doTest testDone @ not && } { testDone ++ sp basicT testX } if
-    if ( doTest && ( ! testDone ) ) Printf ( "true" ) ;
-    else Printf ( "false" ) ;
-}
-
-void
-CSL_ObjectNew ( ) //int64 size, byte * name, uint64 category, int64 allocType )
-{
-    int64 allocType = DataStack_Pop ( ) ;
-    int64 category = DataStack_Pop ( ) ;
-    byte * name = ( byte* ) DataStack_Pop ( ) ;
-    int64 size = DataStack_Pop ( ) ;
-
-    byte * obj = _CSL_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
-    Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
-    word->Size = size ;
-    //return word ;
-    DataStack_Push ( ( uint64 ) word ) ;
-}
-#endif
-
 void
 CSL_Jcc8_On ( )
 {
@@ -326,24 +299,22 @@ CSL_NoOp ( void )
 }
 
 void
-CSL_Hex ( ) // !
+CSL_Hex ( )
 {
-
-    _Context_->System0->NumberBase = 16 ;
+    NUMBER_BASE_SET ( 16 ) ;
 }
 
 void
-CSL_Binary ( ) // !
+CSL_Binary ( ) 
 {
-
-    _Context_->System0->NumberBase = 2 ;
+    NUMBER_BASE_SET ( 2 );
 }
 
 void
-CSL_Decimal ( ) // !
+CSL_Decimal ( ) 
 {
 
-    _Context_->System0->NumberBase = 10 ;
+    NUMBER_BASE_SET ( 10 ) ;
 }
 
 void

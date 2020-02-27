@@ -12,7 +12,7 @@ void
 List_Interpret ( dllist * list )
 {
     dllist_Map ( list, _Interpret_ListNode ) ;
-    List_Init ( list ) ;
+    //List_Init ( list ) ;
 }
 
 // list : a list of lists of postfix operations needing to be interpreted
@@ -69,7 +69,7 @@ List_CheckInterpretLists_OnVariable ( dllist * list, byte * token )
 }
 
 void
-_List_PrintNames ( dllist * list, int64 count, int64 flag )
+List_PrintNames ( dllist * list, int64 count, int64 flag )
 {
     dlnode * node, *nextNode ;
     Word * nodeWord, *beforeNode, *afterNode ;
@@ -94,9 +94,9 @@ _List_PrintNames ( dllist * list, int64 count, int64 flag )
 }
 
 void
-_List_Show_N_Word_Names ( dllist * list, uint64 n, int64 showBeforeAfterFlag, int64 dbgFlag )
+List_Show_N_Word_Names ( dllist * list, uint64 n, int64 showBeforeAfterFlag, int64 dbgFlag )
 {
     if ( dbgFlag ) NoticeColors ;
-    _List_PrintNames ( list, n, showBeforeAfterFlag ) ;
+    List_PrintNames ( list, n, showBeforeAfterFlag ) ;
     if ( dbgFlag ) DefaultColors ;
 }

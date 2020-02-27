@@ -327,7 +327,9 @@ Namespace_RemoveNamespacesStack ( Stack * stack )
                 if ( ns == _CSL_->InNamespace ) _CSL_->InNamespace = 0 ;
                 if ( _Finder_ && ( ns == _Finder_->QualifyingNamespace ) ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
                 _Namespace_SetState ( ns, NOT_USING ) ;
+                //if ( _O_->Dbi ) _Namespace_PrintWordList_FromNode ( ns ) ;
                 dlnode_Remove ( ( dlnode* ) ns ) ;
+                //if ( _O_->Dbi ) _Namespace_PrintWordList_FromNode ( ns ) ;
             }
             n -- ;
         }
@@ -348,21 +350,4 @@ Namespace_RemoveAndClearNamespacesStack ( Stack * stack )
         Stack_Init ( stack ) ;
     }
 }
-
-#if 0
-void
-Namespace_NamespacesStack_PrintWords ( Stack * stack )
-{
-    if ( stack )
-    {
-        int64 n ;
-        for ( n = Stack_Depth ( stack ) ; n > 0 ; n -- )
-        {
-            Namespace * ns = stack->StackPointer [n] ; //( Namespace* ) Stack_Pop ( stack ) ;
-            //if ( ns ) _Namespace_RemoveFromUsingListAndClear ( ns ) ;
-            n -- ;
-        }
-    }
-}
-#endif
 

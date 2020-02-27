@@ -51,7 +51,7 @@ using
 };
 DLLNode.size @ dup 16 _assert nl "DLLNode size = " prints p nl
 sp
-"testNode" DLLNode new 
+DLLNode "testNode" new 
 testNode.AfterReference 1 =
 testNode.BeforeReference 2 =
 testNode testNode.size @ dup p dup 16 _assert dump sp
@@ -65,7 +65,7 @@ sp
 sp
 scOn
 
-: init ( this )
+d: : init ( this )
     this.HeadNode.AfterReference this.TailNode.BeforeReference =
     this.TailNode.BeforeReference this.HeadNode.AfterReference =
     this.HeadNode.BeforeReference 1 =
@@ -73,8 +73,8 @@ scOn
 ;
 ' init find wdiss //pause
 sp
-DLList 'testList new 
-testList DLList.size @ dup p dump 
+DLList 'testList d: new 
+d: testList testList.size @ dup p dump 
 sp
 #if 1 //Is_DebugOn // test for debugger showing a long line of code
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey "\n below line should show several 15's yada yada yada yada neti" ps : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; nl hey nl "\n above line should show several 15's" ps // debugger test

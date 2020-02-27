@@ -101,7 +101,7 @@ Ovt_RunInit ( OpenVmTil * ovt )
 {
     //ovt->SignalExceptionsHandled = 0 ;
     ovt->StartedTimes ++ ;
-    OVT_SetRestartCondition ( ovt, csl_RUN_INIT ) ;
+    OVT_SetRestartCondition ( ovt, CSL_RUN_INIT ) ;
 }
 
 void

@@ -63,38 +63,6 @@ CSL_DebugOff ( )
 }
 
 void
-DebugRuntimeBreakpoint ( )
-{
-    Debugger * debugger = _Debugger_ ;
-    //if ( ( ! CompileMode ) )
-    {
-        if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) //|DBG_CONTINUE_MODE ) ) )
-        {
-            //if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )
-            {
-                SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
-                if ( ! GetState ( debugger, ( DBG_STEPPING | DBG_AUTO_MODE ) ) )
-                {
-                    Debugger_On ( debugger ) ;
-                    Debugger_SetupStepping ( debugger ) ;
-                    SetState_TrueFalse ( debugger, DBG_RUNTIME | DBG_ACTIVE | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF,
-                        DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
-                }
-            }
-        }
-        else
-        {
-            debugger->DebugAddress += 3 ; // 3 : sizeof call rax insn :: skip the call else we would recurse to here
-            if ( GetState ( debugger, ( DBG_CONTINUE_MODE ) ) ) SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
-        }
-        SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_CONTINUE_MODE ), false ) ;
-        //Debugger_InterpreterLoop ( debugger ) ;
-        Debugger_Interpret ( debugger, 0, 0, debugger->DebugAddress ) ;
-        SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
-    }
-}
-
-void
 CSL_DebugRuntimeBreakpoint ( )
 {
     if ( ( ! CompileMode ) ) DebugRuntimeBreakpoint ( ) ;
@@ -112,8 +80,3 @@ CSL_DebugRuntimeBreakpoint_IsDebugOn ( )
     if ( Is_DebugOn ) DebugRuntimeBreakpoint ( ) ;
 }
 
-void
-_DEBUG_SETUP (Word * word, byte * token, byte * address, Boolean force , int64 debugLevel)
-{
-    Debugger_PreSetup (_Debugger_, word, token, address, force, debugLevel) ;
-}

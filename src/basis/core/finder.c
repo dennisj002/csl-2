@@ -111,7 +111,7 @@ Finder_QID_Find ( Finder * finder, byte * token ) //, int64 flag, int64 saveQns 
     Word * word = 0 ;
     if ( token )
     {
-        if ( ! ( word = ( Word* ) _CSL_ParseQid ( token ) ) ) word = Finder_Word_FindUsing ( finder, token, 0 ) ;
+        if ( ! ( word = ( Word* ) _CSL_ParseQid_Token ( token ) ) ) word = Finder_Word_FindUsing ( finder, token, 0 ) ;
         CSL_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
     }
     return word ;
@@ -123,6 +123,7 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
     Word * rword = 0 ;
     if ( name )
     {
+#if 1        
         // the InNamespace takes precedence with this one exception but is this the best logic ??               
         if ( finder->QualifyingNamespace )
         {
@@ -137,7 +138,10 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
                 }
             }
         }
-        if ( ! rword ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
+        else
+#endif        
+            rword = _Finder_FindWord_InOneNamespace ( finder, _CSL_->InNamespace, name ) ;
+        if ( ! rword ) rword = _Finder_Word_Find ( finder, flag, name ) ;
     }
     return rword ;
 }

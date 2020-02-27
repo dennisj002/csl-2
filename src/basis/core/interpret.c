@@ -15,7 +15,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
         DEBUG_SETUP_TOKEN (token, 1) ;
         word = Lexer_ParseToken_ToWord ( interp->Lexer0, token, tsrli, scwi ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-        DEBUG_SETUP ( word, 0 ) ;
+        DEBUG_SETUP ( word, 1 ) ;
         cntx->CurrentTokenWord = word ; // dbg flag
         cntx->TokenDebugSetupWord = word ;
     }
@@ -67,7 +67,6 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
     SetState ( compiler, DOING_BEFORE_AN_INFIX_WORD, false ) ; //svState ) ;
-    //if ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) 
     Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
     SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ; //svState ) ;
 }
@@ -76,6 +75,7 @@ void
 _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
     SetState ( cntx->Compiler0, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ), true ) ;
+    _Fp_ = _Dsp_ ; 
     Interpret_PrefixFunction_OrUntil_RParen ( interp, word ) ;
     SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
 }

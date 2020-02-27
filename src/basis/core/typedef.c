@@ -59,15 +59,15 @@ Parse_Identifier ( Context * cntx, int64 t_type )
         {
             if ( ( ! tdsci->Tdsci_StructureUnion_Namespace->Name ) || String_Equal ( tdsci->Tdsci_StructureUnion_Namespace->Name, "<unnamed namespace>" ) )
                 tdsci->Tdsci_StructureUnion_Namespace->Name = String_New ( identifier, DICTIONARY ) ;
-            Parse_Do_IdentifierAlias ( cntx, identifier ) ; //else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
+            id = Parse_Do_IdentifierAlias ( cntx, identifier ) ; //else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
         }
         else
         {
             tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS_CLONE, 0, identifier, 0, 0, 0, 0, 0,
                 tdsci->Tdsci_InNamespace, 0, - 1, - 1 ) ;
             Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
-            //id->W_ObjectAttributes |= ( STRUCTURE ) ; //??
         }
+        id->W_ObjectAttributes |= ( STRUCT )  ; //??
         //Class_Size_Set ( tdsci->Tdsci_BackgroundStructureNamespace, tdsci->Tdsci_BackgroundStructSize ) ; //>Tdsci_StructureUnion_Size ) ;
     }
     else if ( t_type == PRE_STRUCTURE_IDENTIFIER )

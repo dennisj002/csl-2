@@ -54,7 +54,7 @@ _Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
     while ( token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) )
     {
         Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-        if ( String_Equal ( ( char* ) token, ")" ) ) 
+        if ( String_Equal ( ( char* ) token, end ) ) 
         {
             SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
             break ;

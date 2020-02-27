@@ -15,6 +15,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
     do
     {
         Debugger_DoState ( debugger ) ;
+        //CSL_Using ( ) ;
         if ( ! GetState ( _Debugger_, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ) )
         {
             while ( ( debugger->Key = Key ( ) ) == - 1 ) ;
@@ -25,7 +26,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
     }
     while ( DBG_Intrp_Loop_Test ( debugger ) ) ;
     debugger->LastPreSetupWord = debugger->w_Word ;
-    SetState ( debugger, (DBG_STACK_OLD|DBG_INTERPRET_LOOP_DONE), true ) ;
+    SetState ( debugger, ( DBG_STACK_OLD | DBG_INTERPRET_LOOP_DONE ), true ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
     if ( GetState ( debugger, ( DBG_SETUP_ADDRESS ) ) )
     {
@@ -126,6 +127,13 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
 }
 
 void
+_DEBUG_SETUP ( Word * word, byte * token, byte * address, Boolean force, int64 debugLevel )
+{
+    //_Debugger_->WordDsp = _Dsp_ ;
+    Debugger_PreSetup ( _Debugger_, word, token, address, force, debugLevel ) ;
+}
+
+void
 _Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force, int64 debugLevel )
 {
     _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force, debugLevel ) ;
@@ -135,6 +143,31 @@ void
 Debugger_PostShow ( Debugger * debugger )
 {
     _Debugger_PostShow ( debugger, debugger->w_Word, 0, 0 ) ;
+}
+
+void
+DebugRuntimeBreakpoint ( )
+{
+    Debugger * debugger = _Debugger_ ;
+    if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) //|DBG_CONTINUE_MODE ) ) )
+    {
+        SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
+        if ( ! GetState ( debugger, ( DBG_STEPPING | DBG_AUTO_MODE ) ) )
+        {
+            Debugger_On ( debugger ) ;
+            Debugger_SetupStepping ( debugger ) ;
+            SetState_TrueFalse ( debugger, DBG_RUNTIME | DBG_ACTIVE | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF,
+                DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
+        }
+    }
+    else
+    {
+        debugger->DebugAddress += 3 ; // 3 : sizeof call rax insn :: skip the call else we would recurse to here
+        if ( GetState ( debugger, ( DBG_CONTINUE_MODE ) ) ) SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
+    }
+    SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_CONTINUE_MODE ), false ) ;
+    Debugger_Interpret ( debugger, 0, 0, debugger->DebugAddress ) ;
+    SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
 }
 
 void
@@ -370,12 +403,14 @@ Debugger_Continue ( Debugger * debugger )
         while ( debugger->DebugAddress )
         {
             if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_Step ( debugger ) ;
-            else return ;
+            else goto doneOrStopContinue ;
         }
         SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_STEPPING | DBG_AUTO_MODE | DBG_CONTINUE_MODE | DBG_RUNTIME_BREAKPOINT ) ;
         SetState ( debugger->w_Word, STEPPED, true ) ;
     }
     else _Debugger_Eval ( debugger, 1 ) ;
+doneOrStopContinue:
+    ;
 }
 
 // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
@@ -384,7 +419,7 @@ void
 _Debugger_Eval ( Debugger * debugger, Boolean continueFlag )
 {
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
-    debugger->WordDsp = _Dsp_ ;
+    //debugger->WordDsp = _Dsp_ ;
     if ( continueFlag )
     {
         if ( Debugger_IsStepping ( debugger ) ) Debugger_Continue ( debugger ) ;

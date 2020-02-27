@@ -140,14 +140,6 @@ _CSL_GetSystemState_String0 ( byte * buf )
     if ( GetState ( _Context_, C_SYNTAX ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     if ( ! GetState ( _Context_, PREFIX_MODE | INFIX_MODE ) ) strcat ( ( char* ) buf, "postfixMode is on" ) ;
-#if 0    
-    strcat ( ( char* ) buf, "LHS is " ) ;
-    if ( GetState ( _Context_, C_LHS ) ) strcat ( ( char* ) buf, "on, " ) ;
-    else strcat ( ( char* ) buf, "off, " ) ;
-    strcat ( ( char* ) buf, "RHS is " ) ;
-    if ( GetState ( _Context_, C_RHS ) ) strcat ( ( char* ) buf, "on. " ) ;
-    else strcat ( ( char* ) buf, "off. " ) ;
-#endif    
     return buf ;
 }
 
@@ -162,7 +154,7 @@ _CSL_GetSystemState_String1 ( byte *buf )
     else strcat ( ( char* ) buf, "off. " ) ;
     sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Verbosity = %ld. ", _O_->Verbosity ) ;
     sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Console = %ld, ", _O_->Console ) ;
-    sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "NumberBase = %ld.", _Context_->System0->NumberBase ) ;
+    sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "NumberBase = %ld.", NUMBER_BASE_GET ) ;
     return buf ;
 }
 
@@ -218,7 +210,7 @@ __CSL_Dump ( byte * address, int64 number, int64 dumpMod )
     {
         byte * nformat ;
         int64 i, n ;
-        if ( _Context_->System0->NumberBase == 16 ) nformat = ( byte* ) "\nDump : Address = " UINT_FRMT " : Number = " UINT_FRMT " :: (little endian dump)" ;
+        if ( NUMBER_BASE_GET == 16 ) nformat = ( byte* ) "\nDump : Address = " UINT_FRMT " : Number = " UINT_FRMT " :: (little endian dump)" ;
         else nformat = ( byte* ) "\nDump : Address = " UINT_FRMT " : Number = " INT_FRMT " :: (little endian dump)" ;
         Printf ( nformat, ( int64 ) address, number ) ;
         for ( i = 0 ; i < number ; )
@@ -226,9 +218,6 @@ __CSL_Dump ( byte * address, int64 number, int64 dumpMod )
             Printf ( ( byte* ) "\n" UINT_FRMT " : ", address + i ) ;
             if ( ! ( i % dumpMod ) )
             {
-/*
-                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) Printf ( ( byte* ) UINT_FRMT " ", *( int64* ) ( address + i + n ) ) ;
-*/
                 Printf ( ( byte* ) " " ) ;
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CSL_NByteDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CSL_CharacterDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
@@ -237,7 +226,6 @@ __CSL_Dump ( byte * address, int64 number, int64 dumpMod )
             else i ++ ;
         }
     }
-    //_Compiler_->LHS_Word = 0 ;
 }
 
 void

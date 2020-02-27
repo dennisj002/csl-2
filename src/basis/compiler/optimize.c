@@ -141,7 +141,7 @@ _Compiler_GetWordStackState ( Compiler * compiler, Word * word )
                 break ;
             }
         }
-        else if ( IS_MORPHISM_TYPE ( optInfo->wordn ) )
+        else if ( IS_MORPHISM_TYPE ( optInfo->wordn ) && ( ! IS_NON_MORPHISM_TYPE(optInfo->wordn) ) )
         {
             if ( optInfo->wordArg2 ) optInfo->xBetweenArg1AndArg2 = optInfo->wordn ;
             else optInfo->wordArg2 = optInfo->wordn ;

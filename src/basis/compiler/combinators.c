@@ -74,7 +74,7 @@ CSL_BlockRun ( )
     }
     else
     {
-        Dbg_Block_Eval (0, doBlock) ;
+        Dbg_Block_Eval ( 0, doBlock ) ;
         //Set_DataStackPointer_FromDspReg ( ) ;
     }
 }
@@ -93,12 +93,12 @@ CSL_LoopCombinator ( )
         byte * start = Here ;
         compiler->ContinuePoint = start ;
         Block_CopyCompile ( ( byte* ) loopBlock, 0, 0 ) ;
-        _Compile_JumpToAddress (start, JMPI32 ) ;
+        _Compile_JumpToAddress ( start, JMPI32 ) ;
         CSL_EndCombinator ( 1, 1 ) ;
     }
     else
     {
-        while ( 1 ) Dbg_Block_Eval (0, loopBlock) ;
+        while ( 1 ) Dbg_Block_Eval ( 0, loopBlock ) ;
     }
 }
 
@@ -119,7 +119,7 @@ CSL_WhileCombinator ( )
         d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( ( byte* ) "\nCheckOptimize : after optimize :", 0, 0 ) ) ;
         Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 0, 0 ) ;
-        _Compile_JumpToAddress (start, 0) ; //((Here - start) < 127) ? JMPI8 : JMPI32 ) ;
+        _Compile_JumpToAddress ( start, 0 ) ; //((Here - start) < 127) ? JMPI8 : JMPI32 ) ;
         CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ; // for testBlock
         CSL_EndCombinator ( 2, 1 ) ;
         //DBI_OFF ;
@@ -128,9 +128,9 @@ CSL_WhileCombinator ( )
     {
         while ( 1 )
         {
-            Dbg_Block_Eval (0, testBlock) ;
+            Dbg_Block_Eval ( 0, testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
-            Dbg_Block_Eval (0, trueBlock) ;
+            Dbg_Block_Eval ( 0, trueBlock ) ;
         }
     }
     return 1 ;
@@ -149,7 +149,7 @@ CSL_DoWhileCombinator ( )
         compiler->ContinuePoint = Here ;
         Block_CopyCompile ( ( byte* ) doBlock, 1, 0 ) ;
         Block_CopyCompile ( ( byte* ) testBlock, 0, 1 ) ;
-        _Compile_JumpToAddress (start, 0 ) ;
+        _Compile_JumpToAddress ( start, 0 ) ;
         CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CSL_EndCombinator ( 2, 1 ) ;
     }
@@ -157,8 +157,8 @@ CSL_DoWhileCombinator ( )
     {
         do
         {
-            Dbg_Block_Eval (0, doBlock) ;
-            Dbg_Block_Eval (0, testBlock) ;
+            Dbg_Block_Eval ( 0, doBlock ) ;
+            Dbg_Block_Eval ( 0, testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
         }
         while ( 1 ) ;
@@ -186,7 +186,7 @@ CSL_If1Combinator ( )
     }
     else
     {
-        if ( DataStack_Pop ( ) ) Dbg_Block_Eval (0, doBlock) ;
+        if ( DataStack_Pop ( ) ) Dbg_Block_Eval ( 0, doBlock ) ;
     }
 }
 
@@ -196,6 +196,7 @@ void
 CSL_If2Combinator ( )
 {
     block testBlock = ( block ) _Dsp_ [ - 1 ], doBlock = ( block ) TOS ;
+    int64 tvalue ;
     DataStack_DropN ( 2 ) ;
     if ( CompileMode )
     {
@@ -207,8 +208,13 @@ CSL_If2Combinator ( )
     }
     else
     {
-        Dbg_Block_Eval (0, testBlock) ;
-        if ( DataStack_Pop ( ) ) Dbg_Block_Eval (0, doBlock) ;
+        //int64 * svDsp = _Dsp_ ;
+        Dbg_Block_Eval ( 0, testBlock ) ;
+        if ( tvalue = DataStack_Pop ( ) )
+        {
+            //_Dsp_ = svDsp ;
+            Dbg_Block_Eval ( 0, doBlock ) ;
+        }
     }
 }
 
@@ -236,8 +242,8 @@ CSL_TrueFalseCombinator2 ( )
     }
     else
     {
-        if ( testCondition ) Dbg_Block_Eval (0, trueBlock) ;
-        else Dbg_Block_Eval (0, falseBlock) ;
+        if ( testCondition ) Dbg_Block_Eval ( 0, trueBlock ) ;
+        else Dbg_Block_Eval ( 0, falseBlock ) ;
     }
 }
 
@@ -263,9 +269,18 @@ CSL_TrueFalseCombinator3 ( )
     }
     else
     {
-        Dbg_Block_Eval (0, testBlock) ;
-        if ( DataStack_Pop ( ) ) Dbg_Block_Eval (0, trueBlock) ;
-        else Dbg_Block_Eval (0, falseBlock) ;
+        //int64 * svDsp = _Dsp_ ;
+        Dbg_Block_Eval ( 0, testBlock ) ;
+        if ( DataStack_Pop ( ) )
+        {
+            //_Dsp_ = svDsp ;
+            Dbg_Block_Eval ( 0, trueBlock ) ;
+        }
+        else
+        {
+            //_Dsp_ = svDsp ;
+            Dbg_Block_Eval ( 0, falseBlock ) ;
+        }
     }
 }
 
@@ -301,18 +316,20 @@ CSL_DoWhileDoCombinator ( )
         Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
 
         Block_CopyCompile ( ( byte* ) doBlock2, 0, 0 ) ;
-        _Compile_JumpToAddress (start, 0 ) ; // runtime
+        _Compile_JumpToAddress ( start, 0 ) ; // runtime
         CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CSL_EndCombinator ( 3, 1 ) ;
     }
     else
     {
+        //int64 * svDsp = _Dsp_ ;
         do
         {
-            Dbg_Block_Eval (0, doBlock1) ;
-            Dbg_Block_Eval (0, testBlock) ;
+            Dbg_Block_Eval ( 0, doBlock1 ) ;
+            Dbg_Block_Eval ( 0, testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
-            Dbg_Block_Eval (0, doBlock2) ;
+            //_Dsp_ = svDsp ;
+            Dbg_Block_Eval ( 0, doBlock2 ) ;
         }
         while ( 1 ) ;
     }
@@ -343,20 +360,20 @@ CSL_ForCombinator ( )
         d0 ( _CSL_SC_WordList_Show ( ( byte* ) "for combinator : before doPostBlock", 0, 0 ) ) ;
         Block_CopyCompile ( ( byte* ) doPostBlock, 1, 0 ) ;
 
-        _Compile_JumpToAddress (start, 0 ) ;
+        _Compile_JumpToAddress ( start, 0 ) ;
         CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 
         CSL_EndCombinator ( 4, 1 ) ;
     }
     else
     {
-        Dbg_Block_Eval (0, doPreBlock) ;
+        Dbg_Block_Eval ( 0, doPreBlock ) ;
         do
         {
-            Dbg_Block_Eval (0, testBlock) ;
+            Dbg_Block_Eval ( 0, testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
-            Dbg_Block_Eval (0, doBlock) ;
-            Dbg_Block_Eval (0, doPostBlock) ;
+            Dbg_Block_Eval ( 0, doBlock ) ;
+            Dbg_Block_Eval ( 0, doPostBlock ) ;
         }
         while ( 1 ) ;
     }

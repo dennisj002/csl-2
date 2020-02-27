@@ -10,7 +10,7 @@ Int Class DLLNode
 "DLLNodeAlloc" class :{ DLLNode nodes [ 32 ] ; };
 : sp ; //stack pause ; sp
 
-"testna" DLLNodeAlloc new
+DLLNodeAlloc "testna" new
 "DLLNode size = " prints DLLNode size @ Io.print nl 
 "DLLNodeAlloc size = " prints DLLNodeAlloc size @ Io.print nl 
 testna.nodes [ 1 2 + ].AfterReference 1 =
@@ -20,7 +20,7 @@ testna.nodes [ 3 ].AfterReference @ 1 _assert
 sp
 "DLLNodeAlloc4" class :{ DLLNode nodes [ 32 ] [ 4 ] ; };
 "DLLNodeAlloc4 size = " prints DLLNodeAlloc4 size @ Io.print nl 
-"testna4" DLLNodeAlloc4 new
+DLLNodeAlloc4 "testna4" new
 // test just using a object but not as a local variable 
 // nb. doesn't work as a local variable yet
 //verbosity 3 =
@@ -74,7 +74,7 @@ testna5 //pause
 testna4.nodes [ 3 ] [ 2 ].BeforeReference @ testna4.nodes [ 3 ] [ 2 ].AfterReference _assert
 //pause
 
-"testnarr2" DLLNodeAlloc new 
+DLLNodeAlloc "testnarr2" new 
 : tna
     testnarr2.nodes [ 1 ] 32 dump 
     testnarr2.nodes [ 1 ].AfterReference 1 = 
@@ -101,7 +101,7 @@ sp
 	this . nodes [ 2 ].BeforeReference 2 =
 	this this.size @ dump
 ;
-"testn4" DLLNodeAlloc new sp
+DLLNodeAlloc "testn4" new sp
 testn4 tnarr2a 
 testn4.nodes[2].AfterReference @ 1 _assert
 testn4.nodes[2].BeforeReference @ 2 _assert
@@ -132,7 +132,7 @@ sp
 	this.nodes[4].BeforeReference dup hp 16 dump
 ;
 ' tnax1 find wdiss sp
-"testnx" DLLNodeAlloc new 
+DLLNodeAlloc "testnx" new 
 sp
 testnx tnax1
 sp
@@ -166,7 +166,7 @@ sp
 arr1.ar[2] @ 0x89 _assert
 sp
 "Ar2" class :{ int64 ar [4][4] ; };
-"a4" Ar2 new
+Ar2 "a4" new
 "a4 : " ps location a4 size @ dump
 a4.ar[3][2]  0x89 =
 "a4 : " ps location a4 size @ dump
@@ -180,7 +180,7 @@ a4.ar[3][2] @ 0x89 _assert
 1 2 a4 a5 s
 "a4 : " ps location a4 128 dump //pause
 "Ar3" class :{ int64 ar [3][3][2] ; };
-"a6" Ar3 s new sp
+Ar3 "a6" s new sp
 //"a6 : " ps location a6.size @ dump
 'a6x var sp
 a6x a6.ar[2][2][1] =
@@ -285,12 +285,12 @@ jcc8_Off
 ;
 jcc8_On
 ' a9 find wdiss s //pause
-"arr9" Ar9 d: new arr9 a9 sp //pause
+Ar9 "arr9" new arr9 a9 sp //pause
 adump ( 0 123 234 arr9 ) 
 sp //pause
 #endif
 "ct" class :{ byte ar [3][3][3] ; };
-"ab" ct new
+ct "ab" new
 ab.ar [0][0][0] hp
 ab.ar [0][0][1] hp
 ab.ar [1][0][0] hp
@@ -306,12 +306,12 @@ ab.ar [0][0][0] @ dup p 254 _assert
     TODO ( "array out of bounds checking with variables?!" )
     a.ar 32 dump
 ;
-"ac" ct new 
+ct "ac" new 
 'tct find wdiss
 2 ac tct //pause
 sp
 "cta" class :{ byte ar [3][3][3] ; };
-"aba" cta new
+cta "aba" new
 scOn
 : tcta ( y cta a )
     a.ar [0][y @ 1 +][0] dup nl hp 77 =
@@ -323,7 +323,7 @@ scOn
     //addr @ size @ <dbg> dump
     addr @ size @ dump
 ; prefix
-"caba" cta new
+cta "caba" new
 c_syntaxOn
  
 void

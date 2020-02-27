@@ -408,10 +408,9 @@ CPrimitive CPrimitives [] = {
     { "inlineOn", 0, 0, 0, CSL_InlineOn, 0, 0, 0, "OpenVmTil", "Root" },
     { "debugOff", 0, 0, 0, CSL_DebugOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "debugOn", 0, 0, 0, CSL_DebugOn, 0, 0, 0, "OpenVmTil", "Root" },
-    //{ "_debugLevel", 0, 0, 0, CSL_DebugLevel, 0, 0, 0, "OpenVmTil", "Root" },
-    { "debugLevel", 0, 0, 0, CSL_DebugLevel, IMMEDIATE, 0, 0, "OpenVmTil", "Root" },
-    { "verbosity", 0, 0, 0, OpenVmTil_Verbosity, IMMEDIATE, 0, 0, "OpenVmTil", "Root" },
-    { "dbi", 0, 0, 0, OpenVmTil_ShowMachineCodeInstructions, IMMEDIATE, 0, 0, "OpenVmTil", "Root" },
+    { "debugLevel", 0, 0, 0, CSL_DebugLevel, IMMEDIATE|NAMESPACE_VARIABLE, 0, 0, "OpenVmTil", "Root" },
+    { "verbosity", 0, 0, 0, OpenVmTil_Verbosity, IMMEDIATE|NAMESPACE_VARIABLE, 0, 0, "OpenVmTil", "Root" },
+    { "dbi", 0, 0, 0, OpenVmTil_ShowMachineCodeInstructions, IMMEDIATE|NAMESPACE_VARIABLE, 0, 0, "OpenVmTil", "Root" },
     { "codeSize", 0, 0, 0, OpenVmTil_CodeSize, 0, 0, 0, "OpenVmTil", "Root" },
     { "objectsSize", 0, 0, 0, OpenVmTil_ObjectsSize, 0, 0, 0, "OpenVmTil", "Root" },
     { "compilerTempObjectsSize", 0, 0, 0, OpenVmTil_CompilerTempObjectsSize, 0, 0, 0, "OpenVmTil", "Root" },
@@ -425,7 +424,6 @@ CPrimitive CPrimitives [] = {
     { "addToHistoryOff", 0, 0, 0, OpenVmTil_AddStringToHistoryOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "showAllocated", 0, 0, 0, OVT_Mem_ShowAllocated, 0, 0, 0, "OpenVmTil", "Root" },
     { "recycleDebugInfo", 0, 0, 0, OVT_RecycleAllWordsDebugInfo, 0, 0, 0, "OpenVmTil", "Root" },
-    //{ "<dbg>", 0, 0, 0, CSL_DebugRuntimeBreakpoint, CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, "OpenVmTil", "Root" },
 
     { "freeTemporayMem", 0, 0, 0, OVT_MemListFree_TempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
     { "freeCompilerTempMem", 0, 0, 0, OVT_MemListFree_CompilerTempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
@@ -505,6 +503,7 @@ CPrimitive CPrimitives [] = {
     { "addrToWord", 0, 0, 0, AddressToWord, 0, 0, 0, "Word", "Root" },
     { "purgeWordName", 0, 0, 0, CSL_Namespaces_PurgeWordExactName, 0, 0, 0, "Word", "Root" },
     { "purgeWordIfContainsName", 0, 0, 0, CSL_Namespaces_PurgeWordIfContainsName, 0, 0, 0, "Word", "Root" },
+    { "wordNsListPrint", 0, 0, 0, CSL_Namespace_PrintWordList, 0, 0, 0, "Word", "Root" },
 
     // Dynamic Object - DObject
     { "dobject", 0, 0, 0, CSL_SetPropertiesAsDObject, 0, 0, 0, "DObject", "Root" },

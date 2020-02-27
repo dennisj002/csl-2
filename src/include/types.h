@@ -742,7 +742,7 @@ typedef struct
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
     Word * ReturnVariableWord, * Current_Word_New, *Current_Word_Create, * LHS_Word ;
-    Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *LocalsNamespace, *AutoVarTypeNamespace, *NonCompilingNs ; //, ** FunctionTypesArray ;
+    Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *Qid_BackgroundNamespace, *LocalsNamespace, *AutoVarTypeNamespace, *NonCompilingNs ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;
     dllist * RegisterParameterList ;
@@ -781,7 +781,7 @@ typedef struct _Debugger
     uint64 State ;
     uint64 * SaveDsp, *AddressModeSaveDsp, *SaveEdi, *SaveRsp, * WordDsp, * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp, LevelBitNamespaceMap ;
     int64 TerminalLineWidth, RL_ReadIndex, SaveTOS, SaveStackDepth, Key, SaveKey, LastScwi, Esi, Edi ;
-    Word * w_Word, *w_Alias, *w_AliasOf, *EntryWord, *LastShowInfoWord, *LastPostShowWord, *NextEvalWord ;
+    Word * w_Word, *w_Alias, *w_AliasOf, *EntryWord, *LastShowInfoWord, *LastShowEffectsWord, *NextEvalWord ;
     Word *LocalsNamespace, *LastPreSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord, *SubstitutedWord ;
     byte * Token, *DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress, * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
     block SaveCpuState, RestoreCpuState ;

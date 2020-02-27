@@ -429,7 +429,7 @@ typedef struct _byteTest0
 {
     byte a [64] ;
 } bt1 ;
-'abt1 bt1 new
+bt1 'abt1 new
 p ( bt1.size ) ; 
 sprintf ( &abt1.a, "%s", "It's a beautiful day. Don't let it get away" ) ;
 dump ( abt1, abt1.size ) ;

@@ -164,7 +164,8 @@ _Compile_LogicalNot ( Compiler * compiler )
     Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ, false ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
-    CSL_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
+    //CSL_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
+    _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ; // we took value from TOS and return 'not' value to TOS
     //_Printf ( (byte*) "\nSize of LogicalNot code = %d bytes\n", Here -here ) ;
     //DBI_OFF ;
 }

@@ -843,7 +843,7 @@ done:
 // dl : diff in length of token and token with highlighting :: dl = slt1 - slt0 :: not currently used
 
 byte *
-_String_HighlightTokenInputLine ( byte * nvw, Boolean lef, int64 leftBorder, int64 tokenStart, byte *token, int64 rightBorder, Boolean ref )
+_String_HighlightTokenInputLine (byte * nvw, Boolean lef, int64 leftBorder, int64 tokenStart, byte *token, byte * token0, int64 rightBorder, Boolean ref )
 {
     int32 slt = Strlen ( token ) ;
     if ( ! GetState ( _Debugger_, DEBUG_SHTL_OFF ) )
@@ -853,6 +853,16 @@ _String_HighlightTokenInputLine ( byte * nvw, Boolean lef, int64 leftBorder, int
         // inputLineW is the inputLine line (window) start that we use here
         // we are building our output in b2
         // our scratch buffer is b3
+#if 0    
+    if ( GetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ) ) )
+    {
+        int64 slt0 = strlen ( token0 ) ;
+        Strncpy ( nvw, &il[nws], scswci ) ; //leftBorder + (slt0/2) ) ; //scswci ) ; // tvw ) ; // copy the the new view window to buffer nvw
+        Strncat ( nvw, token, slt ) ; // tvw ) ; // copy the the new view window to buffer nvw
+        Strncat ( nvw, &il[nws + slt0], tvw ) ; // tvw ) ; // copy the the new view window to buffer nvw
+    }
+    //else 
+#endif    
         if ( leftBorder < 0 ) leftBorder = 0 ; // something more precise here with C syntax is needed !?!?
         if ( lef )
         {
@@ -876,6 +886,7 @@ _String_HighlightTokenInputLine ( byte * nvw, Boolean lef, int64 leftBorder, int
 
         nvw = b2 ;
     }
+    SetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION, false ) ;
     return nvw ;
 }
 

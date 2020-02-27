@@ -52,6 +52,7 @@ void
 Namespace_Do_Namespace ( Namespace * ns, Boolean isForwardDotted )
 {
     Context * cntx = _Context_ ;
+    if ( isForwardDotted ) Compiler_Save_Qid_BackgroundNamespace ( cntx->Compiler0 ) ;
     if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX | LISP_MODE ) ) _Namespace_Do_Namespace ( ns ) ;
     else if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
     {
@@ -187,7 +188,7 @@ Namespaces_PrintList ( Namespace * ns, byte * insert )
     //CSL_Namespaces_PrettyPrintTree ( ) ;
     //CSL_Using ( ) ;
     Printf ( ( byte* ) "\n\nNamespace : %s :: %s _Namespace_SetState : \n\t", ns->Name, insert ) ;
-    _List_PrintNames ( _CSL_->Namespaces->W_List, 5, 0 ) ;
+    List_PrintNames ( _CSL_->Namespaces->W_List, 5, 0 ) ;
 }
 
 void
@@ -204,9 +205,7 @@ Namespace_SetState_AdjustListPosition ( Namespace * ns, uint64 state, Boolean se
             if ( setInNsFlag ) _CSL_SetAsInNamespace ( ns ) ;
         }
         else _Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
-        d0 ( if ( Is_DebugModeOn )
-        {
-            Namespaces_PrintList ( ns, "After" ) ; CSL_Using ( ) ; } ) ;
+        d0 ( if ( Is_DebugModeOn ) { Namespaces_PrintList ( ns, "After" ) ; CSL_Using ( ) ; } ) ;
     }
 }
 
@@ -502,6 +501,13 @@ _Namespace_PrintWords ( Namespace * ns )
 }
 
 void
+_Namespace_PrintWordList_FromNode ( Word * word )
+{
+    CSL_NewLine () ;
+    dllist_Map1_FromNode ( (dlnode *) word, ( MapFunction1 ) _Word_Print, 0 ) ;
+}
+
+void
 Namespace_PrintWords ( byte * name )
 {
     Namespace * ns ;
@@ -528,19 +534,13 @@ CSL_SetInNamespaceFromBackground ( )
     else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
 
-#if 0
 
 void
-Namespace_AddToNamespaces_SetUsing ( Namespace * ns, Boolean addToHeadFlag, Boolean usingFlag )
+CSL_Namespace_PrintWordList ()
 {
-    if ( ns )
-    {
-        if ( addToHeadFlag ) _Namespace_AddToNamespacesHead ( ns ) ;
-        else _Namespace_AddToNamespacesTail ( ns ) ;
-        //if ( usingFlag ) SetState_TrueFalse ( ns, USING, NOT_USING ) ;
-        //else SetState_TrueFalse ( ns, NOT_USING, USING ) ;
-        _Namespace_SetState ( ns, usingFlag ) ;
-    }
+    byte * name = ( byte * ) DataStack_Pop ( ) ;
+    CSL_NewLine () ;
+    Namespace_PrintWords ( name );
 }
-#endif
+
 

@@ -48,7 +48,7 @@ _LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs )
     if ( lfunction->W_LispAttributes & LIST_FUNCTION ) return (( ListFunction ) lfunction->Lo_CSLWord->Definition )( lfirst ) ;
     else if ( lfunction->W_MorphismAttributes & CSL_WORD ) // this case is hypothetical for now
     {
-        if ( lfunction->W_LispAttributes & T_LISP_csl_COMPILED )
+        if ( lfunction->W_LispAttributes & T_LISP_CSL_COMPILED )
         {
             Interpreter_DoWord ( _Context_->Interpreter0, lfunction->Lo_CSLWord, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
             vReturn = nil ;
@@ -297,8 +297,6 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
     Word_Eval ( word ) ;
     Word *baseObject = _Interpreter_->BaseObject ;
     if ( ( word->Name[0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
-    //if ( ((word->W_ObjectAttributes & (OBJECT_FIELD|QUALIFIED_ID)) || ( word->Name[0] == '\"' )) 
-    //    && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
     {
         if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
         else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;

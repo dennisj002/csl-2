@@ -314,7 +314,7 @@ _LO_Semi ( Word * word )
         CSL_EndBlock ( ) ;
         block blk = ( block ) DataStack_Pop ( ) ;
         Word_InitFinal ( word, ( byte* ) blk ) ;
-        word->W_LispAttributes |= T_LISP_csl_COMPILED ;
+        word->W_LispAttributes |= T_LISP_CSL_COMPILED ;
     }
 }
 

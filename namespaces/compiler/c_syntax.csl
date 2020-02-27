@@ -374,7 +374,7 @@ typedef struct _byteTest
     byte d8_123 ;
     int16 a16_123 ; // size = 26
 } byteTest, abyteTest ;
-'bt byteTest new ;
+byteTest 'bt new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
 bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
 var ( 'btt ) ;
@@ -391,7 +391,7 @@ void bttt ( byteTest bt )
     dump ( &bt, bt.size ) ; 
     p ( bt.a8_123 ) ;
 } 
-'bt byteTest new ;
+byteTest 'bt new ;
 bttt ( bt ) ; pwi bttt //pause // error size not considered
 bt.a8_123 = 255 ; dump ( bt, bt.size ) ; //pause
 'bt byteTest new ;
@@ -404,7 +404,7 @@ _assert ( bt.a8_123 1 ) ;
 _assert ( bt.a32_123, 2147483647 ) ;
 //verbosity = 4 ;
 void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; }
-'abt byteTest new ;
+byteTest 'abt new ;
 btest ( abt 46 456 234567 2345566 ) ;
 pwi btest ; //pause
 void btest1 ( byteTest bt, byte i8 ) { bt.c8_123 = i8 ; }

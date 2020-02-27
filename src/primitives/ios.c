@@ -106,8 +106,8 @@ void
 PrintfInt ( int64 n )
 {
     byte * buffer = Buffer_Data ( _CSL_->ScratchB1 ) ;
-    if ( _Context_->System0->NumberBase == 10 ) sprintf ( ( char* ) buffer, INT_FRMT, n ) ;
-    else if ( _Context_->System0->NumberBase == 2 )
+    if ( NUMBER_BASE_GET == 10 ) sprintf ( ( char* ) buffer, INT_FRMT, n ) ;
+    else if ( NUMBER_BASE_GET == 2 )
     {
         Print_Binary ( n ) ; 
         return ;
@@ -126,10 +126,10 @@ CSL_PrintInt ( )
 void
 CSL_HexPrintInt ( )
 {
-    int64 svb = _Context_->System0->NumberBase ;
-    _Context_->System0->NumberBase = 16 ;
+    int64 svb = NUMBER_BASE_GET ;
+    NUMBER_BASE_SET ( 16 ) ;
     PrintfInt ( DataStack_Pop ( ) ) ;
-    _Context_->System0->NumberBase = svb ;
+    NUMBER_BASE_SET ( svb ) ;
 }
 
 void

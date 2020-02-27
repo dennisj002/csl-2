@@ -152,15 +152,15 @@ DLLNodeAlloc
 	this.nodes [ 7 ].BeforeReference 7 =
 	t1 @ DLLNode.size @ 8 * dump 
 ;
-"testA1" DLLNodeAlloc new sp
-"testB1" DLLNodeAlloc new sp
+DLLNodeAlloc "testA1" new sp
+DLLNodeAlloc "testB1" new sp
 nl "testA1 = " prints testA1 dup print nl tna2x //pause
 sp
 Class DLLNode
 : sp ; //stack pause ;
 DLLNodeAlloc
-"testA2" DLLNodeAlloc new
-"testB2" DLLNodeAlloc new
+DLLNodeAlloc "testA2" new
+DLLNodeAlloc "testB2" new
 testA2.nodes [ 1 ].AfterReference 3 =
 testA2.nodes [ 3 ].BeforeReference 4 =
 testA2 32 dump
@@ -176,7 +176,7 @@ testA2 32 dump
 testB2.nodes [ 1 ].AfterReference 5 =
 testB2.nodes [ 3 ].BeforeReference 6 =
 testB2 32 dump
-"testD" DLLNodeAlloc new
+DLLNodeAlloc "testD" new
 'testD find dobject
 testD.a112.b1138 77 =
 "testC" 'testD find DObject.clone 

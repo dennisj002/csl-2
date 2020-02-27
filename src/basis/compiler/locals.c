@@ -34,7 +34,7 @@ int64
 _ParameterVar_Offset ( Word * word, int64 numberOfArgs, Boolean frameFlag )
 {
     int64 offset ;
-    offset = - ( numberOfArgs - word->Index + ( frameFlag ? 1 : 0 ) ) ; // is this totally correct??
+    offset = - ( numberOfArgs - word->Index + ( frameFlag ? 1 : 0 )) ; // is this totally correct??
     return offset ;
 }
 
@@ -85,9 +85,8 @@ LocalOrParameterVar_Disp ( Word * word )
 }
 
 Word *
-_Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismType, int64 objectType, int64 lispType, int64 allocType )
+Compiler_LocalWord_UpdateCompiler ( Compiler * compiler, Word * word, int64 objectType )
 {
-    Word *word = _DObject_New ( name, 0, ( morphismType | IMMEDIATE ), objectType, lispType, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
     compiler->NumberOfVariables ++ ;
     if ( objectType & REGISTER_VARIABLE )
     {
@@ -110,18 +109,26 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismType, int6
         {
             word->Index = ++ compiler->NumberOfNonRegisterLocals ;
             compiler->NumberOfLocals ++ ;
-            _CSL_->SC_Word->W_NumberOfNonRegisterLocals ++ ;
+            if ( _CSL_->SC_Word ) _CSL_->SC_Word->W_NumberOfNonRegisterLocals ++ ;
         }
         else
         {
             word->Index = ++ compiler->NumberOfArgs ;
             compiler->NumberOfNonRegisterArgs ++ ;
-            _CSL_->SC_Word->W_NumberOfNonRegisterArgs ++ ;
+            if ( _CSL_->SC_Word ) _CSL_->SC_Word->W_NumberOfNonRegisterArgs ++ ;
         }
     }
     word->W_ObjectAttributes |= RECYCLABLE_LOCAL ;
     //CSL->SC_Word->W_NumberOfNonRegisterArgs += compiler->NumberOfNonRegisterArgs ; // debugOutput.c showLocals need this others ?
     //CSL->SC_Word->W_NumberOfNonRegisterLocals += compiler->NumberOfNonRegisterLocals ;
+    return word ;
+}
+
+Word *
+_Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismType, int64 objectType, int64 lispType, int64 allocType )
+{
+    Word *word = _DObject_New ( name, 0, ( morphismType | IMMEDIATE ), objectType, lispType, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
+    Compiler_LocalWord_UpdateCompiler ( compiler, word, objectType ) ;
     return word ;
 }
 
@@ -197,14 +204,14 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     int64 parameterVarsSubAmount = 0 ;
     Boolean returnValueFlag, already = false ;
-    returnValueFlag = ( Context_CurrentWord ( )->W_MorphismAttributes & C_RETURN ) 
+    returnValueFlag = ( Context_CurrentWord ( )->W_MorphismAttributes & C_RETURN )
         || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
     // nb. these variables have no lasting lvalue - they exist on the stack - we can only return their rvalue
     if ( compiler->ReturnVariableWord )
     {
-        if ( ! ( compiler->ReturnVariableWord->W_ObjectAttributes & REGISTER_VARIABLE ) ) 
-            Compile_GetVarLitObj_RValue_To_Reg (compiler->ReturnVariableWord, ACC , 0) ; // need to copy because ReturnVariableWord may have been used within the word already
+        if ( ! ( compiler->ReturnVariableWord->W_ObjectAttributes & REGISTER_VARIABLE ) )
+            Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC, 0 ) ; // need to copy because ReturnVariableWord may have been used within the word already
     }
     else if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
@@ -218,7 +225,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         else
         {
             byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ;
-            if ( memcmp ( mov_r14_rax, Here - 3, 3 ) ) 
+            if ( memcmp ( mov_r14_rax, Here - 3, 3 ) )
                 Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
 #if 0   // hasn't occurred yet but maybe useful in some cases especially in connection with the below #else block        
             else
@@ -237,22 +244,22 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         // remove the incoming parameters -- like in C
         if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
         _Compile_LEA ( DSP, FP, 0, - CELL ) ; // restore sp - release locals stack frame
+        //_Compile_LEA ( DSP, FP, 0, - ( parameterVarsSubAmount ? parameterVarsSubAmount + CELL : CELL ) ) ; // restore sp - release locals stack frame
         _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
     }
+#if 1    
     if ( ( parameterVarsSubAmount > 0 ) && ( ! IsWordRecursive ) ) Compile_SUBI ( REG, DSP, 0, parameterVarsSubAmount, 0 ) ; // remove stack variables
-    else if ( ! already )
+    else
+        if ( ! already )
     {
         // add a place on the stack for return value
         if ( parameterVarsSubAmount < 0 ) Compile_ADDI ( REG, DSP, 0, abs ( parameterVarsSubAmount ), 0 ) ;
-        else if ( returnValueFlag && ( ! compiler->NumberOfNonRegisterArgs ) && ( parameterVarsSubAmount == 0 )  // && 
+        else if ( returnValueFlag && ( ! compiler->NumberOfNonRegisterArgs ) && ( parameterVarsSubAmount == 0 ) // && 
             && ( ! compiler->NumberOfArgs ) )
-            //( GetState ( compiler, RETURN_TOS ) || compiler->ReturnVariableWord ) ) //&& ( ! IsWordRecursive ) ) 
-            //( GetState ( compiler, RETURN_TOS ) || compiler->ReturnVariableWord ) ) //&& ( ! IsWordRecursive ) ) 
-            //( returnValueFlag ) && ( ! IsWordRecursive ) ) 
             Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
     }
+#endif    
     // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
-#if 1       
     if ( returnValueFlag || ( IsWordRecursive && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
         if ( compiler->ReturnVariableWord )
@@ -266,22 +273,6 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         }
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
-#else // something like this seem more understandable and extendable than what is working now ...
-    if ( returnValueFlag ) //|| ( IsWordRecursive && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
-    {
-        if ( compiler->ReturnVariableWord )
-        {
-            Compiler_Word_SCHCPUSCA ( compiler->ReturnVariableWord, 0 ) ;
-            if ( compiler->ReturnVariableWord->W_ObjectAttributes & REGISTER_VARIABLE )
-            {
-                _Compile_Stack_PushReg ( DSP, compiler->ReturnVariableWord->RegToUse ) ;
-                return ;
-            }
-        }
-        _Compile_Stack_PushReg ( DSP, ACC ) ;
-
-    }
-#endif    
     d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) _CSL_Debugger_Locals_Show ) ) ;
 }
 

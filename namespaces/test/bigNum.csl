@@ -1,10 +1,10 @@
 5
+: sp ; //stack pause ;
+sp
 Int 
 //dbgOff 
 C
 //jcc8_Off
-: sp ; //stack pause ;
-sp
 // testing before bignum starts // - tail recursion ideas from http://c2.com/cgi/wiki?TailCallOptimization
 : factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 'factorial find wdiss //pause

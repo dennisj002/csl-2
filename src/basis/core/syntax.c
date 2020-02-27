@@ -20,6 +20,7 @@ Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
     _Debugger_->SubstitutedWord = _CSL_->BeginBlockWord ;
     Interpreter_DoWord_Default ( _Interpreter_, _CSL_->EndBlockWord, tsrli, scwi ) ;
     _CSL_->EndBlockWord->Name = ( byte* ) "}" ;
+    _Debugger_->SubstitutedWord = 0 ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
 
@@ -36,6 +37,7 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     _Debugger_->SubstitutedWord = _CSL_->BeginBlockWord ;
     Interpreter_DoWord_Default ( _Interpreter_, _CSL_->BeginBlockWord, tsrli, scwi ) ;
     _CSL_->BeginBlockWord->Name = ( byte* ) "{" ;
+    _Debugger_->SubstitutedWord = 0 ;
     compiler->BeginBlockFlag = false ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
@@ -193,8 +195,8 @@ void
 _CSL_C_Infix_EqualOp ( block op )
 {
     Context * cntx = _Context_ ;
-    Interpreter * interp = cntx->Interpreter0 ;
     Compiler *compiler = cntx->Compiler0 ;
+    Interpreter * interp = cntx->Interpreter0 ;
     Word * wordr, *word0 = CSL_WordList ( 0 ) ;
     Word *lhsWord = compiler->LHS_Word, *word0a, *rword ;
     int64 tsrli = word0 ? word0->W_RL_Index : 0 ;
@@ -208,7 +210,8 @@ _CSL_C_Infix_EqualOp ( block op )
         if ( ( lhsWord->W_ObjectAttributes & ( OBJECT | OBJECT_FIELD | THIS | QID ) || GetState ( lhsWord, QID ) ) )
         {
             if ( ( ! String_Equal ( word0a->Name, "]" ) ) &&
-                ( ! ( word0a->W_ObjectAttributes & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) ) Compile_TosRmToTOS ( ) ;
+                ( ! ( word0a->W_ObjectAttributes & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) )
+                Compile_TosRmToTOS ( ) ;
             wordr = _CSL_->PokeWord ;
         }
         else
@@ -225,15 +228,19 @@ _CSL_C_Infix_EqualOp ( block op )
     else wordr = _CSL_->PokeWord ;
     d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( "\nCSL_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
     if ( op ) Block_Eval ( op ) ;
-    else
+    else 
     {
         rword = wordr ;
         svName = rword->Name ;
         rword->Name = ( byte* ) "=" ;
-        SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
-        _Debugger_->SubstitutedWord = rword ;
+        if ( ! String_Equal ( "=", word0->Name ) ) 
+        {
+            SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
+            _Debugger_->SubstitutedWord = rword ;
+        }
         Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ; // remember _CSL_WordList_PopWords earlier in this function
-        SetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ), false ) ;
+        SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, false ) ;
+        _Debugger_->SubstitutedWord = 0 ;
         rword->Name = svName ;
     }
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
@@ -243,7 +250,6 @@ _CSL_C_Infix_EqualOp ( block op )
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;
-
     if ( ! Compiling ) CSL_InitSourceCode ( _CSL_ ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
     SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
@@ -594,14 +600,14 @@ Word_ClassStructure_PrintData ( Context * cntx, Word * word, byte * typedefStrin
     {
         Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
         ReadLiner * rl = cntx->ReadLiner0 ;
-        
+
         Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
         //TypeDefStructCompileInfo_New ( cntx, CONTEXT ) ;
         //byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
-    TDSCI * tdsci = TDSCI_Start ( cntx, 0, 0 ) ;
-    //Parse_Structure ( cntx ) ;
+        TDSCI * tdsci = TDSCI_Start ( cntx, 0, 0 ) ;
+        //Parse_Structure ( cntx ) ;
         CSL_Parse_A_Typed_Field ( cntx, TDSCI_PRINT, ( byte* ) word ) ;
-    tdsci = TDSCI_Finalize ( cntx ) ;
+        tdsci = TDSCI_Finalize ( cntx ) ;
         Readline_Restore_InputLine_State ( rl ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;
     }

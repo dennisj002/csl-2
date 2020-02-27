@@ -13,7 +13,165 @@
 // compiler can use the slot number in the function being compiled
 // compile a local variable such that when used at runtime it pushes
 // the slot address on the DataStack
+#if 0
+Namespace *
+_CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // stack variables flag
+{
+    // number of stack variables, number of locals, stack variable flag
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
+    Lexer * lexer = cntx->Lexer0 ;
+    Finder * finder = cntx->Finder0 ;
+    int64 scm = IsSourceCodeOn ;
+    byte * svDelimiters = lexer->TokenDelimiters ;
+    Word * word ;
+    int64 objectAttributes = 0, lispAttributes = 0, numberOfRegisterVariables = 0, numberOfVariables = 0 ;
+    int64 svff = 0, addWords, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
+    Boolean regFlag = false ;
+    byte *token, *returnVariable = 0 ;
+    Namespace *typeNamespace = 0, *objectTypeNamespace = 0, *saveInNs = _CSL_->InNamespace ;
+    //CSL_DbgSourceCodeOff ( ) ;
+    if ( ! CompileMode ) Compiler_Init ( compiler, 0 ) ;
 
+    if ( svf ) svff = 1 ;
+    addWords = 1 ;
+    if ( lispMode ) args = ( ListObject * ) args->Lo_List->head ;
+
+    while ( ( lispMode ? ( int64 ) _LO_Next ( args ) : 1 ) )
+    {
+        if ( lispMode )
+        {
+            args = _LO_Next ( args ) ;
+            if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
+            token = ( byte* ) args->Lo_Name ;
+            CSL_AddStringToSourceCode ( _CSL_, token ) ;
+        }
+        else token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
+        if ( token )
+        {
+            if ( String_Equal ( token, "(" ) ) continue ;
+            if ( String_Equal ( ( char* ) token, "|" ) )
+            {
+                svff = 0 ; // set stack variable flag to off -- no more stack variables ; begin local variables
+                continue ; // don't add a node to our temporary list for this token
+            }
+            if ( String_Equal ( ( char* ) token, "-t" ) ) // for setting W_TypeSignatureString
+            {
+                if ( lispMode )
+                {
+                    args = _LO_Next ( args ) ;
+                    if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
+                    token = ( byte* ) args->Lo_Name ;
+                    CSL_AddStringToSourceCode ( _CSL_, token ) ;
+                }
+                else token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
+                strncpy ( ( char* ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString, ( char* ) token, 8 ) ;
+                continue ; // don't add a node to our temporary list for this token
+            }
+            if ( String_Equal ( ( char* ) token, "--" ) ) // || ( String_Equal ( ( char* ) token, "|-" ) == 0 ) || ( String_Equal ( ( char* ) token, "|--" ) == 0 ) )
+            {
+                if ( ! svf ) break ;
+                else
+                {
+                    addWords = 0 ;
+                    getReturnFlag = 1 ;
+                    continue ;
+                }
+            }
+            if ( String_Equal ( ( char* ) token, ")" ) ) break ;
+            if ( String_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
+            {
+                if ( GetState ( _CSL_, OPTIMIZE_ON ) ) regFlag = true ;
+                continue ;
+            }
+            if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) )
+            {
+                CSL_Exception ( SYNTAX_ERROR, "\nLocal variables syntax error : no closing parenthesis ')' found", 1 ) ;
+                break ;
+            }
+            if ( ! lispMode )
+            {
+                word = Finder_Word_FindUsing ( finder, token, 1 ) ; // ?? find after Literal - eliminate making strings or numbers words ??
+                if ( word && ( word->W_ObjectAttributes & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
+                {
+                    if ( word->W_ObjectAttributes & STRUCTURE ) objectTypeNamespace = word ;
+                    else typeNamespace = word ;
+                    continue ;
+                }
+            }
+            if ( getReturnFlag )
+            {
+                addWords = 0 ;
+                if ( Stringi_Equal ( token, ( byte* ) "ACC" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "EAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "RAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "TOS" ) ) getReturn |= RETURN_TOS ;
+                else returnVariable = token ; //nb. if there is a return variable it must have already been declared as a parameter of local variable else it is an error
+                continue ;
+            }
+            if ( addWords )
+            {
+                if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, 1 ) ; //! debugFlag ) ;
+                if ( svff )
+                {
+                    objectAttributes |= PARAMETER_VARIABLE ; // aka an arg
+                    //if ( lispMode ) objectType |= T_LISP_SYMBOL ;
+                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
+                }
+                else
+                {
+                    objectAttributes |= LOCAL_VARIABLE ;
+                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
+                }
+                if ( regFlag == true )
+                {
+                    objectAttributes |= REGISTER_VARIABLE ;
+                    numberOfRegisterVariables ++ ;
+                }
+                if ( objectTypeNamespace )
+                {
+                    Compiler_TypedObjectInit ( word, objectTypeNamespace ) ;
+                    Word_TypeChecking_SetSigInfoForAnObject ( word ) ;
+                }
+                else
+                {
+                    if ( typeNamespace ) word->ObjectByteSize = typeNamespace->ObjectByteSize ;
+                    word = DataObject_New ( objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                    if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables ++] = '_' ;
+                    if ( regFlag == true )
+                    {
+                        word->RegToUse = RegParameterOrder ( regToUseIndex ++ ) ;
+                        if ( word->W_ObjectAttributes & PARAMETER_VARIABLE )
+                        {
+                            if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
+                            _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
+                        }
+                        regFlag = false ;
+                    }
+                }
+                typeNamespace = 0 ;
+                objectTypeNamespace = 0 ;
+                objectAttributes = 0 ;
+                if ( String_Equal ( token, "this" ) ) word->W_ObjectAttributes |= THIS ;
+            }
+        }
+        else return 0 ; // Syntax Error or no local or parameter variables
+    }
+    compiler->State |= getReturn ;
+
+    // we support nested locals and may have locals in other blocks so the indexes are cumulative
+    if ( numberOfRegisterVariables ) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ;
+    if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
+
+    _CSL_->InNamespace = saveInNs ;
+    finder->FoundWord = 0 ;
+    Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
+    compiler->LocalsNamespace = localsNs ;
+    SetState ( compiler, VARIABLE_FRAME, true ) ;
+    SetState ( _CSL_, DEBUG_SOURCE_CODE_MODE, scm ) ;
+    return localsNs ;
+}
+#else
 Namespace *
 _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // stack variables flag
 {
@@ -171,6 +329,22 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
     SetState ( compiler, VARIABLE_FRAME, true ) ;
     SetState ( _CSL_, DEBUG_SOURCE_CODE_MODE, scm ) ;
     return localsNs ;
+}
+
+#endif
+void
+Compiler_TypedObjectInit ( Word * word, Namespace * typeNamespace )
+{
+    int64 size ;
+    word->TypeNamespace = typeNamespace ;
+    word->W_MorphismAttributes |= typeNamespace->W_MorphismAttributes ;
+    if ( typeNamespace->W_ObjectAttributes & CLASS ) word->W_ObjectAttributes |= OBJECT ;
+    if ( Compiling ) word->W_ObjectAttributes |= LOCAL_OBJECT ;
+    size = _Namespace_VariableValueGet ( word, ( byte* ) "size" ) ;
+    word->Size = size ? size : typeNamespace->ObjectByteSize ;
+    //_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
+    _DObject_Init ( word, ( int64 ) 0, LOCAL_OBJECT, ( byte* ) _DataObject_Run, 0 ) ;
+    _Word_Add ( word, 1, 0 ) ;
 }
 
 void
@@ -375,9 +549,9 @@ Lexer_ParseObject ( Lexer * lexer, byte * token )
             }
             //else if ( tolower ( token [1] ) == 'o' ) goto doOctal ; // #o
         }
-        if ( cntx->System0->NumberBase == 10 ) _Lexer_ParseDecimal ( lexer, token ) ;
-        else if ( cntx->System0->NumberBase == 2 ) Lexer_ParseBinary ( lexer, token, 0 ) ;
-        else if ( cntx->System0->NumberBase == 16 ) _Lexer_ParseHex ( lexer, token ) ;
+        if ( NUMBER_BASE_GET == 10 ) _Lexer_ParseDecimal ( lexer, token ) ;
+        else if ( NUMBER_BASE_GET == 2 ) Lexer_ParseBinary ( lexer, token, 0 ) ;
+        else if ( NUMBER_BASE_GET == 16 ) _Lexer_ParseHex ( lexer, token ) ;
     }
 }
 
@@ -445,14 +619,14 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
 }
 
 int64
-_CSL_ParseQid ( byte * finderToken )
+_CSL_ParseQid_Token ( byte * token0 )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Finder * finder = cntx->Finder0 ;
     int64 nst ;
     Word * word = 0, *ns = 0 ;
-    byte * token = finderToken ; // finderToken is also a flag of the caller : (finderToken > 0) ? finder : parser
+    byte * token = token0 ; // finderToken is also a flag of the caller : (finderToken > 0) ? finder : parser
     while ( 1 )
     {
         if ( ! token )
@@ -462,19 +636,19 @@ _CSL_ParseQid ( byte * finderToken )
         }
         if ( token && _Lexer_IsTokenForwardDotted ( lexer, 0 ) )
         {
-            if ( finderToken ) cntx->Interpreter0->BaseObject = 0 ;
+            if ( token0 ) cntx->Interpreter0->BaseObject = 0 ;
             //word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
             if ( ns ) word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
             else word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
             if ( word && ( nst = word->W_ObjectAttributes & THIS ) ) ns = word, _CSL_SetAsInNamespace ( ns ), Finder_SetQualifyingNamespace ( finder, ns ) ;
-            else if ( word && ( nst = word->W_ObjectAttributes & ( finderToken ? ( NAMESPACE_TYPE | THIS ) : ( C_TYPE | C_CLASS | NAMESPACE | THIS ) ) ) )
+            else if ( word && ( nst = word->W_ObjectAttributes & ( token0 ? ( NAMESPACE_TYPE | THIS ) : ( C_TYPE | C_CLASS | NAMESPACE | THIS ) ) ) )
             {
                 ns = word ;
                 Finder_SetQualifyingNamespace ( finder, ns ) ;
                 _CSL_SetAsInNamespace ( ns ) ;
 
             }
-            else if ( finderToken )
+            else if ( token0 )
             {
                 if ( ! nst ) _CSL_Do_Dot ( cntx, word ) ;
                 break ; //return (int64) word ;
@@ -487,17 +661,72 @@ _CSL_ParseQid ( byte * finderToken )
     if ( ns )
     {
         //word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
+        if ( token0 ) return ( int64 ) word ;
+        else return ( int64 ) token ; //( word ? word->Name : token ) ;
+    }
+    else
+#endif        
+    {
+        if ( token0 ) return ( int64 ) word ;
+        else return ( int64 ) token ;
+    }
+}
+
+#if 0
+
+int64
+CSL_ParseQid_Word ( Word * word )
+{
+    Context * cntx = _Context_ ;
+    Lexer * lexer = cntx->Lexer0 ;
+    Finder * finder = cntx->Finder0 ;
+    int64 nst ;
+    Word *ns = 0 ;
+    byte * token = 0 ; //= finderToken ; // finderToken is also a flag of the caller : (finderToken > 0) ? finder : parser
+    ///if ( word0 ) { word = word0 ; goto gotWord0 ; }
+    while ( 1 )
+    {
+        if ( word && ( nst = word->W_ObjectAttributes & THIS ) ) ns = word, _CSL_SetAsInNamespace ( ns ), Finder_SetQualifyingNamespace ( finder, ns ) ;
+        else if ( word && ( nst = word->W_ObjectAttributes & ( NAMESPACE_TYPE | THIS ) ) ) //: ( C_TYPE | C_CLASS | NAMESPACE | THIS ) ) ) )
+        {
+            ns = word ;
+            Finder_SetQualifyingNamespace ( finder, ns ) ;
+            _CSL_SetAsInNamespace ( ns ) ;
+
+        }
+        //else if ( finderToken )
+        {
+            if ( ! nst ) _CSL_Do_Dot ( cntx, word ) ;
+            //break ; //return (int64) word ;
+        }
+        token = Lexer_ReadToken ( lexer ) ;
+        if ( token && ( token [0] == '.' ) ) token = Lexer_ReadToken ( lexer ) ;
+        {
+            //if ( finderToken ) cntx->Interpreter0->BaseObject = 0 ;
+            //word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+            if ( ns ) word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
+            else word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
+        }
+        if ( ! _Lexer_IsTokenForwardDotted ( lexer, 0 ) ) break ;
+    }
+#if 0    
+    if ( ns )
+    {
+        //word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
         if ( finderToken ) return ( int64 ) word ;
         else return ( int64 ) token ; //( word ? word->Name : token ) ;
     }
     else
 #endif        
     {
-        if ( finderToken ) return ( int64 ) word ;
-        else return ( int64 ) token ;
+        //if ( finderToken ) 
+        return ( int64 ) word ;
+        //else return ( int64 ) token ;
     }
 }
-// ?? seems way to complicated and maybe should be integrated with Lexer_ParseObject
+#endif
+
+// _CSL_SingleQuote : ?? seems way to complicated and maybe should be integrated with Lexer_ParseObject
 
 void
 _CSL_SingleQuote ( )
@@ -547,27 +776,11 @@ _CSL_SingleQuote ( )
     else
     {
         if ( ! Compiling ) CSL_InitSourceCode_WithName ( _CSL_, lexer->OriginalToken, 0 ) ;
-        byte * token = ( byte* ) _CSL_ParseQid ( 0 ) ;
+        byte * token = ( byte* ) _CSL_ParseQid_Token ( 0 ) ;
         DataStack_Push ( ( int64 ) token ) ;
         if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) )
             CSL_InitSourceCode_WithName ( _CSL_, token, 0 ) ;
     }
     _CSL_->SC_QuoteMode = false ;
 }
-
-void
-Compiler_TypedObjectInit ( Word * word, Namespace * typeNamespace )
-{
-    int64 size ;
-    word->TypeNamespace = typeNamespace ;
-    word->W_MorphismAttributes |= typeNamespace->W_MorphismAttributes ;
-    if ( typeNamespace->W_ObjectAttributes & CLASS ) word->W_ObjectAttributes |= OBJECT ;
-    word->W_ObjectAttributes |= LOCAL_OBJECT ;
-    size = _Namespace_VariableValueGet ( word, ( byte* ) "size" ) ;
-    word->Size = size ? size : typeNamespace->ObjectByteSize ;
-    //_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
-    _DObject_Init ( word, ( int64 ) 0, LOCAL_OBJECT, ( byte* ) _DataObject_Run, 0 ) ;
-    _Word_Add ( word, 1, 0 ) ;
-}
-
 

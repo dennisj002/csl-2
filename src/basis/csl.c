@@ -325,7 +325,7 @@ CSL_DebugLevel ( )
     //else 
     //DataStack_Push ( ( int64 ) & _CSL_->DebugLevel ) ;
 #endif    
-    Compile_C_Pointer_StackAccess ( (byte* )& _CSL_->DebugLevel );
+    Do_C_Pointer_StackAccess ( (byte* )& _CSL_->DebugLevel );
 }
 
 

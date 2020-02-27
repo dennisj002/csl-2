@@ -133,7 +133,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
     Word * word = debugger->w_Word ;
     if ( word )
     {
-        debugger->WordDsp = _Dsp_ ; // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
+        //debugger->WordDsp = _Dsp_ ; // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
         Debugger_CanWeStep ( debugger, word ) ;
         // we would at least need to save/restore our registers to step thru native c code
         if ( ! GetState ( debugger, DBG_CAN_STEP ) )
@@ -400,7 +400,7 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
     int64 result = true ;
     //if ( ( ! debugger->DebugAddress ) || ( GetState ( debugger, DBG_SETUP_ADDRESS ) ) )
     if ( ! word ) result = false ;
-    else if ( word->W_MorphismAttributes & ( CSL_WORD | csl_ASM_WORD ) ) result = true ;
+    else if ( word->W_MorphismAttributes & ( CSL_WORD | CSL_ASM_WORD ) ) result = true ;
     else if ( ! word->CodeStart ) result = false ;
     else if ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | C_PREFIX_RTL_ARGS ) ) result = false ;
     else if ( ! NamedByteArray_CheckAddress ( _O_CodeSpace, word->CodeStart ) ) result = false ;
@@ -508,14 +508,15 @@ Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
 Boolean
 _Debugger_CASOI_Do_JmpOrCall_Insn ( Debugger * debugger, byte * jcAddress )
 {
-    //jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
-    Word * word = Word_UnAlias ( Word_GetFromCodeAddress ( jcAddress ) ) ;
+    Word *word, * word0 = Word_GetFromCodeAddress ( jcAddress ) ;
+    word = Word_UnAlias ( word0 ) ;
     debugger->w_Word = word ;
+    
     if ( word && ( word->W_MorphismAttributes & ( DEBUG_WORD | RT_STEPPING_DEBUG ) ) )
     {
-        SetState ( debugger, DBG_AUTO_MODE, false ) ;
+        SetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ), false ) ;
         // we are already stepping here and now, so skip
-        Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", ( char* ) c_gd ( word->Name ), debugger->DebugAddress ) ;
+        Printf ( ( byte* ) "\nskipping over a debug word : %s : at 0x%-8x", (word ? ( char* ) c_gd ( word->Name ) : (char*) "<dbg>"), debugger->DebugAddress ) ;
         //Pause () ;
         debugger->DebugAddress += 3 ; // 3 : sizeof call reg insn
         //goto end ; // skip it

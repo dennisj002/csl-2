@@ -194,7 +194,7 @@
 #define _AppendCharacterToTokenBuffer( lex, character ) lexer->TokenBuffer [ lex->TokenWriteIndex ] = character
 
 
-#define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE | OBJECT )
+#define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE | OBJECT | STRUCT )
 #define NAMESPACE_RELATED_TYPE ( NAMESPACE_TYPE | OBJECT_FIELD )
 #define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL | THIS ) // | T_LISP_SYMBOL
 #define VARIABLE_TYPE ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | OBJECT_FIELD | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL )
@@ -292,6 +292,9 @@
 #define PT_TYPEDEF 1
 #define PT_TYPE 2
 #define CONTEXT_TDSCI_STACK( cntx ) ((Context*) cntx) ? cntx->Compiler0->TDSCI_StructUnionStack : _Context_->Compiler0->TDSCI_StructUnionStack
+#define Is_DbiOn _O_->Dbi
 
+#define NUMBER_BASE_GET _Context_->System0->NumberBase
+#define NUMBER_BASE_SET( value ) _Context_->System0->NumberBase = ( value )
 
 

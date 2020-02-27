@@ -51,7 +51,6 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
         //word = Finder_QID_Find ( cntx->Finder0, token ) ;
         word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
         if ( word && compiler->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
-        //_DEBUG_SETUP ( word, token, 0, 0 ) ;
         if ( ! word )
         {
             Lexer_ParseObject ( lexer, token ) ;
@@ -64,13 +63,12 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
                 }
                 else Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, "\nLexer_ObjectToken_New : unknown token" ) ;
             }
-            else word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, 
+            else word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0,
                 lexer->Literal, 0, 0, tsrli, scwi ) ;
             Word_SetTypeNamespace ( word, lexer->L_ObjectAttributes ) ;
             word->ObjectByteSize = lexer->TokenObjectSize ;
         }
         lexer->TokenWord = word ;
-        //DEBUG_SHOW ;
     }
     return word ;
 }
@@ -95,8 +93,6 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         if ( lexer->TokenWriteIndex && ( ! GetState ( lexer, LEXER_RETURN_NULL_TOKEN ) ) )
         {
             _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
-            //if ( _AtCommandLine ( ) ) lexer->OriginalToken = String_New_RemoveColors ( lexer->TokenBuffer, SESSION ) ;
-            //else 
             lexer->OriginalToken = String_New ( lexer->TokenBuffer, SESSION ) ; // not TEMPORARY or strings on the stack are deleted at each newline after startup
         }
         else lexer->OriginalToken = ( byte * ) 0 ; // why not goto restartToken ? -- to allow user to hit newline and get response
@@ -305,7 +301,6 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
 void
 Lexer_DoChar ( Lexer * lexer, byte c )
 {
-
     lexer->TokenInputByte = c ;
     _Lexer_DoChar ( lexer, c ) ;
     lexer->CurrentReadIndex = lexer->ReadLiner0->ReadIndex ;
@@ -314,7 +309,6 @@ Lexer_DoChar ( Lexer * lexer, byte c )
 void
 Lexer_DoNextChar ( Lexer * lexer )
 {
-
     Lexer_DoChar ( lexer, lexer->NextChar ( lexer->ReadLiner0 ) ) ;
 }
 

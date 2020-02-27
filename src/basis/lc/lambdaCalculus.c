@@ -414,7 +414,7 @@ void
 LC_Print_LispDefinesNamespace ( )
 {
     Printf ( ( byte* ) "\n LC_Print_LispDefinesNamespace : printing ...\n" ) ;
-    _List_PrintNames ( _LC_->LispDefinesNamespace->W_List, - 1, 0 ) ;
+    List_PrintNames ( _LC_->LispDefinesNamespace->W_List, - 1, 0 ) ;
     Printf ( ( byte* ) "\n" ) ;
 }
 
@@ -422,7 +422,7 @@ void
 LC_Print_LispNamespace ( )
 {
     Printf ( ( byte* ) "\n LC_Print_LispNamespace : printing ...\n" ) ;
-    _List_PrintNames ( _LC_->LispNamespace->W_List, - 1, 0 ) ;
+    List_PrintNames ( _LC_->LispNamespace->W_List, - 1, 0 ) ;
     Printf ( ( byte* ) "\n" ) ;
 }
 

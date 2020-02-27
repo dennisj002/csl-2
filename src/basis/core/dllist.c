@@ -424,20 +424,20 @@ dlnode *
 dllist_Head ( dllist * list )
 {
     if ( ! list ) return 0 ;
-    return ( dlnode * ) list->head ;
+    return ( dlnode * ) list->n_After ;
 }
 
 dlnode *
 dllist_Tail ( dllist * list )
 {
     if ( ! list ) return 0 ;
-    return ( dlnode * ) list->tail ;
+    return ( dlnode * ) list->n_Before ;
 }
 
 dlnode *
 _dllist_First ( dllist * list )
 {
-    return dlnode_Next ( list->head ) ;
+    return dlnode_Next ( list->n_After ) ;
 }
 
 dlnode *
@@ -451,7 +451,7 @@ dlnode *
 dllist_Last ( dllist * list )
 {
     if ( ! list ) return 0 ;
-    return dlnode_Previous ( list->tail ) ;
+    return dlnode_Previous ( list->n_Before ) ;
 }
 
 dlnode *
@@ -567,6 +567,7 @@ _dllist_Get_N_Node ( dllist * list, int64 n )
 }
 
 #if 0
+
 int64
 _dllist_Get_N_InUse_Node_M_Slot ( dllist * list, int64 n, int64 m )
 {
@@ -706,6 +707,24 @@ dllist_Map1 ( dllist * list, MapFunction1 mf, int64 one )
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
     {
         nextNode = dlnode_Next ( node ) ;
+        mf ( node, one ) ;
+    }
+}
+
+void
+dllist_Map1_FromNode ( dlnode * node0, MapFunction1 mf, int64 one )
+{
+    dlnode *node, *nextNode, *previousNode ;
+    CSL_NewLine () ;
+    for ( node = node0 ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ;
+        mf ( node, one ) ;
+    }
+    CSL_NewLine () ;
+    for ( node = node0 ; node ; node = previousNode )
+    {
+        previousNode = dlnode_Previous ( node ) ;
         mf ( node, one ) ;
     }
 }
@@ -868,11 +887,9 @@ Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
         {
             nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
             _CSL_->FindWordCount ++ ;
-            if ( mf ( ( Symbol* ) word, one ) )
-                return word ;
-            else if ( Is_NamespaceType ( word ) )
+            if ( ( ( word->State & state ) || Is_NamespaceType ( word ) ) && ( mf ( ( Symbol* ) word, one ) ) ) return word ;
             {
-                if ( ( word->State & state ) )
+                if ( Is_NamespaceType ( word ) )
                 {
                     if ( ( word2 = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) word->W_List ), mf, one ) ) )
                         return word2 ;

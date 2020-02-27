@@ -82,7 +82,7 @@ _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Bool
     if ( sib && ( controlFlags & SIB_B ) ) _Compile_Int8 ( sib ) ;
     if ( disp || ( controlFlags & DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags & IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags & IMM_B ) ) ;
-    if ( _DBI || _O_->Dbi )
+    if ( _DBI || (_O_->Dbi > 1) )
     {
         d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
         d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
@@ -294,7 +294,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
                 modRm = 0 ;
             }
         }
-        else //if ( immSize == 8 ) 
+        else //if ( immSize >= 8 ) 
         {
             opCode = 0xb8 ;
             opCode += ( rm & 7 ) ;

@@ -6,12 +6,13 @@
 // we run all new objects thru here ; good for debugging and understanding 
 
 Word *
-DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes, uint64 objectAttributes, uint64 lispAttributes,
+DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttributes, uint64 objectAttributes, uint64 lispAttributes,
     int64 index, int64 value, Namespace * addToNs, int allocType, int64 tsrli, int64 scwi )
 {
     Context * cntx = _Context_ ;
     Word_SetTsrliScwi ( word, tsrli, scwi )
-    if ( word && ( ! ( type & ( T_LC_NEW | T_LC_LITERAL ) ) ) ) Word_Recycle ( word ) ;
+    if ( word && ( ! ( type & ( T_LC_NEW | T_LC_LITERAL ) ) ) )
+        Word_Recycle ( word ) ;
     switch ( type )
     {
         case T_LC_NEW:
@@ -123,7 +124,7 @@ Word *
 _CSL_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 {
     byte * obj = _CSL_NamelessObjectNew ( size, allocType ) ;
-    Word * word = _DObject_New ( name, ( int64 ) obj, ( IMMEDIATE | CPRIMITIVE ), OBJECT | category, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    Word * word = _DObject_New ( name, ( int64 ) obj, ( IMMEDIATE | CPRIMITIVE ), OBJECT | category, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
     word->ObjectByteSize = size ;
     return word ;
 }
@@ -165,13 +166,12 @@ _Class_Object_New ( byte * name, uint64 category )
     int64 size ;
     byte * object ;
     Word * word ;
-    Namespace * ns = Word_UnAlias ( _CSL_Namespace_InNamespaceGet ( )) ;
+    Namespace * ns = Word_UnAlias ( _CSL_Namespace_InNamespaceGet ( ) ) ;
     size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
-    word = _CSL_ObjectNew ( size, name, category, CompileMode ? DICTIONARY : OBJECT_MEM ) ;
+    word = _CSL_ObjectNew ( size, name, (category|OBJECT), CompileMode ? DICTIONARY : OBJECT_MEM ) ;
     object = ( byte* ) word->W_Value ;
     _Class_Object_Init ( word, ns ) ;
     _Namespace_VariableValueSet ( ns, ( byte* ) "this", ( int64 ) object ) ;
-    _Word_Add ( word, 0, ns ) ;
     return word ;
 }
 
@@ -186,23 +186,20 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     if ( ( ! ns ) ) //|| ( ! String_Equal ( ns->S_ContainingNamespace->Name, CSL_In_Namespace () )) )
     {
         sns = _CSL_Namespace_InNamespaceGet ( ) ;
-        if ( cloneFlag )
-        {
-            size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
-        }
+        if ( cloneFlag ) size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         ns = _DObject_New ( name, 0, IMMEDIATE, CLASS | objectType, 0, objectType, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
         Namespace_Do_Namespace ( ns, 0 ) ; // before "size", "this"
         Word *ws = _CSL_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CSL_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
-        wt->W_ObjectAttributes |= THIS | OBJECT ;
+        wt->W_ObjectAttributes |= (THIS | OBJECT)  ;
         token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-        if ( ( token[0] == '{' ) || ( token[1] == '{' )  || ( token[2] == '{' ) ) // consider "{", ":{" and +:{" tokens
+        if ( ( token[0] == '{' ) || ( token[1] == '{' ) || ( token[2] == '{' ) ) // consider "{", ":{" and +:{" tokens
         {
             if ( ! GetState ( _Compiler_, TDSCI_PARSING ) )
             {
-                _ClassTypedef (_Context_, ns, cloneFlag ) ;
-                ns->W_ObjectAttributes |= STRUCT ;
+                _ClassTypedef ( _Context_, ns, cloneFlag ) ;
+                ns->W_ObjectAttributes |= ( OBJECT | STRUCT ) ;
             }
         }
     }

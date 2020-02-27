@@ -179,12 +179,12 @@
 
 #define OPENVMTIL_SIZE ( 2 * KB )
 #define STACK_SIZE ( 2 * KB ) // * 4 bytes per slot
-#define csl_SIZE (STACK_SIZE * 4) + (12.5 * K)
+#define CSL_SIZE (STACK_SIZE * 4) + (12.5 * K)
 
 #define TEMP_MEM_SIZE (COMPILER_TEMP_OBJECTS_SIZE + SESSION_OBJECTS_SIZE + LISP_TEMP_SIZE + TEMP_OBJECTS_SIZE + HISTORY_SIZE + BUFFER_SPACE_SIZE + CONTEXT_SIZE)
 #define VARIABLE_MEM_SIZE TEMP_MEM_SIZE 
 #define CORE_MEM_SIZE (DICTIONARY_SIZE + OBJECTS_SIZE + CODE_SIZE) 
-#define STATIC_MEM_SIZE (OPENVMTIL_SIZE + csl_SIZE)
+#define STATIC_MEM_SIZE (OPENVMTIL_SIZE + CSL_SIZE)
 #define PERMANENT_MEM_SIZE (CORE_MEM_SIZE + STATIC_MEM_SIZE)
 #define TOTAL_MEM_SIZE (TEMP_MEM_SIZE + CORE_MEM_SIZE + STATIC_MEM_SIZE)
 #define MINIMUM_MEM_SIZE (TEMP_MEM_SIZE + STATIC_MEM_SIZE)
@@ -213,10 +213,10 @@
 #define PSI_NEWLINE ( (uint64) 1 << 15 )
 #define PSI_PROMPT  ( (uint64) 1 << 16 )
 
-// MorphismAttributes & LispAttributes -shared in common 
+// MorphismAttributes, ObjectAttributes & LispAttributes -shared in common 
 #define CPRIMITIVE      ( (uint64) 1 << 0 )
 #define CSL_WORD     ( (uint64) 1 << 1 )
-#define csl_ASM_WORD  ( (uint64) 1 << 2 ) // machine code words
+#define CSL_ASM_WORD  ( (uint64) 1 << 2 ) // machine code words
 #define T_LISP_SYMBOL   ( (uint64) 1 << 3 )
 #define NOT_A_KNOWN_OBJECT ( (uint64) 1 << 6 )  
 #define KNOWN_OBJECT ( (uint64) 1 << 7 )  
@@ -388,7 +388,7 @@
 #define T_LISP_csl ( (uint64) 1 << 45 )
 #define T_LISP_COLON ( (uint64) 1 << 46 )
 #define T_LISP_IMMEDIATE ( (uint64) 1 << 48 )
-#define T_LISP_csl_COMPILED ( (uint64) 1 << 49 )
+#define T_LISP_CSL_COMPILED ( (uint64) 1 << 49 )
 
 //#define   ( (uint64) 1 <<  )
 #define NEW_RUN_COMPOSITE 0
@@ -401,7 +401,7 @@
 #define ABORT ( (uint64) 1 << 6 )
 #define QUIT ( (uint64) 1 << 5 )
 // don't use 4 because it is also SIGILL ??
-#define csl_RUN_INIT ( (uint64) 1 << 4 )
+#define CSL_RUN_INIT ( (uint64) 1 << 4 )
 #define STOP ( (uint64) 1 << 3 )
 #define BREAK ( (uint64) 1 << 2 )
 #define CONTINUE ( (uint64) 1 << 1 )

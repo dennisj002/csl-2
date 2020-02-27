@@ -7,7 +7,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
     // ...source code source code TP source code source code ... EOL
     Word * scWord, * word ;
     dllist * list ;
-    byte *sourceCode ;
+    byte *sourceCode, *token, *buffer ;
     int64 fixed ;
     if ( ! Compiling )
     {
@@ -28,11 +28,12 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
                     {
                         if ( ( scWord->W_TypeAttributes & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )
                         {
-                            word->Name = ( byte* ) "=" ;
-                            fixed = 1 ;
+                            //word->Name = ( byte* ) "=" ;
+                            //fixed = 1 ;
+                            SetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION, true ) ;
                         }
-
-                        byte * buffer = DBG_PrepareSourceCodeString ( word, 0, sourceCode, 0, 0, 1 ) ;
+                        token = GetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) ? (byte*) "=" : word->Name ;
+                        buffer = DBG_PrepareSourceCodeString ( word, token, sourceCode, 0, 0, 1 ) ;
                         if ( buffer && buffer[0] ) Printf ( ( byte* ) "\n%s", buffer ) ;
                         if ( fixed ) word->Name = ( byte* ) "store" ;
                         if ( _Debugger_ ) _Debugger_->LastSourceCodeWord = word ;
@@ -701,7 +702,7 @@ Get_SourceCodeWord ( )
         {
             if ( debugger && Is_DebugOn )
             {
-                if ( debugger->LastPostShowWord ) scWord = debugger->LastPostShowWord ;
+                if ( debugger->LastShowEffectsWord ) scWord = debugger->LastShowEffectsWord ;
                 else scWord = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
             }
         }

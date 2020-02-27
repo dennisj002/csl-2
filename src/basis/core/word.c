@@ -10,7 +10,9 @@ Word_Run ( Word * word )
         if ( ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) ) Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word ;
         word = _Context_->CurrentlyRunningWord ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
+        //DEBUG_SETUP ( word, 0 ) ;
         Block_Eval ( word->Definition ) ;
+        //_DEBUG_SHOW ( word, 0, 0 ) ;
         _Context_->LastRanWord = word ;
         _Context_->CurrentlyRunningWord = 0 ;
     }
@@ -127,6 +129,15 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
             if ( word->W_MorphismAttributes & BLOCK ) Printf ( ( byte* ) "\nnew Word :: %s.%s", ns->Name, word->Name ) ;
             else Printf ( ( byte* ) "\nnew DObject :: %s.%s", ns->Name, word->Name ) ;
         }
+    }
+
+    if ( Is_DbiOn && ( ( addToInNs || addToNs ) ) ) //&& word->S_ContainingNamespace ) )//&& String_Equal ("bt", word->Name) )
+    {
+        //if ( Is_DbiOn && String_Equal ("locals_0", word->Name) || String_Equal ("bt", word->Name) )
+        //if ( String_Equal ("locals_0", word->Name) || String_Equal ("bt", word->Name) )
+        _Printf ( ( byte* ) c_ad ( "\n_Word_Add : %s.%s = %lx : at %s\n" ),
+            ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "" ), word->Name, word, Context_Location ( ) ) ;
+        //Pause () ;
     }
 }
 
@@ -251,7 +262,12 @@ void
 _Word_Print ( Word * word )
 {
     _Context_->WordCount ++ ;
-    Printf ( ( byte* ) c_ud ( " %s" ), word->Name ) ;
+    if ( _O_->Dbi )
+    {
+        Printf ( ( byte* ) c_ud ( " %s" ), ( word->Name && word->Name[0] ) ? c_ud ( word->Name ) : ( byte* ) "<unnamed>" ) ;
+        Printf ( ( byte* ) c_gd ( " = %lx," ), word ) ;
+    }
+    else Printf ( ( byte* ) c_ud ( " %s" ), word->Name ) ;
 }
 
 void
