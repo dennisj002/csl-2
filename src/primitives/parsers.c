@@ -93,9 +93,9 @@ void
 CSL_Word_Name_ClassStructure_PrintData ( )
 {
     byte * token = ( byte* ) DataStack_Pop ( ) ;
-    Word * typedefWord = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+    Word * typedefWord = Finder_Word_FindUsing (_Finder_, token, 0) ;
     byte * token1 = ( byte* ) DataStack_Pop ( ) ;
-    Word * word = Finder_Word_FindUsing ( _Finder_, token1, 0 ) ;
+    Word * word = Finder_Word_FindUsing (_Finder_, token1, 0) ;
     _CSL_Word_ClassStructure_PrintData ( typedefWord, word ) ;
 }
 

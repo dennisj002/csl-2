@@ -354,7 +354,7 @@ _LO_CSL ( ListObject * lfirst )
         lc = _LC_ ;
     }
     _CSL_Namespace_NotUsing ( ( byte * ) "Lisp" ) ; // nb. don't use Lisp words when compiling csl
-    SetState ( cntx, LC_csl, true ) ;
+    SetState ( cntx, LC_CSL, true ) ;
     SetState ( compiler, LISP_MODE, false ) ;
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
@@ -401,7 +401,7 @@ _LO_CSL ( ListObject * lfirst )
             Interpreter_DoWord ( cntx->Interpreter0, word1, ldata->W_RL_Index, ldata->W_SC_Index ) ;
         }
     }
-    SetState ( cntx, LC_csl, false ) ;
+    SetState ( cntx, LC_CSL, false ) ;
     if ( lc )
     {
         _LC_ = lc ;

@@ -110,7 +110,7 @@ _Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
     }
     else if ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | THIS ) )
     {
-        if ( _Interpreter_->BaseObject ) SetHere ( _Interpreter_->BaseObject->Coding, 1 ) ;
+        if ( _Context_->BaseObject ) SetHere ( _Context_->BaseObject->Coding, 1 ) ;
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue, 0 ) ;
         Compile_Move_Rm_To_Reg ( reg, reg, 0, size ) ; // not implemented
     }
@@ -144,7 +144,7 @@ _Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
     }
     else if ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) )
     {
-        if ( _Interpreter_->BaseObject ) SetHere ( _Interpreter_->BaseObject->Coding, 1 ) ;
+        if ( _Context_->BaseObject ) SetHere ( _Context_->BaseObject->Coding, 1 ) ;
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue, 0 ) ;
         Compile_Move_Rm_To_Reg ( reg, reg, 0, size ) ; // not implemented
     }

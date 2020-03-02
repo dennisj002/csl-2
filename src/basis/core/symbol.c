@@ -90,7 +90,7 @@ Symbol_CompareName ( Symbol * symbol, byte * name )
     {
 #if 1        
         Word * word = (Word*) symbol1 ;
-        return word = Word_UnAlias ( word ) ;
+        return word ; //= Word_UnAlias ( word ) ;
 #else        
         return symbol ;
 #endif        

@@ -243,7 +243,7 @@ int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out
 //verbosity 3 =
 'cpow find wdiss
 c_syntaxOff
-2 30 C_Syntax.cpow dup p  1073741824 _assert //pause
+2 30 int.cpow dup p  1073741824 _assert //pause
 
 : sp ; //stack pause ;
 : pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ; //"II.I" typeSignature
@@ -278,7 +278,7 @@ c_syntaxOff
 Int
 "**" ffx2
 "pow_03" ffx2
-sp
+d: sp
 : sp ; 
 
 C

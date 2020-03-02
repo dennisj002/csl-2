@@ -141,7 +141,7 @@ _Compiler_GetWordStackState ( Compiler * compiler, Word * word )
                 break ;
             }
         }
-        else if ( IS_MORPHISM_TYPE ( optInfo->wordn ) && ( ! IS_NON_MORPHISM_TYPE(optInfo->wordn) ) )
+        else if ( IS_MORPHISM_TYPE ( optInfo->wordn ) ) //&& ( ! IS_NON_MORPHISM_TYPE(optInfo->wordn) ) )
         {
             if ( optInfo->wordArg2 ) optInfo->xBetweenArg1AndArg2 = optInfo->wordn ;
             else optInfo->wordArg2 = optInfo->wordn ;
@@ -530,6 +530,7 @@ Compiler_CompileOptimize_IncDec ( Compiler * compiler )
 void
 Compiler_CompileOptimizedLoad ( Compiler * compiler )
 {
+    Context * cntx = _Context_ ;
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     Word * wordArg2 ;
     //Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
@@ -544,9 +545,9 @@ Compiler_CompileOptimizedLoad ( Compiler * compiler )
             }
             else
             {
-                if ( ( optInfo->wordArg2->W_ObjectAttributes & OBJECT_FIELD ) && _Context_->Interpreter0->BaseObject )
+                if ( ( optInfo->wordArg2->W_ObjectAttributes & OBJECT_FIELD ) && cntx->BaseObject )
                 {
-                    wordArg2 = _Context_->Interpreter0->BaseObject ;
+                    wordArg2 = cntx->BaseObject ;
                     Compile_StandardArg ( wordArg2, ACC, optInfo->wordArg2_rvalue, wordArg2->Coding, true ) ;
                 }
                     //SetHere ( optInfo->wordArg2->Coding, 0 ) ;

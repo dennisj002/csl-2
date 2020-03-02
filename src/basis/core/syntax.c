@@ -261,14 +261,14 @@ CSL_IncDec ( int64 op ) // ++/--
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     int64 sd = List_Depth ( _CSL_->Compiler_N_M_Node_WordList ) ;
-    if ( ( sd > 1 ) && ( ! GetState ( cntx, LC_csl ) ) )
+    if ( ( sd > 1 ) && ( ! GetState ( cntx, LC_CSL ) ) )
     {
         Word * currentWord = _CSL_WordList ( 0 ) ;
         Word *two = 0, *one = ( Word* ) _CSL_WordList ( 1 ) ;
         if ( GetState ( _Context_, C_SYNTAX ) && ( one->W_MorphismAttributes & CATEGORY_OP )
             && ( ! ( one->W_MorphismAttributes & CATEGORY_OP_LOAD ) ) ) one = two = _CSL_WordList ( 2 ) ;
         byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
-        Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
+        Word * nextWord = Finder_Word_FindUsing (cntx->Interpreter0->Finder0, nextToken, 0) ;
         if ( nextWord && IS_MORPHISM_TYPE ( nextWord )
             && ( nextWord->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) )
         {
@@ -556,7 +556,7 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
     {
         switch ( *nc )
         {
-            case ']': case '[': return true ;
+            case ']': case '[': return false ;
             case '\n': case ',': case ';': case '(': case ')': case '\'': return false ;
             case '.':
             {

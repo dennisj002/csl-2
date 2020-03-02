@@ -41,6 +41,7 @@ int64
 Interpreter_IsDone ( Interpreter * interp, uint64 flags )
 {
     //Interpreter_SetLexState ( interp) ;
+    Interpreter_SetLexState ( interp ) ;
     return GetState ( interp, flags | INTERPRETER_DONE ) ;
 }
 

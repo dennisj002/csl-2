@@ -11,9 +11,12 @@ CSL_PreProcessor ( )
     int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( lexer ) ;
     _CSL_UnAppendFromSourceCode_NChars ( _CSL_, 1 ) ; // 1 : '#'
-    Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
+    //Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
-    Interpreter_InterpretNextToken ( interp ) ;
+    byte * token = Lexer_ReadToken ( lexer ) ;
+    Word * ppword = _Finder_FindWord_InOneNamespace ( _Finder_, Namespace_Find ( ( byte* ) "PreProcessor" ), token ) ;
+    Interpreter_DoWord ( interp, ppword, -1, -1 ) ;
+    //Interpreter_InterpretNextToken ( interp ) ;
     SetState ( interp, PREPROCESSOR_MODE, false ) ;
     if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }

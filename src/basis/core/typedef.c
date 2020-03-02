@@ -50,7 +50,7 @@ Parse_Identifier ( Context * cntx, int64 t_type )
         // with a nameless struct or union identifier are added to the background namespace
         addToNs = ( tdsci->Tdsci_StructureUnion_Namespace && tdsci->Tdsci_StructureUnion_Namespace->Name ) ?
             tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_InNamespace ;
-        tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, identifier, 0, 0, 0, tdsci->Tdsci_Offset, tdsci->Tdsci_Field_Size, addToNs, 0, 0, 0 ) ;
+        tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, identifier, 0, 0, 0, tdsci->Tdsci_Offset, tdsci->Tdsci_Field_Size, Word_UnAlias (addToNs), 0, 0, 0 ) ;
         TypeNamespace_Set ( id, tdsci->Tdsci_Field_Type_Namespace ) ;
     }
     else if ( t_type == POST_STRUCTURE_NAME ) //&& GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
@@ -534,7 +534,7 @@ Parser_Check_Do_CommentWord ( Word * word )
 Boolean
 Parser_Check_Do_Debug_Token ( byte * token )
 {
-    Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+    Word * word = Finder_Word_FindUsing (_Finder_, token, 0) ;
     return Parser_Check_Do_CommentWord ( word ) ;
 }
 

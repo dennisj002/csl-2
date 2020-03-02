@@ -115,7 +115,7 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
             token = Lexer_ReadToken ( interp->Lexer0 ) ; // skip the opening left paren
             if ( token && ( ! String_Equal ( token, "(" ) ) )
             {
-                if ( word = Finder_Word_FindUsing ( interp->Finder0, token, 1 ) )
+                if ( word = Finder_Word_FindUsing (interp->Finder0, token, 1) )
                 {
                     if ( word->W_MorphismAttributes & DEBUG_WORD ) continue ;
                     else flag = 1 ;

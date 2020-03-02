@@ -8,6 +8,7 @@ DataStack_Pop ( )
 {
     int64 value = _Dsp_ [ 0 ] ; //
     _Dsp_ -- ;
+    //CSL_TypeStack_Drop ( ) ;
     return value ;
 }
 
@@ -107,7 +108,6 @@ Set_DspReg ( uint64 * ptr )
 void
 Set_DspReg_FromDebuggerDspReg ( )
 {
-    //_Dsp_ = _Debugger_->cs_Cpu->R14d ;
     Set_DspReg ( _Debugger_->cs_Cpu->R14d ) ;
 }
 
@@ -121,8 +121,6 @@ _Set_DataStackPointers ( uint64 * ptr )
 void
 Set_DataStackPointers_FromDebuggerDspReg ( )
 {
-    //Set_DspReg_FromDebuggerDspReg ( ) ;
-    //CSL->DataStack->StackPointer = _Dsp_ ;
     _Set_DataStackPointers ( _Debugger_->cs_Cpu->R14d ) ;
 }
 
@@ -137,21 +135,6 @@ Set_DspReg_FromDataStackPointer ( )
 {
     _Dsp_ = _CSL_->DataStack->StackPointer ;
 }
-
-#if 0
-void
-Set_DataStackPointer_FromDspReg ( )
-{
-    _CSL_->Set_DataStackPointer_FromDspReg ( ) ;
-}
-
-void
-Set_DspReg_FromDataStackPointer ( )
-{
-    _Debugger_->cs_Cpu->R14d = _Dsp_ ;
-    _CSL_->Set_DspReg_FromDataStackPointer ( ) ;
-}
-#endif
 
 void
 CSL_CheckInitDataStack ( )

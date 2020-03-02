@@ -1,7 +1,7 @@
 #include "../../include/csl.h"
 
 void
-Word_Run ( Word * word )
+Word_Morphism_Run ( Word * word )
 {
     if ( word )
     {
@@ -10,9 +10,7 @@ Word_Run ( Word * word )
         if ( ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) ) Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word ;
         word = _Context_->CurrentlyRunningWord ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
-        //DEBUG_SETUP ( word, 0 ) ;
         Block_Eval ( word->Definition ) ;
-        //_DEBUG_SHOW ( word, 0, 0 ) ;
         _Context_->LastRanWord = word ;
         _Context_->CurrentlyRunningWord = 0 ;
     }
@@ -30,7 +28,10 @@ Word_Eval ( Word * word )
                 _Context_->CurrentEvalWord = word ;
                 if ( IS_MORPHISM_TYPE ( word ) ) CSL_Typecheck ( word ) ;
                 DEBUG_SETUP ( word, 0 ) ;
-                if ( ( word->W_MorphismAttributes & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
+                if ( ( word->W_MorphismAttributes & IMMEDIATE ) || ( ! CompileMode ) )
+                {
+                    Word_Morphism_Run ( word ) ;
+                }
                 else _Word_Compile ( word ) ;
                 _DEBUG_SHOW ( word, 0, 0 ) ;
                 _Context_->CurrentEvalWord = 0 ;
@@ -87,7 +88,7 @@ void
 _Word_Finish ( Word * word )
 {
     DObject_Finish ( word ) ;
-    _CSL_FinishWordDebugInfo ( word ) ;
+    //_CSL_FinishWordDebugInfo ( word ) ;
     CSL_Finish_WordSourceCode ( _CSL_, word ) ;
     CSL_TypeStackReset ( ) ;
     _CSL_->LastFinished_Word = word ;
@@ -204,26 +205,29 @@ Word_New ( byte * name )
 void
 Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
 {
-    Context * cntx = _Context_ ;
-    if ( Is_DebugModeOn ) NoticeColors ;
-    byte * name = String_ConvertToBackSlash ( word->Name ) ;
-    if ( String_Equal ( "]", name ) && cntx->Interpreter0->BaseObject )
+    if ( word )
     {
-        Printf ( ( byte* ) "\n\'%s\' = array end :: base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx => address = 0x%lx",
-            name, cntx->Interpreter0->BaseObject->Name, cntx->Interpreter0->BaseObject->W_Value, offset, totalOffset, ( ( byte* ) cntx->Interpreter0->BaseObject->W_PtrToValue ) + totalOffset ) ;
+        Context * cntx = _Context_ ;
+        if ( Is_DebugModeOn ) NoticeColors ;
+        byte * name = String_ConvertToBackSlash ( word->Name ) ;
+        if ( String_Equal ( "]", name ) && cntx->BaseObject )
+        {
+            Printf ( ( byte* ) "\n\'%s\' = array end :: base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx => address = 0x%lx",
+                name, cntx->BaseObject->Name, cntx->BaseObject->W_Value, offset, totalOffset, ( ( byte* ) cntx->BaseObject->W_PtrToValue ) + totalOffset ) ;
+        }
+        else
+        {
+            totalOffset = cntx->Compiler0->AccumulatedOptimizeOffsetPointer ? *cntx->Compiler0->AccumulatedOptimizeOffsetPointer : - 1 ;
+            Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size (in bytes) = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
+                //name, cntx->BaseObject ? cntx->BaseObject->Name : ( byte* ) "",
+                name, word->TypeNamespace ? word->TypeNamespace->Name : ( byte* ) "",
+                word->ObjectByteSize,
+                cntx->BaseObject ? String_ConvertToBackSlash ( cntx->BaseObject->Name ) : ( byte* ) "",
+                cntx->BaseObject ? cntx->BaseObject->W_Value : 0,
+                word->Offset, totalOffset, cntx->BaseObject ? ( ( ( byte* ) cntx->BaseObject->W_Value ) + totalOffset ) : ( byte* ) - 1 ) ;
+        }
+        if ( Is_DebugModeOn ) DefaultColors ;
     }
-    else
-    {
-        totalOffset = cntx->Compiler0->AccumulatedOptimizeOffsetPointer ? *cntx->Compiler0->AccumulatedOptimizeOffsetPointer : - 1 ;
-        Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size (in bytes) = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
-            //name, cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->Name : ( byte* ) "",
-            name, word->TypeNamespace ? word->TypeNamespace->Name : ( byte* ) "",
-            word->ObjectByteSize,
-            cntx->Interpreter0->BaseObject ? String_ConvertToBackSlash ( cntx->Interpreter0->BaseObject->Name ) : ( byte* ) "",
-            cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->W_Value : 0,
-            word->Offset, totalOffset, cntx->Interpreter0->BaseObject ? ( ( ( byte* ) cntx->Interpreter0->BaseObject->W_Value ) + totalOffset ) : ( byte* ) - 1 ) ;
-    }
-    if ( Is_DebugModeOn ) DefaultColors ;
 }
 
 byte *
@@ -325,7 +329,9 @@ Word_ShowSourceCode ( Word * word )
 Word *
 Word_GetFromCodeAddress ( byte * address )
 {
-    return Finder_FindWordFromAddress_AnyNamespace ( _Context_->Finder0, address ) ;
+    Word * word = 0 ;
+    if ( _Context_->Finder0 ) word = Finder_FindWordFromAddress_AnyNamespace ( _Context_->Finder0, address ) ;
+    return word ;
 }
 
 Word *
@@ -337,7 +343,7 @@ Word_GetFromCodeAddress_NoAlias ( byte * address )
 void
 _CSL_WordName_Run ( byte * name )
 {
-    Block_Eval ( Finder_Word_FindUsing ( _Context_->Finder0, name, 0 )->Definition ) ;
+    Block_Eval ( Finder_Word_FindUsing (_Context_->Finder0, name, 0)->Definition ) ;
 }
 
 #if 1

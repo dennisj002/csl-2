@@ -52,7 +52,7 @@ void
 Namespace_Do_Namespace ( Namespace * ns, Boolean isForwardDotted )
 {
     Context * cntx = _Context_ ;
-    if ( isForwardDotted ) Compiler_Save_Qid_BackgroundNamespace ( cntx->Compiler0 ) ;
+    //if ( isForwardDotted ) Compiler_Save_Qid_BackgroundNamespace ( cntx->Compiler0 ) ;
     if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX | LISP_MODE ) ) _Namespace_Do_Namespace ( ns ) ;
     else if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
     {
@@ -61,16 +61,33 @@ Namespace_Do_Namespace ( Namespace * ns, Boolean isForwardDotted )
 }
 
 void
+Context_ClearQidInNamespace ( )
+{
+    _Context_->QidInNamespace = 0 ;
+}
+
+void
+_Context_SetAsQidInNamespace ( Namespace * ns )
+{
+    _Context_->QidInNamespace = ns ;
+}
+
+void
 _CSL_SetAsInNamespace ( Namespace * ns )
 {
     _CSL_->InNamespace = ns ;
 }
 
-void
-_Namespace_AddToNamespacesHead_SetAsInNamespace ( Namespace * ns )
+Namespace *
+_CSL_Namespace_QidInNamespaceSet ( Namespace * ns )
 {
-    _Namespace_AddToNamespacesHead ( ns ) ;
-    _CSL_SetAsInNamespace ( ns ) ;
+    if ( ns )
+    {
+        //_Namespace_SetState ( ns, USING ) ;
+        //_Namespace_AddToNamespacesHead ( ns ) ;
+        _Context_SetAsQidInNamespace ( ns ) ;
+    }
+    return ns ;
 }
 
 Namespace *
@@ -79,7 +96,8 @@ _CSL_Namespace_InNamespaceSet ( Namespace * ns )
     if ( ns )
     {
         _Namespace_SetState ( ns, USING ) ;
-        _Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ;
+        _Namespace_AddToNamespacesHead ( ns ) ;
+        _CSL_SetAsInNamespace ( ns ) ;
     }
     return ns ;
 }
@@ -95,11 +113,11 @@ CSL_Namespace_InNamespaceSet ( byte * name )
 Namespace *
 _CSL_Namespace_InNamespaceGet ( )
 {
-    if ( _CSL_->Namespaces && ( ! _CSL_->InNamespace ) )
+    //if ( _CSL_->Namespaces && ( ! _CSL_->InNamespace ) )
     {
         _CSL_Namespace_InNamespaceSet ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) _Tree_Map_FromANode ( ( dlnode* ) CSL->Namespaces, ( cMapFunction_1 ) _Namespace_IsUsing ) ;
     }
-    return _CSL_->InNamespace ;
+    return Word_UnAlias ( _CSL_->InNamespace ) ;
 }
 
 Namespace *
@@ -123,8 +141,12 @@ _Namespace_Do_Namespace ( Namespace * ns )
 {
     Context * cntx = _Context_ ;
     if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ; //Namespace_SetState ( ns, USING ) ; //
-    else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
-    if ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) ) cntx->Interpreter0->BaseObject = 0 ;
+    else
+    {
+        Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
+        _CSL_Namespace_QidInNamespaceSet ( ns ) ;
+    }
+    if ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) ) cntx->BaseObject = 0 ;
 }
 
 void
@@ -205,7 +227,9 @@ Namespace_SetState_AdjustListPosition ( Namespace * ns, uint64 state, Boolean se
             if ( setInNsFlag ) _CSL_SetAsInNamespace ( ns ) ;
         }
         else _Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
-        d0 ( if ( Is_DebugModeOn ) { Namespaces_PrintList ( ns, "After" ) ; CSL_Using ( ) ; } ) ;
+        d0 ( if ( Is_DebugModeOn )
+        {
+            Namespaces_PrintList ( ns, "After" ) ; CSL_Using ( ) ; } ) ;
     }
 }
 
@@ -243,11 +267,13 @@ _Namespace_ActivateAsPrimary ( Namespace * ns )
 {
     if ( ns )
     {
-        ns = Word_UnAlias ( ns ) ;
+        Context * cntx = _Context_ ;
+        //ns = Word_UnAlias ( ns ) ;
         Finder_SetQualifyingNamespace ( _Context_->Finder0, ns ) ;
+        //_CSL_Namespace_QidInNamespaceSet ( ns )
         _Namespace_AddToUsingList ( ns ) ;
         _CSL_SetAsInNamespace ( ns ) ;
-        _Context_->Interpreter0->BaseObject = 0 ;
+        cntx->BaseObject = 0 ;
     }
 }
 
@@ -297,7 +323,6 @@ Namespace_SetAsNotUsing ( byte * name )
 void
 _Namespace_SetAsNotUsing_MoveToTail ( Namespace * ns )
 {
-    //_Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
     _Namespace_SetAsNotUsing ( ns ) ;
     _Namespace_AddToNamespacesTail ( ns ) ;
 }
@@ -377,19 +402,6 @@ Namespace_Clear ( byte * name )
     _Namespace_Clear ( _Namespace_Find ( name, 0, 0 ) ) ;
 }
 
-void
-_Namespace_RemoveFromUsingListAndClear ( Namespace * ns )
-{
-    if ( ns )
-    {
-        if ( ns == _CSL_->InNamespace ) _CSL_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _O_->CSL->Namespaces->Lo_List ) ;
-        if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
-        _Namespace_Clear ( ns ) ;
-        dlnode_Remove ( ( dlnode* ) ns ) ;
-        Word_Recycle ( ns ) ;
-    }
-}
-
 int64
 _Namespace_VariableValueGet ( Namespace * ns, byte * name )
 {
@@ -412,7 +424,15 @@ _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
-    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, containingNs, 0, 0, - 1 ) ;
+    Namespace * ns ;
+    //if ( String_Equal ( "bt", name ) )
+    //    Printf ( ( byte * ) "Namespace_New : bt" ) ;
+    ns = _Namespace_Find ( name, containingNs, 0 ) ;
+    if ( ! ns )
+    {
+        ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, containingNs, 0, 0, - 1 ) ;
+        //_Namespace_Symbol_Print ( ns, 2, 0 ) ;
+    }
     return ns ;
 }
 
@@ -426,7 +446,7 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
         Word * word = 0 ;
         if ( superNamespace ) word = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
         if ( ! word ) word = Finder_FindWord_UsedNamespaces ( _Finder_, name ) ;
-        if ( word && Is_NamespaceType ( word ) ) return ( Namespace* ) Word_UnAlias ( word ) ;
+        if ( word && Is_NamespaceType ( word ) ) return word ; //( Namespace* ) Word_UnAlias ( word ) ;
         else if ( exceptionFlag )
         {
             Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
@@ -449,6 +469,7 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 {
     if ( ! containingNs ) containingNs = _CSL_->Namespaces ;
     Namespace * ns = _Finder_FindWord_InOneNamespace ( _Finder_, containingNs, name ) ; //_Namespace_Find ( name, containingNs, 0 ) ;
+    //if ( ! ns ) ns = _Namespace_Find ( name, containingNs, 0 ) ;
     if ( ! ns ) ns = Namespace_New ( name, containingNs ) ;
     if ( setUsingFlag ) Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
     return ns ;
@@ -463,14 +484,14 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
     int64 d = Stack_Depth ( compiler->BlockStack ) ;
     byte bufferData [ 32 ], *name = ( byte* ) bufferData ;
     snprintf ( ( char* ) name, 32, "locals_%ld", d - 1 ) ; // 1 : BlockStack starts at 1 
-    ns = _Namespace_Find ( name, _CSL_->Namespaces, 0 ) ;
-    if ( ! ns )
+    //ns = _Namespace_Find ( name, _CSL_->Namespaces, 0 ) ;
+    //if ( ! ns )
     {
         ns = Namespace_New ( name, _CSL_->Namespaces ) ;
         if ( CompileMode ) Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
         else compiler->NonCompilingNs = ns ;
     }
-    Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
+    //Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
     return ns ;
 }
@@ -503,8 +524,8 @@ _Namespace_PrintWords ( Namespace * ns )
 void
 _Namespace_PrintWordList_FromNode ( Word * word )
 {
-    CSL_NewLine () ;
-    dllist_Map1_FromNode ( (dlnode *) word, ( MapFunction1 ) _Word_Print, 0 ) ;
+    CSL_NewLine ( ) ;
+    dllist_Map1_FromNode ( ( dlnode * ) word, ( MapFunction1 ) _Word_Print, 0 ) ;
 }
 
 void
@@ -534,13 +555,47 @@ CSL_SetInNamespaceFromBackground ( )
     else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
 
-
 void
-CSL_Namespace_PrintWordList ()
+CSL_Namespace_PrintWordList ( )
 {
     byte * name = ( byte * ) DataStack_Pop ( ) ;
-    CSL_NewLine () ;
-    Namespace_PrintWords ( name );
+    CSL_NewLine ( ) ;
+    Namespace_PrintWords ( name ) ;
+}
+
+void
+_Namespace_RemoveFromUsingList_ClearFlag ( Namespace * ns, int64 clearFlag )
+{
+    if ( ns )
+    {
+        if ( ns == _CSL_->InNamespace ) _CSL_->InNamespace = 0 ;
+        if ( _Finder_ && ( ns == _Finder_->QualifyingNamespace ) ) Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
+        //if ( _O_->Dbi ) _Namespace_PrintWordList_FromNode ( ns ) ;
+        dlnode_Remove ( ( dlnode* ) ns ) ;
+        if ( clearFlag )
+        {
+            _Namespace_Clear ( ns ) ;
+            Word_Recycle ( ns ) ;
+        }
+        else _Namespace_SetState ( ns, NOT_USING ) ;
+        //if ( _O_->Dbi ) _Namespace_PrintWordList_FromNode ( ns ) ;
+    }
+}
+
+void
+Namespace_RemoveNamespacesStack_ClearFlag ( Stack * stack, int64 clearFlag )
+{
+    if ( stack )
+    {
+        int64 n = Stack_Depth ( stack ) ;
+        while ( n > 0 )
+        {
+            Namespace * ns = ( Namespace* ) _Stack_Pop ( stack ) ;
+            _Namespace_RemoveFromUsingList_ClearFlag ( ns, clearFlag ) ;
+            n -- ;
+        }
+        Stack_Init ( stack ) ;
+    }
 }
 
 

@@ -132,10 +132,10 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
-    Word * baseObject = interp->BaseObject ;
+    //Word * baseObject = cntx->BaseObject ;
     Compiler *compiler = cntx->Compiler0 ;
     Word * word ;
-    int64 arrayIndex, increment ;
+    //int64 arrayIndex, increment ;
     if ( tokenWord )
     {
         word = tokenWord ;
@@ -143,7 +143,7 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
     }
     else
     {
-        word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
+        word = Finder_Word_FindUsing (cntx->Finder0, token, 0) ;
         if ( word )
         {
             word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
@@ -158,12 +158,13 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
         return 0 ;
     }
     else if ( token [0] == ']' ) // ']' == an "array end"
+#if 0        
     {
         int64 dimNumber = compiler->ArrayEnds ; // dimNumber is used as an array index so it is also zero base indexed
         int64 dimSize = CalculateArrayDimensionSize ( arrayBaseObject, dimNumber ) ; // dimNumber is used as an array index so it is also zero base indexed
         compiler->ArrayEnds ++ ; // after, because arrayBaseObject->ArrayDimensions is a zero based array
 
-        Debugger_PreSetup (_Debugger_, word, 0, 0, 0 , 0) ;
+        Debugger_PreSetup ( _Debugger_, word, 0, 0, 0, 0 ) ;
         if ( CompileMode && * variableFlag ) Compile_ArrayDimensionOffset ( _Context_CurrentWord ( cntx ), dimSize, objSize ) ;
         else
         {
@@ -173,19 +174,23 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
             // D0, D1, D2, ... Dn : d0, d1, d2 ... dn => dn*(1*D(n-1)*D1*D2*..D(n-1)) 
             arrayIndex = DataStack_Pop ( ) ;
             if ( arrayIndex >= arrayBaseObject->ArrayDimensions [ dimNumber ] ) Error ( "Array index out of bounds.", ABORT ) ;
-            increment = arrayIndex * dimSize * objSize ; 
+            increment = arrayIndex * dimSize * objSize ;
             Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
-            if ( ! CompileMode ) Array_Do_AccumulatedAddress ( baseObject->AccumulatedOffset ) ; 
+            if ( ! CompileMode ) Array_Do_AccumulatedAddress ( baseObject->AccumulatedOffset ) ;
         }
         if ( Is_DebugModeOn && baseObject ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
         CSL_TypeStack_Pop ( ) ; // pop the index ; we want the object field type 
         if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) )
         {
+            Compiler_SetAs_InNamespace_Qid_BackgroundNamespace ( cntx->Compiler0 ) ;
             SetState ( compiler, ARRAY_MODE, false ) ;
             return 1 ; // breaks the calling function
-        } 
+        }
         return 0 ;
     }
+#else
+    return _CSL_ArrayEnd ( word, arrayBaseObject, objSize, variableFlag ) ;
+#endif    
     if ( *variableFlag ) Set_CompileMode ( true ) ;
     else Set_CompileMode ( false ) ;
     if ( word ) Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
@@ -215,7 +220,7 @@ _CSL_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
     Compiler *compiler = cntx->Compiler0 ;
     Interpreter * interp = cntx->Interpreter0 ;
     Lexer * lexer = cntx->Lexer0 ;
-    Word * baseObject = interp->BaseObject, *l1, * arrayBaseObject ;
+    Word * baseObject = cntx->BaseObject, *l1, * arrayBaseObject ;
     Boolean saveCompileMode = GetState ( compiler, COMPILE_MODE ), svOpState = GetState ( _CSL_, OPTIMIZE_ON ) ;
     int64 objSize = 0 ;
     Boolean variableFlag = 0 ;
@@ -236,7 +241,7 @@ _CSL_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
         CSL_OptimizeOn ( ) ; // internal to arrays optimize must be on
 
         if ( ! arrayBaseObject->ArrayDimensions ) CSL_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
-        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectByteSize ; 
+        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectByteSize ;
         if ( ! objSize ) CSL_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         if ( lispMode ) Arrays_DoArrayArgs_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
@@ -248,21 +253,21 @@ _CSL_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
             {
                 CSL_OptimizeOn ( ) ;
                 SetHere ( baseObject->Coding, 1 ) ;
-                Debugger_Set_StartHere ( _Debugger_ ) ;// for Debugger_DisassembleAccumulated
+                Debugger_Set_StartHere ( _Debugger_ ) ; // for Debugger_DisassembleAccumulated
                 _Debugger_->EntryWord = baseObject ; // for Debugger_DisassembleAccumulated
-                _Compile_GetVarLitObj_LValue_To_Reg (baseObject, ACC , 0) ;
+                _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC, 0 ) ;
                 if ( lispMode )
                 {
-                    Compile_Move_Reg_To_Reg (RegParameterOrder ( (*i) ++ ), ACC , 0) ;
+                    Compile_Move_Reg_To_Reg ( RegParameterOrder ( ( *i ) ++ ), ACC, 0 ) ;
                     _Debugger_->PreHere = baseObject->Coding ;
                 }
-                else _Word_CompileAndRecord_PushReg (baseObject, ACC , true) ;
+                else _Word_CompileAndRecord_PushReg ( baseObject, ACC, true ) ;
             }
             else _CSL_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
             _DEBUG_SHOW ( baseObject, 1, 0 ) ;
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         }
-        if ( lispMode ) interp->BaseObject = 0 ;
+        if ( lispMode ) cntx->BaseObject = 0 ;
         else
         {
             if ( ! variableFlag )
@@ -281,6 +286,45 @@ void
 CSL_ArrayBegin ( )
 {
     _CSL_ArrayBegin ( 0, 0, 0 ) ;
+}
+
+int64
+_CSL_ArrayEnd ( Word * word, Word * arrayBaseObject, int64 objSize, Boolean *variableFlag )
+{
+    Context * cntx = _Context_ ;
+    Interpreter * interp = cntx->Interpreter0 ;
+    Word * baseObject = cntx->BaseObject ;
+    Compiler *compiler = cntx->Compiler0 ;
+    int64 arrayIndex, increment ;
+    
+    int64 dimNumber = compiler->ArrayEnds ; // dimNumber is used as an array index so it is also zero base indexed
+    int64 dimSize = CalculateArrayDimensionSize ( arrayBaseObject, dimNumber ) ; // dimNumber is used as an array index so it is also zero base indexed
+    compiler->ArrayEnds ++ ; // after, because arrayBaseObject->ArrayDimensions is a zero based array
+
+    Debugger_PreSetup ( _Debugger_, word, 0, 0, 0, 0 ) ;
+    if ( CompileMode && * variableFlag ) Compile_ArrayDimensionOffset ( _Context_CurrentWord ( cntx ), dimSize, objSize ) ;
+    else
+    {
+        // big endian arrays where first, left to right variable refers to
+        // the largest Dimension, etc. So offset from array pointer is (for a four dimensional array) : d4*(D3*D2*D1) + d3*(D2*D1) d2*(D1) + d1 
+        // where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes
+        // D0, D1, D2, ... Dn : d0, d1, d2 ... dn => dn*(1*D(n-1)*D1*D2*..D(n-1)) 
+        arrayIndex = DataStack_Pop ( ) ;
+        if ( arrayIndex >= arrayBaseObject->ArrayDimensions [ dimNumber ] ) Error ( "Array index out of bounds.", ABORT ) ;
+        increment = arrayIndex * dimSize * objSize ;
+        Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
+        if ( ! CompileMode ) Array_Do_AccumulatedAddress ( baseObject->AccumulatedOffset ) ;
+    }
+    if ( Is_DebugModeOn && baseObject ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
+    CSL_TypeStack_Pop ( ) ; // pop the index ; we want the object field type 
+    if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) )
+    {
+        //int64 isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, cntx->Lexer0->TokenEnd_ReadLineIndex ) ; //word->W_RL_Index ) ;
+        //if ( ! isForwardDotted ) Compiler_SetAs_InNamespace_Qid_BackgroundNamespace ( cntx->Compiler0 ) ;
+        SetState ( compiler, ARRAY_MODE, false ) ;
+        return 1 ; // breaks the calling function
+    }
+    return 0 ;
 }
 
 void

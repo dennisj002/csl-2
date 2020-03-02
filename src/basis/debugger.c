@@ -369,7 +369,7 @@ Debugger_Print_LispDefinesNamespace ( Debugger * debugger )
 void
 Debugger_FindUsing ( Debugger * debugger )
 {
-    if ( debugger->Token ) debugger->w_Word = Finder_Word_FindUsing ( _Context_->Finder0, debugger->Token, 0 ) ;
+    if ( debugger->Token ) debugger->w_Word = Finder_Word_FindUsing (_Context_->Finder0, debugger->Token, 0) ;
 }
 
 void
@@ -729,7 +729,7 @@ void
 Debugger_Wdiss ( Debugger * debugger )
 {
     DataStack_Push ( ( int64 ) debugger->w_Word ) ;
-    Word * word = Finder_Word_FindUsing ( _Finder_, "wdiss", 0 ) ;
+    Word * word = Finder_Word_FindUsing (_Finder_, "wdiss", 0) ;
     Block_Eval ( word->Definition ) ;
 }
 

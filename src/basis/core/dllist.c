@@ -599,21 +599,6 @@ _dllist_Set_N_Node_M_Slot ( dllist * list, int64 n, int64 m, int64 value )
     if ( node ) dobject_Set_M_Slot ( ( dobject* ) node, m, value ) ;
 }
 
-#if 0
-
-int64
-_dllist_GetTopValue ( dllist * list )
-{
-    _dllist_Get_N_Node_M_Slot ( list, 0, 0 ) ;
-}
-
-int64
-_dllist_SetTopValue ( dllist * list, int64 value )
-{
-    _dllist_Set_N_Node_M_Slot ( list, 0, 0, value ) ;
-}
-#endif
-
 void
 _dllist_MapNodes_UntilWord ( dlnode *first, VMapNodeFunction mf, Word * word )
 {
@@ -715,13 +700,13 @@ void
 dllist_Map1_FromNode ( dlnode * node0, MapFunction1 mf, int64 one )
 {
     dlnode *node, *nextNode, *previousNode ;
-    CSL_NewLine () ;
+    CSL_NewLine ( ) ;
     for ( node = node0 ; node ; node = nextNode )
     {
         nextNode = dlnode_Next ( node ) ;
         mf ( node, one ) ;
     }
-    CSL_NewLine () ;
+    CSL_NewLine ( ) ;
     for ( node = node0 ; node ; node = previousNode )
     {
         previousNode = dlnode_Previous ( node ) ;
@@ -761,6 +746,22 @@ dllist_Map2 ( dllist * list, MapFunction2 mf, int64 one, int64 two )
     {
         nextNode = dlnode_Next ( node ) ;
         mf ( node, one, two ) ;
+    }
+}
+
+void
+dllist_State_Map2 ( dllist * list, int64 state, VMapSymbol2 mf, int64 one, int64 two )
+{
+    dlnode * node, *nextNode ;
+    Word * word ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ;
+        word = ( Word * ) node ;
+        if ( word->State & state )
+        {
+            mf ( word, one, two ) ;
+        }
     }
 }
 

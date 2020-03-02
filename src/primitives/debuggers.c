@@ -24,6 +24,7 @@ CSL_Debugger_Locals_Show ( )
 void
 _CSL_DebugInfo ( )
 {
+    _Debugger_->w_Word = _Context_->CurrentlyRunningWord ;
     Debugger_ShowInfo ( _Debugger_, ( byte* ) "\ninfo", 0 ) ;
 }
 
@@ -51,7 +52,7 @@ CSL_DebugOn ( )
     }
 #if 0  // no : because it makes debugger ineffective for words that aren't on the using list
     byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0, 0 ) ;
-    debugger->EntryWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
+    debugger->EntryWord = Finder_Word_FindUsing (cntx->Interpreter0->Finder0, nextToken, 0) ;
     _Context_->SourceCodeWord = debugger->EntryWord ;
 #endif     
 }

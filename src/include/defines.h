@@ -565,6 +565,8 @@
 #define INTERPRETER_DBG_ACTIVE ( (uint64) 1 << 29 )
 #define INTERPRETER_QID ( (uint64) 1 << 30 )
 #define PREPROCESSOR_MODE ( (uint64) 1 << 31 )
+//#define IS_FORWARD_DOTTED ( (uint64) 1 << 32 )
+//#define IS_REVERSE_DOTTED ( (uint64) 1 << 33 )
 //#define PREPROCESSOR_IF_TRUE ( (uint64) 1 << 31 )
 
 // lexer flags
@@ -633,6 +635,7 @@
 #define ASM_MODE ( (uint64) 1 << 34 )
 #define TDSCI_PARSING ( (uint64) 1 << 35 )
 #define C_BLOCK_INTERPRETER ( (uint64) 1 << 36 )
+#define DOING_C_TYPE_DECLARATION ( (uint64) 1 << 37 )
 
 // Context flags
 #define C_SYNTAX ( (uint64) 1 << 20 )
@@ -644,7 +647,9 @@
 #define ADDRESS_OF_MODE ( (uint64) 1 << 27 ) 
 #define AT_COMMAND_LINE ( (uint64) 1 << 28 ) 
 #define LC_INTERPRET     ( (uint64) 1 << 29 ) 
-#define LC_csl ( (uint64) 1 << 30 )
+#define LC_CSL ( (uint64) 1 << 30 )
+#define IS_FORWARD_DOTTED ( (uint64) 1 << 31 )
+#define IS_REVERSE_DOTTED ( (uint64) 1 << 32 )
 
 #define NON_INLINABLE ( (uint64) 1 << 0 )
 #define DONE true
@@ -680,7 +685,7 @@
 // Lisp State flags 
 #define LC_PRINT_VALUE          ( (uint64) 1 << 0 )
 #define LC_DEFINE_MODE          ( (uint64) 1 << 1 )
-//#define LC_csl_MODE          ( (uint64) 1 << 2 )
+//#define LC_CSL_MODE          ( (uint64) 1 << 2 )
 #define LC_INTERP_DONE          ( (uint64) 1 << 3 )
 #define LC_REPL                 ( (uint64) 1 << 4 )
 #define LC_LAMBDA_MODE          ( (uint64) 1 << 5 )

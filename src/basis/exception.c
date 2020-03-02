@@ -43,7 +43,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     }
     //OVT_SetExceptionMessage ( _O_ ) ;
     Word * eword = _Context_->CurrentEvalWord ;
-    snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUF_IX_SIZE, "\n%s\n%s %s from %s : evalWord = %s.%s -> ...", _O_->ExceptionMessage,
+    snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUF_IX_SIZE, "\n%s\n%s %s from %s : the current evalWord is %s.%s -> ...", _O_->ExceptionMessage,
         ( jb == & _CSL_->JmpBuf0 ) ? "reseting csl" : "restarting OpenVmTil",
         ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ),
         ( eword ? ( eword->S_ContainingNamespace ? eword->S_ContainingNamespace->Name : ( byte* ) "" ) : ( byte* ) "" ), ( eword ? eword->Name : ( byte* ) "" ) ) ;
@@ -554,7 +554,7 @@ _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
 {
     byte * msg = ovt->ThrowBuffer->Data ;
     byte key, * instr = ".: (p)ause, e(x)it, <key> restart" ;
-    printf ( "%s\n%s : (SIGSEGVs == %ld)", msg, instr, ovt->SigSegvs ) ;
+    printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, Context_Location ( ), ovt->SigSegvs ) ;
     fflush ( stdout ) ;
     {
         key = Key ( ) ;
@@ -580,11 +580,11 @@ void
 OVT_Assert ( Boolean testBoolean, byte * msg )
 {
     d1
-    (
+        (
     if ( ! ( testBoolean ) )
     {
-        Printf ( ( byte* ) "\nAssert failed : %s : at %s", msg ? msg : (byte*) "", _Context_Location ( _Context_ ) ) ;
-        _Throw ( QUIT ) ;
+        Printf ( ( byte* ) "\nAssert failed : %s : at %s", msg ? msg : ( byte* ) "", _Context_Location ( _Context_ ) ) ;
+            _Throw ( QUIT ) ;
     }
     ) ;
 }

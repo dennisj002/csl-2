@@ -78,6 +78,12 @@ Finder_SetQualifyingNamespace ( Finder * finder, Namespace * ns )
 }
 
 void
+Finder_ClearQualifyingNamespace ( Finder * finder )
+{
+    finder->QualifyingNamespace = 0 ;
+}
+
+void
 Finder_SetNamedQualifyingNamespace ( Finder * finder, byte * name )
 {
     finder->QualifyingNamespace = Namespace_Find ( name ) ;
@@ -111,52 +117,51 @@ Finder_QID_Find ( Finder * finder, byte * token ) //, int64 flag, int64 saveQns 
     Word * word = 0 ;
     if ( token )
     {
-        if ( ! ( word = ( Word* ) _CSL_ParseQid_Token ( token ) ) ) word = Finder_Word_FindUsing ( finder, token, 0 ) ;
+        if ( ! ( word = ( Word* ) _CSL_ParseQid_Token ( token ) ) ) word = Finder_Word_FindUsing ( finder, token, 1 ) ;
         CSL_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
     }
     return word ;
 }
 
 Word *
-Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
+Finder_Word_Find ( Finder * finder, byte * name, int64 flag, Boolean saveQns )
 {
     Word * rword = 0 ;
     if ( name )
     {
-#if 1        
+        // needed for parsing C functions type declarations within a block
         // the InNamespace takes precedence with this one exception but is this the best logic ??               
         if ( finder->QualifyingNamespace )
         {
             if ( String_Equal ( ".", ( char* ) name ) ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
             else
             {
-                rword = _Finder_FindWord_InOneNamespace ( _Finder_, finder->QualifyingNamespace, name ) ;
+                rword = _Finder_FindWord_InOneNamespace ( _Finder_, Word_UnAlias ( finder->QualifyingNamespace ), name ) ;
                 if ( rword && ( rword->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( finder, rword ) ;
-                else if ( ( ! saveQns ) && ( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) )
-                {
-                    Finder_SetQualifyingNamespace ( finder, 0 ) ; // nb. QualifyingNamespace is only good for one find unless we are in a quid
-                }
+                else if ( ( ! saveQns ) &&( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) ) 
+                    Finder_ClearQualifyingNamespace ( finder ) ; // nb. QualifyingNamespace is only good for one find unless we are in a quid
             }
         }
-        else
-#endif        
-            rword = _Finder_FindWord_InOneNamespace ( finder, _CSL_->InNamespace, name ) ;
+        if ( ( ! rword ) && _Context_->QidInNamespace ) rword = _Finder_FindWord_InOneNamespace ( finder, Word_UnAlias ( _Context_->QidInNamespace ), name ) ;
+        if ( ( ! rword ) && _CSL_->InNamespace ) rword = _Finder_FindWord_InOneNamespace ( finder, Word_UnAlias ( _CSL_->InNamespace ), name ) ;
         if ( ! rword ) rword = _Finder_Word_Find ( finder, flag, name ) ;
     }
     return rword ;
 }
 
 Word *
-Finder_Word_FindUsing ( Finder * finder, byte * name, int64 saveQns )
+Finder_Word_FindUsing ( Finder * finder, byte * name, Boolean saveQns )
 {
     return Finder_Word_Find ( finder, name, USING, saveQns ) ;
 }
 
 Word *
-Finder_Word_FindAny ( Finder * finder, byte * name, int64 saveQns )
+Finder_Word_FindAny ( Finder * finder, byte * name, Boolean saveQns )
 {
     return Finder_Word_Find ( finder, name, ANY, saveQns ) ;
 }
+
+#if 0
 
 Word *
 Finder_FindQualifiedIDWord ( Finder * finder, byte * token )
@@ -184,11 +189,11 @@ Finder_FindQualifiedIDWord ( Finder * finder, byte * token )
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ; // the namespace
             continue ;
         }
-
         else return word ;
     }
     return 0 ;
 }
+#endif
 
 byte *
 Finder_GetTokenDefinitionAddress ( Finder * finder, byte * token )
@@ -266,9 +271,9 @@ CSL_Postfix_Find_Any ( )
 }
 
 void
-CSL_UnsetQualifyingNamespace ( )
+Context_ClearQualifyingNamespace ( )
 {
-    Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
+    Finder_ClearQualifyingNamespace ( _Context_->Finder0 ) ;
 }
 
 void

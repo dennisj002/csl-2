@@ -6,11 +6,12 @@ C
 Int
 : mt 6 ++  ; mt 7 _assert drop
 sp
-: mt1 8 -- 7 _assert drop ; mt1 
+: mt1 8 -- ; mt1 7 _assert drop 
 sp
 : mta 1 5 + ++ ; mta 7 _assert
 : mt1a 9 1 - --  ; mt1a 7 _assert
-: mt2 ( n ) ++ n @ 7 _assert ; 6 mt2 
+: mt2 ( n | -- TOS ) ++ n @ ; 6 mt2 7 _assert 
+sp
 : mt3 ( n ) n @ ++ n @ 7 _assert ; 6 mt3 
 : mt4 ( n ) n @ ++ n @ 7 _assert ; 6 mt4 
 sp

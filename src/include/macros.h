@@ -194,7 +194,7 @@
 #define _AppendCharacterToTokenBuffer( lex, character ) lexer->TokenBuffer [ lex->TokenWriteIndex ] = character
 
 
-#define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE | OBJECT | STRUCT )
+#define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE | STRUCT )
 #define NAMESPACE_RELATED_TYPE ( NAMESPACE_TYPE | OBJECT_FIELD )
 #define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL | THIS ) // | T_LISP_SYMBOL
 #define VARIABLE_TYPE ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | OBJECT_FIELD | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL )
@@ -242,7 +242,7 @@
 #define DBI_ON DEBUG_ASM_SHOW_ON
 #define DBI_OFF DEBUG_ASM_SHOW_OFF
 #define DBI ( Is_DebugOn & _DBI )
-#define Is_DebugOn_DBI ( Is_DebugOn ? DBI : 0 )
+#define Is_DebugOn_DBI ( Is_DebugOn ? DBI_ON : 0 )
 #define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _O_->Verbosity > n ) )
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber
 

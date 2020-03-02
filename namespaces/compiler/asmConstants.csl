@@ -34,6 +34,7 @@ decimal
 "DSP" R14D const 
 "FP" R15D const 
 'ACC RAX const
+'THRU_REG R9D const                     // r9
 
 // ttt codes
 "BELOW" 1 const 

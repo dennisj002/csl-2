@@ -46,7 +46,7 @@ Word *
 Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
-    Word * word = DataObject_New (CSL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
+    Word * word = DataObject_New ( CSL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
     word->W_TypeAttributes |= WT_C_PREFIX_RTL_ARGS ;
     return word ;
 }
@@ -182,6 +182,7 @@ Convert_RestartCondtion ( int64 restartCondition )
 void
 _CSL_SystemState_Print ( int64 pflag )
 {
+    Finder * finder = _Finder_ ;
     byte * buf = Buffer_Data ( _CSL_->ScratchB1 ) ;
     buf = _CSL_GetSystemState_String0 ( buf ) ;
     Printf ( ( byte* ) buf ) ;
@@ -195,6 +196,10 @@ _CSL_SystemState_Print ( int64 pflag )
     Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
     Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
     OVT_ExceptionState_Print ( ) ;
+    Printf ( ( byte* ) "\nInNamespace = %s.%s", _CSL_Namespace_InNamespaceGet ( )->S_ContainingNamespace->Name, _CSL_Namespace_InNamespaceGet ( )->Name ) ;
+    if ( finder->QualifyingNamespace ) Printf ( ( byte* ) "\nQualifyingNamespace = %s.%s",
+        finder->QualifyingNamespace->S_ContainingNamespace ? finder->QualifyingNamespace->S_ContainingNamespace->Name : ( byte* ) "", 
+        finder->QualifyingNamespace->Name ) ;
     if ( pflag || ( _O_->Verbosity > 1 ) )
     {
         OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
@@ -242,7 +247,7 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
         }
         if ( word->W_ObjectAttributes & STRUCTURE )
         {
-            Printf ( ( byte* ) "%s <:> %s : size = %d", name, "structure",  word->ObjectByteSize ) ;
+            Printf ( ( byte* ) "%s <:> %s : size = %d", name, "structure", word->ObjectByteSize ) ;
         }
         else if ( word->W_ObjectAttributes & NAMESPACE )
         {
@@ -302,7 +307,7 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
         if ( word->W_WordData )
         {
             _Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
-            if ( aword && ( aword != Word_UnAlias ( aword ) ) ) 
+            if ( aword && ( aword != Word_UnAlias ( aword ) ) )
             {
                 _Word_ShowSourceCode ( aword ) ;
             }

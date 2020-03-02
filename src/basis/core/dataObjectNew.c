@@ -155,7 +155,7 @@ _Class_Object_Init ( Word * word, Namespace * ins )
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     word->TypeNamespace = ins ;
-    if ( ins->W_ObjectAttributes & STRUCT ) word->W_ObjectAttributes |= STRUCT ;
+    //if ( ins->W_ObjectAttributes & STRUCT ) word->W_ObjectAttributes |= STRUCT ;
 }
 
 // class object new
@@ -166,7 +166,8 @@ _Class_Object_New ( byte * name, uint64 category )
     int64 size ;
     byte * object ;
     Word * word ;
-    Namespace * ns = Word_UnAlias ( _CSL_Namespace_InNamespaceGet ( ) ) ;
+    //Namespace * ns = Word_UnAlias ( _CSL_Namespace_InNamespaceGet ( ) ) ;
+    Namespace * ns = _CSL_Namespace_InNamespaceGet ( ) ;
     size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
     word = _CSL_ObjectNew ( size, name, (category|OBJECT), CompileMode ? DICTIONARY : OBJECT_MEM ) ;
     object = ( byte* ) word->W_Value ;
@@ -192,14 +193,14 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
         Word *ws = _CSL_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CSL_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
-        wt->W_ObjectAttributes |= (THIS | OBJECT)  ;
+        wt->W_ObjectAttributes |= (THIS)  ;
         token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
         if ( ( token[0] == '{' ) || ( token[1] == '{' ) || ( token[2] == '{' ) ) // consider "{", ":{" and +:{" tokens
         {
             if ( ! GetState ( _Compiler_, TDSCI_PARSING ) )
             {
                 _ClassTypedef ( _Context_, ns, cloneFlag ) ;
-                ns->W_ObjectAttributes |= ( OBJECT | STRUCT ) ;
+                ns->W_ObjectAttributes |= STRUCT ; //( OBJECT ) ;
             }
         }
     }

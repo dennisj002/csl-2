@@ -23,7 +23,7 @@ CSL_RuntimeInit ( CSL * csl, int64 cntxDelFlag )
     CSL_CheckInitDataStack ( ) ;
     _CSL_TypeStackReset ( ) ;
     _CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
-    CSL_UnsetQualifyingNamespace ( ) ;
+    Context_ClearQualifyingNamespace () ;
 }
 
 void

@@ -303,16 +303,16 @@ dscOn
 : debugTest 1 2 + p debugTest1 ;
 : _assert1dbg ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
 //: _assert1 ( n m str ) { n @ m @ != } { <dbg> nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { <dbg> str @ ps " : ok\n" ps nl } ifElse ;
-: _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ;
+: _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ; debugWord
 : ctloc do> locationPush does> locationPrint <do ; immediate // compile time location
 : _assert0 ( n m ) { n @ m @ != } { nl location nl hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
-: _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ;
+: _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ; 
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
 : assert0 ( n m ) { n @ m @ != } { nl "error" ps _info _pause } if ; 
-"assert" ' _assert1 find alias
-'assert1 ' _assert1dbg find alias
-'assert1 ' _assert1 find alias
-"_assert" ' _assert0 find alias
+"assert" ' _assert1 find alias debugWord
+'assert1 ' _assert1dbg find alias debugWord
+'assert1 ' _assert1 find alias debugWord
+"_assert" ' _assert0 find alias debugWord
 : _assertStkChk ( n m | str )  
     { verbosity @ }
     {
@@ -479,7 +479,7 @@ Int Root.Experimental
     'a var 'b var
     a 2 = 
     b 4 =
-    a @ b @ + 2 / p
+    a @ b @ + 2 / dup p 3 _assert0
 } xyxz store
 xyxz @ bdis
 nl
@@ -489,13 +489,14 @@ xyxz @ ix
 cOn
 s
 void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
-void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 s _assert s
+void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 _assert s
 cOff
 forStarters 1 =
 #endif
 
 #if 1
-: sp ; //stack pause ;
+: sp ; //stack pause ; 
+sp
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
 #if 0
 : wtdinclude "namespaces/wordTypeDef.csl" include ;
@@ -504,7 +505,7 @@ c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpre
 wtdinclude 
 'wtdInclude find 100 dump
 C.Experimental 
-'wtdIncmlude find d: 'Word find d: wordStructPrint 
+//'wtdIncmlude find d: 'Word find d: wordStructPrint 
 pwi Word //pause
 'C.Experimental notUsing 
 #endif
@@ -523,7 +524,7 @@ faccs ( REG n | REG rec )
 pwi faccs 
 faccs ( 7 ) ; dup p 5040 _assert 
 // test byte size objects
-//dbiOn
+sp
 C.Experimental 
 typedef struct _byteTest 
 {
@@ -545,18 +546,22 @@ byteTest 'bt new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
 bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
 //var ( 'btt ) ;
+sp
 bt.a16_123 = 0x498 ;  
 hp ( bt.a16_123 ) ;
+sp
 void bttt ( byteTest bt | btt ) 
 { 
     btt = bt.a8_123 ; bt.a8_123 = 36 ; bt.a16_123 = 0x1234 ; bt.a32_123 = 0x12345678 ; bt.a64_123 = 0x123456789abcdef0 ; //pause
+    bt.int32 u32_123 = 0x1234567 ;
     printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
     printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
     printf ( "\nbt.a16_123 = 0x%x ", bt.a16_123 ) ; 
     printf ( "\nbt.a32_123 = 0x%x ", bt.a32_123 ) ; 
     printf ( "\nbt.a64_123 = 0x%lx ", bt.a64_123 ) ; 
+    printf ( "\nbt.u32_123 = 0x%lx ", bt.u32_123 ) ; 
     printf ("\nbtt = 0x%lx", btt ) ; 
-    dump ( bt, bt.size ) ; 
+    dump ( &bt, bt.size ) ; 
     hp ( bt.a8_123 ) ;
 } 
 byteTest 'bt new ;
@@ -576,7 +581,7 @@ bt.a8_123 1 _assert
 _assert ( bt.a8_123 1 ) ;
 _assert ( bt.a32_123, 2147483647 ) ;
 void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) 
-{ bt.a8_123 = i8 ; bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; dump ( bt, bt.size ) ; }
+{ bt.a8_123 = i8 ; bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; dump ( &bt, bt.size ) ; }
 byteTest 'abt new ;
 btest ( abt 0x12 0x123 0x1234567 0x123456789abcdef ) ;
 pwi btest ;
@@ -603,7 +608,7 @@ Root Experimental User
 #endif
 
 #if 0 //forStarters @ 
-: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 hi 5 _assert
+: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; pwi hi 2 3 d: hi 5 _assert
 #endif 
 tc
 2 + 7 assertStkChk // stack checking 

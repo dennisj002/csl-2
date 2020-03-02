@@ -156,7 +156,7 @@ _CSL_EndBlock2 ( BlockInfo * bi )
         _CSL_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
         CSL_TurnOffBlockCompiler ( ) ;
     }
-    else if ( ! GetState ( compiler, C_BLOCK_INTERPRETER ) ) _Namespace_RemoveFromUsingListAndClear ( bi->BI_LocalsNamespace ) ; // a block namespace
+    else if ( ! GetState ( compiler, C_BLOCK_INTERPRETER ) ) _Namespace_RemoveFromUsingList_ClearFlag ( bi->BI_LocalsNamespace, 1 ) ; // a block namespace
     return first ;
 }
 

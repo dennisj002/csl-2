@@ -173,28 +173,12 @@ _Compile_ImmDispData ( int64 immDisp, Boolean size, Boolean forceFlag )
 //    7 - 6  5 - 3  2 - 0
 //-----------------------------------------------------------------------
 
-#if 0
-
-uint8
-_Calculate_Rex_With_Sib ( Boolean reg, Boolean scale, Boolean index, Boolean base, Boolean rex_w_flag )
-{
-    Boolean rex = ( ( rex_w_flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( index > 7 ) ? 2 : 0 ) | ( ( base > 7 ) ? 1 : 0 ) ) ;
-    if ( rex ) rex |= 0x40 ;
-    return rex ;
-}
-#endif
-
 uint8
 Calculate_Rex ( Boolean reg, Boolean rm, Boolean rex_w_flag, Boolean rex_b_flag )
 {
-#if 1   
     Boolean rex = ( ( rex_w_flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ) ;
     if ( rex || rex_b_flag || rex_w_flag ) rex |= 0x40 ;
     return rex ;
-#else    
-    return _Calculate_Rex_With_Sib ( reg, 0, 0, 0, rex_w_flag ) ;
-#endif    
-
 }
 
 Boolean
@@ -315,8 +299,8 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
         if ( ! mod )
         {
             if ( disp == 0 ) mod = 0 ;
-            else if ( disp <= 0xff ) mod = 1 ;
-            else if ( disp >= 0x100 ) mod = 2 ;
+            else if ( abs (disp) <= 0x7f ) mod = 1 ;
+            else if ( abs (disp) >= 0x100 ) mod = 2 ;
         }
     }
     Compile_CalculateWrite_Instruction_X64 ( opCode0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
@@ -433,7 +417,6 @@ _Compile_X_Group1 ( Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, 
     // some times we need cell_t where bytes would work
     //Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     //Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_W | MODRM_B, sib, disp, 0, 0, osize ) ;
-#if 1
     if ( operandSize < 8 )
     {
         int64 opCode0 ;
@@ -455,9 +438,6 @@ _Compile_X_Group1 ( Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, 
     {
         Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, 0, 0, operandSize ) ;
     }
-#else    
-    Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, 0, 0, operandSize ) ;
-#endif    
 }
 
 // opCode group 1 - 0x80-0x83 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data
@@ -509,11 +489,12 @@ _Compile_X_Group1_Immediate ( Boolean code, Boolean mod, Boolean rm, int64 disp,
         //DBI_OFF ;
         return ;
     }
-    else if ( ( iSize > BYTE ) || ( imm >= 0x100 ) )
+    else if ( ( iSize > BYTE ) || (abs ( imm ) >= 0x7f ) ) //( imm >= 0x100 ) )
     {
         opCode |= 1 ;
     }
-    else if ( ( iSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ;
+    else if ( ( iSize <= BYTE ) || (abs ( imm ) < 0x100 ) ) //( imm < 0x100 ) ) 
+        opCode |= 3 ;
     // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work

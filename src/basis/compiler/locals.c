@@ -34,7 +34,7 @@ int64
 _ParameterVar_Offset ( Word * word, int64 numberOfArgs, Boolean frameFlag )
 {
     int64 offset ;
-    offset = - ( numberOfArgs - word->Index + ( frameFlag ? 1 : 0 )) ; // is this totally correct??
+    offset = - ( numberOfArgs - word->Index + ( frameFlag ? 1 : 0 ) ) ; // is this totally correct??
     return offset ;
 }
 
@@ -119,8 +119,6 @@ Compiler_LocalWord_UpdateCompiler ( Compiler * compiler, Word * word, int64 obje
         }
     }
     word->W_ObjectAttributes |= RECYCLABLE_LOCAL ;
-    //CSL->SC_Word->W_NumberOfNonRegisterArgs += compiler->NumberOfNonRegisterArgs ; // debugOutput.c showLocals need this others ?
-    //CSL->SC_Word->W_NumberOfNonRegisterLocals += compiler->NumberOfNonRegisterLocals ;
     return word ;
 }
 
@@ -132,18 +130,21 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismType, int6
     return word ;
 }
 
-void
+Namespace *
 Compiler_LocalsNamespace_New ( Compiler * compiler )
 {
     Namespace * ns = Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack, 1 ) ;
+    //_CSL_Namespace_InNamespaceSet ( ns ) ; // done by Namespace_FindOrNew_Local
     Finder_SetQualifyingNamespace ( _Finder_, ns ) ;
+    return ns ;
 }
 
 Word *
 Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismAttributes, int64 objectAttributes, int64 lispAttributes, int64 allocType )
 {
-    if ( ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) ) Compiler_LocalsNamespace_New ( compiler ) ;
+    if ( ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) ) compiler->LocalsNamespace = Compiler_LocalsNamespace_New ( compiler ) ;
     Word * word = _Compiler_LocalWord ( compiler, name, morphismAttributes, objectAttributes, lispAttributes, allocType ) ;
+    //if (compiler->LocalsNamespace) Namespace_DoAddWord ( compiler->LocalsNamespace, word ) ;
     return word ;
 }
 
@@ -288,3 +289,333 @@ CSL_LocalVariablesBegin ( )
     _CSL_Parse_LocalsAndStackVariables ( 0, 0, 0, 0, 0 ) ;
 }
 
+// old docs :
+// parse local variable notation to a temporary "_locals_" namespace
+// calculate necessary frame size
+// the stack frame (Fsp) will be just above TOS -- at higer addresses
+// save entry Dsp in a CSL variable (or at Fsp [ 0 ]). Dsp will be reset to just
+// above the framestack during duration of the function and at the end of the function
+// will be reset to its original value on entry stored in the CSL variable (Fsp [ 0 ])
+// so that DataStack pushes and pops during the function will be accessing above the top of the new Fsp
+// initialize the words to access a slot in the framesize so that the
+// compiler can use the slot number in the function being compiled
+// compile a local variable such that when used at runtime it pushes
+// the slot address on the DataStack
+#if 0
+
+Namespace *
+_CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // stack variables flag
+{
+    // number of stack variables, number of locals, stack variable flag
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
+    Lexer * lexer = cntx->Lexer0 ;
+    Finder * finder = cntx->Finder0 ;
+    int64 scm = IsSourceCodeOn ;
+    byte * svDelimiters = lexer->TokenDelimiters ;
+    Word * word ;
+    int64 objectAttributes = 0, lispAttributes = 0, numberOfRegisterVariables = 0, numberOfVariables = 0 ;
+    int64 svff = 0, addWords, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
+    Boolean regFlag = false ;
+    byte *token, *returnVariable = 0 ;
+    Namespace *typeNamespace = 0, *objectTypeNamespace = 0, *saveInNs = _CSL_->InNamespace ;
+    //CSL_DbgSourceCodeOff ( ) ;
+    if ( ! CompileMode ) Compiler_Init ( compiler, 0 ) ;
+
+    if ( svf ) svff = 1 ;
+    addWords = 1 ;
+    if ( lispMode ) args = ( ListObject * ) args->Lo_List->head ;
+
+    while ( ( lispMode ? ( int64 ) _LO_Next ( args ) : 1 ) )
+    {
+        if ( lispMode )
+        {
+            args = _LO_Next ( args ) ;
+            if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
+            token = ( byte* ) args->Lo_Name ;
+            CSL_AddStringToSourceCode ( _CSL_, token ) ;
+        }
+        else token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
+        if ( token )
+        {
+            if ( String_Equal ( token, "(" ) ) continue ;
+            if ( String_Equal ( ( char* ) token, "|" ) )
+            {
+                svff = 0 ; // set stack variable flag to off -- no more stack variables ; begin local variables
+                continue ; // don't add a node to our temporary list for this token
+            }
+            if ( String_Equal ( ( char* ) token, "-t" ) ) // for setting W_TypeSignatureString
+            {
+                if ( lispMode )
+                {
+                    args = _LO_Next ( args ) ;
+                    if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
+                    token = ( byte* ) args->Lo_Name ;
+                    CSL_AddStringToSourceCode ( _CSL_, token ) ;
+                }
+                else token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
+                strncpy ( ( char* ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString, ( char* ) token, 8 ) ;
+                continue ; // don't add a node to our temporary list for this token
+            }
+            if ( String_Equal ( ( char* ) token, "--" ) ) // || ( String_Equal ( ( char* ) token, "|-" ) == 0 ) || ( String_Equal ( ( char* ) token, "|--" ) == 0 ) )
+            {
+                if ( ! svf ) break ;
+                else
+                {
+                    addWords = 0 ;
+                    getReturnFlag = 1 ;
+                    continue ;
+                }
+            }
+            if ( String_Equal ( ( char* ) token, ")" ) ) break ;
+            if ( String_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
+            {
+                if ( GetState ( _CSL_, OPTIMIZE_ON ) ) regFlag = true ;
+                continue ;
+            }
+            if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) )
+            {
+                CSL_Exception ( SYNTAX_ERROR, "\nLocal variables syntax error : no closing parenthesis ')' found", 1 ) ;
+                break ;
+            }
+            if ( ! lispMode )
+            {
+                word = Finder_Word_FindUsing ( finder, token, 0 ) ; // ?? find after Literal - eliminate making strings or numbers words ??
+                if ( word && ( word->W_ObjectAttributes & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
+                {
+                    if ( word->W_ObjectAttributes & STRUCTURE ) objectTypeNamespace = word ;
+                    else typeNamespace = word ;
+                    continue ;
+                }
+            }
+            if ( getReturnFlag )
+            {
+                addWords = 0 ;
+                if ( Stringi_Equal ( token, ( byte* ) "ACC" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "EAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "RAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "TOS" ) ) getReturn |= RETURN_TOS ;
+                else returnVariable = token ; //nb. if there is a return variable it must have already been declared as a parameter of local variable else it is an error
+                continue ;
+            }
+            if ( addWords )
+            {
+                if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, 1 ) ; //! debugFlag ) ;
+                if ( svff )
+                {
+                    objectAttributes |= PARAMETER_VARIABLE ; // aka an arg
+                    //if ( lispMode ) objectType |= T_LISP_SYMBOL ;
+                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
+                }
+                else
+                {
+                    objectAttributes |= LOCAL_VARIABLE ;
+                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
+                }
+                if ( regFlag == true )
+                {
+                    objectAttributes |= REGISTER_VARIABLE ;
+                    numberOfRegisterVariables ++ ;
+                }
+                if ( objectTypeNamespace )
+                {
+                    Compiler_TypedObjectInit ( word, objectTypeNamespace ) ;
+                    Word_TypeChecking_SetSigInfoForAnObject ( word ) ;
+                }
+                else
+                {
+                    word = DataObject_New ( objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                    if ( typeNamespace ) word->ObjectByteSize = typeNamespace->ObjectByteSize ;
+                    if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables ++] = '_' ;
+                    if ( regFlag == true )
+                    {
+                        word->RegToUse = RegParameterOrder ( regToUseIndex ++ ) ;
+                        if ( word->W_ObjectAttributes & PARAMETER_VARIABLE )
+                        {
+                            if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
+                            _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
+                        }
+                        regFlag = false ;
+                    }
+                }
+                typeNamespace = 0 ;
+                objectTypeNamespace = 0 ;
+                objectAttributes = 0 ;
+                if ( String_Equal ( token, "this" ) ) word->W_ObjectAttributes |= THIS ;
+            }
+        }
+        else return 0 ; // Syntax Error or no local or parameter variables
+    }
+    compiler->State |= getReturn ;
+
+    // we support nested locals and may have locals in other blocks so the indexes are cumulative
+    if ( numberOfRegisterVariables ) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ;
+    if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
+
+    _CSL_->InNamespace = saveInNs ;
+    finder->FoundWord = 0 ;
+    Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
+    compiler->LocalsNamespace = localsNs ;
+    SetState ( compiler, VARIABLE_FRAME, true ) ;
+    SetState ( _CSL_, DEBUG_SOURCE_CODE_MODE, scm ) ;
+    return localsNs ;
+}
+#else
+
+Namespace *
+_CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // stack variables flag
+{
+    // number of stack variables, number of locals, stack variable flag
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
+    Lexer * lexer = cntx->Lexer0 ;
+    Finder * finder = cntx->Finder0 ;
+    int64 scm = IsSourceCodeOn ;
+    byte * svDelimiters = lexer->TokenDelimiters ;
+    Word * word ;
+    int64 objectAttributes = 0, lispAttributes = 0, numberOfRegisterVariables = 0, numberOfVariables = 0 ;
+    int64 svff = 0, addWords, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
+    Boolean regFlag = false ;
+    byte *token, *returnVariable = 0 ;
+    Namespace *typeNamespace = 0, *objectTypeNamespace = 0, *saveInNs = _CSL_->InNamespace ;
+    //CSL_DbgSourceCodeOff ( ) ;
+    if ( ! CompileMode ) Compiler_Init ( compiler, 0 ) ;
+
+    if ( svf ) svff = 1 ;
+    addWords = 1 ;
+    if ( lispMode ) args = ( ListObject * ) args->Lo_List->head ;
+
+    while ( ( lispMode ? ( int64 ) _LO_Next ( args ) : 1 ) )
+    {
+        if ( lispMode )
+        {
+            args = _LO_Next ( args ) ;
+            if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
+            token = ( byte* ) args->Lo_Name ;
+            CSL_AddStringToSourceCode ( _CSL_, token ) ;
+        }
+        else token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
+        if ( token )
+        {
+            if ( String_Equal ( token, "(" ) ) continue ;
+            if ( String_Equal ( ( char* ) token, "|" ) )
+            {
+                svff = 0 ; // set stack variable flag to off -- no more stack variables ; begin local variables
+                continue ; // don't add a node to our temporary list for this token
+            }
+            if ( String_Equal ( ( char* ) token, "-t" ) ) // for setting W_TypeSignatureString
+            {
+                if ( lispMode )
+                {
+                    args = _LO_Next ( args ) ;
+                    if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
+                    token = ( byte* ) args->Lo_Name ;
+                    CSL_AddStringToSourceCode ( _CSL_, token ) ;
+                }
+                else token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
+                strncpy ( ( char* ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString, ( char* ) token, 8 ) ;
+                continue ; // don't add a node to our temporary list for this token
+            }
+            if ( String_Equal ( ( char* ) token, "--" ) ) // || ( String_Equal ( ( char* ) token, "|-" ) == 0 ) || ( String_Equal ( ( char* ) token, "|--" ) == 0 ) )
+            {
+                if ( ! svf ) break ;
+                else
+                {
+                    addWords = 0 ;
+                    getReturnFlag = 1 ;
+                    continue ;
+                }
+            }
+            if ( String_Equal ( ( char* ) token, ")" ) ) break ;
+            if ( String_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
+            {
+                if ( GetState ( _CSL_, OPTIMIZE_ON ) ) regFlag = true ;
+                continue ;
+            }
+            if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) )
+            {
+                //_Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
+                CSL_Exception ( SYNTAX_ERROR, "\nLocal variables syntax error : no closing parenthesis ')' found", 1 ) ;
+                break ;
+            }
+            if ( ! lispMode )
+            {
+                word = Finder_Word_FindUsing ( finder, token, 1 ) ; // 1: saveQns ?? find after Literal - eliminate making strings or numbers words ??
+                if ( word && ( word->W_ObjectAttributes & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
+                {
+                    if ( word->W_ObjectAttributes & STRUCTURE ) objectTypeNamespace = word ;
+                    else typeNamespace = word ;
+                    continue ;
+                }
+            }
+            if ( getReturnFlag )
+            {
+                addWords = 0 ;
+                if ( Stringi_Equal ( token, ( byte* ) "ACC" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "EAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "RAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "TOS" ) ) getReturn |= RETURN_TOS ;
+                else returnVariable = token ; //nb. if there is a return variable it must have already been declared as a parameter of local variable else it is an error
+                continue ;
+            }
+            if ( addWords )
+            {
+                if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, 1 ) ;
+                if ( svff )
+                {
+                    objectAttributes |= PARAMETER_VARIABLE ; // aka an arg
+                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
+                }
+                else
+                {
+                    objectAttributes |= LOCAL_VARIABLE ;
+                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
+                }
+                if ( regFlag == true )
+                {
+                    objectAttributes |= REGISTER_VARIABLE ;
+                    numberOfRegisterVariables ++ ;
+                }
+                word = DataObject_New ( objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables ++] = '_' ;
+                if ( regFlag == true )
+                {
+                    word->RegToUse = RegParameterOrder ( regToUseIndex ++ ) ;
+                    if ( word->W_ObjectAttributes & PARAMETER_VARIABLE )
+                    {
+                        if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
+                        _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
+                    }
+                    regFlag = false ;
+                }
+                if ( objectTypeNamespace )
+                {
+                    Compiler_TypedObjectInit ( word, objectTypeNamespace ) ;
+                    Word_TypeChecking_SetSigInfoForAnObject ( word ) ;
+                }
+                else if ( typeNamespace ) word->ObjectByteSize = typeNamespace->ObjectByteSize ;
+                if ( String_Equal ( token, "this" ) ) word->W_ObjectAttributes |= THIS ;
+                typeNamespace = 0 ;
+                objectTypeNamespace = 0 ;
+                objectAttributes = 0 ;
+            }
+        }
+        else return 0 ; // Syntax Error or no local or parameter variables
+    }
+    compiler->State |= getReturn ;
+
+    // we support nested locals and may have locals in other blocks so the indices are cumulative
+    if ( numberOfRegisterVariables ) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ;
+    if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( cntx->Finder0, localsNs, returnVariable ) ;
+
+    finder->FoundWord = 0 ;
+    Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
+    SetState ( compiler, VARIABLE_FRAME, true ) ;
+    SetState ( _CSL_, DEBUG_SOURCE_CODE_MODE, scm ) ;
+    _CSL_->InNamespace = saveInNs ;
+    compiler->LocalsNamespace = localsNs ;
+    Qid_Save_Set_InNamespace ( localsNs ) ;
+    return localsNs ;
+}
+
+#endif

@@ -86,15 +86,16 @@ tna
 testnarr2.nodes[1].AfterReference @ 1 _assert
 testnarr2.nodes[1].BeforeReference @ 2 _assert
 sp
-C
+DLLNodeAlloc 
 : tnarr2 ( this ) 
         "tnarr2" ps nl
         this nl hp nl
         this . nodes [ 2 ].AfterReference 1 =
 	this . nodes [ 2 ].BeforeReference 2 =
-	this this.size @ dump
+	this.size @ dump
 ;
 sp
+DLLNodeAlloc 
 : tnarr2a ( this ) 
         "tnarr2a" ps nl
 	this . nodes [ 2 ].AfterReference 1 =
@@ -102,21 +103,22 @@ sp
 	this this.size @ dump
 ;
 DLLNodeAlloc "testn4" new sp
+DLLNodeAlloc 
 testn4 tnarr2a 
 testn4.nodes[2].AfterReference @ 1 _assert
 testn4.nodes[2].BeforeReference @ 2 _assert
-
+DLLNodeAlloc 
 : tna3 ( this )
         "tna3" ps
 	this.nodes [ 2 ].AfterReference 1 =
 	this.nodes [ 2 ].BeforeReference 2 =
 	this this.size @ dump
 ;
-
 // : sp stack pause ; 
-
+DLLNodeAlloc 
 "testn5" new
 sp
+pwi tna3
 testn5 tna3 
 sp
 testn5 hp
@@ -139,7 +141,7 @@ sp
 decimal
 "Ar1" class :{ int64 ar [4] ; };
 sp
-'arr1 new
+Ar1 'arr1 new
 "arr1 : " ps location arr1 size @ dump // should be all zeroes
 arr1.ar [ 3 ] 0x89 =
 arr1.ar[0] arr1.ar[3] @ = 
@@ -308,7 +310,8 @@ ab.ar [0][0][0] @ dup p 254 _assert
 ;
 ct "ac" new 
 'tct find wdiss
-2 ac tct //pause
+ct
+2 ac tct 
 sp
 "cta" class :{ byte ar [3][3][3] ; };
 cta "aba" new

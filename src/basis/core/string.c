@@ -692,7 +692,7 @@ StringMacro_Run ( byte * pb_namespaceName, byte * str )
     else sword = Finder_FindWord_AnyNamespace ( _Finder_, str ) ;
     if ( sword )
     {
-        Word_Run ( sword ) ;
+        Word_Morphism_Run ( sword ) ;
         nstr = ( byte* ) DataStack_Pop ( ) ;
 
         return nstr ;
@@ -872,7 +872,7 @@ _String_HighlightTokenInputLine (byte * nvw, Boolean lef, int64 leftBorder, int6
         else strncpy ( ( char* ) b3, ( char* ) nvw, leftBorder ) ;
 
         strcpy ( ( char* ) b2, ( char* ) cc ( b3, &_O_->Debug ) ) ;
-        char * ccToken = ( char* ) cc ( token, &_O_->Notice ) ;
+        char * ccToken = ( char* ) cc ( token, &_O_->Notice ) ; //&_O_->Default ) ;
         strcat ( ( char* ) b2, ccToken ) ;
 
         if ( ref )

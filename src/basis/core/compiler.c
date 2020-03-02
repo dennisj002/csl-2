@@ -223,11 +223,11 @@ Compiler_BlockLevel ( Compiler * compiler )
 void
 CSL_SaveDebugInfo ( Word * word, uint64 allocType )
 {
-    Compiler * compiler = _Compiler_ ;
-    if ( ! allocType ) allocType = SESSION ; //T_CSL ; // COMPILER_TEMP ;
     word = word ? word : _Context_->CurrentWordBeingCompiled ? _Context_->CurrentWordBeingCompiled : 0 ; //_Context_->CurrentWordBeingCompiled : _CSL_->LastFinished_Word ;
     if ( word )
     {
+        Compiler * compiler = _Compiler_ ;
+        if ( ! allocType ) allocType = SESSION ; //T_CSL ; // COMPILER_TEMP ;
         if ( ! GetState ( word, DEBUG_INFO_SAVED ) )
         {
             if ( ! word->NamespaceStack ) // already done earlier
@@ -235,7 +235,9 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
                 if ( compiler->NumberOfVariables )
                 {
                     word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ;
-                    Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+                    Namespace_RemoveNamespacesStack_ClearFlag (compiler->LocalsCompilingNamespacesStack, 0) ; // don't clear ; keep words for source code debugging, etc.
+                    _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 0 ) ;
+                    Word_Recycle ( compiler->LocalsNamespace ) ;
                 }
                 Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
                 if ( ! word->W_SC_WordList )
@@ -254,12 +256,8 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
 void
 Compiler_FreeLocalsNamespaces ( Compiler * compiler )
 {
-    if ( compiler->NumberOfVariables )
-    {
-        Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
-        _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
-        //CSL_NonCompilingNs_Clear ( compiler ) ;
-    }
+    if ( compiler->NumberOfVariables ) Namespace_RemoveNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, 1 ) ;
+    if ( compiler->LocalsNamespace ) _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 1 ) ;
 }
 
 void

@@ -48,7 +48,6 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
     Word * word = 0 ;
     if ( token )
     {
-        //word = Finder_QID_Find ( cntx->Finder0, token ) ;
         word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
         if ( word && compiler->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
         if ( ! word )
@@ -163,16 +162,6 @@ CSL_PushToken_OnTokenList ( byte * token )
     if ( token ) dllist_AddNodeToHead ( _Lexer_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
     //if ( Is_DebugOn ) Symbol_List_Print ( CSL->TokenList ) ;
 }
-
-#if 0
-
-void
-Lexer_ClearTokenList ( Lexer * lexer )
-{
-
-    _dllist_Init ( lexer->TokenList ) ;
-}
-#endif
 
 Symbol *
 Lexer_GetTokenFromTokenList ( Lexer * lexer, Boolean peekFlag )

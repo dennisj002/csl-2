@@ -104,7 +104,7 @@ void
 CSL_Word_Run ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    Word_Run ( word ) ;
+    Word_Morphism_Run ( word ) ;
 }
 
 void
@@ -198,14 +198,13 @@ Word_Name ( )
 Location *
 Location_New ( )
 {
-    ReadLiner * rl = _ReadLiner_ ;
+    Lexer * lexer = _Lexer_ ;
     Location * loc = ( Location * ) Mem_Allocate ( sizeof ( Location ), ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
-    loc->Filename = rl->Filename ;
-    loc->LineNumber = rl->LineNumber ;
-    loc->CursorPosition = _Context_->Lexer0->CurrentReadIndex ; // rl->CursorPosition ;
+    loc->Filename = lexer->Filename ;
+    loc->LineNumber = lexer->LineNumber ;
+    loc->CursorPosition = _Context_->Lexer0->CurrentReadIndex ; 
     return loc ;
 }
-
 void
 _Location_Printf ( Location * loc )
 {

@@ -334,6 +334,7 @@ typedef void ( *MapSymbolFunction ) ( Symbol * ) ;
 typedef void ( *VMapNodeFunction ) ( dlnode * ) ;
 typedef void ( *MapSymbolFunction2 ) ( Symbol *, int64, int64 ) ;
 typedef Word* ( *MapNodeFunction ) ( dlnode * node ) ;
+typedef void ( *VMapSymbol2 ) ( Symbol * symbol, int64, int64 ) ;
 typedef struct location
 {
     byte * Filename ;
@@ -768,7 +769,7 @@ typedef struct Interpreter
     Compiler * Compiler0 ;
     byte * Token, LastLexedChar ;
     Word *w_Word, *LastWord ;
-    Word * BaseObject ;
+    //Word * BaseObject ;
     Word *CurrentObjectNamespace, *ThisNamespace ;
     int64 WordType ;
     dllist * InterpList ;
@@ -820,7 +821,8 @@ typedef struct
     byte * DefaultTokenDelimiters ;
     byte * DefaultDelimiterCharSet ;
     Word * CurrentlyRunningWord, *LastRanWord, *CurrentTokenWord, *TokenDebugSetupWord, *CurrentEvalWord, *LastEvalWord, *NlsWord ;
-    Word * SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord, * LastCompiledWord, *CurrentWordBeingCompiled ;
+    Word * SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord, * LastCompiledWord, *CurrentWordBeingCompiled, * BaseObject ;
+    Namespace * QidInNamespace ;
     block CurrentlyRunningWordDefinition ;
     dllist * PreprocessorStackList ;
     NBA * ContextNba ;

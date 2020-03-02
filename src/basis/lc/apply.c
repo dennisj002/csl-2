@@ -295,7 +295,7 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
     word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
     byte * here = Here ;
     Word_Eval ( word ) ;
-    Word *baseObject = _Interpreter_->BaseObject ;
+    Word *baseObject = _Context_->BaseObject ;
     if ( ( word->Name[0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
     {
         if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;

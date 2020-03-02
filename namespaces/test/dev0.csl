@@ -148,9 +148,7 @@ Compiler C
 c_syntaxOn
 int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; } }
 c_syntaxOff
-//' _fib1c find wdiss
-20 C_Syntax._fib1c dup p 6765 _assert0 
-scOn 
+20 int._fib1c dup p 6765 _assert0 
 : fibPTC? ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ } { n n @ 1 - = } 
     {   
@@ -159,7 +157,7 @@ scOn
         fn fn1 @ fn2 @ + = 
     }
     for
-    fn @
+    fn @ 
 ;
 ' fibPTC? find wdiss 
 20 fibPTC? dup p 6765 _assert0 
@@ -432,7 +430,7 @@ lispOff
 sp  
 
 #if 1 // REG testing
-: fibBN ( n | fn fn1 fn2 -- TOS ) 
+: fib01 ( n | fn fn1 fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -443,9 +441,9 @@ sp
     // svn @ fprint ":" ps fn @ fprint 
     return fn
 ;
-//' fibBN find wdiss
-20 fibBN dup p 6765 _assert sp
-: fibBN ( n | fn REG fn1 fn2 ) 
+pwi fib01
+20 fib01 dup p 6765 _assert sp
+: fib01 ( n | fn REG fn1 fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -456,9 +454,9 @@ sp
     // svn @ fprint ":" ps fn @ fprint 
     return fn
 ;
-//' fibBN find wdiss
-20 fibBN dup p 6765 _assert sp
-: fibBN ( n | fn, REG fn1, REG fn2 ) 
+pwi fib01
+20 fib01 dup p 6765 _assert sp
+: fib01 ( n | fn, REG fn1, REG fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -469,10 +467,10 @@ sp
     // svn @ fprint ":" ps fn @ fprint 
     return fn
 ;
-//' fibBN find wdiss
-20 fibBN dup p 6765 _assert sp
+pwi fib01
+20 fib01 dup p 6765 _assert sp
 
-: fibBN ( n | REG fn REG fn1 REG fn2 ) 
+: fib01 ( n | REG fn REG fn1 REG fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -483,10 +481,10 @@ sp
     // svn @ fprint ":" ps fn @ fprint 
     return fn
 ;
-//' fibBN find wdiss
-20 fibBN dup p 6765 _assert sp
+pwi fib01
+20 fib01 dup p 6765 _assert sp
 scOn
-: fibBN ( REG n | fn fn1 REG fn2 -- TOS ) 
+: fib01 ( REG n | fn fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -497,9 +495,9 @@ scOn
     // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-//' fibBN find wdiss
-20 fibBN dup p 6765 _assert sp
-: fibBN ( REG n | fn REG fn1 REG fn2 -- TOS ) 
+pwi fib01
+20 fib01 dup p 6765 _assert sp
+: fib01 ( REG n | fn REG fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -510,9 +508,9 @@ scOn
     // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-//' fibBN find wdiss
-20 fibBN dup p 6765 _assert sp
-: fibBN ( REG n | REG fn fn1 REG fn2 -- TOS ) 
+pwi fib01
+20 fib01 dup p 6765 _assert sp
+: fib01 ( REG n | REG fn fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -523,9 +521,8 @@ scOn
     // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-pwi fibBN 
-20 fibBN dup p 6765 _assert sp
-
+pwi fib01 
+20 fib01 dup p 6765 _assert sp
 #endif
 sp
 Int

@@ -1,4 +1,9 @@
 infixOn
+
 : itestf ( n m | -- TOS ) (n + m) / 2 dup p ; 
 2 4 itestf 3 _assert
 
+: itestfr ( n m | x ) x = (n + m) / 2  return x ; 
+2 6 itestfr 4 _assert
+
+infixOff

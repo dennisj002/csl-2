@@ -131,6 +131,7 @@ CPrimitive CPrimitives [] = {
 
     { "in", 0, 0, 0, CSL_PrintInNamespace, 0, 0, 0, "Namespace", "Root" },
     { "using", 0, 0, 0, CSL_Using, 0, 0, 0, "Namespace", "Root" },
+    { "usingWAddress", 0, 0, 0, CSL_Using_WithAddress, 0, 0, 0, "Namespace", "Root" },
     { "usingFirst", 0, 0, 0, CSL_Namespace_UsingFirst, 0, 0, 0, "Namespace", "Root" },
     { "usingLast", 0, 0, 0, CSL_Namespace_UsingLast, 0, 0, 0, "Namespace", "Root" },
     { "notUsing", 0, 0, 0, CSL_Namespace_NotUsing, 0, 0, 0, "Namespace", "Root" },

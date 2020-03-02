@@ -68,10 +68,10 @@ sp
 chey.chars [23] = 255 ;
 chey.chars [18] = #b10110 ; // #x16
 //chey.hey = #x12345678 ;
-dump ( chey, cobj.size ) ; 
+dump ( &chey, cobj.size ) ; 
 sp
 printf ( "\ncobj.size = %d",cobj.size ) ; 
-printf ( "\n%s%lx", "\nchey = ", &chey ) ;
+printf ( "\n%s%lx", "\nchey = ", chey ) ;
 printf ( "\n%s%lx", "\nchey.hey = ", chey.hey ) ; sp 
 printf ( "\n%s%lx", "\n&chey.hey = ", &chey.hey ) ; sp
 hp ( chey.hey ) ; 
@@ -113,10 +113,10 @@ chi ( CObj chey0, d | a b c )
     p ( c ) ; c 3 "c should be 3" assert // 3
     p ( b ) ; b 5 "b should be 5" assert // 5
     p ( a ) ; a 8 "a should be 8" assert // 8
-    dump ( chey0, cobj.size ) ; 
-    d = d: cobj.chey0.hey ;
+    dump ( &chey0, cobj.size ) ; 
+    d = cobj.chey0.hey ;
     hex p ( d ) ;
-    <dbg> printf ( "\n chi : d = %lx\n", d ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
     sprintf ( &cobj.chey0.chars, "\n\t\they = %lx", d ) ; // add '&' within parentheses for lvalue
     printf ( "\n chi : d = %lx\n", d ) ;
     sprintf ( &cobj.chey0.chars2, "\n\t\they hey = %lx", cobj.chey0.hey ) ;
@@ -129,60 +129,66 @@ chi ( CObj chey0, d | a b c )
     _assert ( d #x0123456789abcdef ) ; 
     printf ( "\n%x\n", cobj.chey0.hey ) ;
     sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
-    dump ( chey0, cobj.size ) ; 
+    dump ( &chey0, cobj.size ) ; 
 } prefix
-wdiss ( ' chi find ) ;
-d: chi ( chey, 7 ) ;
+pwi chi
+chi ( chey, 7 ) ;
 sp
 #if 1
 void
 interpret2 ( | atoken aword ) 
 {
-    //testc1 () ; pause () ;
+    testc1 () ; //pause () ;
     nl tab () ; ps ( "interpret2 :> " ) ; nl
     while ( 1 )
     {   
         atoken = token () ; 
-        if (  (! atoken) || ! ( strcmp ( atoken, "i2halt" ) ) ) 
+        printf ( "\n\tinterpret2 : token = %s", atoken ) ; 
+        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
         { 
-            return ; 
-        }
+            printf ( "\n\tinterpret2 exiting..." ) ; return ; //goto: done ; 
+        }        
         // test comment here
         else
         // test comment here
         {
-            if ( atoken )
-            {       
-                aword = tokenToWord ( atoken ) ;
-                doWord ( aword ) ;
-            }       
+            aword = tokenToWord ( atoken ) ;
+            doWord ( aword ) ;
         }
     }
+    //label: done ;
+//<dbg>
 }
-#else
+
 void
-interpret2 ( | atoken aword ) 
+interpret3 ( | atoken aword ) 
 {
-    //testc1 () ; pause () ;
+    testc1 () ; //pause () ;
     //nl () ; tab () ; 
-    ps ( "interpret2 :> " ) ; nl () ;
+    ps ( "interpret3 :> " ) ; nl () ;
     while ( 1 )
     {   
         atoken = token () ; 
-        //printf ( "\n\ttoken = %s", atoken ) ; 
-        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) { sp () ; return ; }
+        printf ( "\n\tinterpret3 : token = %s", atoken ) ; 
+        if ( ! ( strcmp ( atoken, "i3halt" ) ) ) 
+        { 
+            printf ( "\n\tinterpret3 exiting..." ) ; goto: done ; 
+        }
         else 
         {       
             aword = tokenToWord ( atoken ) ;
             doWord ( aword ) ;
         }       
     }
+    label: done ;
 }
-#endif // if 1 : endif
+#endif // <~ l.137
 
-wdiss ( ' interpret2 find ) ; 
+pwi interpret2
+pwi interpret3
 C
 sp
+
 #if 1
 //verbosity = 3 ;
 interpret2 
@@ -198,16 +204,17 @@ fac4 ( n  | facc -- TOS )
     while ( n > 1 ) facc *= n -- ;
 #endif
     return facc ;
-} prefix
-wdiss ( ' fac4 find ) ; 
-fac4 ( 7 ) ; dup p 5040 _assert sp
-//'interpret3 'interpret2 find alias
+} 
 c_syntaxOff
-' fac4 find wdiss
-#endif
+pwi fac4 //pause
+7 fac4 dup p 5040 _assert sp
+#endif // <- l. 187
+
+i2halt
+interpret3
 
 User
-words // i2halt code to exit interpret2
+words  
 sp 
 
 : hi1 1 2 + p ;  
@@ -225,20 +232,21 @@ faccs2 ( n | rec )
         rec = rec * n ; 
     } 
     return rec ;
-} prefix
-' faccs2 find wdiss
-faccs2 ( 7 ) dup p 5040 _assert0 
+} 
+pwi faccs2 // why not in c syntax here and in next line ??
+7 faccs2 dup p 5040 _assert0 
 sp 
-optimizeOff
+
+i3halt // code to exit interpret3
 void
 interpret4 ( | atoken aword ) 
 {
-    //nl() ; tab () ; ps ( "interpret2 :> " ) ; nl () ;
+    printf ( "\n\tinterpret4 :> " ) ;
     while ( 1 )
     {   
         atoken = token () ; 
-        //printf ( "\n\ttoken = %s", atoken ) ; 
-        if ( ( ! atoken ) || ( ! ( strcmp ( atoken, "i2halt" ) ) ) )
+        printf ( "\n\tinterpret4 : token = %s", atoken ) ; 
+        if ( ( ! atoken ) || ( ! ( strcmp ( atoken, "i4halt" ) ) ) )
         { 
             printf ( "\n\n\ttoken = %s :: interpret4 exiting ...", atoken ) ; 
             return ; 
@@ -250,9 +258,9 @@ interpret4 ( | atoken aword )
         }
     }
 }
-
+// apparently we are not able to compile an interpreter with a compiled interpreter yet ; r15 is set improperly and stuff is left on the stack ??
+//pause
 interpret4
-c_syntaxOn
 C
 int
 faccs3 ( n | rec ) 
@@ -262,23 +270,18 @@ faccs3 ( n | rec )
         rec = rec * n ; 
     } 
     return rec ;
-}
-' faccs3 find wdiss
-faccs3 ( 7 ) p sp
+} 
 c_syntaxOff
-//verbosity 2 = verbosity @ p pause
-i2halt // see above in interpret2
-#endif // if 2 : endif
-sp
-//i2halt // for second interpret3 
-//i2halt // for third interpret2
-#endif // if 1 : endif
-#endif // if 0 : endif
+' faccs3 find wdiss
+7 faccs3 dup p 5040 _assert0 sp
+i4halt // code to exit interpret4
+#endif // <~ l.225
+
 C
 sp
 c_syntaxOn
 C String libc
-typedef _CBuffer { byte buf [ 256 ] ; } CBuffer ;
+typedef struct _CBuffer { byte buf [ 256 ] ; } CBuffer ;
 void
 $ ( | atoken, buffer, CBuffer buffer0 ) 
 {
@@ -307,7 +310,7 @@ $ ( | atoken, buffer, CBuffer buffer0 )
 'void.$ find wdiss sp
 void
 c_syntaxOff 
-#if doScript2 
+#if 1 //doScript2 
 "\n\nnew $ test\n" ps
 $ls -al . ;
 $ etc/script ; 
@@ -336,9 +339,9 @@ fac5 ( REG n  | REG facc )
     }
     return facc ;
 }
-wdiss ( ' fac5 find ) 
+pwi fac5
 fac5 ( 7 ) dup p 5040 _assert  
-#if 1
+#if 0
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
 //: wtdinclude "namespaces/wordTypeDef.csl" include ;
 //wtdinclude 
@@ -357,7 +360,7 @@ pwi faccs
 faccs ( 7 ) ; 5040 _assert 
 //pause
 // test byte size objects
-C Experimental
+C.Experimental 
 typedef struct _byteTest 
 {
     byte a8_123 ; 
@@ -369,17 +372,20 @@ typedef struct _byteTest
         int64 u64_123 ;
         int32 u32_123 ;
         int8 u8_123 ;
-    } ; //size = 8 
+    } ; //size = 11 
     int32 a32_123 ;
     byte d8_123 ;
-    int16 a16_123 ; // size = 26
-} byteTest, abyteTest ;
+    int16 a16_123 ; 
+} byteTest, abyteTest ; // size = 26
 byteTest 'bt new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
 bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
-var ( 'btt ) ;
+//var ( 'btt ) ;
+sp
 bt.a16_123 = 0x498 ;  
-void bttt ( byteTest bt ) 
+hp ( bt.a16_123 ) ;
+sp
+void bttt ( byteTest bt | btt ) 
 { 
     btt = bt.a8_123 ; bt.a8_123 = 36 ; bt.a16_123 = 0x1234 ; bt.a32_123 = 0x12345678 ; bt.a64_123 = 0x123456789abcdef0 ; //pause
     printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
@@ -387,47 +393,54 @@ void bttt ( byteTest bt )
     printf ( "\nbt.a16_123 = 0x%x ", bt.a16_123 ) ; 
     printf ( "\nbt.a32_123 = 0x%x ", bt.a32_123 ) ; 
     printf ( "\nbt.a64_123 = 0x%lx ", bt.a64_123 ) ; 
-    printf ("\nbtt = %x", btt ) ; 
-    dump ( &bt, bt.size ) ; 
-    p ( bt.a8_123 ) ;
+    printf ("\nbtt = 0x%lx", btt ) ; 
+    dump ( bt, bt.size ) ; 
+    hp ( bt.a8_123 ) ;
 } 
 byteTest 'bt new ;
-bttt ( bt ) ; pwi bttt //pause // error size not considered
-bt.a8_123 = 255 ; dump ( bt, bt.size ) ; //pause
-'bt byteTest new ;
+pwi bttt
+sp
+bttt ( bt ) ;  // error size not considered
+sp
+bt.a8_123 = 255 ; dump ( bt, bt.size ) ; 
+sp
 binary () ; p ( bt.b8_123 ) ; decimal () ; bt.b8_123 = 123 ; binary () ; p ( bt.b8_123 ) ; decimal () ; //pause
 p (bt.a8_123) ; p (bt.b8_123) ; p (bt.a32_123) ; p (bt.d8_123) ; 
 bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 1234 ; bt.a64_123 = 0x123456789abcdef ;
-dump ( bt, bt.size ) ; //pause
+sp
+dump ( bt, bt.size ) ; 
+sp
 bt.a8_123 1 _assert 
 _assert ( bt.a8_123 1 ) ;
 _assert ( bt.a32_123, 2147483647 ) ;
-//verbosity = 4 ;
-void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; }
+void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) 
+{ bt.a8_123 = i8 ; bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; dump ( bt, bt.size ) ; }
 byteTest 'abt new ;
-btest ( abt 46 456 234567 2345566 ) ;
-pwi btest ; //pause
-void btest1 ( byteTest bt, byte i8 ) { bt.c8_123 = i8 ; }
-btest1 ( abt, 0x42 ) ;
-pwi btest1 //pause
+btest ( abt 0x12 0x123 0x1234567 0x123456789abcdef ) ;
+pwi btest ;
+sp
+void btest1 ( byteTest bt, byte i8 ) { bt.c8_123 = i8 ; hex ; p ( bt.c8_123 ) ; }
+btest1 ( abt, 0x12 ) ;
+pwi btest1 
 dump ( abt abt.size ) ;
-_assert ( abt.c8_123, 0x42 ) ;
-pwi btest1 ;
+_assert ( abt.c8_123, 0x12 ) ;
 p ( abt.size ) ; 
 p ( bt.size ) ; 
 dump ( abt abt.size ) ;
-bt.a8_123 1 _assert 
-_assert ( bt.a32_123, 2147483647 ) ;
-_assert ( abt.a16_123 456 ) ; 
-_assert ( abt.b8_123 46 ) ;
-_assert ( abt.a32_123 234567 ) ;
-_assert ( abt.a64_123 2345566 ) ;
+_assert ( abt.a8_123,  0x12 ) ;
+_assert ( abt.a32_123, 0x1234567 ) ;
+_assert ( abt.a16_123 0x123 ) ; 
+_assert ( abt.b8_123 0x12 ) ;
+_assert ( abt.a32_123 0x1234567 ) ;
+_assert ( abt.a64_123 0x123456789abcdef ) ;
 c_syntaxOff 
-notUsing: Experimental byteTest _byteTest abyteTest bt abt ; 
+notUsing: byteTest _byteTest abyteTest bt abt ; 
+'C.Experimental notUsing
 Root Experimental User
 #endif
+c_syntaxOff 
 
-#if 1
+#if 0
 : wtdInclude "namespaces/wordTypeDef.csl" include ;
 wtdInclude 
 C.Experimental

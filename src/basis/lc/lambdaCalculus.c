@@ -152,7 +152,7 @@ Word *
 LC_FindWord ( byte * name, ListObject * locals )
 {
     Word * word = 0 ;
-    if ( GetState ( _Compiler_, LC_ARG_PARSING ) ) word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;
+    if ( GetState ( _Compiler_, LC_ARG_PARSING ) ) word = Finder_Word_FindUsing (_Context_->Finder0, name, 0) ;
     else
     {
         if ( locals ) word = _Finder_FindWord_InOneNamespace ( _Finder_, locals, name ) ;
@@ -178,7 +178,7 @@ LC_FindWord ( byte * name, ListObject * locals )
                         LC_Print_LispNamespace ( ) ;
                     }
 #endif        
-                    word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;
+                    word = Finder_Word_FindUsing (_Context_->Finder0, name, 0) ;
                 }
             }
         }
@@ -444,7 +444,7 @@ LC_LispNamespacesOff ( )
     Namespace_SetAsNotUsing ( ( byte* ) "LispTemp" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "LispDefines" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "Lisp" ) ;
-    CSL_UnsetQualifyingNamespace ( ) ;
+    Context_ClearQualifyingNamespace () ;
 }
 
 void

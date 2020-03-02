@@ -139,8 +139,8 @@ Word_RemoveIfStringContainsName ( Symbol * symbol, byte * name )
 {
     if ( symbol && symbol->Name && strstr ( ( CString ) symbol->Name, ( CString ) name ) )
     {
-        dlnode_Remove ( (dlnode*) symbol ) ;
-        Word_Recycle ( (Word *) symbol ) ;
+        dlnode_Remove ( ( dlnode* ) symbol ) ;
+        Word_Recycle ( ( Word * ) symbol ) ;
     }
     return 0 ;
 }
@@ -154,18 +154,17 @@ _CSL_Namespaces_PurgeWordIfContainsName ( byte * name )
 void
 CSL_Namespaces_PurgeWordIfContainsName ( )
 {
-   byte * name = ( byte* ) DataStack_Pop ( ) ;
-   _CSL_Namespaces_PurgeWordIfContainsName ( name ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
+    _CSL_Namespaces_PurgeWordIfContainsName ( name ) ;
 }
-
 
 int64
 Word_RemoveIfStringEqualExactName ( Symbol * symbol, byte * name )
 {
     if ( String_Equal ( symbol->Name, name ) )
     {
-        dlnode_Remove ( (dlnode*) symbol ) ;
-        Word_Recycle ( (Word *) symbol ) ;
+        dlnode_Remove ( ( dlnode* ) symbol ) ;
+        Word_Recycle ( ( Word * ) symbol ) ;
     }
     return 0 ;
 }
@@ -179,8 +178,8 @@ _CSL_Namespaces_PurgeWordExactName ( byte * name )
 void
 CSL_Namespaces_PurgeWordExactName ( )
 {
-   byte * name = ( byte* ) DataStack_Pop ( ) ;
-   _CSL_Namespaces_PurgeWordExactName ( name ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
+    _CSL_Namespaces_PurgeWordExactName ( name ) ;
 }
 
 void
@@ -251,9 +250,13 @@ _Namespace_Symbol_Print ( Symbol * symbol, int64 printFlag, int64 str )
     char buffer [128] ;
     Namespace * ns = ( Namespace * ) symbol ;
     sprintf ( buffer, "%s ", ns->Name ) ;
-    if ( printFlag )
+    if ( printFlag == 1 )
     {
         Printf ( ( byte* ) "%s", buffer ) ;
+    }
+    else if ( printFlag == 2 )
+    {
+        Printf ( ( byte* ) "%s.%s = 0x%lx, ", (ns->S_ContainingNamespace ? ns->S_ContainingNamespace->Name : (byte*)""), ns->Name, (uint64) ns ) ;
     }
     else strcat ( ( char* ) str, buffer ) ;
 }
@@ -266,7 +269,8 @@ _CSL_UsingToString ( )
 {
     byte * b = Buffer_Data ( _CSL_->ScratchB1 ) ;
     strcpy ( ( char* ) b, "" ) ;
-    Tree_Map_Namespaces_State_2Args ( _CSL_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 0, ( int64 ) b ) ;
+    //Tree_Map_Namespaces_State_2Args ( _CSL_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 0, ( int64 ) b ) ;
+    dllist_State_Map2 ( _CSL_->Namespaces->Lo_List, USING, ( VMapSymbol2 ) _Namespace_Symbol_Print, 0, ( int64 ) b ) ;
     b = String_New ( ( byte* ) b, TEMPORARY ) ;
     return b ;
 }
@@ -275,7 +279,18 @@ void
 CSL_Using ( )
 {
     Printf ( ( byte* ) "\nUsing Namespaces :> " ) ;
-    Tree_Map_Namespaces_State_2Args ( _CSL_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 1, 0 ) ;
+    //Tree_Map_Namespaces_State_2Args ( _CSL_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 1, 0 ) ;
+    dllist_State_Map2 ( _CSL_->Namespaces->Lo_List, USING, ( VMapSymbol2 ) _Namespace_Symbol_Print, 1, 0 ) ;
+
+    Printf ( ( byte* ) "\n" ) ;
+}
+
+void
+CSL_Using_WithAddress ( )
+{
+    Printf ( ( byte* ) "\nUsing Namespaces :> " ) ;
+    //Tree_Map_Namespaces_State_2Args ( _CSL_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 2, 0 ) ;
+    dllist_State_Map2 ( _CSL_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 2, 0 ) ;
     Printf ( ( byte* ) "\n" ) ;
 }
 
@@ -286,7 +301,7 @@ CSL_NonCompilingNs_Clear ( Compiler * compiler )
 {
     if ( compiler->NonCompilingNs )
     {
-        _Namespace_RemoveFromUsingListAndClear (compiler->NonCompilingNs) ;
+        _Namespace_RemoveFromUsingList_ClearFlag ( compiler->NonCompilingNs, true ) ;
         compiler->NonCompilingNs = 0 ;
     }
 }
@@ -308,46 +323,6 @@ _CSL_VariableValueGet ( byte* nameSpace, byte * name )
 void
 _CSL_RemoveNamespaceFromUsingListAndClear ( byte * name )
 {
-    _Namespace_RemoveFromUsingListAndClear ( Namespace_Find ( name ) ) ;
-}
-
-//keep the stack intack just remove the namespace from the Namespaces list and set them as not using
-
-void
-Namespace_RemoveNamespacesStack ( Stack * stack )
-{
-    if ( stack )
-    {
-        int64 n = Stack_Depth ( stack ) ;
-        while ( n > 0 )
-        {
-            Namespace * ns = ( Namespace* ) _Stack_Pop ( stack ) ; 
-            if ( ns )
-            {
-                if ( ns == _CSL_->InNamespace ) _CSL_->InNamespace = 0 ;
-                if ( _Finder_ && ( ns == _Finder_->QualifyingNamespace ) ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
-                _Namespace_SetState ( ns, NOT_USING ) ;
-                //if ( _O_->Dbi ) _Namespace_PrintWordList_FromNode ( ns ) ;
-                dlnode_Remove ( ( dlnode* ) ns ) ;
-                //if ( _O_->Dbi ) _Namespace_PrintWordList_FromNode ( ns ) ;
-            }
-            n -- ;
-        }
-    }
-}
-
-void
-Namespace_RemoveAndClearNamespacesStack ( Stack * stack )
-{
-    if ( stack )
-    {
-        int64 n ;
-        for ( n = Stack_Depth ( stack ) ; n ; n -- )
-        {
-            Namespace * ns = ( Namespace* ) Stack_Pop ( stack ) ;
-            if ( ns ) _Namespace_RemoveFromUsingListAndClear ( ns ) ;
-        }
-        Stack_Init ( stack ) ;
-    }
+    _Namespace_RemoveFromUsingList_ClearFlag ( Namespace_Find ( name ), 1 ) ;
 }
 

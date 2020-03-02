@@ -2,6 +2,7 @@
 #include "../../include/csl.h"
 
 // could be integrated with Lexer_ParseToken_ToWord ??
+
 Word *
 _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int64 scwi )
 {
@@ -12,7 +13,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
     {
         interp->Token = token ;
         cntx->CurrentToken = token ;
-        DEBUG_SETUP_TOKEN (token, 1) ;
+        DEBUG_SETUP_TOKEN ( token, 1 ) ;
         word = Lexer_ParseToken_ToWord ( interp->Lexer0, token, tsrli, scwi ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         DEBUG_SETUP ( word, 1 ) ;
@@ -32,7 +33,6 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tsrli, i
         word = _Interpreter_TokenToWord ( interp, token, tsrli, scwi ) ;
         Interpreter_DoWord ( interp, word, tsrli, scwi ) ;
     }
-    Interpreter_SetLexState ( interp ) ;
     return word ;
 }
 
@@ -75,7 +75,7 @@ void
 _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
     SetState ( cntx->Compiler0, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ), true ) ;
-    _Fp_ = _Dsp_ ; 
+    //_Fp_ = _Dsp_ ;
     Interpret_PrefixFunction_OrUntil_RParen ( interp, word ) ;
     SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
 }
@@ -158,11 +158,9 @@ Word_IsSyntactic ( Word * word )
 void
 Interpreter_SetLexState ( Interpreter * interp )
 {
-    //if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ; 
     byte llc = interp->LastLexedChar ;
     if ( llc == 0 ) SetState ( interp, END_OF_STRING, true ) ;
     else if ( llc == eof ) SetState ( interp, END_OF_FILE, true ) ;
-        //else if ( ( llc == '\n' ) || GetState ( interp->Lexer0, LEXER_END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ;
     else if ( llc == '\n' ) SetState ( interp, END_OF_LINE, true ) ;
 }
 

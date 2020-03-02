@@ -38,7 +38,7 @@ _Compile_WordInline ( Word * word ) // , byte * dstAddress )
 void
 _CompileFromName ( byte * wordName )
 {
-    Word * word = Finder_Word_FindUsing ( _Context_->Finder0, wordName, 0 ) ;
+    Word * word = Finder_Word_FindUsing (_Context_->Finder0, wordName, 0) ;
     // ?? Exception : error message here
     if ( ! word ) _Throw ( QUIT ) ;
     _Word_Compile ( word ) ;
@@ -47,7 +47,7 @@ _CompileFromName ( byte * wordName )
 void
 _CompileFromName_Inline ( byte * wordName )
 {
-    Word * word = Finder_Word_FindUsing ( _Context_->Finder0, wordName, 0 ) ;
+    Word * word = Finder_Word_FindUsing (_Context_->Finder0, wordName, 0) ;
     if ( ! word ) _Throw ( QUIT ) ;
     _Compile_WordInline ( word ) ;
 }

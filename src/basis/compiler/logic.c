@@ -159,13 +159,13 @@ void
 _Compile_LogicalNot ( Compiler * compiler )
 {
     //DBI_ON ;
-    byte * here = Here ;
+    //byte * here = Here ;
     Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ, false ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
-    //CSL_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
-    _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ; // we took value from TOS and return 'not' value to TOS
+    CSL_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
+    //_Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ; // we took value from TOS and return 'not' value to TOS
     //_Printf ( (byte*) "\nSize of LogicalNot code = %d bytes\n", Here -here ) ;
     //DBI_OFF ;
 }
@@ -208,6 +208,7 @@ _Compile_SETcc_Tttn_REG ( Compiler * compiler, Boolean setTtn, Boolean setNegFla
 void
 Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
+    Is_DebugOn_DBI ;
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
     else if ( optSetupFlag )
@@ -253,6 +254,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
     Boolean reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Compile_SETcc_Tttn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Word_CompileAndRecord_PushReg ( _CSL_WordList ( 0 ), reg, true ) ; //ACC ) ;
+    DBI_OFF ;
 }
 //  logical equals - "=="
 

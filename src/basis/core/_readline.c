@@ -188,7 +188,7 @@ Boolean
 ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
 {
     int64 i = 0, space = 0 ;
-    Boolean escSeqFlag = false ; //, quoteMode = false ;
+    Boolean escSeqFlag = false, inArray = false ; ; //, quoteMode = false ;
     byte * nc = & rl->InputLineString [ index ] ;
     for ( i = 0 ; 1 ; i ++, nc ++ )
     {
@@ -210,8 +210,8 @@ ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
                     escSeqFlag = true ;
                     continue ;
                 }
-                case ']': case '[': return false ; //return true ;
-                //case ']': return true ;
+                case ']': { inArray = false ; continue ; }
+                case '[': return true ; //{ inArray = true ; continue ; } //continue ;
                 case 0 : case ',': case ';': case '(': case ')': case '\n': case '\'': return false ;
                 case '.':
                 {
@@ -233,7 +233,9 @@ ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
                 }
                 default:
                 {
-                    if ( ( ! GetState ( _Compiler_, ARRAY_MODE ) ) && space && isgraph ( *nc ) ) return false ;
+                    //if ( ( ! GetState ( _Compiler_, ARRAY_MODE ) ) && space && isgraph ( *nc ) ) return false ;
+                    //if ( ( ! inArray ) && space && isgraph ( *nc ) ) return false ;
+                    if ( space && isgraph ( *nc ) ) return false ;
                     else
                     {
                         space = 0 ;
