@@ -14,7 +14,7 @@ DLLNodeAlloc "testna" new
 "DLLNode size = " prints DLLNode size @ Io.print nl 
 "DLLNodeAlloc size = " prints DLLNodeAlloc size @ Io.print nl 
 testna.nodes [ 1 2 + ].AfterReference 1 =
-testna.nodes [ 2 ].BeforeReference  2 =
+testna.nodes [ 2 ].BeforeReference 2 =
 testna 64 dump
 testna.nodes [ 3 ].AfterReference @ 1 _assert
 sp

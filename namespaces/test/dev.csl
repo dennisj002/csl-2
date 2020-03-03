@@ -278,7 +278,7 @@ c_syntaxOff
 Int
 "**" ffx2
 "pow_03" ffx2
-d: sp
+sp
 : sp ; 
 
 C

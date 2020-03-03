@@ -301,7 +301,7 @@ CSL_NonCompilingNs_Clear ( Compiler * compiler )
 {
     if ( compiler->NonCompilingNs )
     {
-        _Namespace_RemoveFromUsingList_ClearFlag ( compiler->NonCompilingNs, true ) ;
+        _Namespace_RemoveFromUsingList_ClearFlag (compiler->NonCompilingNs, true , 0) ;
         compiler->NonCompilingNs = 0 ;
     }
 }
@@ -323,6 +323,6 @@ _CSL_VariableValueGet ( byte* nameSpace, byte * name )
 void
 _CSL_RemoveNamespaceFromUsingListAndClear ( byte * name )
 {
-    _Namespace_RemoveFromUsingList_ClearFlag ( Namespace_Find ( name ), 1 ) ;
+    _Namespace_RemoveFromUsingList_ClearFlag (Namespace_Find ( name ), 1 , 0) ;
 }
 

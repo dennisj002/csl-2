@@ -35,6 +35,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     //l1->Lo_Value = ( uint64 ) value ; // used by eval
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
+    _CSL_FinishWordDebugInfo ( word ) ;
     _Word_Finish ( word ) ; //l1 ) ;
     return l1 ;
 }

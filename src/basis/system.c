@@ -196,10 +196,14 @@ _CSL_SystemState_Print ( int64 pflag )
     Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
     Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
     OVT_ExceptionState_Print ( ) ;
-    Printf ( ( byte* ) "\nInNamespace = %s.%s", _CSL_Namespace_InNamespaceGet ( )->S_ContainingNamespace->Name, _CSL_Namespace_InNamespaceGet ( )->Name ) ;
+    Namespace * ins = _CSL_Namespace_InNamespaceGet ( ) ;
+    if ( ins ) Printf ( ( byte* ) "\nInNamespace = %s.%s", ins->S_ContainingNamespace->Name, ins->Name ) ;
     if ( finder->QualifyingNamespace ) Printf ( ( byte* ) "\nQualifyingNamespace = %s.%s",
         finder->QualifyingNamespace->S_ContainingNamespace ? finder->QualifyingNamespace->S_ContainingNamespace->Name : ( byte* ) "", 
         finder->QualifyingNamespace->Name ) ;
+    if ( _Context_->QidInNamespace ) Printf ( ( byte* ) "\nQualifyingNamespace = %s.%s",
+        _Context_->QidInNamespace->S_ContainingNamespace ? _Context_->QidInNamespace->S_ContainingNamespace->Name : ( byte* ) "", 
+        _Context_->QidInNamespace->Name ) ;
     if ( pflag || ( _O_->Verbosity > 1 ) )
     {
         OpenVmTil_Print_DataSizeofInfo ( pflag ) ;

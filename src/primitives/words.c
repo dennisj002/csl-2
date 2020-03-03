@@ -167,6 +167,15 @@ CSL_Alias ( )
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     _CSL_Alias (word, name , 0) ;
 }
+
+void
+CSL_FindAlias ( )
+{
+    byte * wname  = ( byte* ) DataStack_Pop ( ) ;
+    Word * word = Finder_Word_FindUsing ( _Finder_, wname, 0 ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
+    _CSL_Alias ( word, name , 0) ;
+}
 #if 0
 
 void

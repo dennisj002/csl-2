@@ -498,7 +498,7 @@ forStarters 1 =
 : sp ; //stack pause ; 
 sp
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
-#if 0
+#if 1
 : wtdinclude "namespaces/wordTypeDef.csl" include ;
 : typesInclude "namespaces/types.csl" include ;
 //typesInclude 
@@ -543,6 +543,7 @@ typedef struct _byteTest
     int16 a16_123 ; 
 } byteTest, abyteTest ; // size = 26
 byteTest 'bt new ;
+pwi byteTest //pause
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
 bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
 //var ( 'btt ) ;
@@ -610,6 +611,42 @@ Root Experimental User
 #if 0 //forStarters @ 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; pwi hi 2 3 d: hi 5 _assert
 #endif 
-tc
+#if 0
+c_syntaxOn
+jcc8_On
+User
+bnOn
+int
+fibBN ( n ) 
+{
+    int fn, fn1, fn2 ;
+    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
+    {   
+        fn1 = fn2 ;
+        fn2 = fn ;
+        fn = fn1 + fn2 ; 
+    }
+    return fn ;
+} prefix
+jcc8_Off
+c_syntaxOff
+' fibBN find wdiss
+20 fibBN p 
+sp
+bnOff
+: tfib4BN ( n | m )  
+    "locals fibBN : " ps 
+    { m 1 = } { m @ n @ <= } { m m @ 1 + =  } 
+    { m @ dup p " : " _ps fibBN fp { n @ m @ > } { "," _ps } if2 } 
+    for
+    //"Cfib2_O3       : " ps 
+    //d: Int.1 ti m 1 = { n @ } { m @ fibBN p n n @ 1 - = } while Int.1 time nl nl
+;
+bnOn    
+//nl nl 47 tfib3 //sp pause
+nl 92 dup p fibBN p //sp
+nl nl 92 d: tfib4BN //sp pause
+bnOff //pause
+#endif
 2 + 7 assertStkChk // stack checking 
 s

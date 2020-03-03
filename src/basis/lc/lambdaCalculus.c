@@ -401,7 +401,7 @@ LC_FinishSourceCode ( )
 void
 _LC_ClearDefinesNamespace ( LambdaCalculus * lc )
 {
-    if ( lc ) _Namespace_Clear ( lc->LispDefinesNamespace ) ;
+    if ( lc ) _Namespace_Clear (lc->LispDefinesNamespace, 0) ;
 }
 
 void
@@ -429,7 +429,7 @@ LC_Print_LispNamespace ( )
 void
 _LC_ClearTempNamespace ( LambdaCalculus * lc )
 {
-    if ( lc ) _Namespace_Clear ( lc->LispTempNamespace ) ;
+    if ( lc ) _Namespace_Clear (lc->LispTempNamespace, 0) ;
 }
 
 void

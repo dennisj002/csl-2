@@ -485,6 +485,7 @@ CPrimitive CPrimitives [] = {
 
     { "sm:", 0, 0, 0, CSL_StringMacro, 0, 0, 0, "Macro", "Root" },
     { "alias", 0, 0, 0, CSL_Alias, 0, 0, 0, "Macro", "Root" },
+    { "findAlias", 0, 0, 0, CSL_FindAlias, 0, 0, 0, "Macro", "Root" },
     { "tm:", 0, 0, 0, CSL_TextMacro, 0, 0, 0, "Macro", "Root" },
 
     { "name", 0, 0, 0, Word_Name, CATEGORY_OP_STACK, 0, 0, "Word", "Root" },

@@ -241,10 +241,8 @@ void
 Qid_Save_Set_InNamespace ( Namespace * ns )
 {
     Compiler_Save_Qid_BackgroundNamespace ( _Compiler_ ) ;
-    _CSL_Namespace_InNamespaceSet ( Word_UnAlias ( ns ) ) ;
+    _CSL_Namespace_InNamespaceSet ( ns ) ; //Word_UnAlias ( ns ) ) ;
 }
-
-#define UIN  0 //use inNamespace
 
 void
 CSL_Set_QidInNamespace ( Namespace * ns )
@@ -261,11 +259,7 @@ Context_DoDotted_Pre ( Context * cntx, Word * ns )
     isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, cntx->Lexer0->TokenEnd_ReadLineIndex - 1 ) ; //word->W_RL_Index ) ;
     if ( ( isForwardDotted ) ) //&& Is_NamespaceType ( ns ) )
     {
-#if UIN        
-        Qid_Save_Set_InNamespace ( ns ) ;
-#else        
         CSL_Set_QidInNamespace ( ns ) ;
-#endif        
         Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
         if ( ( ! isReverseDotted ) || ( ! cntx->BaseObject ) ) cntx->BaseObject = ns ;
     }
@@ -281,19 +275,14 @@ Context_DoDotted_Post ( Context * cntx )
         if ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) )
         {
             cntx->BaseObject = 0 ;
-            Context_ClearQualifyingNamespace () ;
         }
         if ( GetState ( cntx, IS_REVERSE_DOTTED ) ) 
         {
-#if UIN           
-            Compiler_SetAs_InNamespace_Qid_BackgroundNamespace ( cntx->Compiler0 ) ; // originally saved above
-#else            
+            Context_ClearQualifyingNamespace () ;
             Context_ClearQidInNamespace () ;
             SetState ( _Context_, (IS_REVERSE_DOTTED|IS_FORWARD_DOTTED), false ) ;
-#endif            
         }
     }
-    //SetState ( _Context_, (IS_REVERSE_DOTTED|IS_FORWARD_DOTTED), false ) ;
 }
 
 

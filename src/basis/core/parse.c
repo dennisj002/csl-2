@@ -78,6 +78,8 @@ Lexer_ParseBinary ( Lexer * lexer, byte * token, int64 offset )
 void
 Lexer_ParseBigNum ( Lexer * lexer, byte * token )
 {
+    //Namespace * qidNs = _Context_->QidInNamespace ;
+    //if ( qidNs && ( ! String_Equal ( qidNs->Name, "Int") ) && Namespace_IsUsing ( ( byte* ) "BigNum" ) )
     if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) )
     {
         mpfr_t *bfr = ( mpfr_t* ) _BigNum_New ( token ) ;

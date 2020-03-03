@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.906.600" ) 
+#define VERSION ((byte*) "0.906.640" ) 
 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -8,6 +8,7 @@
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // State Machines, Push Down Automata (PDA), Turing Machines :: 
 // Also Laws of Form, by G.S. Brown, Kurt Goedel's work and Quantum Field Theory, etc.
+// csl : context sensitive language
 // (til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas),
 
 OpenVmTil * _O_ ;
@@ -117,7 +118,7 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
     _O_ = 0 ;
 }
 #define USE_OpenVmTil_CalculateMemSpaceSizes 0
-#define _csl_SIZE (82 * K) // data stack included here
+#define _CSL_SIZE (82 * K) // data stack included here
 #if USE_OpenVmTil_CalculateMemSpaceSizes
 // _OpenVmTil_CalculateMemSpaceSizes is convoluted and needs rework
 
@@ -165,7 +166,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
         // static mem sizes
         dataStackSize = 2 * K ; // STACK_SIZE
         openVmTilSize = 2 * K ; //OPENVMTIL_SIZE ;
-        cslSize = _csl_SIZE ; //( dataStackSize * 4 ) + ( 12.5 * K ) ; // csl_SIZE
+        cslSize = _CSL_SIZE ; //( dataStackSize * 4 ) + ( 12.5 * K ) ; // csl_SIZE
         exceptionsHandled = 0 ;
     }
     else // 0 or -1 get default
@@ -183,7 +184,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
 
         dataStackSize = 8 * KB ; //STACK_SIZE ;
         openVmTilSize = 15 * KB ; //OPENVMTIL_SIZE ;
-        cslSize = _csl_SIZE ; //( dataStackSize * sizeof (int64 ) ) + ( 5 * KB ) ; //csl_SIZE ;
+        cslSize = _CSL_SIZE ; //( dataStackSize * sizeof (int64 ) ) + ( 5 * KB ) ; //csl_SIZE ;
 
         exceptionsHandled = 0 ;
     }

@@ -22,6 +22,42 @@
 // TYPED_FIELD :: TYPEDEF | TYPE
 
 Word *
+_CSL_TypedefAlias ( Word * word, byte * name, Namespace * addToNs )
+{
+    Word * alias = 0 ;
+    if ( word && word->Definition )
+    {
+        alias = _Word_New ( name, word->W_MorphismAttributes | ALIAS, word->W_ObjectAttributes, word->W_LispAttributes, 0, addToNs, DICTIONARY ) ; // inherit type from original word
+        word = Word_UnAlias ( word ) ;
+        //Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
+        _Word_DefinitionStore ( alias, ( block ) word->Definition ) ;
+        //if ( ! word->S_ContainingNamespace ) _Word_Add ( word, 0, addToNs ) ; // don't re-add if it is a recursive word cf. CSL_BeginRecursiveWord
+        DObject_Finish ( alias ) ;
+        //CSL_Finish_WordSourceCode ( _CSL_, word ) ;
+        CSL_TypeStackReset ( ) ;
+        _CSL_->LastFinished_Word = alias ;
+        //_CSL_FinishWordDebugInfo ( word ) ;
+        alias->S_CodeSize = word->S_CodeSize ;
+        alias->W_AliasOf = word ;
+        alias->Size = word->Size ;
+        alias->NamespaceStack = word->NamespaceStack ;
+        //Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 8 ) ;
+        //alias->W_SC_WordList = word->W_SC_WordList ;
+#if 0        
+        if ( ! word->W_SourceCode )
+        {
+            CSL_Finish_WordSourceCode ( _CSL_, word ) ;
+            alias->W_SourceCode = word->W_SourceCode ;
+        }
+        else CSL_Finish_WordSourceCode ( _CSL_, alias ) ;
+#endif        
+        alias->W_SourceCode = _CSL_GetSourceCode ( ) ;
+    }
+    else Exception ( USEAGE_ERROR, ABORT ) ;
+    return alias ;
+}
+
+Word *
 Parse_Do_IdentifierAlias ( Context * cntx, byte * token )
 {
     Compiler * compiler = cntx->Compiler0 ;
@@ -50,7 +86,8 @@ Parse_Identifier ( Context * cntx, int64 t_type )
         // with a nameless struct or union identifier are added to the background namespace
         addToNs = ( tdsci->Tdsci_StructureUnion_Namespace && tdsci->Tdsci_StructureUnion_Namespace->Name ) ?
             tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_InNamespace ;
-        tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, identifier, 0, 0, 0, tdsci->Tdsci_Offset, tdsci->Tdsci_Field_Size, Word_UnAlias (addToNs), 0, 0, 0 ) ;
+        //tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, identifier, 0, 0, 0, tdsci->Tdsci_Offset, tdsci->Tdsci_Field_Size, Word_UnAlias (addToNs), 0, 0, 0 ) ;
+        tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, identifier, 0, 0, 0, tdsci->Tdsci_Offset, tdsci->Tdsci_Field_Size, addToNs, 0, 0, 0 ) ;
         TypeNamespace_Set ( id, tdsci->Tdsci_Field_Type_Namespace ) ;
     }
     else if ( t_type == POST_STRUCTURE_NAME ) //&& GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )

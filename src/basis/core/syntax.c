@@ -112,6 +112,7 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                     blocksParsed ++ ;
                 }
                 if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
+                else CSL_C_Semi ( ) ;
                 break ;
             }
             case 'e':

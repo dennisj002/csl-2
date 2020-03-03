@@ -39,7 +39,8 @@ CSL_TurnOffBlockCompiler ( )
     Compiler * compiler = cntx->Compiler0 ;
     if ( ! GetState ( compiler, LISP_MODE ) ) CSL_LeftBracket ( ) ;
     _CSL_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
-    CSL_SaveDebugInfo ( 0, 0 ) ;
+    //CSL_SaveDebugInfo ( 0, 0 ) ;
+    _CSL_FinishWordDebugInfo ( 0 ) ;
     CSL_NonCompilingNs_Clear ( compiler ) ;
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
     cntx->LastCompiledWord = cntx->CurrentWordBeingCompiled ;
@@ -156,7 +157,7 @@ _CSL_EndBlock2 ( BlockInfo * bi )
         _CSL_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
         CSL_TurnOffBlockCompiler ( ) ;
     }
-    else if ( ! GetState ( compiler, C_BLOCK_INTERPRETER ) ) _Namespace_RemoveFromUsingList_ClearFlag ( bi->BI_LocalsNamespace, 1 ) ; // a block namespace
+    else if ( ! GetState ( compiler, C_BLOCK_INTERPRETER ) ) _Namespace_RemoveFromUsingList_ClearFlag (bi->BI_LocalsNamespace, 1 , 0) ; // a block namespace
     return first ;
 }
 

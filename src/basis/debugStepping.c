@@ -510,7 +510,6 @@ _Debugger_CASOI_Do_JmpOrCall_Insn ( Debugger * debugger, byte * jcAddress )
 {
     Word *word, * word0 = Word_GetFromCodeAddress ( jcAddress ) ;
     word = Word_UnAlias ( word0 ) ;
-    debugger->w_Word = word ;
     
     if ( word && ( word->W_MorphismAttributes & ( DEBUG_WORD | RT_STEPPING_DEBUG ) ) )
     {
@@ -522,6 +521,7 @@ _Debugger_CASOI_Do_JmpOrCall_Insn ( Debugger * debugger, byte * jcAddress )
         //goto end ; // skip it
         return false ;
     }
+    else debugger->w_Word = word ;
     return true ;
 }
 

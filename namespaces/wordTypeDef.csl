@@ -1,7 +1,7 @@
 5
 c_syntaxOn
-'C.Experimental namespace
-Experimental
+C 'Experimental namespace
+C.Experimental
 type Pointer ; Pointer.size = 8 ;
 type block ; block.size = 8 ;
 type Location ; Location.size = 8 ;

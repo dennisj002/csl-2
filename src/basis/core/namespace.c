@@ -61,9 +61,16 @@ Namespace_Do_Namespace ( Namespace * ns, Boolean isForwardDotted )
 }
 
 void
+_Context_ClearQidInNamespace ( Context * cntx )
+{
+    cntx->QidInNamespace = 0 ;
+}
+
+void
 Context_ClearQidInNamespace ( )
 {
-    _Context_->QidInNamespace = 0 ;
+    //_Context_->QidInNamespace = 0 ;
+    _Context_ClearQidInNamespace ( _Context_ ) ;
 }
 
 void
@@ -236,6 +243,10 @@ Namespace_SetState_AdjustListPosition ( Namespace * ns, uint64 state, Boolean se
 void
 _Namespace_AddToUsingList ( Namespace * ns )
 {
+#if 0    
+    if ( String_Equal ( "cobj", ns->Name ) )
+        Printf ( ( byte * ) "_Namespace_AddToUsingList : entered : cobj at %s", Context_Location () ), CSL_Using ( ), Pause () ;
+#endif    
     int64 i ;
     Namespace * svNs = ns ;
     Stack * stack = _Compiler_->InternalNamespacesStack ;
@@ -253,13 +264,20 @@ _Namespace_AddToUsingList ( Namespace * ns )
         if ( ns->WL_OriginalWord ) ns = ns->WL_OriginalWord ; //_Namespace_Find ( ns->Name, 0, 0 ) ; // this is needed because of Compiler_PushCheckAndCopyDuplicates
         Namespace_SetState_AdjustListPosition ( ns, USING, 0 ) ;
     }
+#if 0    
     if ( ns != svNs )
     {
         //CSL_Using () ;
         Namespace_SetState_AdjustListPosition ( svNs, USING, 1 ) ;
         //CSL_Using () ;
     }
-    else _Namespace_SetState ( ns, USING ) ;
+#endif    
+    //else 
+    _Namespace_SetState ( ns, USING ) ;
+#if 0   
+    if ( String_Equal ( "cobj", ns->Name ) )
+        Printf ( ( byte * ) "_Namespace_AddToUsingList : added : cobj at %s", Context_Location () ), CSL_Using ( ), Pause () ;
+#endif    
 }
 
 void
@@ -267,13 +285,11 @@ _Namespace_ActivateAsPrimary ( Namespace * ns )
 {
     if ( ns )
     {
-        Context * cntx = _Context_ ;
         //ns = Word_UnAlias ( ns ) ;
         Finder_SetQualifyingNamespace ( _Context_->Finder0, ns ) ;
-        //_CSL_Namespace_QidInNamespaceSet ( ns )
         _Namespace_AddToUsingList ( ns ) ;
         _CSL_SetAsInNamespace ( ns ) ;
-        cntx->BaseObject = 0 ;
+        //_Context_->BaseObject = 0 ;
     }
 }
 
@@ -386,12 +402,13 @@ Namespace_RemoveFromUsingList_WithCheck ( byte * name )
 }
 
 void
-_Namespace_Clear ( Namespace * ns )
+_Namespace_Clear ( Namespace * ns, Boolean recycleFlag )
 {
     if ( ns )
     {
-        DLList_Recycle_NamespaceList ( ns->W_List ) ;
-        DLList_RemoveWords ( ns->W_List ) ;
+        if ( recycleFlag ) DLList_Recycle_NamespaceList ( ns->W_List ) ;
+        else DLList_RemoveWords ( ns->W_List ) ; // if not recycle the words are just removed and still accessible by the debugger ;
+        // but we need to put them on another list to be recycled when not needed ???
         _dllist_Init ( ns->W_List ) ;
     }
 }
@@ -399,7 +416,7 @@ _Namespace_Clear ( Namespace * ns )
 void
 Namespace_Clear ( byte * name )
 {
-    _Namespace_Clear ( _Namespace_Find ( name, 0, 0 ) ) ;
+    _Namespace_Clear ( _Namespace_Find ( name, 0, 0 ), 0 ) ;
 }
 
 int64
@@ -422,31 +439,14 @@ _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 }
 
 Namespace *
-Namespace_New ( byte * name, Namespace * containingNs )
-{
-    Namespace * ns ;
-    //if ( String_Equal ( "bt", name ) )
-    //    Printf ( ( byte * ) "Namespace_New : bt" ) ;
-    ns = _Namespace_Find ( name, containingNs, 0 ) ;
-    if ( ! ns )
-    {
-        ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, containingNs, 0, 0, - 1 ) ;
-        //_Namespace_Symbol_Print ( ns, 2, 0 ) ;
-    }
-    return ns ;
-}
-
-// a namespaces internal finder, a wrapper for Symbol_Find - prefer Symbol_Find directly
-
-Namespace *
 _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
 {
     if ( name )
     {
-        Word * word = 0 ;
-        if ( superNamespace ) word = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
-        if ( ! word ) word = Finder_FindWord_UsedNamespaces ( _Finder_, name ) ;
-        if ( word && Is_NamespaceType ( word ) ) return word ; //( Namespace* ) Word_UnAlias ( word ) ;
+        Namespace * ns = 0 ;
+        if ( superNamespace ) ns = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
+        if ( ( ! ns ) && ( ! superNamespace ) ) ns = Finder_FindWord_UsedNamespaces ( _Finder_, name ) ;
+        if ( ns && Is_NamespaceType ( ns ) ) return ns ; //( Namespace* ) Word_UnAlias ( word ) ;
         else if ( exceptionFlag )
         {
             Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
@@ -456,6 +456,35 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
     }
     return 0 ;
 }
+
+#if 1
+Namespace *
+_Namespace_New ( byte * name, Namespace * containingNs )
+{
+    Namespace * ns = _DObject_New ( name, 0, IMMEDIATE, NAMESPACE, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
+    return ns ;
+}
+#else
+Namespace *
+_Namespace_New ( byte * name, Namespace * containingNs )
+{
+    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, containingNs, 0, 0, - 1 ) ;
+    return ns ;
+}
+#endif
+Namespace *
+Namespace_New ( byte * name, Namespace * containingNs )
+{
+    Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
+    if ( ! ns )
+    {
+        ns = _Namespace_New ( name, containingNs ) ;
+        //_Namespace_Symbol_Print ( ns, 2, 0 ) ;
+    }
+    return ns ;
+}
+
+// a namespaces internal finder, a wrapper for Symbol_Find - prefer Symbol_Find directly
 
 Namespace *
 Namespace_Find ( byte * name )
@@ -469,7 +498,7 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 {
     if ( ! containingNs ) containingNs = _CSL_->Namespaces ;
     Namespace * ns = _Finder_FindWord_InOneNamespace ( _Finder_, containingNs, name ) ; //_Namespace_Find ( name, containingNs, 0 ) ;
-    //if ( ! ns ) ns = _Namespace_Find ( name, containingNs, 0 ) ;
+    if ( ! ns ) ns = _Namespace_Find ( name, containingNs, 0 ) ;
     if ( ! ns ) ns = Namespace_New ( name, containingNs ) ;
     if ( setUsingFlag ) Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
     return ns ;
@@ -487,7 +516,9 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
     //ns = _Namespace_Find ( name, _CSL_->Namespaces, 0 ) ;
     //if ( ! ns )
     {
-        ns = Namespace_New ( name, _CSL_->Namespaces ) ;
+        //ns = Namespace_New ( name, _CSL_->Namespaces ) ;
+        //ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, _CSL_->Namespaces, 0, 0, - 1 ) ;
+        ns = _Namespace_New ( name, _CSL_->Namespaces ) ;
         if ( CompileMode ) Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
         else compiler->NonCompilingNs = ns ;
     }
@@ -564,26 +595,27 @@ CSL_Namespace_PrintWordList ( )
 }
 
 void
-_Namespace_RemoveFromUsingList_ClearFlag ( Namespace * ns, int64 clearFlag )
+_Namespace_RemoveFromUsingList_ClearFlag ( Namespace * ns, Boolean clearFlag, Boolean recycleFlag )
 {
     if ( ns )
     {
         if ( ns == _CSL_->InNamespace ) _CSL_->InNamespace = 0 ;
-        if ( _Finder_ && ( ns == _Finder_->QualifyingNamespace ) ) Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
+        if ( _Finder_ && ( ns == _Finder_->QualifyingNamespace ) ) Finder_ClearQualifyingNamespace ( _Finder_ ) ;
+        if ( _Context_ && _Context_->QidInNamespace ) _Context_ClearQidInNamespace ( _Context_ ) ;
         //if ( _O_->Dbi ) _Namespace_PrintWordList_FromNode ( ns ) ;
         dlnode_Remove ( ( dlnode* ) ns ) ;
         if ( clearFlag )
         {
-            _Namespace_Clear ( ns ) ;
-            Word_Recycle ( ns ) ;
+            _Namespace_Clear ( ns, recycleFlag ) ;
+            if ( recycleFlag ) Word_Recycle ( ns ) ; // probably could recycle the ns without interfering
         }
-        else _Namespace_SetState ( ns, NOT_USING ) ;
+        _Namespace_SetState ( ns, NOT_USING ) ;
         //if ( _O_->Dbi ) _Namespace_PrintWordList_FromNode ( ns ) ;
     }
 }
 
 void
-Namespace_RemoveNamespacesStack_ClearFlag ( Stack * stack, int64 clearFlag )
+Namespace_RemoveAndReInitNamespacesStack_ClearFlag (Stack * stack, Boolean clearFlag , Boolean recycleFlag)
 {
     if ( stack )
     {
@@ -591,7 +623,9 @@ Namespace_RemoveNamespacesStack_ClearFlag ( Stack * stack, int64 clearFlag )
         while ( n > 0 )
         {
             Namespace * ns = ( Namespace* ) _Stack_Pop ( stack ) ;
-            _Namespace_RemoveFromUsingList_ClearFlag ( ns, clearFlag ) ;
+            //if ( clearFlag ) 
+            _Namespace_RemoveFromUsingList_ClearFlag ( ns, clearFlag, recycleFlag ) ;
+            //else _Namespace_SetState ( ns, NOT_USING ) ;
             n -- ;
         }
         Stack_Init ( stack ) ;

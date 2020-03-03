@@ -16,14 +16,14 @@ Word_Object_Run ( Word * word )
     {
         Context_DoDotted_Pre ( cntx, word ) ;
         isReverseDotted = GetState ( cntx, IS_REVERSE_DOTTED ) ;
-        isForwardDotted = GetState ( cntx, IS_FORWARD_DOTTED ) ;   
+        isForwardDotted = GetState ( cntx, IS_FORWARD_DOTTED ) ;
         if ( GetState ( _Compiler_, LC_ARG_PARSING ) )
         {
             if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) rvalueFlag = false ;
             else rvalueFlag = true ;
         }
         else rvalueFlag = ( ! Is_LValue ( cntx, word ) ) ;
-        if ( word->W_ObjectAttributes & LOCAL_OBJECT ) Do_LocalObject (word, rvalueFlag, isForwardDotted, isReverseDotted) ;
+        if ( word->W_ObjectAttributes & LOCAL_OBJECT ) Do_LocalObject ( word, rvalueFlag, isForwardDotted, isReverseDotted ) ;
         else if ( ( word->W_LispAttributes & T_LISP_SYMBOL ) || ( word->W_ObjectAttributes & T_LISP_SYMBOL ) ) //lambda variables are parsed as CAttribute & T_LISP_SYMBOL
         {
             if ( ! GetState ( cntx, LC_CSL ) ) CSL_Do_LispSymbol ( word ) ;
@@ -119,7 +119,7 @@ CSL_Do_Object ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolea
             if ( isForwardDotted && ( ( ! cntx->BaseObject ) || ( ! isReverseDotted ) ) )
             {
                 cntx->BaseObject = word ;
-                Finder_SetQualifyingNamespace ( cntx->Finder0, Word_UnAlias ( word ) ) ;
+                Finder_SetQualifyingNamespace ( cntx->Finder0, Word_UnAlias ( word ) ) ; //Word_UnAlias : that's where we add CLASS_FIELDs in Parse_Identifier
             }
             //Qid_Save_Set_InNamespace ( word->S_ContainingNamespace ) ;
             interp->CurrentObjectNamespace = TypeNamespace_Get ( word ) ;
@@ -141,7 +141,7 @@ _Do_LocalObject_AllocateInit ( Namespace * typeNamespace, byte ** value, int64 s
 }
 
 void
-Do_LocalObject (Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean isReverseDotted)
+Do_LocalObject ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean isReverseDotted )
 {
     if ( ( word->W_ObjectAttributes & LOCAL_VARIABLE ) && ( ! GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
     {

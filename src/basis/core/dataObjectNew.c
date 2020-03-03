@@ -181,12 +181,12 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
 {
     Context * cntx = _Context_ ;
     if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Save_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-    Namespace * ns = _Namespace_Find ( name, 0, 0 ), * sns ;
+    Namespace *sns, * ns = _Namespace_Find ( name, sns = _CSL_Namespace_InNamespaceGet ( ), 0 ) ;
     int64 size = 0 ;
     byte * token ;
-    if ( ( ! ns ) ) //|| ( ! String_Equal ( ns->S_ContainingNamespace->Name, CSL_In_Namespace () )) )
+    if ( ! ns ) 
     {
-        sns = _CSL_Namespace_InNamespaceGet ( ) ;
+        //sns = _CSL_Namespace_InNamespaceGet ( ) ;
         if ( cloneFlag ) size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         ns = _DObject_New ( name, 0, IMMEDIATE, CLASS | objectType, 0, objectType, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
         Namespace_Do_Namespace ( ns, 0 ) ; // before "size", "this"
@@ -285,12 +285,5 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
     word = _DObject_New ( name, uliteral, ( IMMEDIATE | lexer->L_MorphismAttributes ), ( LITERAL | CONSTANT | lexer->L_ObjectAttributes ), 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
 
     return word ;
-}
-
-Namespace *
-_Namespace_New ( byte * name, Namespace * containingNs )
-{
-    Namespace * ns = _DObject_New ( name, 0, IMMEDIATE, NAMESPACE, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
-    return ns ;
 }
 
