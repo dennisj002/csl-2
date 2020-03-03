@@ -1,7 +1,7 @@
 #include "../../include/csl.h"
 
 void
-Word_Morphism_Run ( Word * word )
+Word_PreRun_Init ( Word * word )
 {
     if ( word )
     {
@@ -9,7 +9,15 @@ Word_Morphism_Run ( Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         if ( ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) ) Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word ;
-        word = _Context_->CurrentlyRunningWord ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
+    }
+}
+
+void
+Word_Morphism_Run ( Word * word )
+{
+    if ( word )
+    {
+        Word_PreRun_Init ( word ) ;
         Block_Eval ( word->Definition ) ;
         _Context_->LastRanWord = word ;
         _Context_->CurrentlyRunningWord = 0 ;
@@ -343,7 +351,7 @@ Word_GetFromCodeAddress_NoAlias ( byte * address )
 void
 _CSL_WordName_Run ( byte * name )
 {
-    Block_Eval ( Finder_Word_FindUsing (_Context_->Finder0, name, 0)->Definition ) ;
+    Block_Eval ( Finder_Word_FindUsing ( _Context_->Finder0, name, 0 )->Definition ) ;
 }
 
 // alias : postfix
