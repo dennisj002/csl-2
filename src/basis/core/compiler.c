@@ -11,6 +11,7 @@ _CopyDuplicateWord ( Word * word0, Boolean complete )
     wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
     _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
     wordc->W_ObjectAttributes |= ( uint64 ) RECYCLABLE_COPY ;
+    wordc->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
     if ( complete )
     {
         wordc->WL_OriginalWord = Word_GetOriginalWord ( word0 ) ;

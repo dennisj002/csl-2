@@ -272,9 +272,9 @@ Context_DoDotted_Post ( Context * cntx )
 {
     if ( ! GetState ( cntx, IS_FORWARD_DOTTED ) )
     {
-        if ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) )
+        //if ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) )
         {
-            cntx->BaseObject = 0 ;
+            cntx->BaseObject = 0 ; // nb! very important !! 
         }
         if ( GetState ( cntx, IS_REVERSE_DOTTED ) ) 
         {
