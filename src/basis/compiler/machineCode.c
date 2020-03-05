@@ -82,7 +82,7 @@ _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Bool
     if ( sib && ( controlFlags & SIB_B ) ) _Compile_Int8 ( sib ) ;
     if ( disp || ( controlFlags & DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags & IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags & IMM_B ) ) ;
-    if ( _DBI || (_O_->Dbi > 1) )
+    if ( _DBI || ( _O_->Dbi > 1 ) )
     {
         d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
         d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
@@ -263,7 +263,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
     {
         reg = 0 ; // the rm is the destination and this is move immediate
         controlFlags |= IMM_B ;
-        if ( immSize < 8 )
+        if ( immSize && (immSize < 8) )
         {
             if ( immSize == 1 ) opCode = 0xb0 + rm ;
             else if ( immSize == 2 )
@@ -280,8 +280,21 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
         }
         else //if ( immSize >= 8 ) 
         {
-            opCode = 0xb8 ;
-            opCode += ( rm & 7 ) ;
+            //DBI_ON ;
+#if 1          
+            if ( imm <= 2147483647 ) // sign extend 32 bit to 64 bit -> smaller faster insn
+            {
+                opCode = 0xc7 ;
+                reg = 0 ;
+                immSize = 4 ;
+                controlFlags |= ( MODRM_B ) ;
+            }
+            else
+#endif                
+            {
+                opCode = 0xb8 ;
+                opCode += ( rm & 7 ) ;
+            }
             controlFlags |= ( REX_W ) ;
         }
         //DBI_ON ; 
@@ -299,8 +312,8 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
         if ( ! mod )
         {
             if ( disp == 0 ) mod = 0 ;
-            else if ( abs (disp) <= 0x7f ) mod = 1 ;
-            else if ( abs (disp) >= 0x100 ) mod = 2 ;
+            else if ( abs ( disp ) <= 0x7f ) mod = 1 ;
+            else if ( abs ( disp ) >= 0x100 ) mod = 2 ;
         }
     }
     Compile_CalculateWrite_Instruction_X64 ( opCode0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
@@ -489,11 +502,11 @@ _Compile_X_Group1_Immediate ( Boolean code, Boolean mod, Boolean rm, int64 disp,
         //DBI_OFF ;
         return ;
     }
-    else if ( ( iSize > BYTE ) || (abs ( imm ) >= 0x7f ) ) //( imm >= 0x100 ) )
+    else if ( ( iSize > BYTE ) || ( abs ( imm ) >= 0x7f ) ) //( imm >= 0x100 ) )
     {
         opCode |= 1 ;
     }
-    else if ( ( iSize <= BYTE ) || (abs ( imm ) < 0x100 ) ) //( imm < 0x100 ) ) 
+    else if ( ( iSize <= BYTE ) || ( abs ( imm ) < 0x100 ) ) //( imm < 0x100 ) ) 
         opCode |= 3 ;
     // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
@@ -745,10 +758,10 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
 int32
 _CalculateOffsetForCallOrJump ( byte * offsetAddress, byte * jmpToAddr, byte insn )
 {
-    int32 offset = jmpToAddr - (offsetAddress + 1)  ;
+    int32 offset = jmpToAddr - ( offsetAddress + 1 ) ;
     byte * insnAddr = offsetAddress - 1, offsetSize ;
     insn = insn ? insn : * insnAddr ; // when compiling a jmp/jcc insn *insnAddr == 0 ; nb! : insn is necessary in this case
-    offsetSize = ( ( insn == JMPI32 ) || ( insn == JCC32 ) || ( insn == CALLI32 ) || ( abs (offset) > 127 ) ) ? 4 : 1 ;
+    offsetSize = ( ( insn == JMPI32 ) || ( insn == JCC32 ) || ( insn == CALLI32 ) || ( abs ( offset ) > 127 ) ) ? 4 : 1 ;
 
     //if ( ( offsetSize == 4 ) || ( abs ( jmpToAddr - ( offsetAddress + offsetSize ) ) > 255 ) ) offset = ( jmpToAddr - ( offsetAddress + 4 ) ) ; // operandSize sizeof offset //call/jmp insn x64/x86 mode //sizeof (cell) ) ; // we have to go back the instruction size to get to the start of the insn 
     if ( offsetSize == 4 )
@@ -773,7 +786,7 @@ _SetOffsetForCallOrJump ( byte * offsetAddress, byte * jmpToAddr, byte insn )
     byte * insnAddr = offsetAddress - 1 ;
     insn = insn ? insn : * insnAddr ;
     int32 offset = _CalculateOffsetForCallOrJump ( offsetAddress, jmpToAddr, insn ) ;
-    if ( ( insn != JMPI32 ) && ( insn != JCC32 ) && ( abs (offset) < 127 ) ) * ( ( int8* ) offsetAddress ) = ( byte ) offset ;
+    if ( ( insn != JMPI32 ) && ( insn != JCC32 ) && ( abs ( offset ) < 127 ) ) * ( ( int8* ) offsetAddress ) = ( byte ) offset ;
     else if ( insn == JMPI32 ) * ( ( int32* ) offsetAddress ) = offset ; //offset ;
     else if ( insn == JCC32 ) * ( ( int32* ) ( offsetAddress + 1 ) ) = offset ; //offset ;
 }

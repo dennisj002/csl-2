@@ -656,7 +656,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
 // only check a first node, if no first node the list is empty
 
 byte *
-OVT_CheckRecycleableAllocate ( dllist * list, int64 size )
+DLList_CheckRecycledForAllocation ( dllist * list, int64 size )
 {
     DLNode * node = 0 ;
     if ( list ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ;
@@ -692,7 +692,7 @@ _CheckRecycleWord ( Word * w )
     if ( w && ( w->W_ObjectAttributes & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) ) 
     {
         //if ( Is_DebugOn ) 
-        _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
+        if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
         Word_Recycle ( w ) ;
     }
 }

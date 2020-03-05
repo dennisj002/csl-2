@@ -155,7 +155,7 @@ _Word_Allocate ( uint64 allocType )
 {
     Word * word = 0 ;
     int64 size = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
-    word = ( Word* ) OVT_CheckRecycleableAllocate ( _O_->MemorySpace0->RecycledWordList, size ) ;
+    word = ( Word* ) DLList_CheckRecycledForAllocation ( _O_->MemorySpace0->RecycledWordList, size ) ;
     if ( word ) _O_->MemorySpace0->RecycledWordCount ++ ;
     else word = ( Word* ) Mem_Allocate ( size, allocType ) ;
     ( ( DLNode* ) word )->n_Size = size ;

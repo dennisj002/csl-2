@@ -100,7 +100,7 @@ CSL_Debugger_SaveCpuState ( )
 void
 CSL_PrintReturnStackWindow ( )
 {
-    _PrintNStackWindow ( ( uint64* ) _CSL_->cs_Cpu->Rsp, (byte*) "CSL C ReturnStack (RSP)", (byte*) "RSP", 4 ) ;
+    _PrintNStackWindow ( ( uint64* ) _CSL_->cs_Cpu->Rsp, ( byte* ) "CSL C ReturnStack (RSP)", ( byte* ) "RSP", 4 ) ;
 }
 
 void
@@ -171,7 +171,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
 
     _Context_ = csl->Context0 = _Context_New ( csl ) ;
 
-    csl->Debugger0 = _Debugger_New ( allocType ) ; 
+    csl->Debugger0 = _Debugger_New ( allocType ) ;
     csl->cs_Cpu = CpuState_New ( allocType ) ;
     csl->cs_Cpu2 = CpuState_New ( allocType ) ;
     csl->PeekPokeByteArray = ByteArray_AllocateNew ( 32, allocType ) ;
@@ -187,12 +187,12 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     }
     CSL_MachineCodePrimitive_AddWords ( csl ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
     csl->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
-    csl->PokeWord = Finder_FindWord_InOneNamespace ( _Finder_, (byte*) "Compiler", (byte*) "=" ) ; //Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "=" ) ;
+    csl->PokeWord = Finder_FindWord_InOneNamespace ( _Finder_, ( byte* ) "Compiler", ( byte* ) "=" ) ; //Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "=" ) ;
     csl->RightBracket = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "]" ) ;
-    csl->InfixNamespace = Namespace_Find ( (byte*) "Infix" ) ;
-    csl->StringNamespace = Namespace_Find ( (byte*) "String" ) ;
-    csl->BigNumNamespace = Namespace_Find ( (byte*) "BigNum" ) ;
-    csl->IntegerNamespace = Namespace_Find ( (byte*) "Integer" ) ;
+    csl->InfixNamespace = Namespace_Find ( ( byte* ) "Infix" ) ;
+    csl->StringNamespace = Namespace_Find ( ( byte* ) "String" ) ;
+    csl->BigNumNamespace = Namespace_Find ( ( byte* ) "BigNum" ) ;
+    csl->IntegerNamespace = Namespace_Find ( ( byte* ) "Integer" ) ;
     //csl->RawStringNamespace = Namespace_Find ( (byte*) "RawString" ) ;
     //csl->CharNamespace = Namespace_Find ( (byte*) "Char" ) ;
     //csl->FloatNamespace = Namespace_Find ( (byte*) "Float" ) ;
@@ -200,8 +200,8 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     CSL_LexerTables_Setup ( csl ) ;
     csl->LC = 0 ;
     csl->SC_QuoteMode = 0 ;
-    csl->EndBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, (byte*) "Reserved", (byte*) "}" ) ;
-    csl->BeginBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, (byte*) "Reserved", (byte*) "{" ) ;
+    csl->EndBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, ( byte* ) "Reserved", ( byte* ) "}" ) ;
+    csl->BeginBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, ( byte* ) "Reserved", ( byte* ) "{" ) ;
     SetState ( csl, SOURCE_CODE_ON, true ) ;
 }
 
@@ -315,17 +315,88 @@ void
 CSL_DebugLevel ( )
 {
 #if 0    
-    if ( Compiling ) 
+    if ( Compiling )
     {
-        _Compile_Stack_Push ( DSP, ACC, ( int64 ) &_CSL_->DebugLevel ) ; 
+        _Compile_Stack_Push ( DSP, ACC, ( int64 ) & _CSL_->DebugLevel ) ;
         _Set_To_Here_Word_StackPushRegisterCode ( _Context_->CurrentEvalWord, 1 ) ;
     }
-    //if ( Compiling ) Compile_MoveImm_To_Reg ( RAX, ( int64 ) & _CSL_->DebugLevel, CELL ) ;
+        //if ( Compiling ) Compile_MoveImm_To_Reg ( RAX, ( int64 ) & _CSL_->DebugLevel, CELL ) ;
     else DataStack_Push ( ( int64 ) & _CSL_->DebugLevel ) ;
     //else 
     //DataStack_Push ( ( int64 ) & _CSL_->DebugLevel ) ;
 #endif    
-    Do_C_Pointer_StackAccess ( (byte* )& _CSL_->DebugLevel );
+    Do_C_Pointer_StackAccess ( ( byte* ) & _CSL_->DebugLevel ) ;
+}
+
+void
+CSL_SaveDebugInfo ( Word * word, uint64 allocType )
+{
+    word = word ? word : _Context_->CurrentWordBeingCompiled ? _Context_->CurrentWordBeingCompiled : 0 ; //_Context_->CurrentWordBeingCompiled : _CSL_->LastFinished_Word ;
+    if ( word )
+    {
+        Compiler * compiler = _Compiler_ ;
+        if ( ! allocType ) allocType = SESSION ; //T_CSL ; // COMPILER_TEMP ;
+        if ( ! GetState ( word, DEBUG_INFO_SAVED ) )
+        {
+            if ( ! word->NamespaceStack ) // already done earlier
+            {
+                if ( ! word->W_SC_WordList )
+                {
+                    word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
+                    _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
+                }
+                else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
+                if ( compiler->NumberOfVariables )
+                {
+                    word->W_NumberOfVariables = compiler->NumberOfVariables ;
+                    word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ;
+                    Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, 0, 0 ) ; // don't clear ; keep words for source code debugging, etc.
+                    _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 0, 0 ) ;
+                    ///Word_Recycle ( compiler->LocalsNamespace ) ;
+                    ///_CheckRecycleWord ( compiler->LocalsNamespace ) ;
+                }
+                Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+                SetState ( word, DEBUG_INFO_SAVED, true ) ;
+            }
+        }
+    }
+    else CSL_DeleteDebugInfo ( ) ;
+}
+
+void
+CSL_DeleteWordDebugInfo ( Word * word )
+{
+    if ( word )
+    {
+        if ( GetState ( word, DEBUG_INFO_SAVED ) )
+        {
+            if ( word->NamespaceStack ) // already done earlier
+            {
+                if ( word->W_SC_WordList )
+                {
+                    //DLList_Recycle_WordList ( word->W_SC_WordList ) ; // why not ??
+                    Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( word->NamespaceStack, 1, 1 ) ; // don't clear ; keep words for source code debugging, etc.
+                }
+                List_Init ( word->W_SC_WordList ) ;
+                Stack_Init ( word->NamespaceStack ) ;
+                SetState ( word, DEBUG_INFO_SAVED, false ) ;
+            }
+        }
+    }
+}
+
+void
+CSL_DeleteDebugInfo ( )
+{
+    Compiler_FreeLocalsNamespaces ( _Compiler_ ) ;
+    if ( ! _Context_->CurrentWordBeingCompiled ) CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+}
+
+void
+_CSL_FinishWordDebugInfo ( Word * word )
+{
+    if ( word && ( ! GetState ( _CSL_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) ) CSL_DeleteDebugInfo ( ) ;
+    else CSL_SaveDebugInfo ( word, 0 ) ;
 }
 
 

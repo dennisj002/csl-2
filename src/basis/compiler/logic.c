@@ -107,10 +107,12 @@ _Compile_GetTestLogicFromTOS ( BlockInfo *bi )
 void
 _Compile_LogicResultForStack ( int64 reg, Boolean setTtn, Boolean setNegFlag )
 {
-    _Compile_Jcc ( setNegFlag, setTtn, Here + 14, JCC8 ) ; // if eax is zero return not(R8) == 1 else return 0
+    //_Compile_Jcc ( setNegFlag, setTtn, Here + 14, JCC8 ) ; // 8 bit versoin : if eax is zero return not(R8) == 1 else return 0
+    _Compile_Jcc ( setNegFlag, setTtn, Here + 11, JCC8 ) ; // if eax is zero return not(R8) == 1 else return 0
     Compile_MoveImm_To_Reg ( reg, 0, CELL_SIZE ) ; // 6 bytes
     //return 0 in reg :
-    _Compile_JumpWithOffset ( 10 ) ; // 
+    //_Compile_JumpWithOffset ( 10 ) ; // 8 bit version
+    _Compile_JumpWithOffset ( 7 ) ; // 
     //return 1 in reg :
     Compile_MoveImm_To_Reg ( reg, 1, CELL_SIZE ) ;
     //_Set_JccLogicCode ( _Compiler_ ) ;

@@ -220,83 +220,11 @@ Compiler_BlockLevel ( Compiler * compiler )
     int64 depth = _Stack_Depth ( compiler->BlockStack ) ;
     return depth ;
 }
-
-void
-CSL_SaveDebugInfo ( Word * word, uint64 allocType )
-{
-    word = word ? word : _Context_->CurrentWordBeingCompiled ? _Context_->CurrentWordBeingCompiled : 0 ; //_Context_->CurrentWordBeingCompiled : _CSL_->LastFinished_Word ;
-    if ( word )
-    {
-        Compiler * compiler = _Compiler_ ;
-        if ( ! allocType ) allocType = SESSION ; //T_CSL ; // COMPILER_TEMP ;
-        if ( ! GetState ( word, DEBUG_INFO_SAVED ) )
-        {
-            if ( ! word->NamespaceStack ) // already done earlier
-            {
-                if ( ! word->W_SC_WordList )
-                {
-                    word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
-                    _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
-                }
-                else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
-                if ( compiler->NumberOfVariables )
-                {
-                    word->W_NumberOfVariables = compiler->NumberOfVariables ;
-                    word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ;
-                    Namespace_RemoveAndReInitNamespacesStack_ClearFlag (compiler->LocalsCompilingNamespacesStack, 0 , 0) ; // don't clear ; keep words for source code debugging, etc.
-                    _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 0, 0 ) ;
-                    ///Word_Recycle ( compiler->LocalsNamespace ) ;
-                    ///_CheckRecycleWord ( compiler->LocalsNamespace ) ;
-                }
-                Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
-                SetState ( word, DEBUG_INFO_SAVED, true ) ;
-            }
-        }
-    }
-    else CSL_DeleteDebugInfo ( ) ;
-}
-
-void
-CSL_DeleteWordDebugInfo ( Word * word )
-{
-    if ( word )
-    {
-        if ( GetState ( word, DEBUG_INFO_SAVED ) )
-        {
-            if ( word->NamespaceStack ) // already done earlier
-            {
-                if ( word->W_SC_WordList ) //&& w 
-                {
-                    Dllist_Clear ( word->W_SC_WordList, 1 ) ;
-                    Namespace_RemoveAndReInitNamespacesStack_ClearFlag (word->NamespaceStack, 1 , 1) ; // don't clear ; keep words for source code debugging, etc.
-                }
-                List_Init ( word->W_SC_WordList ) ;
-                Stack_Init ( word->NamespaceStack ) ;
-                SetState ( word, DEBUG_INFO_SAVED, false ) ;
-            }
-        }
-    }
-}
-
 void
 Compiler_FreeLocalsNamespaces ( Compiler * compiler )
 {
     if ( compiler->NumberOfVariables ) Namespace_RemoveAndReInitNamespacesStack_ClearFlag (compiler->LocalsCompilingNamespacesStack, 1 , 0) ;
     if ( compiler->LocalsNamespace ) _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 1, 0 ) ;
-}
-
-void
-CSL_DeleteDebugInfo ( )
-{
-    Compiler_FreeLocalsNamespaces ( _Compiler_ ) ;
-    if ( ! _Context_->CurrentWordBeingCompiled ) _CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
-}
-
-void
-_CSL_FinishWordDebugInfo ( Word * word )
-{
-    if ( word && ( ! GetState ( _CSL_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) ) CSL_DeleteDebugInfo ( ) ;
-    else CSL_SaveDebugInfo ( word, 0 ) ;
 }
 
 void

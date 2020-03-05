@@ -28,8 +28,8 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
                     {
                         if ( ( scWord->W_TypeAttributes & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )
                         {
-                            //word->Name = ( byte* ) "=" ;
-                            //fixed = 1 ;
+                            word->Name = ( byte* ) "=" ;
+                            fixed = 1 ;
                             SetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION, true ) ;
                         }
                         token = GetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) ? (byte*) "=" : word->Name ;
@@ -197,19 +197,32 @@ DLList_RecycleInit_WordList ( Word * word )
 }
 
 void
-_CSL_RecycleInit_Compiler_N_M_Node_WordList ( )
+_CSL_RecycleInit_Compiler_N_M_Node_WordList (dllist * list, Boolean force)
 {
+    if ( force || ( ! GetState ( _CSL_, ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ) )
+    {
+        DLList_Recycle_WordList ( list ) ;
+    }
+    List_Init ( list ) ;
+}
+
+void
+CSL_RecycleInit_Compiler_N_M_Node_WordList ( )
+{
+#if 0    
     if ( ( ! GetState ( _CSL_, ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ) )
     {
         DLList_Recycle_WordList ( _CSL_->Compiler_N_M_Node_WordList ) ;
     }
     List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
+#endif    
+    _CSL_RecycleInit_Compiler_N_M_Node_WordList (_CSL_->Compiler_N_M_Node_WordList, 0) ;
 }
 
 void
 CSL_WordList_Init ( Word * word )
 {
-    _CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
     if ( word )
     {
         //if ( ! GetState ( _Compiler_, LISP_MODE ) ) word->W_SC_Index = 0 ; // before pushWord !

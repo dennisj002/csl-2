@@ -405,7 +405,7 @@ Namespace_RemoveFromUsingList_WithCheck ( byte * name )
 }
 
 void
-Dllist_Clear ( dllist * list, Boolean recycleFlag )
+Dllist_WordList_Clear ( dllist * list, Boolean recycleFlag )
 {
     if ( list )
     {
@@ -426,7 +426,7 @@ _Namespace_Clear ( Namespace * ns, Boolean recycleFlag )
         //else DLList_RemoveWords ( ns->W_List ) ; // if not recycle the words are just removed and still accessible by the debugger ;
         //// but we need to put them on another list to be recycled when not needed ???
         //_dllist_Init ( ns->W_List ) ;
-        Dllist_Clear ( ns->W_List, recycleFlag ) ;
+        Dllist_WordList_Clear ( ns->W_List, recycleFlag ) ;
     }
 }
 

@@ -341,13 +341,24 @@ fac5 ( REG n  | REG facc )
 }
 pwi fac5
 fac5 ( 7 ) dup p 5040 _assert  
-#if 0
+#if 1
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
-//: wtdinclude "namespaces/wordTypeDef.csl" include ;
-//wtdinclude 
+#if 1
+C.Experimental 
+: wtdinclude "namespaces/wordTypeDef.csl" include ;
+: typesInclude "namespaces/types.csl" include ;
+//typesInclude 
+wtdinclude 
+C.Experimental 
+pwi Word //pause
+'wtdinclude find 100 dump
+//'wtdinclude find 'Word find d: wordStructPrint 
+'C.Experimental notUsing 
+#endif
 c_syntaxOn
 int
-faccs ( REG int32 n | REG in64 rec -- RAX ) 
+//faccs ( REG int32 n | REG in64 rec -- RAX ) 
+faccs ( REG n | REG rec ) 
 {
     rec = 1 ; 
     while ( n > 1 )
@@ -357,9 +368,9 @@ faccs ( REG int32 n | REG in64 rec -- RAX )
     return rec ;
 }
 pwi faccs 
-faccs ( 7 ) ; 5040 _assert 
-//pause
+faccs ( 7 ) ; dup p 5040 _assert 
 // test byte size objects
+sp
 C.Experimental 
 typedef struct _byteTest 
 {
@@ -378,6 +389,7 @@ typedef struct _byteTest
     int16 a16_123 ; 
 } byteTest, abyteTest ; // size = 26
 byteTest 'bt new ;
+pwi byteTest //pause
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
 bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
 //var ( 'btt ) ;
@@ -385,22 +397,27 @@ sp
 bt.a16_123 = 0x498 ;  
 hp ( bt.a16_123 ) ;
 sp
-void bttt ( byteTest bt | btt ) 
+void bttt ( byteTest xbt | btt ) 
 { 
-    btt = bt.a8_123 ; bt.a8_123 = 36 ; bt.a16_123 = 0x1234 ; bt.a32_123 = 0x12345678 ; bt.a64_123 = 0x123456789abcdef0 ; //pause
-    printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
-    printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
-    printf ( "\nbt.a16_123 = 0x%x ", bt.a16_123 ) ; 
-    printf ( "\nbt.a32_123 = 0x%x ", bt.a32_123 ) ; 
-    printf ( "\nbt.a64_123 = 0x%lx ", bt.a64_123 ) ; 
-    printf ("\nbtt = 0x%lx", btt ) ; 
-    dump ( bt, bt.size ) ; 
-    hp ( bt.a8_123 ) ;
+    printf ( "\nbtt" ) ;
+    btt = xbt.a8_123 ; xbt.a8_123 = 'a' ; xbt.b8_123 = 'b' ; xbt.c8_123 = 'c' ; xbt.a16_123 = 0x1234 ; 
+    xbt.a32_123 = 0x12345678 ; xbt.a64_123 = 0x123456789abcdef0 ; //pause
+    xbt.int32 u32_123 = 0x1234567 ; btt = 0xfedcba0987654321 ;
+    printf ( "\nbt.a16_123 = 0x%x ", xbt.a16_123 ) ; 
+    printf ( "\nbt.a32_123 = 0x%x ", xbt.a32_123 ) ; 
+    printf ( "\nbt.a64_123 = 0x%lx ", xbt.a64_123 ) ; 
+    printf ( "\nbt.u32_123 = 0x%lx ", xbt.u32_123 ) ; 
+    printf ( "\nbt.a8_123 = %c ", xbt.a8_123 ) ; 
+    printf ( "\nbt.b8_123 = %c ", xbt.b8_123 ) ; 
+    printf ( "\nbt.c8_123 = %c ", xbt.c8_123 ) ; 
+    printf ( "\nbtt = 0x%lx", btt ) ; 
+    dump ( &xbt, xbt.size ) ; 
+    hp ( xbt.a8_123 ) ;
 } 
 byteTest 'bt new ;
 pwi bttt
 sp
-bttt ( bt ) ;  // error size not considered
+bttt ( bt ) ;  //pause // error size not considered
 sp
 bt.a8_123 = 255 ; dump ( bt, bt.size ) ; 
 sp
@@ -414,7 +431,7 @@ bt.a8_123 1 _assert
 _assert ( bt.a8_123 1 ) ;
 _assert ( bt.a32_123, 2147483647 ) ;
 void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) 
-{ bt.a8_123 = i8 ; bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; dump ( bt, bt.size ) ; }
+{ bt.a8_123 = i8 ; bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; dump ( &bt, bt.size ) ; }
 byteTest 'abt new ;
 btest ( abt 0x12 0x123 0x1234567 0x123456789abcdef ) ;
 pwi btest ;
@@ -437,6 +454,7 @@ c_syntaxOff
 notUsing: byteTest _byteTest abyteTest bt abt ; 
 'C.Experimental notUsing
 Root Experimental User
+//dbiOff
 #endif
 c_syntaxOff 
 

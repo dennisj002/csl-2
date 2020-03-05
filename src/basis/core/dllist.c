@@ -11,8 +11,6 @@ dlnode *
 _dlnode_New ( uint64 allocType )
 {
     dlnode * node = ( dlnode* ) Mem_Allocate ( sizeof (dlnode ), allocType ) ;
-    //if ( node == (dlnode*) 0x7ffff7a1ee28 ) 
-    //    Printf ( (byte*) "\nnode 0x7ffff7a1ee28" ) ;
     return node ;
 }
 
@@ -798,6 +796,8 @@ _dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int
         dobj->do_iData[i] = value ;
     }
     va_end ( args ) ;
+    //if ( dobj == (dobject*) 0x7ffff7a1ee28 ) 
+    //    Printf ( (byte*) "\nnode 0x7ffff7a1ee28" ) ;
     _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
 
     return dobj ;
