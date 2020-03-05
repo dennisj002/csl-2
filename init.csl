@@ -499,14 +499,15 @@ forStarters 1 =
 sp
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
 #if 1
+C.Experimental 
 : wtdinclude "namespaces/wordTypeDef.csl" include ;
 : typesInclude "namespaces/types.csl" include ;
 //typesInclude 
 wtdinclude 
-'wtdInclude find 100 dump
 C.Experimental 
-//'wtdIncmlude find d: 'Word find d: wordStructPrint 
 pwi Word //pause
+'wtdinclude find 100 dump
+//'wtdinclude find 'Word find d: wordStructPrint 
 'C.Experimental notUsing 
 #endif
 c_syntaxOn

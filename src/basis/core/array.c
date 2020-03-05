@@ -263,7 +263,7 @@ NamedByteArray_CheckAddress ( NamedByteArray * nba, byte * address )
     {
         nodeNext = dlnode_Next ( node ) ;
         ba = Get_BA_Symbol_To_BA ( node ) ;
-        if ( ByteArray_IsAddressWwitinTheArray ( ba, address ) == true ) return true ;
+        if ( ba && ByteArray_IsAddressWwitinTheArray ( ba, address ) == true ) return true ;
         //if ( ( address >= ( byte* ) ba->BA_Data ) && ( address <= ( byte* ) ba->bp_Last ) ) return true ; // ?!? not quite accurate
     }
     return false ;

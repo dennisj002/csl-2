@@ -483,7 +483,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
 
     if ( svf ) svff = 1 ;
     addWords = 1 ;
-    if ( lispMode ) args = ( ListObject * ) args->Lo_List->head ;
+    if ( lispMode ) args = ( ListObject * ) args->Lo_List->Head ;
 
     while ( ( lispMode ? ( int64 ) _LO_Next ( args ) : 1 ) )
     {

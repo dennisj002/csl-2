@@ -43,7 +43,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     }
     //OVT_SetExceptionMessage ( _O_ ) ;
     Word * eword = _Context_->CurrentEvalWord ;
-    snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUF_IX_SIZE, "\n%s\n%s %s from %s : the current evalWord is %s.%s -> ...", _O_->ExceptionMessage,
+    snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUFFER_IX_SIZE, "\n%s\n%s %s from %s : the current evalWord is %s.%s -> ...", _O_->ExceptionMessage,
         ( jb == & _CSL_->JmpBuf0 ) ? "reseting csl" : "restarting OpenVmTil",
         ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ),
         ( eword ? ( eword->S_ContainingNamespace ? eword->S_ContainingNamespace->Name : ( byte* ) "" ) : ( byte* ) "" ), ( eword ? eword->Name : ( byte* ) "" ) ) ;

@@ -13,8 +13,8 @@
 #define LC_SaveStackPointer( lc ) _LC_SaveDsp ( lc )
 #define LC_RestoreStackPointer( lc ) _LC_ResetStack ( lc ) //{ if ( lc && lc->SaveStackPointer ) Dsp = lc->SaveStackPointer ; }
 
-#define LC_snprintf2( buffer, format, value1, value2 ) snprintf ( ( char* ) buffer, BUF_IX_SIZE, ((char*) (format)), value1, value2 ) 
-#define LC_snprintf1( buffer, format, value ) snprintf ( ( char* ) buffer, BUF_IX_SIZE, ((char*) (format)), value ) 
+#define LC_snprintf2( buffer, format, value1, value2 ) snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, ((char*) (format)), value1, value2 ) 
+#define LC_snprintf1( buffer, format, value ) snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, ((char*) (format)), value ) 
 #define LC_sprintf_String( buffer, format, str ) LC_snprintf1 ( buffer, (format), ((char*) str) ) 
 #define LC_sprintString( buffer, str ) LC_sprintf_String (buffer, " %s", (str) ) 
 #define LC_sprintAString( buffer, str ) LC_sprintString (buffer, (str) ) 

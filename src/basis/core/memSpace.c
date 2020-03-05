@@ -683,14 +683,16 @@ void
 Word_Recycle ( Word * w )
 {
     OVT_Recycle ( ( dlnode * ) w ) ;
+    w->W_ObjectAttributes &=  ~( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ;
 }
 
 void
 _CheckRecycleWord ( Word * w )
 {
-    if ( w && ( w->W_ObjectAttributes & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
+    if ( w && ( w->W_ObjectAttributes & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) ) 
     {
-        //if ( Is_DebugOn ) _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
+        //if ( Is_DebugOn ) 
+        _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
         Word_Recycle ( w ) ;
     }
 }

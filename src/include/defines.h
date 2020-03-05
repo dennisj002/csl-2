@@ -162,7 +162,7 @@
 #define M MB
 
 #define BUFFER_SIZE (2 * K)
-#define BUF_IX_SIZE (BUFFER_SIZE - 1)
+#define BUFFER_IX_SIZE (BUFFER_SIZE - 1)
 
 #define DICTIONARY_SIZE ( (uint64) 1 * MB )
 #define OBJECTS_SIZE ( (uint64) 1 * MB )

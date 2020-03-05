@@ -257,6 +257,28 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
 }
 
 void
+CSL_DeleteWordDebugInfo ( Word * word )
+{
+    if ( word )
+    {
+        if ( GetState ( word, DEBUG_INFO_SAVED ) )
+        {
+            if ( word->NamespaceStack ) // already done earlier
+            {
+                if ( word->W_SC_WordList ) //&& w 
+                {
+                    Dllist_Clear ( word->W_SC_WordList, 1 ) ;
+                    Namespace_RemoveAndReInitNamespacesStack_ClearFlag (word->NamespaceStack, 1 , 1) ; // don't clear ; keep words for source code debugging, etc.
+                }
+                List_Init ( word->W_SC_WordList ) ;
+                Stack_Init ( word->NamespaceStack ) ;
+                SetState ( word, DEBUG_INFO_SAVED, false ) ;
+            }
+        }
+    }
+}
+
+void
 Compiler_FreeLocalsNamespaces ( Compiler * compiler )
 {
     if ( compiler->NumberOfVariables ) Namespace_RemoveAndReInitNamespacesStack_ClearFlag (compiler->LocalsCompilingNamespacesStack, 1 , 0) ;

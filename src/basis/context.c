@@ -14,7 +14,7 @@ _Context_Location ( Context * cntx )
     if ( cntx && cntx->ReadLiner0 )
     {
         byte * buffer = Buffer_Data ( _CSL_->StringB ) ;
-        snprintf ( ( char* ) buffer, BUF_IX_SIZE, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
+        snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
         str = cntx->Location = String_New ( buffer, TEMPORARY ) ;
     }
     return str ;

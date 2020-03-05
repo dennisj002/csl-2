@@ -189,11 +189,11 @@ LC_FindWord ( byte * name, ListObject * locals )
 Boolean
 LO_strcat ( byte * buffer, byte * buffer2 )
 {
-    if ( Strlen ( ( char* ) buffer2 ) + Strlen ( ( char* ) buffer ) >= BUF_IX_SIZE )
+    if ( Strlen ( ( char* ) buffer2 ) + Strlen ( ( char* ) buffer ) >= BUFFER_IX_SIZE )
     {
         Error ( "LambdaCalculus : LO_strcat : buffer overflow.", QUIT ) ;
     }
-    else strncat ( ( char* ) buffer, ( char* ) buffer2, BUF_IX_SIZE ) ;
+    else strncat ( ( char* ) buffer, ( char* ) buffer2, BUFFER_IX_SIZE ) ;
     buffer2 [0] = 0 ;
     return true ;
 }
@@ -209,8 +209,8 @@ _LO_CopyOne ( ListObject * l0, uint64 allocType )
         //MemCpy ( l1, l0, sizeof ( ListObject ) ) ;
         l1 = Word_Copy ( l0, allocType ) ;
         // nb. since we are coping the car/cdr are the same as the original so we must clear them else when try to add to the list and remove first it will try to remove from a wrong list so ...
-        l1->Lo_Car = 0 ;
-        l1->Lo_Cdr = 0 ;
+        l1->S_Car = 0 ;
+        l1->S_Cdr = 0 ;
     }
     return l1 ;
 }
@@ -401,7 +401,7 @@ LC_FinishSourceCode ( )
 void
 _LC_ClearDefinesNamespace ( LambdaCalculus * lc )
 {
-    if ( lc ) _Namespace_Clear (lc->LispDefinesNamespace, 0) ;
+    if ( lc ) _Namespace_Clear (lc->LispDefinesNamespace, 1) ;
 }
 
 void
@@ -429,7 +429,7 @@ LC_Print_LispNamespace ( )
 void
 _LC_ClearTempNamespace ( LambdaCalculus * lc )
 {
-    if ( lc ) _Namespace_Clear (lc->LispTempNamespace, 0) ;
+    if ( lc ) _Namespace_Clear (lc->LispTempNamespace, 1) ;
 }
 
 void

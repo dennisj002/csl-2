@@ -120,11 +120,11 @@ CSL_Namespace_InNamespaceSet ( byte * name )
 Namespace *
 _CSL_Namespace_InNamespaceGet ( )
 {
-    //if ( _CSL_->Namespaces && ( ! _CSL_->InNamespace ) )
+    //if ( _CSL_->Namespaces ) //&& ( ! _CSL_->InNamespace ) )
     {
-        _CSL_Namespace_InNamespaceSet ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) _Tree_Map_FromANode ( ( dlnode* ) CSL->Namespaces, ( cMapFunction_1 ) _Namespace_IsUsing ) ;
+        return _CSL_Namespace_InNamespaceSet ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) _Tree_Map_FromANode ( ( dlnode* ) CSL->Namespaces, ( cMapFunction_1 ) _Namespace_IsUsing ) ;
     }
-    return Word_UnAlias ( _CSL_->InNamespace ) ;
+    //return Word_UnAlias ( _CSL_->InNamespace ) ;
 }
 
 Namespace *
@@ -190,10 +190,13 @@ Word *
 _Namespace_FirstOnUsingList ( )
 {
     Word * ns, *nextNs ;
-    for ( ns = ( Namespace* ) dllist_First ( ( dllist* ) _CSL_->Namespaces->W_List ) ; ns ; ns = nextNs )
+    if ( _CSL_->Namespaces )
     {
-        nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
-        if ( Is_NamespaceType ( ns ) && ( ns->State & USING ) ) return ns ;
+        for ( ns = ( Namespace* ) dllist_First ( ( dllist* ) _CSL_->Namespaces->W_List ) ; ns ; ns = nextNs )
+        {
+            nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
+            if ( Is_NamespaceType ( ns ) && ( ns->State & USING ) ) return ns ;
+        }
     }
     return 0 ;
 }
@@ -245,7 +248,7 @@ _Namespace_AddToUsingList ( Namespace * ns )
 {
 #if 0    
     if ( String_Equal ( "cobj", ns->Name ) )
-        Printf ( ( byte * ) "_Namespace_AddToUsingList : entered : cobj at %s", Context_Location () ), CSL_Using ( ), Pause () ;
+        Printf ( ( byte * ) "_Namespace_AddToUsingList : entered : cobj at %s", Context_Location ( ) ), CSL_Using ( ), Pause ( ) ;
 #endif    
     int64 i ;
     Namespace * svNs = ns ;
@@ -276,7 +279,7 @@ _Namespace_AddToUsingList ( Namespace * ns )
     _Namespace_SetState ( ns, USING ) ;
 #if 0   
     if ( String_Equal ( "cobj", ns->Name ) )
-        Printf ( ( byte * ) "_Namespace_AddToUsingList : added : cobj at %s", Context_Location () ), CSL_Using ( ), Pause () ;
+        Printf ( ( byte * ) "_Namespace_AddToUsingList : added : cobj at %s", Context_Location ( ) ), CSL_Using ( ), Pause ( ) ;
 #endif    
 }
 
@@ -402,14 +405,28 @@ Namespace_RemoveFromUsingList_WithCheck ( byte * name )
 }
 
 void
+Dllist_Clear ( dllist * list, Boolean recycleFlag )
+{
+    if ( list )
+    {
+        if ( recycleFlag ) DLList_Recycle_NamespaceList ( list ) ;
+        else DLList_RemoveWords ( list ) ; 
+        //else DLList_RemoveWords ( list ) ; // if not recycle the words are just removed and still accessible by the debugger ;
+        // but we need to put them on another list to be recycled when not needed ???
+        _dllist_Init ( list ) ;
+    }
+}
+
+void
 _Namespace_Clear ( Namespace * ns, Boolean recycleFlag )
 {
     if ( ns )
     {
-        if ( recycleFlag ) DLList_Recycle_NamespaceList ( ns->W_List ) ;
-        else DLList_RemoveWords ( ns->W_List ) ; // if not recycle the words are just removed and still accessible by the debugger ;
-        // but we need to put them on another list to be recycled when not needed ???
-        _dllist_Init ( ns->W_List ) ;
+        //if ( recycleFlag ) DLList_Recycle_NamespaceList ( ns->W_List ) ;
+        //else DLList_RemoveWords ( ns->W_List ) ; // if not recycle the words are just removed and still accessible by the debugger ;
+        //// but we need to put them on another list to be recycled when not needed ???
+        //_dllist_Init ( ns->W_List ) ;
+        Dllist_Clear ( ns->W_List, recycleFlag ) ;
     }
 }
 
@@ -458,13 +475,16 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
 }
 
 #if 1
+
 Namespace *
 _Namespace_New ( byte * name, Namespace * containingNs )
 {
     Namespace * ns = _DObject_New ( name, 0, IMMEDIATE, NAMESPACE, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
+    ns->S_SymbolList =_dllist_New ( DICTIONARY ) ;
     return ns ;
 }
 #else
+
 Namespace *
 _Namespace_New ( byte * name, Namespace * containingNs )
 {
@@ -472,6 +492,7 @@ _Namespace_New ( byte * name, Namespace * containingNs )
     return ns ;
 }
 #endif
+
 Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
@@ -615,7 +636,7 @@ _Namespace_RemoveFromUsingList_ClearFlag ( Namespace * ns, Boolean clearFlag, Bo
 }
 
 void
-Namespace_RemoveAndReInitNamespacesStack_ClearFlag (Stack * stack, Boolean clearFlag , Boolean recycleFlag)
+Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( Stack * stack, Boolean clearFlag, Boolean recycleFlag )
 {
     if ( stack )
     {

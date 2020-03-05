@@ -85,15 +85,13 @@ typedef struct _dllist
 {
     struct
     {
-        dlnode * n_After ;
-        dlnode * n_Before ;
+        dlnode * n_Head ;
+        dlnode * n_Tail ;
     } ;
     node * n_CurrentNode ;
-} dllist ; //, list ;
-#define after_ptr n_After
-#define before_ptr n_Before
-#define head after_ptr
-#define tail before_ptr
+} dllist ; 
+#define Head n_Head
+#define Tail n_Tail
 enum types
 {
     BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, CARTESIAN_PRODUCT
@@ -188,10 +186,8 @@ typedef struct
     AttributeInfo n_Attributes ;
 } DLNode, Node, ListNode, DLList, List ;
 
-#define afterNode n_After 
-#define beforeNode n_Before 
-#define n_Car afterNode 
-#define n_Cdr beforeNode
+#define n_Car n_After 
+#define n_Cdr n_Before
 typedef void ( *MapFunction0 ) ( dlnode * ) ;
 typedef int64( *MapFunction1 ) ( dlnode *, int64 ) ;
 typedef int64( *MapFunction2 ) ( dlnode *, int64, int64 ) ;
@@ -244,8 +240,8 @@ typedef struct _Identifier // _Symbol
     struct _Identifier * CSLWord, * BaseObject ;
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
-#define S_Car S_Node.n_Car
-#define S_Cdr S_Node.n_Cdr
+#define S_Car S_Node.n_After
+#define S_Cdr S_Node.n_Before
 #define S_After S_Cdr
 #define S_Before S_Car
 #define S_CurrentNode n_CurrentNode
@@ -267,8 +263,6 @@ typedef struct _Identifier // _Symbol
 #define S_CodeSize CodeSize 
 #define S_MacroLength CodeSize 
 
-#define Head S_Car
-#define Tail S_Cdr
 #define Name S_Name
 #define W_MorphismAttributes S_MorphismAttributes
 #define W_ObjectAttributes S_ObjectAttributes
@@ -288,8 +282,6 @@ typedef struct _Identifier // _Symbol
 #define Lo_CProp W_MorphismAttributes
 #define Lo_LProp W_LispAttributes
 #define Lo_Name Name
-#define Lo_Car S_Car
-#define Lo_Cdr S_Cdr
 #define Lo_Size ObjectByteSize
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr

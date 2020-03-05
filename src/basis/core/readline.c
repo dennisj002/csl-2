@@ -70,7 +70,7 @@ ReadLine_SetCursorPosition ( ReadLiner * rl, int64 pos )
 void
 ReadLiner_CommentToEndOfLine ( ReadLiner * rl )
 {
-    ReadLine_Set_ReadIndex ( rl, BUF_IX_SIZE ) ;
+    ReadLine_Set_ReadIndex ( rl, BUFFER_IX_SIZE ) ;
     ReadLiner_Done ( rl ) ;
 }
 
@@ -91,7 +91,7 @@ ReadLiner_Done ( ReadLiner * rl )
 Boolean
 ReadLiner_IsDone ( ReadLiner * rl )
 {
-    return ( ( GetState ( rl, READLINER_DONE ) ) || ( rl->EndPosition >= BUF_IX_SIZE ) || ( rl->ReadIndex >= BUF_IX_SIZE ) ) ;
+    return ( ( GetState ( rl, READLINER_DONE ) ) || ( rl->EndPosition >= BUFFER_IX_SIZE ) || ( rl->ReadIndex >= BUFFER_IX_SIZE ) ) ;
 }
 
 void
@@ -131,7 +131,7 @@ ReadLine_SetInputLine ( ReadLiner * rl, byte * buffer )
 void
 ReadLine_InputLine_Clear ( ReadLiner * rl )
 {
-    Mem_Clear ( rl->InputLine, BUF_IX_SIZE ) ;
+    Mem_Clear ( rl->InputLine, BUFFER_IX_SIZE ) ;
 }
 
 void
@@ -398,8 +398,8 @@ ReadLine_DeleteChar ( ReadLiner * rl )
     }
     rl->InputLine [ rl->CursorPosition ] = 0 ;
     // prevent string overwriting itself while coping ...
-    strncpy ( ( char* ) b, ( char* ) & rl->InputLine [ rl->CursorPosition + 1 ], BUF_IX_SIZE ) ;
-    if ( rl->CursorPosition < rl->EndPosition ) strncat ( ( char* ) rl->InputLine, ( char* ) b, BUF_IX_SIZE ) ;
+    strncpy ( ( char* ) b, ( char* ) & rl->InputLine [ rl->CursorPosition + 1 ], BUFFER_IX_SIZE ) ;
+    if ( rl->CursorPosition < rl->EndPosition ) strncat ( ( char* ) rl->InputLine, ( char* ) b, BUFFER_IX_SIZE ) ;
     ReadLine_ClearAndShowLineWithCursor ( rl ) ;
 }
 

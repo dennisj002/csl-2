@@ -676,7 +676,7 @@ _CSL_AppendCharToSourceCode ( CSL * csl, byte c )
 void
 CSL_AppendCharToSourceCode ( CSL * csl, byte c )
 {
-    if ( csl->SC_Index < ( BUF_IX_SIZE ) )
+    if ( csl->SC_Index < ( BUFFER_IX_SIZE ) )
     {
         if ( c == '"' )
         {

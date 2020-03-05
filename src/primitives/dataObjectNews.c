@@ -50,14 +50,14 @@ Type_Create ( )
 {
     int64 size = 0 ;
     byte * token = Lexer_ReadToken ( _Lexer_ ) ; // 
-    if ( token [ 0 ] == '{' ) size = CSL_Parse_A_Typed_Field ( 0, 0, 0 ) ; //Namespace_ActivateAsPrimary ( ( byte* ) "C_Typedef" ) ;
+    if ( token [ 0 ] == '{' ) size = CSL_Parse_A_Typed_Field ( 0 ) ; //Namespace_ActivateAsPrimary ( ( byte* ) "C_Typedef" ) ;
     return size ;
 }
 
 void
 _CSL_Typedef (Word * word)
 {
-    int64 size = CSL_Parse_A_Typed_Field (0, 0, 0) ;
+    int64 size = CSL_Parse_A_Typed_Field (0) ;
     //DataStack_Push ( size ) ;
 }
 

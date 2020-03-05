@@ -1,229 +1,71 @@
 #include "../../include/csl.h"
 
-// i don't like not have C access to a structure but i want object allocation in init to 
-// be robustly tested for csl use
-
-dobject *
-_dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int64 m_slots, ... )
-{
-    int64 i, value ;
-    va_list args ;
-    va_start ( args, m_slots ) ;
-    dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
-    for ( i = 0 ; i < m_slots ; i ++ )
-    {
-        value = va_arg ( args, int64 ) ;
-        dobj->do_iData[i] = value ;
-    }
-    va_end ( args ) ;
-    _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
-
-    return dobj ;
-}
-
-#if 0
-
-dobject *
-_dllist_AddToTail_New_M_Slot_Node ( dllist* list, int64 typeCode, int64 allocType, int64 m_slots, ... )
-{
-    int64 i ;
-    va_list args ;
-    va_start ( args, m_slots ) ;
-    dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
-    for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
-    va_end ( args ) ;
-    dllist_AddNodeToTail ( list, ( dlnode* ) dobj ) ;
-    return dobj ;
-}
-#endif
-
-inline
-void
-List_Push ( dllist *list, dlnode * node )
-{
-    _dllist_AddNodeToHead ( list, ( dlnode* ) node ) ;
-}
-
-inline
-dlnode *
-List_Pop ( dllist *list )
-{
-    return _dllist_PopNode ( list ) ;
-}
-
-inline
-dlnode *
-List_Top ( dllist *list )
-{
-    return _dllist_First ( list ) ;
-}
-
-inline
-int64
-dobject_Get_M_Slot ( dobject* dobj, int64 m )
-{
-    if ( dobj ) return dobj->do_iData [m] ;
-    else return 0 ;
-}
-
-inline
-void
-dobject_Set_M_Slot ( dobject* dobj, int64 m, int64 value )
-{
-    if ( dobj ) dobj->do_iData [m] = value ;
-}
-
-inline
-void
-List_Set_N_Node_M_Slot ( dllist *list, int64 n, int64 m, int64 value )
-{
-    _dllist_Set_N_Node_M_Slot ( list, n, m, value ) ;
-}
-
-inline
-int64
-List_Get_N_Node_M_Slot ( dllist *list, int64 n, int64 m )
-{
-    return _dllist_Get_N_Node_M_Slot ( list, n, m ) ;
-}
-
-// first slot of the n node
-
-inline
-int64
-List_GetN_Value ( dllist *list, int64 n )
-{
-    return _dllist_Get_N_Node_M_Slot ( list, n, 0 ) ;
-}
-
-inline
-int64
-List_Pick_Value ( dllist *list, int64 n )
-{
-    return List_GetN_Value ( list, n ) ;
-}
-
-inline
-int64
-List_Pop_1Value ( dllist *list )
-{
-    //return List_GetN_Value ( list, n ) ;
-    dobject* dobj = ( dobject * ) _dllist_PopNode ( list ) ;
-    return dobj->do_iData [0] ;
-}
-
-inline
-dlnode *
-List_Pick ( dllist *list, int64 n )
-{
-    return _dllist_Get_N_Node ( list, n ) ;
-}
-
-inline
-void
-List_SetN_Value ( dllist *list, int64 n, int64 value )
-{
-    dobject * dobj = ( dobject* ) _dllist_Get_N_Node ( list, n ) ;
-    dobject_Set_M_Slot ( dobj, 0, value ) ;
-}
-
-inline
-void
-List_SetTop_Value ( dllist *list, int64 value )
-{
-    List_SetN_Value ( list, 0, value ) ;
-}
-
-inline
-int64
-List_Top_Value ( dllist *list )
-{
-    return List_GetN_Value ( list, 0 ) ;
-}
-
-inline
-int64
-List_Depth ( dllist *list )
-{
-    return dllist_Depth ( list ) ;
-}
-
-inline
-int64
-List_Length ( dllist *list )
-{
-    return dllist_Depth ( list ) ;
-}
-
-inline
-void
-List_Push_1Value_NewNode_T_WORD ( dllist *list, int64 value, int64 allocType )
-{
-    _dllist_PushNew_M_Slot_Node ( list, allocType, T_WORD, 1, value ) ;
-}
-
-inline
-void
-_List_PushNew_ForWordList ( dllist *list, Word * word, int64 inUseFlag )
-{
-    _dllist_PushNew_M_Slot_Node ( list, COMPILER_TEMP, T_WORD, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
-}
-
-inline
-void
-_List_PushNew_1Value ( dllist *list, int64 allocType, int64 typeCode, int64 value )
-{
-    _dllist_PushNew_M_Slot_Node ( list, allocType, typeCode, 1, value ) ;
-}
-
-inline
-void
-List_PushNew_T_WORD ( dllist *list, int64 value, int64 allocType )
-{
-    _List_PushNew_1Value ( list, value, T_WORD, allocType ) ;
-}
-
 void
 _dlnode_Init ( dlnode * node )
 {
-    node->afterNode = 0 ;
-    node->beforeNode = 0 ;
+    node->n_After = 0 ;
+    node->n_Before = 0 ;
 }
 
 dlnode *
 _dlnode_New ( uint64 allocType )
 {
     dlnode * node = ( dlnode* ) Mem_Allocate ( sizeof (dlnode ), allocType ) ;
+    //if ( node == (dlnode*) 0x7ffff7a1ee28 ) 
+    //    Printf ( (byte*) "\nnode 0x7ffff7a1ee28" ) ;
     return node ;
 }
 
-// toward the TailNode - after - next
-// toward the HeadNode - before - previous
-#define _dlnode_Previous( node ) node ? node->beforeNode : 0 
-#define Is_NotHeadOrTailNode( node ) ( node && _dlnode_Next ( node ) && _dlnode_Previous ( node ) ) ? node : 0
-//#define Is_NotHeadNode( node ) ( node && _dlnode_Previous ( node ) ) ? node : 0
+dlnode *
+_dlnode_Previous ( dlnode * anode )
+{
+    return anode->n_Before ;
+}
+
+dlnode *
+_dlnode_Next ( dlnode * anode )
+{
+    return anode->n_After ;
+}
 
 inline dlnode *
-Is_NotHeadNode ( dlnode * anode )
+Is_NotHeadOrTailNode ( dlnode * anode )
 {
-    if ( anode && anode->beforeNode )
-    {
-        return anode ;
-    }
+    if ( anode && _dlnode_Next ( anode ) && _dlnode_Previous ( anode ) ) return anode ;
     else return 0 ;
 }
 
 inline dlnode *
-_dlnode_Next ( dlnode * anode )
+_Is_NotAHeadNode ( dlnode * anode )
 {
-    if ( anode && anode->afterNode ) return anode->afterNode ;
-    return 0 ;
+    if ( _dlnode_Previous ( anode ) ) return anode ;
+    else return 0 ;
 }
 
 inline dlnode *
-Is_NotTailNode ( dlnode * anode )
+_Is_NotATailNode ( dlnode * anode )
+{
+    if ( _dlnode_Next ( anode ) ) return anode ;
+    return 0 ;
+}
+
+// with error checking anode
+
+inline dlnode *
+Is_NotAHeadNode ( dlnode * anode )
+{
+    if ( anode && _dlnode_Previous ( anode ) ) return anode ;
+        //if ( _dlnode_Previous ( anode ) ) return anode ;
+    else return 0 ;
+}
+
+// with error checking anode
+
+inline dlnode *
+Is_NotATailNode ( dlnode * anode )
 {
     if ( anode && _dlnode_Next ( anode ) ) return anode ;
+    //if ( _dlnode_Next ( anode ) ) return anode ;
     return 0 ;
 }
 
@@ -232,15 +74,11 @@ Is_NotTailNode ( dlnode * anode )
 dlnode *
 dlnode_Next ( dlnode * node )
 {
-    dlnode * nextNode ;
     // don't return TailNode, return 0
     if ( node )
     {
-        if ( nextNode = _dlnode_Next ( node ) )
-        {
-            //if ( _dlnode_Next ( nextNode ) ) return nextNode ;
-            return Is_NotTailNode ( nextNode ) ;
-        }
+        dlnode * nextNode = node->n_After ; //_dlnode_Next ( node ) ;
+        if ( nextNode && nextNode->n_After ) return nextNode ;
     }
     return 0 ;
 }
@@ -251,14 +89,10 @@ dlnode *
 dlnode_Previous ( dlnode * node )
 {
     // don't return HeadNode return 0
-    dlnode * prevNode ;
     if ( node )
     {
-        if ( prevNode = _dlnode_Previous ( node ) )
-        {
-            //if ( _dlnode_Previous ( prevNode ) ) return prevNode ;
-            return Is_NotHeadNode ( prevNode ) ;
-        }
+        dlnode * prevNode = node->n_Before ;
+        if ( prevNode && prevNode->n_Before ) return prevNode ;
     }
     return 0 ;
 }
@@ -266,26 +100,26 @@ dlnode_Previous ( dlnode * node )
 void
 dlnode_InsertThisAfterANode ( dlnode * thisNode, dlnode * aNode ) // Insert thisNode After aNode : toward the tail of the list - "after" the Head
 {
-    if ( thisNode && ( aNode = Is_NotTailNode ( aNode ) ) )
+    if ( thisNode && ( aNode = Is_NotATailNode ( aNode ) ) )
     {
         //if ( aNode->afterNode ) 
-        aNode->afterNode->beforeNode = thisNode ; // don't overwrite a Head or Tail node 
-        thisNode->afterNode = aNode->afterNode ;
-        aNode->afterNode = thisNode ; // necessarily after the above statement ! 
-        thisNode->beforeNode = aNode ;
+        aNode->n_After->n_Before = thisNode ; // don't overwrite a Head or Tail node 
+        thisNode->n_After = aNode->n_After ;
+        aNode->n_After = thisNode ; // necessarily after the above statement ! 
+        thisNode->n_Before = aNode ;
     }
 }
 
 void
 dlnode_InsertThisBeforeANode ( dlnode * thisNode, dlnode * aNode ) // Insert thisNode Before aNode : toward the head of the list - "before" the Tail
 {
-    if ( thisNode && ( aNode = Is_NotHeadNode ( aNode ) ) )
+    if ( thisNode && ( aNode = Is_NotAHeadNode ( aNode ) ) )
     {
         //if ( aNode->beforeNode ) 
-        aNode->beforeNode->afterNode = thisNode ; // don't overwrite a Head or Tail node
-        thisNode->beforeNode = aNode->beforeNode ;
-        aNode->beforeNode = thisNode ; // necessarily after the above statement ! 
-        thisNode->afterNode = aNode ;
+        aNode->n_Before->n_After = thisNode ; // don't overwrite a Head or Tail node
+        thisNode->n_Before = aNode->n_Before ;
+        aNode->n_Before = thisNode ; // necessarily after the above statement ! 
+        thisNode->n_After = aNode ;
     }
 }
 
@@ -294,12 +128,10 @@ dlnode_Remove ( dlnode * node )
 {
     if ( node = Is_NotHeadOrTailNode ( node ) )
     {
-        //if ( node->beforeNode ) 
-        node->beforeNode->afterNode = node->afterNode ;
-        //if ( node->afterNode ) 
-        node->afterNode->beforeNode = node->beforeNode ;
-        node->afterNode = 0 ;
-        node->beforeNode = 0 ;
+        node->n_Before->n_After = node->n_After ;
+        node->n_After->n_Before = node->n_Before ;
+        node->n_After = 0 ;
+        node->n_Before = 0 ;
     }
 }
 
@@ -308,9 +140,9 @@ dlnode_ReplaceNodeWithANode ( dlnode * node, dlnode * anode )
 {
     if ( node && anode )
     {
-        dlnode * afterNode = node->n_After ;
+        dlnode * n_After = node->n_After ;
         dlnode_Remove ( node ) ;
-        dlnode_InsertThisBeforeANode ( anode, afterNode ) ;
+        dlnode_InsertThisBeforeANode ( anode, n_After ) ;
     }
 }
 
@@ -319,29 +151,29 @@ dlnode_Replace ( dlnode * replacedNode, dlnode * replacingNode )
 {
     if ( replacedNode && replacingNode )
     {
-        if ( replacedNode->beforeNode ) replacedNode->beforeNode->afterNode = replacingNode ;
-        if ( replacedNode->afterNode ) replacedNode->afterNode->beforeNode = replacingNode ;
+        if ( replacedNode->n_Before ) replacedNode->n_Before->n_After = replacingNode ;
+        if ( replacedNode->n_After ) replacedNode->n_After->n_Before = replacingNode ;
     }
 }
 
 void
 _dllist_Init ( dllist * list )
 {
-    if ( list && list->head )
+    if ( list && list->Head && list->Tail )
     {
-        list->head->afterNode = ( dlnode * ) list->tail ;
-        list->head->beforeNode = ( dlnode * ) 0 ;
-        list->tail->afterNode = ( dlnode* ) 0 ;
-        list->tail->beforeNode = ( dlnode * ) list->head ;
+        list->Head->n_After = ( dlnode * ) list->Tail ;
+        list->Head->n_Before = ( dlnode * ) 0 ;
+        list->Tail->n_After = ( dlnode* ) 0 ;
+        list->Tail->n_Before = ( dlnode * ) list->Head ;
         list->n_CurrentNode = 0 ;
     }
 }
 
 void
-dllist_Init ( dllist * list, dlnode * head, dlnode * tail )
+dllist_Init ( dllist * list, dlnode * ahead, dlnode * atail )
 {
-    list->head = head ;
-    list->tail = tail ;
+    list->Head = ahead ;
+    list->Tail = atail ;
     _dllist_Init ( list ) ;
 }
 
@@ -349,8 +181,8 @@ dllist *
 _dllist_New ( uint64 allocType )
 {
     dllist * list = ( dllist* ) Mem_Allocate ( sizeof ( dllist ), allocType ) ;
-    list->head = _dlnode_New ( allocType ) ;
-    list->tail = _dlnode_New ( allocType ) ;
+    list->Head = _dlnode_New ( allocType ) ;
+    list->Tail = _dlnode_New ( allocType ) ;
     _dllist_Init ( list ) ;
     return list ;
 }
@@ -359,18 +191,6 @@ dllist *
 dllist_New ( )
 {
     return _dllist_New ( DICTIONARY ) ;
-}
-
-void
-dllist_ReInit ( dllist * list )
-{
-    dlnode * node, * nextNode ;
-    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
-    {
-        nextNode = dlnode_Next ( node ) ;
-        dlnode_Remove ( node ) ;
-    }
-    _dllist_Init ( list ) ;
 }
 
 int64
@@ -389,7 +209,7 @@ dllist_Depth ( dllist * list )
 void
 _dllist_AddNodeToHead ( dllist *list, dlnode * node )
 {
-    if ( list && node ) dlnode_InsertThisAfterANode ( node, list->head ) ; // after Head toward Tail
+    if ( list && node ) dlnode_InsertThisAfterANode ( node, list->Head ) ; // after Head toward Tail
 }
 
 void
@@ -406,7 +226,7 @@ dllist_AddNodeToHead ( dllist *list, dlnode * node )
 void
 _dllist_AddNodeToTail ( dllist *list, dlnode * node )
 {
-    if ( list && node ) dlnode_InsertThisBeforeANode ( node, list->tail ) ; // before Tail toward Head
+    if ( list && node ) dlnode_InsertThisBeforeANode ( node, list->Tail ) ; // before Tail toward Head
 }
 
 void
@@ -420,38 +240,93 @@ dllist_AddNodeToTail ( dllist *list, dlnode * node )
     }
 }
 
+inline dlnode *
+_dllist_Head ( dllist * list )
+{
+    return list->Head ;
+}
+
+inline dlnode *
+_dllist_Tail ( dllist * list )
+{
+    return list->Tail ;
+}
+
 dlnode *
 dllist_Head ( dllist * list )
 {
-    if ( ! list ) return 0 ;
-    return ( dlnode * ) list->n_After ;
+    //if ( ! list ) return 0 ;
+    //return ( dlnode * ) list->head ;
+    dlnode * ahead = 0 ;
+    if ( list ) ahead = _dllist_Head ( list ) ;
+    return ahead ;
 }
 
 dlnode *
 dllist_Tail ( dllist * list )
 {
-    if ( ! list ) return 0 ;
-    return ( dlnode * ) list->n_Before ;
+    //if ( ! list ) return 0 ;
+    //return ( dlnode * ) list->tail ;
+    dlnode * atail = 0 ;
+    if ( list ) atail = _dllist_Tail ( list ) ;
+    return atail ;
 }
+
+Boolean
+Is_TheHeadNode ( dlnode * anode )
+{
+    if ( anode->n_Before ) return false ;
+    else return true ;
+}
+
+Boolean
+Is_TheTailNode ( dlnode * anode )
+{
+    if ( anode->n_After ) return false ;
+    else return true ;
+}
+
+#if 0
+Boolean
+Is_TheHeadOrTailNode ( dlnode * anode )
+{
+    if ( anode && anode->n_After && anode->n_Before ) return false ;
+    return true ;
+}
+#endif
 
 dlnode *
 _dllist_First ( dllist * list )
 {
-    return dlnode_Next ( list->n_After ) ;
+    dlnode * head = _dllist_Head ( list ), * headNext ;
+    if ( head && ( headNext = _dlnode_Next ( head ) ) )
+        if ( ! Is_TheTailNode ( headNext ) ) return headNext ;
+    return 0 ;
+}
+
+dlnode *
+_dllist_Last ( dllist * list )
+{
+    dlnode *tail = _dllist_Tail ( list ), * tailPrevious ;
+    if ( tail && ( tailPrevious = _dlnode_Previous ( tail ) ) )
+        if ( ! Is_TheHeadNode ( tailPrevious ) ) return tailPrevious ;
+    return 0 ;
 }
 
 dlnode *
 dllist_First ( dllist * list )
 {
-    if ( ! list ) return 0 ;
-    return _dllist_First ( list ) ;
+    dlnode * first ;
+    if ( list && ( first = _dllist_First ( list ) ) ) return first ;
+    else return 0 ;
 }
 
 dlnode *
 dllist_Last ( dllist * list )
 {
-    if ( ! list ) return 0 ;
-    return dlnode_Previous ( list->n_Before ) ;
+    dlnode * last ;
+    if ( list && ( last = _dllist_Last ( list ) ) ) return last ;
+    else return 0 ;
 }
 
 dlnode *
@@ -906,4 +781,202 @@ List_N_M_Node_PrintWords ( dllist * alist )
 {
     dllist_Map1_FromEnd ( alist, ( MapFunction1 ) Word_N_M_Node_Print, 0 ) ;
 }
+
+// i don't like not have C access to a structure but i want object allocation in init to 
+// be robustly tested for csl use
+
+dobject *
+_dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int64 m_slots, ... )
+{
+    int64 i, value ;
+    va_list args ;
+    va_start ( args, m_slots ) ;
+    dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
+    for ( i = 0 ; i < m_slots ; i ++ )
+    {
+        value = va_arg ( args, int64 ) ;
+        dobj->do_iData[i] = value ;
+    }
+    va_end ( args ) ;
+    _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
+
+    return dobj ;
+}
+
+#if 0
+
+dobject *
+_dllist_AddToTail_New_M_Slot_Node ( dllist* list, int64 typeCode, int64 allocType, int64 m_slots, ... )
+{
+    int64 i ;
+    va_list args ;
+    va_start ( args, m_slots ) ;
+    dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
+    for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
+    va_end ( args ) ;
+    dllist_AddNodeToTail ( list, ( dlnode* ) dobj ) ;
+    return dobj ;
+}
+#endif
+
+inline
+void
+List_Push ( dllist *list, dlnode * node )
+{
+    _dllist_AddNodeToHead ( list, ( dlnode* ) node ) ;
+}
+
+inline
+dlnode *
+List_Pop ( dllist *list )
+{
+    return _dllist_PopNode ( list ) ;
+}
+
+inline
+dlnode *
+List_Top ( dllist *list )
+{
+    return _dllist_First ( list ) ;
+}
+
+inline
+int64
+dobject_Get_M_Slot ( dobject* dobj, int64 m )
+{
+    if ( dobj ) return dobj->do_iData [m] ;
+    else return 0 ;
+}
+
+inline
+void
+dobject_Set_M_Slot ( dobject* dobj, int64 m, int64 value )
+{
+    if ( dobj ) dobj->do_iData [m] = value ;
+}
+
+inline
+void
+List_Set_N_Node_M_Slot ( dllist *list, int64 n, int64 m, int64 value )
+{
+    _dllist_Set_N_Node_M_Slot ( list, n, m, value ) ;
+}
+
+inline
+int64
+List_Get_N_Node_M_Slot ( dllist *list, int64 n, int64 m )
+{
+    return _dllist_Get_N_Node_M_Slot ( list, n, m ) ;
+}
+
+// first slot of the n node
+
+inline
+int64
+List_GetN_Value ( dllist *list, int64 n )
+{
+    return _dllist_Get_N_Node_M_Slot ( list, n, 0 ) ;
+}
+
+inline
+int64
+List_Pick_Value ( dllist *list, int64 n )
+{
+    return List_GetN_Value ( list, n ) ;
+}
+
+inline
+int64
+List_Pop_1Value ( dllist *list )
+{
+    //return List_GetN_Value ( list, n ) ;
+    dobject* dobj = ( dobject * ) _dllist_PopNode ( list ) ;
+    return dobj->do_iData [0] ;
+}
+
+inline
+dlnode *
+List_Pick ( dllist *list, int64 n )
+{
+    return _dllist_Get_N_Node ( list, n ) ;
+}
+
+inline
+void
+List_SetN_Value ( dllist *list, int64 n, int64 value )
+{
+    dobject * dobj = ( dobject* ) _dllist_Get_N_Node ( list, n ) ;
+    dobject_Set_M_Slot ( dobj, 0, value ) ;
+}
+
+inline
+void
+List_SetTop_Value ( dllist *list, int64 value )
+{
+    List_SetN_Value ( list, 0, value ) ;
+}
+
+inline
+int64
+List_Top_Value ( dllist *list )
+{
+    return List_GetN_Value ( list, 0 ) ;
+}
+
+inline
+int64
+List_Depth ( dllist *list )
+{
+    return dllist_Depth ( list ) ;
+}
+
+inline
+int64
+List_Length ( dllist *list )
+{
+    return dllist_Depth ( list ) ;
+}
+
+inline
+void
+List_Push_1Value_NewNode_T_WORD ( dllist *list, int64 value, int64 allocType )
+{
+    _dllist_PushNew_M_Slot_Node ( list, allocType, T_WORD, 1, value ) ;
+}
+
+inline
+void
+_List_PushNew_ForWordList ( dllist *list, Word * word, int64 inUseFlag )
+{
+    _dllist_PushNew_M_Slot_Node ( list, COMPILER_TEMP, T_WORD, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
+}
+
+inline
+void
+_List_PushNew_1Value ( dllist *list, int64 allocType, int64 typeCode, int64 value )
+{
+    _dllist_PushNew_M_Slot_Node ( list, allocType, typeCode, 1, value ) ;
+}
+
+inline
+void
+List_PushNew_T_WORD ( dllist *list, int64 value, int64 allocType )
+{
+    _List_PushNew_1Value ( list, value, T_WORD, allocType ) ;
+}
+
+#if 0
+
+void
+dllist_ReInit ( dllist * list )
+{
+    dlnode * node, * nextNode ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ;
+        dlnode_Remove ( node ) ;
+    }
+    _dllist_Init ( list ) ;
+}
+#endif
 

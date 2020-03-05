@@ -81,7 +81,7 @@ Parse_Identifier ( Context * cntx, int64 t_type )
     {
         if ( t_type == TYPE_NAME ) TDSCI_Print_Field ( cntx, t_type, tdsci->Tdsci_Field_Size ) ;
     }
-    if ( t_type == TYPE_NAME )
+    else if ( t_type == TYPE_NAME )
     {
         // with a nameless struct or union identifier are added to the background namespace
         addToNs = ( tdsci->Tdsci_StructureUnion_Namespace && tdsci->Tdsci_StructureUnion_Namespace->Name ) ?
@@ -104,7 +104,7 @@ Parse_Identifier ( Context * cntx, int64 t_type )
                 tdsci->Tdsci_InNamespace, 0, - 1, - 1 ) ;
             Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
         }
-        id->W_ObjectAttributes |= ( STRUCT )  ; //??
+        id->W_ObjectAttributes |= ( STRUCT ) ; //??
         //Class_Size_Set ( tdsci->Tdsci_BackgroundStructureNamespace, tdsci->Tdsci_BackgroundStructSize ) ; //>Tdsci_StructureUnion_Size ) ;
     }
     else if ( t_type == PRE_STRUCTURE_IDENTIFIER )
@@ -335,19 +335,22 @@ Parse_Field ( Context * cntx )
 }
 
 int64
-CSL_Parse_A_Typed_Field ( Context * cntx, Boolean printFlag, byte * codeData )
+CSL_Parse_A_Typed_Field ( Context * cntx )
 {
     if ( ! cntx ) cntx = _Context_ ;
-    byte * token ;
+    //byte * token ;
     Word * word = cntx->CurrentEvalWord ;
-    TDSCI * tdsci = TDSCI_Start ( cntx, word, 0 ) ;
-    if ( printFlag && ( ! GetState ( tdsci, TDSCI_PRINT ) ) )// if we are already within a printing don't reset the pointer
+    TDSCI * tdsci = TDSCI_Start ( cntx, word, 0, 0 ) ;
+#if 0    
+    if ( printFlag && ( ! GetState ( tdsci, TDSCI_PRINT ) ) )// if we are already within a printing don't reset the structData data pointer
     {
-        tdsci->DataPtr = codeData ;
+        tdsci->DataPtr = structData ;
         SetState ( tdsci, TDSCI_PRINT, true ) ;
         token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
-        if ( ! String_Equal ( token, "typedef" ) ) return 0 ;
+        //if ( ! String_Equal ( token, "typedef" ) ) return 0 ;
+        if ( String_Equal ( token, "typedef" ) ) token = TDSCI_ReadToken ( cntx ) ;
     }
+#endif    
     Parse_Field ( cntx ) ;
     tdsci = TDSCI_Finalize ( cntx ) ;
     return tdsci->Tdsci_StructureUnion_Size ;
@@ -372,9 +375,10 @@ Parse_PreStruct_Accounting ( Context * cntx, Namespace * ns, int64 state )
         tdsci->State = ctdsci->State ;
         tdsci->Tdsci_InNamespace = ctdsci->Tdsci_StructureUnion_Namespace ? ctdsci->Tdsci_StructureUnion_Namespace : _CSL_Namespace_InNamespaceGet ( ) ;
         if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = ctdsci->Tdsci_StructureUnion_Namespace ;
+        tdsci->DataPtr = ctdsci->DataPtr ;
     }
     //else
-    if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace =
+    if ( ( ! tdsci->Tdsci_StructureUnion_Namespace ) && ( ! GetState ( tdsci, TDSCI_PRINT ) ) ) tdsci->Tdsci_StructureUnion_Namespace =
         DataObject_New ( CLASS, 0, "<unnamed namespace>", 0, 0, 0, 0, 0, tdsci->Tdsci_InNamespace, 0, 0, - 1 ) ;
     tdsci->State |= state ;
     return tdsci ;
@@ -432,12 +436,13 @@ TypeDefStructCompileInfo *
 TDSCI_Push_New ( Context * cntx )
 {
     TypeDefStructCompileInfo *tdsci = TypeDefStructCompileInfo_New ( cntx, CONTEXT ) ;
+    //tdsci->State |= stateContinuation ;
     Stack_Push ( cntx->Compiler0->TDSCI_StructUnionStack, ( int64 ) tdsci ) ;
     return tdsci ;
 }
 
 TDSCI *
-TDSCI_Start ( Context * cntx, Word * word, int64 stateFlags )
+TDSCI_Start ( Context * cntx, Word * word, byte* objectBitData, int64 stateFlags )
 {
     TypeDefStructCompileInfo * tdsci ;
     TDSCI_STACK_INIT ( cntx ) ;
@@ -449,8 +454,9 @@ TDSCI_Start ( Context * cntx, Word * word, int64 stateFlags )
         tdsci->Tdsci_Offset = _Namespace_VariableValueGet ( tdsci->Tdsci_InNamespace, ( byte* ) "size" ) ; // allows for cloning - prototyping
         tdsci->Tdsci_StructureUnion_Size = tdsci->Tdsci_Offset ;
     }
-    else tdsci->Tdsci_InNamespace = Is_NamespaceType ( word ) ? word : _CSL_Namespace_InNamespaceGet ( ) ;
+    else if ( ! ( stateFlags & TDSCI_PRINT ) ) tdsci->Tdsci_InNamespace = Is_NamespaceType ( word ) ? word : _CSL_Namespace_InNamespaceGet ( ) ;
     tdsci->State |= stateFlags ;
+    tdsci->DataPtr = objectBitData ;
     SetState ( _Compiler_, TDSCI_PARSING, true ) ;
     Lexer_SetTokenDelimiters ( cntx->Lexer0, ( byte* ) " ,\n\r\t", CONTEXT ) ;
     CSL_Lexer_SourceCodeOn ( ) ;
@@ -492,11 +498,12 @@ void
 _TDSCI_Print_StructField ( Context * cntx )
 {
     TDSCI * tdsci = TDSCI_GetTop ( cntx ) ;
+    //CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ) ;
     //Printf ( "\n0x%016lx\t%16s : size = %d : at %016lx", &tdsci->DataPtr [ tdsci->Tdsci_Offset ],
     Printf ( "\n\t%16s : %s : size = %d : at %016lx",
         tdsci->Tdsci_Field_Type_Namespace->Name, tdsci->TdsciToken, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
         &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
-    Word_ClassStructure_PrintData ( cntx, tdsci->Tdsci_Field_Type_Namespace, tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
+    Object_PrintStructuredData ( ( byte* ) & tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) ;
     CSL_NewLine ( ) ;
 }
 
@@ -510,6 +517,10 @@ TDSCI_Print_Field ( Context * cntx, int64 t_type, int64 size )
         && ( ! GetState ( tdsci, TDSCI_POINTER ) ) && ( tdsci->Tdsci_Field_Type_Namespace->W_SourceCode ) )
     {
         _TDSCI_Print_StructField ( cntx ) ;
+        //CSL_Parse_A_Typed_Field ( cntx, 0, tdsci->DataPtr ) ;
+        //Parse_Structure ( cntx ) ;
+        //token = TDSCI_ReadToken ( cntx ) ;
+        //Parse_Field ( cntx ) ;
     }
     else
     {
@@ -571,7 +582,7 @@ Parser_Check_Do_CommentWord ( Word * word )
 Boolean
 Parser_Check_Do_Debug_Token ( byte * token )
 {
-    Word * word = Finder_Word_FindUsing (_Finder_, token, 0) ;
+    Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
     return Parser_Check_Do_CommentWord ( word ) ;
 }
 
@@ -603,7 +614,7 @@ void
 CSL_Parse_Error ( byte * msg, byte * token )
 {
     byte * buffer = Buffer_Data_Cleared ( _CSL_->ScratchB1 ) ;
-    sprintf ( ( char* ) buffer, "\nCSL_Parse_Error : %s : \'%s\' at %s", ( char* ) msg, token, Context_Location ( ) ) ;
+    snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, "\nCSL_Parse_Error : %s : \'%s\' at %s", ( char* ) msg, token, Context_Location ( ) ) ;
     _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
 }
 

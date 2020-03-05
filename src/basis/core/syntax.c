@@ -229,12 +229,12 @@ _CSL_C_Infix_EqualOp ( block op )
     else wordr = _CSL_->PokeWord ;
     d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( "\nCSL_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
     if ( op ) Block_Eval ( op ) ;
-    else 
+    else
     {
         rword = wordr ;
         svName = rword->Name ;
         rword->Name = ( byte* ) "=" ;
-        if ( ! String_Equal ( "=", word0->Name ) ) 
+        if ( ! String_Equal ( "=", word0->Name ) )
         {
             SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
             _Debugger_->SubstitutedWord = rword ;
@@ -269,7 +269,7 @@ CSL_IncDec ( int64 op ) // ++/--
         if ( GetState ( _Context_, C_SYNTAX ) && ( one->W_MorphismAttributes & CATEGORY_OP )
             && ( ! ( one->W_MorphismAttributes & CATEGORY_OP_LOAD ) ) ) one = two = _CSL_WordList ( 2 ) ;
         byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
-        Word * nextWord = Finder_Word_FindUsing (cntx->Interpreter0->Finder0, nextToken, 0) ;
+        Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         if ( nextWord && IS_MORPHISM_TYPE ( nextWord )
             && ( nextWord->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) )
         {
@@ -595,9 +595,9 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
 }
 
 void
-Word_ClassStructure_PrintData ( Context * cntx, Word * word, byte * typedefString )
+Object_PrintStructuredData ( byte * objectBits, byte * typedefString )
 {
-    if ( word && typedefString && typedefString[0] )
+    if ( objectBits && typedefString && typedefString[0] )
     {
         Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
         ReadLiner * rl = cntx->ReadLiner0 ;
@@ -605,9 +605,12 @@ Word_ClassStructure_PrintData ( Context * cntx, Word * word, byte * typedefStrin
         Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
         //TypeDefStructCompileInfo_New ( cntx, CONTEXT ) ;
         //byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
-        TDSCI * tdsci = TDSCI_Start ( cntx, 0, 0 ) ;
+        TDSCI * tdsci = TDSCI_Start (cntx, 0, objectBits, TDSCI_PRINT ) ;
         //Parse_Structure ( cntx ) ;
-        CSL_Parse_A_Typed_Field ( cntx, TDSCI_PRINT, ( byte* ) word ) ;
+        byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
+        if ( String_Equal ( token, "typedef" ) ) token = TDSCI_ReadToken ( cntx ) ;
+        //CSL_Parse_A_Typed_Field ( cntx ) ;
+        Parse_Field ( cntx ) ;
         tdsci = TDSCI_Finalize ( cntx ) ;
         Readline_Restore_InputLine_State ( rl ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;

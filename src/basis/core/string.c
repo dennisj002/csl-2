@@ -200,7 +200,7 @@ _String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * color )
     byte * buffer = Buffer_Data ( _CSL_->StringInsertB2 ) ;
     byte * tbuffer = Buffer_Data ( _CSL_->StringInsertB3 ) ;
 
-    strncpy ( ( char* ) buffer, ( char* ) _Context_->ReadLiner0->InputLine, BUF_IX_SIZE ) ;
+    strncpy ( ( char* ) buffer, ( char* ) _Context_->ReadLiner0->InputLine, BUFFER_IX_SIZE ) ;
     String_RemoveFinalNewline ( ( byte* ) buffer ) ;
     if ( ! _Lexer_IsCharDelimiter ( _Context_->Lexer0, buffer [ ndx ] ) ) ndx ++ ; // Lexer index auto increments index at token end ; dot doesn't incrment index therefore it is a dot at index
     preTokenLen = ndx - Strlen ( ( char* ) token ) ;
@@ -209,9 +209,9 @@ _String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * color )
     Strncpy ( tbuffer, buffer, preTokenLen ) ; // copy upto start of token
     tbuffer [ preTokenLen ] = 0 ; // Strncpy does not necessarily null delimit
     String_ShowColors ( &tbuffer [ Strlen ( ( char* ) tbuffer ) ], color ) ; // new foreground, new background
-    strncat ( ( char* ) tbuffer, ( char* ) token, BUF_IX_SIZE ) ;
+    strncat ( ( char* ) tbuffer, ( char* ) token, BUFFER_IX_SIZE ) ;
     String_ShowColors ( &tbuffer [ Strlen ( ( char* ) tbuffer ) ], &_O_->Default ) ; // old foreground, old background
-    strncat ( ( char* ) tbuffer, ( char* ) &buffer [ ndx ], BUF_IX_SIZE ) ; // copy the rest of the buffer after the token : -1 : get the delimiter; 0 based array
+    strncat ( ( char* ) tbuffer, ( char* ) &buffer [ ndx ], BUFFER_IX_SIZE ) ; // copy the rest of the buffer after the token : -1 : get the delimiter; 0 based array
     tbuffer = String_New ( tbuffer, TEMPORARY ) ;
     return tbuffer ;
 }
@@ -575,16 +575,16 @@ void
 String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot, byte * data ) // size in bytes
 {
     byte * b = Buffer_DataCleared ( _CSL_->StringInsertB2 ) ;
-    if ( ( Strlen ( ( char* ) str ) + Strlen ( ( char* ) data ) ) < BUF_IX_SIZE )
+    if ( ( Strlen ( ( char* ) str ) + Strlen ( ( char* ) data ) ) < BUFFER_IX_SIZE )
     {
         if ( Strlen ( ( char* ) str ) > startOfSlot ) //( endOfSlot - startOfSlot ) )
         {
-            strncpy ( ( char* ) b, ( char* ) str, BUF_IX_SIZE ) ;
-            strncpy ( ( char* ) & b [ startOfSlot ], ( char* ) data, BUF_IX_SIZE ) ; // watch for overlapping ??
-            strncat ( ( char* ) b, ( char* ) &str [ endOfSlot ], BUF_IX_SIZE ) ;
-            strncpy ( ( char* ) str, ( char* ) b, BUF_IX_SIZE ) ;
+            strncpy ( ( char* ) b, ( char* ) str, BUFFER_IX_SIZE ) ;
+            strncpy ( ( char* ) & b [ startOfSlot ], ( char* ) data, BUFFER_IX_SIZE ) ; // watch for overlapping ??
+            strncat ( ( char* ) b, ( char* ) &str [ endOfSlot ], BUFFER_IX_SIZE ) ;
+            strncpy ( ( char* ) str, ( char* ) b, BUFFER_IX_SIZE ) ;
         }
-        else strncat ( ( char* ) str, ( char* ) data, BUF_IX_SIZE ) ;
+        else strncat ( ( char* ) str, ( char* ) data, BUFFER_IX_SIZE ) ;
     }
 
     else CSL_Exception ( BUFFER_OVERFLOW, 0, 1 ) ;

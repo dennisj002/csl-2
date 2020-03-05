@@ -106,7 +106,7 @@ CSL_PrintReturnStackWindow ( )
 void
 _CSL_NamespacesInit ( CSL * csl )
 {
-    Namespace * ns = DataObject_New (NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    Namespace * ns = DataObject_New ( NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
     ns->State |= USING ; // nb. _Namespace_SetState ( ns, USING ) ; // !! can't be used with "Namespaces"
     csl->Namespaces = ns ;
     CSL_AddCPrimitives ( ) ;

@@ -72,22 +72,22 @@ void
 List_PrintNames ( dllist * list, int64 count, int64 flag )
 {
     dlnode * node, *nextNode ;
-    Word * nodeWord, *beforeNode, *afterNode ;
+    Word * nodeWord, *beforeNode, *n_After ;
     byte * thisName, *beforeName, *afterName, *bt = Buffer_New_pbyte ( 64 ), *ba = Buffer_New_pbyte ( 64 ), *bb = Buffer_New_pbyte ( 64 ) ;
     for ( node = dllist_First ( ( dllist* ) list ) ; node && count -- ; node = nextNode )
     {
         nextNode = dlnode_Next ( node ) ;
         if ( flag )
         {
-            nodeWord = ( node->afterNode && node->afterNode->afterNode ? ( Word* ) dobject_Get_M_Slot ( (dobject*) node, 0 ) : 0 ) ;
+            nodeWord = ( node->n_After && node->n_After->n_After ? ( Word* ) dobject_Get_M_Slot ( (dobject*) node, 0 ) : 0 ) ;
             if ( ! nodeWord ) break ;
             thisName = nodeWord ? sconvbs ( bt, nodeWord->Name ) : ( byte* ) " ", node ;
-            beforeNode = ( node->beforeNode == list->afterNode ? 0 : ( Word * ) dobject_Get_M_Slot ( (dobject*) node->beforeNode, SCN_T_WORD ) ) ;
-            afterNode = ( node->afterNode == list->afterNode ? 0 : ( Word* ) dobject_Get_M_Slot ( (dobject*) node->afterNode, SCN_T_WORD ) ) ;
-            afterName = afterNode ? sconvbs ( ba, afterNode->Name ) : ( byte* ) " ", node->afterNode ;
-            beforeName = beforeNode ? sconvbs ( bb, ( beforeNode )->Name ) : ( byte* ) " ", node->beforeNode ;
+            beforeNode = ( node->n_Before == list->Head ? 0 : ( Word * ) dobject_Get_M_Slot ( (dobject*) node->n_Before, SCN_T_WORD ) ) ;
+            n_After = ( node->n_After == list->Tail ? 0 : ( Word* ) dobject_Get_M_Slot ( (dobject*) node->n_After, SCN_T_WORD ) ) ;
+            afterName = n_After ? sconvbs ( ba, n_After->Name ) : ( byte* ) " ", node->n_After ;
+            beforeName = beforeNode ? sconvbs ( bb, ( beforeNode )->Name ) : ( byte* ) " ", node->n_Before ;
             Printf ( ( byte* ) "\n\tName : %s 0x%08x \t\tBefore : %s 0x%08x : \t\tAfter : %s 0x%08x,",
-                thisName, node, beforeName, node->beforeNode, afterName, node->afterNode ) ;
+                thisName, node, beforeName, node->n_Before, afterName, node->n_After ) ;
         }
         else Printf ( ( byte* ) "\n\tName : %s", ( ( Word* ) ( node ) )->Name ) ; //thisName ) ;
     }

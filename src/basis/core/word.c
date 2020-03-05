@@ -167,6 +167,8 @@ Word *
 _Word_Create ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispType, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
+    //if ( word == (Word*) 0x7ffff7a1ee28 ) 
+    //    Printf ( (byte*) "\nword 0x7ffff7a1ee28 = %s", word->Name ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
     word->WAllocType = allocType ;
@@ -299,7 +301,7 @@ _Word_ShowSourceCode ( Word * word0 )
         if ( ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) ) && word->W_SourceCode )
         {
             byte * sc = Buffer_Data_Cleared ( _CSL_->ScratchB1 ) ;
-            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode, BUF_IX_SIZE ) ;
+            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode, BUFFER_IX_SIZE ) ;
             scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
         }
         else scd = ( byte* ) "C Primitive" ;

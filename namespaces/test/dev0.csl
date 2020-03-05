@@ -219,6 +219,7 @@ nl 200 dup "\nfib" ps p "=" ps fibBN p //pause
     { m @ dup p " : " _ps fibBN p { n @ m @ > } { "," _ps } if2 } 
     for
 ;
+    
 nl nl 92 tfib3
 nl nl 92 tfib3
 bnOff
