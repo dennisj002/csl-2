@@ -397,7 +397,7 @@ sp
 bt.a16_123 = 0x498 ;  
 hp ( bt.a16_123 ) ;
 sp
-d: void bttt ( byteTest xbt | btt ) 
+void bttt ( byteTest xbt | btt ) 
 { 
     printf ( "\nbtt" ) ;
     btt = xbt.a8_123 ; xbt.a8_123 = 'a' ; xbt.b8_123 = 'b' ; xbt.c8_123 = 'c' ; xbt.a16_123 = 0x1234 ; 

@@ -281,7 +281,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
         else //if ( immSize >= 8 ) 
         {
             //DBI_ON ;
-#if 1          
+            //if ( abs (imm) <= 2147483647 ) // sign extend 32 bit to 64 bit -> smaller faster insn
             if ( imm <= 2147483647 ) // sign extend 32 bit to 64 bit -> smaller faster insn
             {
                 opCode = 0xc7 ;
@@ -290,7 +290,6 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
                 controlFlags |= ( MODRM_B ) ;
             }
             else
-#endif                
             {
                 opCode = 0xb8 ;
                 opCode += ( rm & 7 ) ;

@@ -337,8 +337,20 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
         }
         else //if ( immSize >= 8 ) 
         {
-            opCode = 0xb8 ;
-            opCode += ( rm Bits.& 7 ) ;
+            //DBI_ON ;
+            //if ( abs (imm) <= 2147483647 ) // sign extend 32 bit to 64 bit -> smaller faster insn
+            if ( imm <= 2147483647 ) // sign extend 32 bit to 64 bit -> smaller faster insn
+            {
+                opCode = 0xc7 ;
+                reg = 0 ;
+                immSize = 4 ;
+                controlFlags |= ( MODRM_B ) ;
+            }
+            else
+            {
+                opCode = 0xb8 ;
+                opCode += ( rm Bits.& 7 ) ;
+            }
             controlFlags |= ( REX_W ) ;
         }
         //DBI_ON ; 
@@ -347,7 +359,6 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
     }
     else // non immediate
     {
-    //<dbg>
         controlFlags |= ( MODRM_B ) ;
         opCode = 0x88 ;
         if ( operandSize > 1 ) opCode += 1 ; //nb. if using rex then we cannot use AH, BH, CH, DH per Intel instruction manual
@@ -361,8 +372,6 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
             else if ( abs (disp) >= 0x100 ) mod = 2 ;
         }
     }
-//  Compile_CalculateWrite_Instruction_X64 ( uint8 opCode0, uint8 opCode1, uint8 mod, uint8 reg, uint8 rm, uint16 controlFlags, uint8 sib, uint64 disp, uint8 dispSize, uint64 imm, uint8 immSize )
-    //<dbg>
     Compile_CalculateWrite_Instruction_X64 ( opCode0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
     //DBI_OFF ;
 } prefix
