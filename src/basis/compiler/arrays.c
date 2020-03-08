@@ -132,15 +132,9 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
-    //Word * baseObject = cntx->BaseObject ;
     Compiler *compiler = cntx->Compiler0 ;
     Word * word ;
-    //int64 arrayIndex, increment ;
-    if ( tokenWord )
-    {
-        word = tokenWord ;
-        word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
-    }
+    if ( tokenWord ) word = tokenWord ;
     else
     {
         word = Finder_Word_FindUsing (cntx->Finder0, token, 0) ;
@@ -158,39 +152,7 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
         return 0 ;
     }
     else if ( token [0] == ']' ) // ']' == an "array end"
-#if 0        
-    {
-        int64 dimNumber = compiler->ArrayEnds ; // dimNumber is used as an array index so it is also zero base indexed
-        int64 dimSize = CalculateArrayDimensionSize ( arrayBaseObject, dimNumber ) ; // dimNumber is used as an array index so it is also zero base indexed
-        compiler->ArrayEnds ++ ; // after, because arrayBaseObject->ArrayDimensions is a zero based array
-
-        Debugger_PreSetup ( _Debugger_, word, 0, 0, 0, 0 ) ;
-        if ( CompileMode && * variableFlag ) Compile_ArrayDimensionOffset ( _Context_CurrentWord ( cntx ), dimSize, objSize ) ;
-        else
-        {
-            // big endian arrays where first, left to right variable refers to
-            // the largest Dimension, etc. So offset from array pointer is (for a four dimensional array) : d4*(D3*D2*D1) + d3*(D2*D1) d2*(D1) + d1 
-            // where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes
-            // D0, D1, D2, ... Dn : d0, d1, d2 ... dn => dn*(1*D(n-1)*D1*D2*..D(n-1)) 
-            arrayIndex = DataStack_Pop ( ) ;
-            if ( arrayIndex >= arrayBaseObject->ArrayDimensions [ dimNumber ] ) Error ( "Array index out of bounds.", ABORT ) ;
-            increment = arrayIndex * dimSize * objSize ;
-            Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
-            if ( ! CompileMode ) Array_Do_AccumulatedAddress ( baseObject->AccumulatedOffset ) ;
-        }
-        if ( Is_DebugModeOn && baseObject ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
-        CSL_TypeStack_Pop ( ) ; // pop the index ; we want the object field type 
-        if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) )
-        {
-            Compiler_SetAs_InNamespace_Qid_BackgroundNamespace ( cntx->Compiler0 ) ;
-            SetState ( compiler, ARRAY_MODE, false ) ;
-            return 1 ; // breaks the calling function
-        }
-        return 0 ;
-    }
-#else
-    return _CSL_ArrayEnd ( word, arrayBaseObject, objSize, variableFlag ) ;
-#endif    
+        return _CSL_ArrayEnd ( word, arrayBaseObject, objSize, variableFlag ) ;
     if ( *variableFlag ) Set_CompileMode ( true ) ;
     else Set_CompileMode ( false ) ;
     if ( word ) Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
@@ -292,7 +254,6 @@ int64
 _CSL_ArrayEnd ( Word * word, Word * arrayBaseObject, int64 objSize, Boolean *variableFlag )
 {
     Context * cntx = _Context_ ;
-    Interpreter * interp = cntx->Interpreter0 ;
     Word * baseObject = cntx->BaseObject ;
     Compiler *compiler = cntx->Compiler0 ;
     int64 arrayIndex, increment ;
@@ -319,8 +280,6 @@ _CSL_ArrayEnd ( Word * word, Word * arrayBaseObject, int64 objSize, Boolean *var
     CSL_TypeStack_Pop ( ) ; // pop the index ; we want the object field type 
     if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) )
     {
-        //int64 isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, cntx->Lexer0->TokenEnd_ReadLineIndex ) ; //word->W_RL_Index ) ;
-        //if ( ! isForwardDotted ) Compiler_SetAs_InNamespace_Qid_BackgroundNamespace ( cntx->Compiler0 ) ;
         SetState ( compiler, ARRAY_MODE, false ) ;
         return 1 ; // breaks the calling function
     }

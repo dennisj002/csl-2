@@ -801,10 +801,6 @@ _dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int
         dobj->do_iData[i] = value ;
     }
     va_end ( args ) ;
-#if 1 // debugging    
-    if ( dobj == (dobject*) 0x7ffff7a9eb28 ) 
-        Printf ( (byte*) "\nnode 0x7ffff7a9eb28\n" ) ;
-#endif    
     _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
 
     return dobj ;

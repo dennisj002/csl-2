@@ -77,13 +77,14 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
     ListObject *l0 = 0 ;
     byte *token1 ;
     SetState ( word, QID, qidFlag ) ;
+    int64 allocType = GetState ( _Compiler_, LC_ARG_PARSING ) ? DICTIONARY : LISP ;
     if ( ( word->W_LispAttributes & ( T_LISP_READ_MACRO | T_LISP_IMMEDIATE ) ) && ( ! GetState ( _LC_, LC_READ_MACRO_OFF ) ) )
     {
         Word_Eval ( word ) ;
         if ( word->W_LispAttributes & T_LISP_SPECIAL )
         {
             l0 = DataObject_New (T_LC_NEW, word, 0, word->W_MorphismAttributes, word->W_ObjectAttributes,
-                T_LISP_SYMBOL | word->W_LispAttributes, 0, word->Lo_Value, 0, 0, tsrli, scwi ) ;
+                T_LISP_SYMBOL | word->W_LispAttributes, 0, word->Lo_Value, 0, allocType, tsrli, scwi ) ;
         }
     }
     else if ( word->W_LispAttributes & T_LISP_TERMINATING_MACRO )
@@ -92,7 +93,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         Word_Eval ( word ) ;
         token1 = ( byte * ) DataStack_Pop ( ) ;
         SetState ( lc, ( LC_READ ), true ) ;
-        l0 = DataObject_New (T_LC_LITERAL, 0, token1, 0, LITERAL | word->W_ObjectAttributes, word->W_LispAttributes, 0, 0, 0, 0, tsrli, scwi ) ;
+        l0 = DataObject_New (T_LC_LITERAL, 0, token1, 0, LITERAL | word->W_ObjectAttributes, word->W_LispAttributes, 0, 0, 0, allocType, tsrli, scwi ) ;
     }
     else
     {
@@ -107,7 +108,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
             Set_CompileMode ( false ) ;
         }
         l0 = DataObject_New (T_LC_NEW, word, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes,
-            ( T_LISP_SYMBOL | word->W_LispAttributes ), 0, word->Lo_Value, 0, 0, tsrli, scwi ) ;
+            ( T_LISP_SYMBOL | word->W_LispAttributes ), 0, word->Lo_Value, 0, allocType, tsrli, scwi ) ;
         if ( word->W_ObjectAttributes & NAMESPACE_TYPE ) Namespace_Do_Namespace ( word, 0 ) ;
     }
     return l0 ;
@@ -127,8 +128,9 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
     if ( word ) l0 = _LO_Read_DoWord ( lc, word, qidFlag, tsrli, scwi ) ;
     else
     {
+        int64 allocType = GetState ( _Compiler_, LC_ARG_PARSING ) ? DICTIONARY : LISP ;
         Lexer_ParseObject ( lexer, token ) ;
-        l0 = DataObject_New (T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, 0, 0, 0, tsrli, scwi ) ;
+        l0 = DataObject_New (T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, 0, 0, allocType, tsrli, scwi ) ;
     }
     if ( l0 )
     {

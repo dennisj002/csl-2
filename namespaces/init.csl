@@ -569,10 +569,10 @@ void bttt ( byteTest xbt | btt )
     printf ( "\nbt.a8_123 = %c ", xbt.a8_123 ) ; 
     printf ( "\nbt.b8_123 = %c ", xbt.b8_123 ) ; 
     printf ( "\nbt.c8_123 = %c ", xbt.c8_123 ) ; 
-    d1: printf ( "\nbtt = 0x%lx", btt ) ; 
+    printf ( "\nbtt = 0x%lx", btt ) ; 
     dump ( &xbt, xbt.size ) ; 
     hp ( xbt.a8_123 ) ;
-d: } 
+} 
 byteTest 'bt new ;
 pwi bttt
 sp

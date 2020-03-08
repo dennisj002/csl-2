@@ -356,6 +356,10 @@ CSL_WordList ( int64 n )
 void
 CSL_WordList_Push ( Word * word, Boolean inUseFlag )
 {
+#if 0 // debugging    
+    if ( ( word == (Word*) 0x7ffff711ef58 ) || ( word == (Word*) 0x7ffff711af58 ) )
+        Printf ( (byte*) "\nword 0x7ffff711ef58\n" ) ;
+#endif    
     _List_PushNew_ForWordList ( _CSL_->Compiler_N_M_Node_WordList, word, inUseFlag ) ;
 }
 
@@ -436,7 +440,6 @@ DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag, int64 prefix, i
         int64 iuFlag = dobject_Get_M_Slot ( ( dobject * ) anode, SCN_IN_USE_FLAG ) ;
         if ( word && ( ( ! inUseOnlyFlag ) || ( inUseOnlyFlag && iuFlag ) ) )
         {
-            //if ( word->Name ) // adhoc hack == has word been recycled already??
             _DWL_ShowWord_Print ( word, index, ( byte* ) prefix, word->Coding, word->SourceCoding, 0, scwi, iuFlag ) ;
         }
     }
