@@ -322,7 +322,7 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
         {
             Ovt_AutoVarOn ( ) ;
             Compiler_LocalsNamespace_New ( _Compiler_ ) ;
-            word = _Interpreter_TokenToWord ( interp, token0, - 1, - 1 ) ;
+            word = Lexer_Do_MakeItAutoVar ( _Lexer_, token0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
             _Compiler_->LHS_Word = word ;
             Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
             _Compile_C_TypeDeclaration ( ) ;

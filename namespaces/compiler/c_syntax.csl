@@ -340,8 +340,37 @@ fac5 ( REG n  | REG facc )
     return facc ;
 }
 pwi fac5
-fac5 ( 7 ) dup p 5040 _assert  
+fac5 ( 7 ) dup p 5040 _assert 
+cOff
 #if 1
+infixOff
+Int Root.Experimental 
+'xyxz var
+{
+    'a var 'b var
+    a 2 = 
+    b 4 =
+    a @ b @ + 2 / dup p 3 _assert0
+} xyxz store
+xyxz @ bdis
+nl
+xyxz @ ix 
+xyxz @ ix 
+"\nabove line should show 3 3" ps
+cOn
+infixOn
+void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
+void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 _assert s
+cOff
+forStarters 1 =
+#endif
+
+
+#if 0 //forStarters @ 
+: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; pwi hi 2 3 d: hi 5 _assert
+#endif 
+#if 1
+: sp ; //stack pause ;
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
 #if 1
 C.Experimental 
@@ -370,7 +399,7 @@ faccs ( REG n | REG rec )
 pwi faccs 
 faccs ( 7 ) ; dup p 5040 _assert 
 // test byte size objects
-sp
+
 C.Experimental 
 typedef struct _byteTest 
 {
@@ -397,6 +426,7 @@ sp
 bt.a16_123 = 0x498 ;  
 hp ( bt.a16_123 ) ;
 sp
+#if 1    
 void bttt ( byteTest xbt | btt ) 
 { 
     printf ( "\nbtt" ) ;
@@ -418,6 +448,7 @@ byteTest 'bt new ;
 pwi bttt
 sp
 bttt ( bt ) ;  //pause // error size not considered
+#endif
 sp
 bt.a8_123 = 255 ; dump ( bt, bt.size ) ; 
 sp
@@ -457,16 +488,6 @@ Root Experimental User
 //dbiOff
 #endif
 c_syntaxOff 
-
-#if 0
-: wtdInclude "namespaces/wordTypeDef.csl" include ;
-wtdInclude 
-C.Experimental
-'wtdInclude find 100 dump
-//'wtdInclude find 'C.Experimental.Word find d: wordStructPrint 
-'C.Experimental notUsing 
-//pause
-#endif
 
 bnOff
 infixOn
