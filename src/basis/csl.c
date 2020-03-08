@@ -314,17 +314,6 @@ CSL_InlineOff ( )
 void
 CSL_DebugLevel ( )
 {
-#if 0    
-    if ( Compiling )
-    {
-        _Compile_Stack_Push ( DSP, ACC, ( int64 ) & _CSL_->DebugLevel ) ;
-        _Set_To_Here_Word_StackPushRegisterCode ( _Context_->CurrentEvalWord, 1 ) ;
-    }
-        //if ( Compiling ) Compile_MoveImm_To_Reg ( RAX, ( int64 ) & _CSL_->DebugLevel, CELL ) ;
-    else DataStack_Push ( ( int64 ) & _CSL_->DebugLevel ) ;
-    //else 
-    //DataStack_Push ( ( int64 ) & _CSL_->DebugLevel ) ;
-#endif    
     Do_C_Pointer_StackAccess ( ( byte* ) & _CSL_->DebugLevel ) ;
 }
 
@@ -374,10 +363,10 @@ CSL_DeleteWordDebugInfo ( Word * word )
             {
                 if ( word->W_SC_WordList )
                 {
-#if 1 // debugging                    
+#if 0 // debugging                    
                     SC_WordList_Show ( word->W_SC_WordList, word, 1, 0, (byte*) "CSL_DeleteWordDebugInfo" ) ; // debugging
-#endif                    
                     DLList_Recycle_WordList ( word->W_SC_WordList ) ; // why not ??
+#endif                    
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( word->NamespaceStack, 1, 1 ) ; // don't clear ; keep words for source code debugging, etc.
                 }
                 List_Init ( word->W_SC_WordList ) ;
