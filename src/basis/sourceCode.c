@@ -8,7 +8,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
     Word * scWord, * word ;
     dllist * list ;
     byte *sourceCode, *token, *buffer ;
-    int64 fixed ;
+    int64 storeFixed ;
     if ( ! Compiling )
     {
         if ( ! scWord0 ) scWord = Get_SourceCodeWord ( ) ;
@@ -21,7 +21,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
                 sourceCode = scWord->W_SourceCode ; //? scWord->W_SourceCode : String_New ( CSL->SC_Buffer, TEMPORARY ) ;
                 if ( ! String_Equal ( sourceCode, "" ) )
                 {
-                    fixed = 0 ;
+                    storeFixed = 0 ;
                     //if ( Is_DebugOn ) SC_WordList_Show ( list, scWord, 0, 0, 0 ) ;
                     word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
                     if ( word )
@@ -29,13 +29,13 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
                         if ( ( scWord->W_TypeAttributes & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )
                         {
                             word->Name = ( byte* ) "=" ;
-                            fixed = 1 ;
+                            storeFixed = 1 ;
                             SetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION, true ) ;
                         }
                         token = GetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) ? (byte*) "=" : word->Name ;
                         buffer = DBG_PrepareSourceCodeString ( word, token, sourceCode, 0, 0, 1 ) ;
                         if ( buffer && buffer[0] ) Printf ( ( byte* ) "\n%s", buffer ) ;
-                        if ( fixed ) word->Name = ( byte* ) "store" ;
+                        if ( storeFixed ) word->Name = ( byte* ) "store" ;
                         if ( _Debugger_ ) _Debugger_->LastSourceCodeWord = word ;
                     }
                 }
@@ -209,13 +209,6 @@ _CSL_RecycleInit_Compiler_N_M_Node_WordList (dllist * list, Boolean force)
 void
 CSL_RecycleInit_Compiler_N_M_Node_WordList ( )
 {
-#if 0    
-    if ( ( ! GetState ( _CSL_, ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ) )
-    {
-        DLList_Recycle_WordList ( _CSL_->Compiler_N_M_Node_WordList ) ;
-    }
-    List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
-#endif    
     _CSL_RecycleInit_Compiler_N_M_Node_WordList (_CSL_->Compiler_N_M_Node_WordList, 0) ;
 }
 
@@ -419,16 +412,18 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
             Printf ( ( byte* ) "\n %s :: word = 0x%08x : \'%-12s\' : coding  = 0x%08x : oldCoding  = 0x%08x : newCoding = 0x%08x : scwi = %03d, inUse = %s",
                 prefix, word, name, coding, sourceCoding, newSourceCoding, scwi, biuFlag ) ;
         }
-        else if ( index )
+        else //if ( index )
         {
             Printf ( ( byte* ) "\n WordList : index %3d : word = 0x%08x : \'%-12s\' : sourceCoding = 0x%08x : scwi = %03d : inUse = %s",
                 index, word, name, sourceCoding, scwi, biuFlag ) ;
         }
+#if 0        
         else //if ( scwiDiff )
         {
             Printf ( ( byte* ) "\n %s :: \'%-12s\' : sourceCoding  = 0x%08x : scwi = %03d : inUse = %s",
                 prefix, name, sourceCoding, scwi, biuFlag ) ;
         }
+#endif    
     }
 }
 
@@ -451,7 +446,8 @@ void
 SC_WordList_Show ( dllist * list, Word * scWord, Boolean fromFirstFlag, Boolean inUseOnlyFlag, byte * listName )
 {
     if ( scWord ) Printf ( ( byte* ) "\n%s WordList : for word \'%s\' :", listName, scWord->Name ) ;
-    if ( list ) dllist_Map4_FromFirstFlag_Indexed ( list, fromFirstFlag, DWL_ShowWord, inUseOnlyFlag, ( int64 ) "", 0 ) ;
+    //if ( list ) dllist_Map4_FromFirstFlag_Indexed ( list, fromFirstFlag, DWL_ShowWord, inUseOnlyFlag, ( int64 ) "", 0 ) ;
+    if ( list ) dllist_Map4_FromFirstFlag_Indexed ( list, fromFirstFlag, DWL_ShowWord, inUseOnlyFlag, 0, 0 ) ;
 }
 
 // too much/many shows ?? combine some

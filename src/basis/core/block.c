@@ -25,6 +25,7 @@ Dbg_Block_Eval ( Word * word, block blck )
         if ( ! GetState ( _Debugger_->w_Word, STEPPED ) )
         {
             _Block_Eval ( blck ) ;
+            _DEBUG_SHOW ( word, 1, 0 ) ;
         }
         SetState ( _Debugger_->w_Word, STEPPED, false ) ;
     }

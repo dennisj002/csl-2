@@ -169,7 +169,7 @@ _Class_Object_New ( byte * name, uint64 category )
     //Namespace * ns = Word_UnAlias ( _CSL_Namespace_InNamespaceGet ( ) ) ;
     Namespace * ns = _CSL_Namespace_InNamespaceGet ( ) ;
     size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
-    word = _CSL_ObjectNew ( size, name, (category|OBJECT), CompileMode ? DICTIONARY : OBJECT_MEM ) ;
+    word = _CSL_ObjectNew ( size, name, ( category | OBJECT ), CompileMode ? DICTIONARY : OBJECT_MEM ) ;
     object = ( byte* ) word->W_Value ;
     _Class_Object_Init ( word, ns ) ;
     _Namespace_VariableValueSet ( ns, ( byte* ) "this", ( int64 ) object ) ;
@@ -184,7 +184,7 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     Namespace *sns, * ns = _Namespace_Find ( name, sns = _CSL_Namespace_InNamespaceGet ( ), 0 ) ;
     int64 size = 0 ;
     byte * token ;
-    if ( ! ns ) 
+    if ( ! ns )
     {
         //sns = _CSL_Namespace_InNamespaceGet ( ) ;
         if ( cloneFlag ) size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
@@ -193,7 +193,7 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
         Word *ws = _CSL_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CSL_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
-        wt->W_ObjectAttributes |= (THIS)  ;
+        wt->W_ObjectAttributes |= ( THIS ) ;
         token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
         if ( ( token[0] == '{' ) || ( token[1] == '{' ) || ( token[2] == '{' ) ) // consider "{", ":{" and +:{" tokens
         {
@@ -282,7 +282,9 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
         }
         name = lexer->OriginalToken ;
     }
-    word = _DObject_New ( name, uliteral, ( IMMEDIATE | lexer->L_MorphismAttributes ), ( LITERAL | CONSTANT | lexer->L_ObjectAttributes ), 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
+    word = _DObject_New ( name, uliteral, ( IMMEDIATE | lexer->L_MorphismAttributes ), 
+        ( LITERAL | CONSTANT | lexer->L_ObjectAttributes ), 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, 
+        ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
 
     return word ;
 }

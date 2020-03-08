@@ -168,7 +168,8 @@ testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert
 C
 sp //pause
 
-using "\nprintf output = " ps printf ( "this.size = %d\n", this.size )  //pause
+using "\nprintf output = " ps d: printf ( "this.size = %d\n", this.size )  //pause
+//using "\nprintf output = " ps d1: printf ( "this.size = %d\n", this.size )  //pause
 sp
 this @ dup hex p this.size @ dup decimal p dump //pause // 'this' is a pointer to a pointer 
 sp

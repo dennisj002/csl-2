@@ -64,7 +64,7 @@ Compiler_IncrementCurrentAccumulatedOffset ( Compiler * compiler, int64 incremen
 {
     if ( compiler->AccumulatedOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) += ( increment ) ;
     if ( compiler->AccumulatedOptimizeOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) += ( increment ) ;
-    _Debugger_->PreHere = ( ( byte* ) compiler->AccumulatedOffsetPointer ) - 3 ; // 3 : sizeof add immediate insn with rex
+    //_Debugger_->PreHere = ( ( byte* ) compiler->AccumulatedOffsetPointer ) - 3 ; // 3 : sizeof add immediate insn with rex
     return ( byte* ) compiler->AccumulatedOffsetPointer ; // 3 : sizeof add immediate insn with rex
 }
 
@@ -279,7 +279,7 @@ Compiler_New ( uint64 allocType )
     compiler->TDSCI_StructUnionStack = Stack_New ( 64, allocType ) ;
     compiler->PointerToOffsetStack = Stack_New ( 64, allocType ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, allocType ) ;
-    compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, allocType ) ;
+    compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, T_CSL ) ; // allow recycling across contexts
     compiler->InternalNamespacesStack = Stack_New ( 64, allocType ) ; //initialized when using
     compiler->PostfixLists = _dllist_New ( allocType ) ;
     compiler->GotoList = _dllist_New ( allocType ) ;

@@ -45,6 +45,7 @@ testc1 ()
 testc1 () ; sp 
 #if 1
 C libc
+#if 0
 void
 interpret2 ( | atoken aword ) 
 {
@@ -70,6 +71,33 @@ interpret2 ( | atoken aword )
         }
     }
 }
+#else
+void
+interpret2 ( | atoken aword ) 
+{
+    testc1 () ; //pause () ;
+    nl tab () ; ps ( "interpret2 :> " ) ; nl
+    while ( 1 )
+    {   
+        atoken = token () ; 
+        printf ( "\n\tinterpret2 : token = %s", atoken ) ; 
+        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
+        { 
+            printf ( "\n\tinterpret2 exiting..." ) ; return ; //goto: done ; 
+        }        
+        // test comment here
+        else
+        // test comment here
+        {
+            aword = tokenToWord ( atoken ) ;
+            doWord ( aword ) ;
+        }
+    }
+    //label: done ;
+//<dbg>
+}
+
+#endif
 ' interpret2 find wdiss //pause
 sp
 

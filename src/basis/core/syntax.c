@@ -446,6 +446,8 @@ int64
 Lexer_CheckForwardToStatementEnd_Is_LValue ( Lexer * lexer, Word * word )
 {
     byte * inputPtr ;
+    int64 index = ( ( int64 ) word == - 1 ) ? lexer->TokenStart_ReadLineIndex : word->W_RL_Index ;
+#if 0    
     int64 index ;
     int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? lexer->TokenStart_ReadLineIndex : word->W_RL_Index ;
     if ( AtCommandLine ( lexer->ReadLiner0 ) )
@@ -458,6 +460,9 @@ Lexer_CheckForwardToStatementEnd_Is_LValue ( Lexer * lexer, Word * word )
         index = Lexer_ConvertLineIndexToFileIndex ( lexer, tokenStartReadLineIndex ) ;
         inputPtr = & lexer->ReadLiner0->InputStringOriginal [index] ;
     }
+#else
+    inputPtr = & lexer->ReadLiner0->InputLine[index] ;
+#endif    
     return IsLValue_String_CheckForwardToStatementEnd ( inputPtr ) ;
 
 }
@@ -605,7 +610,7 @@ Object_PrintStructuredData ( byte * objectBits, byte * typedefString )
         Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
         //TypeDefStructCompileInfo_New ( cntx, CONTEXT ) ;
         //byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
-        TDSCI * tdsci = TDSCI_Start (cntx, 0, objectBits, TDSCI_PRINT ) ;
+        TDSCI * tdsci = TDSCI_Start ( cntx, 0, objectBits, TDSCI_PRINT ) ;
         //Parse_Structure ( cntx ) ;
         byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
         if ( String_Equal ( token, "typedef" ) ) token = TDSCI_ReadToken ( cntx ) ;

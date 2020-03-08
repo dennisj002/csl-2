@@ -498,42 +498,134 @@ forStarters 1 =
 #if 0 //forStarters @ 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; pwi hi 2 3 d: hi 5 _assert
 #endif 
-#if 0
+#if 1
+: sp ; //stack pause ;
+c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
+#if 1
+C.Experimental 
+: wtdinclude "namespaces/wordTypeDef.csl" include ;
+: typesInclude "namespaces/types.csl" include ;
+//typesInclude 
+wtdinclude 
+C.Experimental 
+pwi Word //pause
+'wtdinclude find 100 dump
+//'wtdinclude find 'Word find d: wordStructPrint 
+'C.Experimental notUsing 
+#endif
 c_syntaxOn
-jcc8_On
-User
-bnOn
 int
-fibBN ( n ) 
+//faccs ( REG int32 n | REG in64 rec -- RAX ) 
+faccs ( REG n | REG rec ) 
 {
-    int fn, fn1, fn2 ;
-    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
-    {   
-        fn1 = fn2 ;
-        fn2 = fn ;
-        fn = fn1 + fn2 ; 
-    }
-    return fn ;
-} prefix
-jcc8_Off
-c_syntaxOff
-' fibBN find wdiss
-20 fibBN p 
+    rec = 1 ; 
+    while ( n > 1 )
+    { 
+        rec = rec * n ;  n-- ; 
+    } 
+    return rec ;
+}
+pwi faccs 
+faccs ( 7 ) ; dup p 5040 _assert 
+// test byte size objects
+
+C.Experimental 
+typedef struct _byteTest 
+{
+    byte a8_123 ; 
+    int64 a64_123 ;
+    byte b8_123 ;
+    byte c8_123 ; // test comment
+    union
+    {
+        int64 u64_123 ;
+        int32 u32_123 ;
+        int8 u8_123 ;
+    } ; //size = 11 
+    int32 a32_123 ;
+    byte d8_123 ;
+    int16 a16_123 ; 
+} byteTest, abyteTest ; // size = 26
+byteTest 'bt new ;
+pwi byteTest //pause
+ps ( "\nbt.size =" ) ; p ( bt.size ) ;
+bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
+//var ( 'btt ) ;
 sp
-bnOff
-: tfib4BN ( n | m )  
-    "locals fibBN : " ps 
-    { m 1 = } { m @ n @ <= } { m m @ 1 + =  } 
-    { m @ dup p " : " _ps fibBN fp { n @ m @ > } { "," _ps } if2 } 
-    for
-    //"Cfib2_O3       : " ps 
-    //d: Int.1 ti m 1 = { n @ } { m @ fibBN p n n @ 1 - = } while Int.1 time nl nl
-;
-bnOn    
-//nl nl 47 tfib3 //sp pause
-nl 92 dup p fibBN p //sp
-nl nl 92 d: tfib4BN //sp pause
-bnOff //pause
+bt.a16_123 = 0x498 ;  
+hp ( bt.a16_123 ) ;
+sp
+#if 1    
+void bttt ( byteTest xbt | btt ) 
+{ 
+    printf ( "\nbtt" ) ;
+    btt = xbt.a8_123 ; xbt.a8_123 = 'a' ; xbt.b8_123 = 'b' ; xbt.c8_123 = 'c' ; xbt.a16_123 = 0x1234 ; 
+    xbt.a32_123 = 0x12345678 ; xbt.a64_123 = 0x123456789abcdef0 ; //pause
+    xbt.u32_123 = 0x1234567 ; btt = 0xfedcba0987654321 ;
+    printf ( "\nbt.a16_123 = 0x%x ", xbt.a16_123 ) ; 
+    printf ( "\nbt.a32_123 = 0x%x ", xbt.a32_123 ) ; 
+    printf ( "\nbt.a64_123 = 0x%lx ", xbt.a64_123 ) ; 
+    printf ( "\nbt.u32_123 = 0x%lx ", xbt.u32_123 ) ; 
+    printf ( "\nbt.a8_123 = %c ", xbt.a8_123 ) ; 
+    printf ( "\nbt.b8_123 = %c ", xbt.b8_123 ) ; 
+    printf ( "\nbt.c8_123 = %c ", xbt.c8_123 ) ; 
+    d: printf ( "\nbtt = 0x%lx", btt ) ; 
+    dump ( &xbt, xbt.size ) ; 
+    hp ( xbt.a8_123 ) ;
+d: } 
+byteTest 'bt new ;
+pwi bttt
+sp
+bttt ( bt ) ;  //pause // error size not considered
+#endif
+sp
+bt.a8_123 = 255 ; dump ( bt, bt.size ) ; 
+sp
+binary () ; p ( bt.b8_123 ) ; decimal () ; bt.b8_123 = 123 ; binary () ; p ( bt.b8_123 ) ; decimal () ; //pause
+p (bt.a8_123) ; p (bt.b8_123) ; p (bt.a32_123) ; p (bt.d8_123) ; 
+bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 1234 ; bt.a64_123 = 0x123456789abcdef ;
+sp
+dump ( bt, bt.size ) ; 
+sp
+bt.a8_123 1 _assert 
+_assert ( bt.a8_123 1 ) ;
+_assert ( bt.a32_123, 2147483647 ) ;
+void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) 
+{ bt.a8_123 = i8 ; bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; dump ( &bt, bt.size ) ; }
+byteTest 'abt new ;
+btest ( abt 0x12 0x123 0x1234567 0x123456789abcdef ) ;
+pwi btest ;
+sp
+void btest1 ( byteTest bt, byte i8 ) { bt.c8_123 = i8 ; hex ; p ( bt.c8_123 ) ; }
+btest1 ( abt, 0x12 ) ;
+pwi btest1 
+dump ( abt abt.size ) ;
+_assert ( abt.c8_123, 0x12 ) ;
+p ( abt.size ) ; 
+p ( bt.size ) ; 
+dump ( abt abt.size ) ;
+_assert ( abt.a8_123,  0x12 ) ;
+_assert ( abt.a32_123, 0x1234567 ) ;
+_assert ( abt.a16_123 0x123 ) ; 
+_assert ( abt.b8_123 0x12 ) ;
+_assert ( abt.a32_123 0x1234567 ) ;
+_assert ( abt.a64_123 0x123456789abcdef ) ;
+c_syntaxOff 
+notUsing: byteTest _byteTest abyteTest bt abt ; 
+'C.Experimental notUsing
+Root Experimental User
+//dbiOff
+#endif
+c_syntaxOff 
+
+#if 0
+: wtdInclude "namespaces/wordTypeDef.csl" include ;
+wtdInclude 
+C.Experimental
+'wtdInclude find 100 dump
+//'wtdInclude find 'C.Experimental.Word find d: wordStructPrint 
+'C.Experimental notUsing 
+//pause
 #endif
 2 + 7 assertStkChk // stack checking 
 s

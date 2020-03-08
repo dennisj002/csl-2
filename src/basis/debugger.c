@@ -2,7 +2,7 @@
 #include "../include/csl.h"
 
 Boolean
-DBG_Intrp_Loop_Test ( Debugger * debugger )
+DBG_Interpret_Loop_Test ( Debugger * debugger )
 {
     Boolean rtn = ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
         ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
@@ -24,7 +24,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
         debugger->CharacterFunctionTable [ debugger->CharacterTable [ debugger->Key ] ] ( debugger ) ;
     }
-    while ( DBG_Intrp_Loop_Test ( debugger ) ) ;
+    while ( DBG_Interpret_Loop_Test ( debugger ) ) ;
     debugger->LastPreSetupWord = debugger->w_Word ;
     SetState ( debugger, ( DBG_STACK_OLD | DBG_INTERPRET_LOOP_DONE ), true ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
@@ -43,7 +43,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
 void
 Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byte * address )
 {
-    if ( ( word ) && ( word->W_AliasOf ) )
+    if ( word && ( word->W_AliasOf ) )
     {
         debugger->w_Alias = word ;
         debugger->w_AliasOf = Word_UnAlias ( word ) ;
@@ -53,6 +53,7 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
         debugger->w_Alias = 0 ;
         debugger->w_AliasOf = 0 ;
     }
+    debugger->PreHere = Here ;
     if ( word ) debugger->RL_ReadIndex = word->W_RL_Index ;
     debugger->w_Word = word ;
     SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
@@ -72,11 +73,20 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
 }
 
 void
-Debugger_Setup_SaveState ( Debugger * debugger, Word * word )
+Debugger_Setup_ResetState ( Debugger * debugger )
 {
     debugger->DebugAddress = 0 ;
+    debugger->w_Alias = 0 ;
+    debugger->w_AliasOf = 0 ;
+    debugger->w_Word = 0 ;
+    debugger->Token = 0 ;
+}
+
+void
+Debugger_Setup_SaveState ( Debugger * debugger, Word * word )
+{
     SetState ( debugger, DBG_MENU, false ) ;
-    debugger->PreHere = Here ;
+    //debugger->PreHere = Here ;
     debugger->LastPreSetupWord = word ;
 }
 
@@ -112,13 +122,7 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
             if ( ( ! word ) && ( ! token ) ) word = Context_CurrentWord ( ) ;
             if ( force || ( word && word->Name[0] ) || token )
             {
-                Debugger_Setup_RecordState ( debugger, word, token, address ) ;
-
-                DebugColors ;
-                Debugger_InterpreterLoop ( debugger ) ; // core of this function
-                DefaultColors ;
-
-                Debugger_Setup_SaveState ( debugger, word ) ;
+                Debugger_Interpret ( debugger, word, token, address ) ;
                 rtn = true ;
             }
         }
@@ -369,7 +373,7 @@ Debugger_Print_LispDefinesNamespace ( Debugger * debugger )
 void
 Debugger_FindUsing ( Debugger * debugger )
 {
-    if ( debugger->Token ) debugger->w_Word = Finder_Word_FindUsing (_Context_->Finder0, debugger->Token, 0) ;
+    if ( debugger->Token ) debugger->w_Word = Finder_Word_FindUsing ( _Context_->Finder0, debugger->Token, 0 ) ;
 }
 
 void
@@ -729,7 +733,7 @@ void
 Debugger_Wdiss ( Debugger * debugger )
 {
     DataStack_Push ( ( int64 ) debugger->w_Word ) ;
-    Word * word = Finder_Word_FindUsing (_Finder_, "wdiss", 0) ;
+    Word * word = Finder_Word_FindUsing ( _Finder_, "wdiss", 0 ) ;
     Block_Eval ( word->Definition ) ;
 }
 

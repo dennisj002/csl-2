@@ -167,9 +167,8 @@ Word *
 _Word_Create ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispType, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
-    //if ( word == (Word*) 0x7ffff7a1ee28 ) 
-    //    Printf ( (byte*) "\nword 0x7ffff7a1ee28 = %s", word->Name ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
+    //if ( objectType & ( LITERAL | CONSTANT ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
     word->WAllocType = allocType ;
     word->W_MorphismAttributes = morphismType ;
@@ -191,7 +190,7 @@ Word_SetLocation ( Word * word )
     {
         word->W_WordData->Filename = rl->Filename ;
         word->W_WordData->LineNumber = rl->LineNumber ;
-        word->W_CursorPosition = rl->CursorPosition ;
+        word->W_TokenStart_LineIndex = _Lexer_->TokenStart_ReadLineIndex ;
     }
 }
 
@@ -244,7 +243,8 @@ byte *
 _Word_SourceCodeLocation_pbyte ( Word * word )
 {
     byte * b = Buffer_Data ( _CSL_->ScratchB2 ) ;
-    if ( word ) sprintf ( ( char* ) b, "%s.%s : %s %ld.%ld", word->ContainingNamespace->Name, word->Name, word->W_WordData->Filename, word->W_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex ) ;
+    if ( word ) sprintf ( ( char* ) b, "%s.%s : %s %ld.%ld", word->ContainingNamespace->Name, word->Name, word->W_WordData->Filename, 
+        word->W_WordData->LineNumber, word->W_TokenStart_LineIndex ) ;
     return String_New ( b, TEMPORARY ) ;
 }
 

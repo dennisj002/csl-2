@@ -20,7 +20,7 @@ CSL_TokenQID ( )
         if ( word )
         {
             Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
-            if ( ( isForwardDotted ) || ( token[0] == '.' ) ) Word_Eval ( word ) ;
+            if ( ( isForwardDotted ) || ( token[0] == '.' ) ) Interpreter_DoWord_Default ( _Interpreter_, word, word->W_RL_Index, word->W_SC_Index ) ;//  Word_Eval ( word ) ;
             else break ;
         }
     }

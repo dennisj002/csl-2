@@ -284,7 +284,9 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
     {
         if ( GetState ( _CSL_, STRING_MACROS_ON ) && GetState ( &_CSL_->Sti, STI_INITIALIZED ) ) _CSL_StringMacros_Do ( lexer->TokenBuffer ) ;
         Word * word = Lexer_ParseToken_ToWord ( lexer, token, - 1, - 1 ) ;
-        Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ;
+        //Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ;
+        //Interpreter_DoWord_Default ( _Interpreter_, word, - 1, - 1 ) ;
+        Word_Eval ( word ) ;
     }
     return token ;
 }

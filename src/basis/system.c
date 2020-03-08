@@ -107,6 +107,7 @@ _CSL_WordAccounting_Print ( byte * functionName )
     Printf ( ( byte* ) "\n%s :: DObjectCreateCount = %d : WordCreateCount = %d : WordsAdded = %d : FindWordCount = %d : FindWordMaxCount = %d",
         functionName, _CSL_->DObjectCreateCount, _CSL_->WordCreateCount, _CSL_->WordsAdded, _CSL_->FindWordCount, _CSL_->FindWordMaxCount ) ;
     Printf ( ( byte* ) "\nRecycledWordCount : %d", _O_->MemorySpace0->RecycledWordCount ) ;
+    Printf ( ( byte* ) "\nWordsInRecycling : %d", _O_->MemorySpace0->WordsInRecycling ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
@@ -316,7 +317,8 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
                 _Word_ShowSourceCode ( aword ) ;
             }
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
-            if ( word->W_WordData->Filename ) Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, word->W_WordData->Filename, word->W_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
+            if ( word->W_WordData->Filename ) Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, 
+                word->W_WordData->Filename, word->W_WordData->LineNumber, word->W_TokenStart_LineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
             if ( ( word->W_LispAttributes & T_LC_DEFINE ) && ( ! ( word->W_LispAttributes & T_LISP_COMPILED_WORD ) ) ) Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
             else if ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) )
             {

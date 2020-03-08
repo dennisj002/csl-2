@@ -403,9 +403,15 @@ OVT_MemListFree_LispSpace ( )
 }
 
 void
+_OVT_MemListFree_CompilerTempObjectSpace ( )
+{
+    OVT_MemList_FreeNBAMemory ( ( byte* ) "CompilerTempObjectSpace", 0, 1 ) ;
+}
+
+void
 OVT_MemListFree_CompilerTempObjects ( )
 {
-    if ( ! GetState ( _CSL_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) OVT_MemList_FreeNBAMemory ( ( byte* ) "CompilerTempObjectSpace", 0, 1 ) ;
+    if ( ! GetState ( _CSL_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) _OVT_MemListFree_CompilerTempObjectSpace ( ) ;
 }
 
 void
@@ -650,6 +656,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     }
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
     Printf ( ( byte* ) "\nRecycledWordCount :: %5d x %3d bytes : Recycled = %9d", _O_->MemorySpace0->RecycledWordCount, wordSize, _O_->MemorySpace0->RecycledWordCount * wordSize ) ;
+    Printf ( ( byte* ) "\nWordsInRecycling :: %5d x %3d bytes : Recycling = %9d", _O_->MemorySpace0->WordsInRecycling, wordSize, _O_->MemorySpace0->WordsInRecycling * wordSize ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
@@ -662,7 +669,6 @@ DLList_CheckRecycledForAllocation ( dllist * list, int64 size )
     if ( list ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ;
     if ( node )
     {
-        //if ( ( checkFlag ) && ( ( node->n_InUseFlag == N_IN_USE ) || ( node->n_Size != size ) || ( node->n_InUseFlag != N_FREE ) ) ) return 0 ;
         dlnode_Remove ( ( dlnode* ) node ) ; // necessary else we destroy the list!
         Mem_Clear ( ( byte* ) node, size ) ;
         node->n_InUseFlag = N_IN_USE ;
@@ -675,6 +681,7 @@ void
 OVT_Recycle ( dlnode * anode )
 {
     if ( anode ) dllist_AddNodeToTail ( _O_->MemorySpace0->RecycledWordList, anode ) ;
+    _O_->MemorySpace0->WordsInRecycling ++ ;
 }
 
 // put a word on the recycling list

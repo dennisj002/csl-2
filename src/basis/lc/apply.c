@@ -1,4 +1,6 @@
+
 #include "../../include/csl.h"
+
 //===================================================================================================================
 //| _LO_Apply 
 //===================================================================================================================
@@ -292,9 +294,14 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
     ListObject *l1 = * pl1 ;
     Word * word = l1 ;
     word = l1->Lo_CSLWord ;
-    word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
     byte * here = Here ;
+#if 1    
+    word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
+    Word_SetCodingAndSourceCoding ( word, Here ) ;
     Word_Eval ( word ) ;
+#else    
+    Interpreter_DoWord_Default ( _Interpreter_, word, l1->W_RL_Index, l1->W_SC_Index ) ;
+#endif    
     Word *baseObject = _Context_->BaseObject ;
     if ( ( word->Name [0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
     {
@@ -361,14 +368,16 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) _LO_Apply_Arg ( lc, &l1, &i ) ;
         Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
-        Word_SetCodingAndSourceCoding ( word, Here ) ;
-        word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
-        // for printf ?? others 
         //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, i, CELL ) ; 
-        //if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; 
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
+#if 1        
+        word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
+        Word_SetCodingAndSourceCoding ( word, Here ) ;
+        // for printf ?? others 
         Word_Eval ( word ) ;
+#else        
+        Interpreter_DoWord_Default ( _Interpreter_, word, word->W_RL_Index, word->W_SC_Index ) ;
+#endif        
         if ( word->W_MorphismAttributes & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
         if ( ! svcm )
         {
@@ -377,8 +386,6 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
             Set_CompileMode ( svcm ) ;
             Set_CompilerSpace ( scs ) ;
             _Debugger_->PreHere = Here ; // prevent debugger from showing the 1 byte ret for 'word'
-            _DEBUG_SETUP (word, 0, (byte*) 0, 1 , 0) ;
-            _DEBUG_SHOW ( word, 1, 0 ) ;
             Dbg_Block_Eval (word, b) ;
         }
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;

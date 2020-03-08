@@ -349,7 +349,7 @@ typedef struct _WordData
     byte * Coding ; // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
     byte * Filename ; // ?? should be made a part of a accumulated string table ??
     int64 LineNumber ;
-    int64 CursorPosition ;
+    int64 TokenStart_LineIndex ;
     int64 NumberOfNonRegisterArgs ;
     int64 NumberOfNonRegisterLocals ;
     int64 NumberOfVariables ;
@@ -418,8 +418,8 @@ typedef struct _WordData
 #define W_OurLocation W_WordData->OurLocation
 #define StackPushRegisterCode W_WordData->StackPushRegisterCode // used by Optimize
 #define W_SourceCode W_WordData->WD_SourceCode 
-#define W_TokenEnd_ReadLineIndex W_WordData->CursorPosition 
-#define W_CursorPosition W_WordData->CursorPosition 
+//#define W_TokenEnd_ReadLineIndex W_WordData->CursorEndPosition 
+#define W_TokenStart_LineIndex W_WordData->TokenStart_LineIndex 
 #define S_FunctionTypesArray W_WordData->FunctionTypesArray
 #define RegToUse W_WordData->RegToUse
 #define Opt_Rm W_WordData->Opt_Rm
@@ -936,7 +936,7 @@ typedef struct
     dllist * BufferList ;
     dllist * RecycledWordList ;
     dllist * RecycledOptInfoList ;
-    int64 RecycledWordCount ;
+    int64 RecycledWordCount, WordsInRecycling ;
 } MemorySpace ;
 typedef struct
 {

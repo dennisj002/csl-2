@@ -397,12 +397,12 @@ sp
 bt.a16_123 = 0x498 ;  
 hp ( bt.a16_123 ) ;
 sp
-void bttt ( byteTest xbt | btt ) 
+d: void bttt ( byteTest xbt | btt ) 
 { 
     printf ( "\nbtt" ) ;
     btt = xbt.a8_123 ; xbt.a8_123 = 'a' ; xbt.b8_123 = 'b' ; xbt.c8_123 = 'c' ; xbt.a16_123 = 0x1234 ; 
     xbt.a32_123 = 0x12345678 ; xbt.a64_123 = 0x123456789abcdef0 ; //pause
-    xbt.int32 u32_123 = 0x1234567 ; btt = 0xfedcba0987654321 ;
+    xbt.u32_123 = 0x1234567 ; btt = 0xfedcba0987654321 ;
     printf ( "\nbt.a16_123 = 0x%x ", xbt.a16_123 ) ; 
     printf ( "\nbt.a32_123 = 0x%x ", xbt.a32_123 ) ; 
     printf ( "\nbt.a64_123 = 0x%lx ", xbt.a64_123 ) ; 

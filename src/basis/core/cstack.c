@@ -139,7 +139,7 @@ _Stack_N ( Stack * stack, int64 n )
 int64
 _Stack_NOS ( Stack * stack )
 {
-    return _Stack_N ( stack, 1 ) ; 
+    return _Stack_N ( stack, 1 ) ;
 }
 
 void
@@ -181,8 +181,8 @@ _Stack_IntegrityCheck ( Stack * stack )
     {
         return true ;
     }
-    if ( _Stack_Overflow ( stack ) ) flag = STACK_OVERFLOW, errorString = (byte*) "\nStack Integrity Error : Stack Onverflow" ;
-    else flag = STACK_UNDERFLOW, errorString = (byte*) "\nStack Integrity Error : Stack Underflow" ;
+    if ( _Stack_Overflow ( stack ) ) flag = STACK_OVERFLOW, errorString = ( byte* ) "\nStack Integrity Error : Stack Onverflow" ;
+    else flag = STACK_UNDERFLOW, errorString = ( byte* ) "\nStack Integrity Error : Stack Underflow" ;
     CSL_Exception ( flag, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Underflow" ;
     return false ;
 }
@@ -191,8 +191,8 @@ int64
 _Stack_Depth ( Stack * stack )
 {
     int64 depth = 0 ;
-    if ( stack ) depth = stack->StackPointer - stack->InitialTosPointer ; 
-    return ( depth ) ; 
+    if ( stack ) depth = stack->StackPointer - stack->InitialTosPointer ;
+    return ( depth ) ;
 }
 
 int64
@@ -206,12 +206,15 @@ Stack_Depth ( Stack * stack )
 void
 _Stack_Init ( Stack * stack, int64 slots )
 {
-    memset ( stack, 0, sizeof ( Stack ) + ( slots * sizeof (int64 ) ) ) ;
-    stack->StackSize = slots ; // re-init size after memset cleared it
-    stack->StackMin = & stack->StackData [ 0 ] ; // 
-    stack->StackMax = & stack->StackData [ stack->StackSize - 1 ] ;
-    stack->InitialTosPointer = & stack->StackData [ - 1 ] ; // first push goes to stack->StackData [ 0 ]
-    stack->StackPointer = stack->InitialTosPointer ;
+    if ( stack )
+    {
+        memset ( stack, 0, sizeof ( Stack ) + ( slots * sizeof (int64 ) ) ) ;
+        stack->StackSize = slots ; // re-init size after memset cleared it
+        stack->StackMin = & stack->StackData [ 0 ] ; // 
+        stack->StackMax = & stack->StackData [ stack->StackSize - 1 ] ;
+        stack->InitialTosPointer = & stack->StackData [ - 1 ] ; // first push goes to stack->StackData [ 0 ]
+        stack->StackPointer = stack->InitialTosPointer ;
+    }
 }
 
 void
@@ -268,17 +271,17 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
     else word = Word_GetFromCodeAddress ( ( byte* ) ( stackPointer [ i ] ) ) ;
     if ( word )
     {
-        if ( IS_NON_MORPHISM_TYPE ( word ) && (!(word->W_MorphismAttributes & CSL_WORD )) && (!tsl) ) 
+        if ( IS_NON_MORPHISM_TYPE ( word ) && ( ! ( word->W_MorphismAttributes & CSL_WORD ) ) && ( ! tsl ) )
         {
             sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx >",
                 word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( String_ConvertToBackSlash ( word->Name ) ),
                 ( uint64 ) word->S_Value ) ;
         }
-        else 
+        else
         {
             sprintf ( ( char* ) buffer, "< word : %s.%s : code = 0x%016lx > : type %s- %s",
-               (word->ContainingNamespace ? (char*) word->ContainingNamespace->Name : ""), c_gd ( word->Name ), ( uint64 ) word->Definition,
-               (tsl ? "signature " : ""), c_gd ( ts ) ) ;
+                ( word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "" ), c_gd ( word->Name ), ( uint64 ) word->Definition,
+                ( tsl ? "signature " : "" ), c_gd ( ts ) ) ;
         }
     }
     else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;
@@ -294,8 +297,8 @@ _Stack_PrintHeader ( Stack * stack, byte * name )
     {
         uint64 * sp = stack->StackPointer ; // 0 based stack
         byte * location = c_gd ( Context_Location ( ) ) ;
-        Printf ( ( byte* ) "\n%s at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, 
-            name, location, name, depth, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CSLRsp (Rbx)" : "", ( int64 ) sp, 
+        Printf ( ( byte* ) "\n%s at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT,
+            name, location, name, depth, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CSLRsp (Rbx)" : "", ( int64 ) sp,
             ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
     }
 }

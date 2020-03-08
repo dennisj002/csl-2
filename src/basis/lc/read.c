@@ -1,5 +1,5 @@
 #include "../../include/csl.h"
-
+ 
 //===================================================================================================================
 //| _LO_Read 
 //===================================================================================================================
@@ -99,7 +99,11 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         if ( ( ! GetState ( _Compiler_, LC_ARG_PARSING ) ) && ( ( word->W_ObjectAttributes & STRUCT ) || Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) )
         {
             Set_CompileMode ( true ) ;
+#if 1            
             Word_Object_Run ( word ) ;
+#else            
+            Interpreter_DoWord_Default ( _Interpreter_, word, tsrli, scwi ) ;
+#endif            
             Set_CompileMode ( false ) ;
         }
         l0 = DataObject_New (T_LC_NEW, word, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes,

@@ -14,16 +14,23 @@ _dlnode_New ( uint64 allocType )
     return node ;
 }
 
-dlnode *
+inline dlnode *
 _dlnode_Previous ( dlnode * anode )
 {
     return anode->n_Before ;
 }
 
-dlnode *
+inline dlnode *
 _dlnode_Next ( dlnode * anode )
 {
     return anode->n_After ;
+}
+
+inline dlnode *
+_Is_NotHeadOrTailNode ( dlnode * anode )
+{
+    if ( _dlnode_Next ( anode ) && _dlnode_Previous ( anode ) ) return anode ;
+    else return 0 ;
 }
 
 inline dlnode *
@@ -53,7 +60,6 @@ inline dlnode *
 Is_NotAHeadNode ( dlnode * anode )
 {
     if ( anode && _dlnode_Previous ( anode ) ) return anode ;
-        //if ( _dlnode_Previous ( anode ) ) return anode ;
     else return 0 ;
 }
 
@@ -63,7 +69,6 @@ inline dlnode *
 Is_NotATailNode ( dlnode * anode )
 {
     if ( anode && _dlnode_Next ( anode ) ) return anode ;
-    //if ( _dlnode_Next ( anode ) ) return anode ;
     return 0 ;
 }
 
@@ -75,7 +80,7 @@ dlnode_Next ( dlnode * node )
     // don't return TailNode, return 0
     if ( node )
     {
-        dlnode * nextNode = node->n_After ; //_dlnode_Next ( node ) ;
+        dlnode * nextNode = node->n_After ; 
         if ( nextNode && nextNode->n_After ) return nextNode ;
     }
     return 0 ;
@@ -98,7 +103,7 @@ dlnode_Previous ( dlnode * node )
 void
 dlnode_InsertThisAfterANode ( dlnode * thisNode, dlnode * aNode ) // Insert thisNode After aNode : toward the tail of the list - "after" the Head
 {
-    if ( thisNode && ( aNode = Is_NotATailNode ( aNode ) ) )
+    if ( thisNode && Is_NotATailNode ( aNode ) )
     {
         //if ( aNode->afterNode ) 
         aNode->n_After->n_Before = thisNode ; // don't overwrite a Head or Tail node 
@@ -111,7 +116,7 @@ dlnode_InsertThisAfterANode ( dlnode * thisNode, dlnode * aNode ) // Insert this
 void
 dlnode_InsertThisBeforeANode ( dlnode * thisNode, dlnode * aNode ) // Insert thisNode Before aNode : toward the head of the list - "before" the Tail
 {
-    if ( thisNode && ( aNode = Is_NotAHeadNode ( aNode ) ) )
+    if ( thisNode && Is_NotAHeadNode ( aNode ) ) 
     {
         //if ( aNode->beforeNode ) 
         aNode->n_Before->n_After = thisNode ; // don't overwrite a Head or Tail node
@@ -124,7 +129,7 @@ dlnode_InsertThisBeforeANode ( dlnode * thisNode, dlnode * aNode ) // Insert thi
 void
 dlnode_Remove ( dlnode * node )
 {
-    if ( node = Is_NotHeadOrTailNode ( node ) )
+    if ( Is_NotHeadOrTailNode ( node ) )
     {
         node->n_Before->n_After = node->n_After ;
         node->n_After->n_Before = node->n_Before ;
@@ -495,7 +500,7 @@ dllist_Map4_FromFirstFlag_Indexed ( dllist * list, Boolean fromFirst, MapFunctio
         for ( index = 0, node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode, index ++ )
         {
             // get nextNode before map function (mf) in case mf changes list by a Remove of current node
-            // problem could arise if mf removes Next node
+            // problems could arise if mf removes Next node
             nextNode = dlnode_Next ( node ) ;
             mf ( node, index, one, two, three ) ;
         }
@@ -718,7 +723,7 @@ Tree_Map_Namespaces ( dllist * list, MapSymbolFunction mf )
     {
         nextNode = dlnode_Next ( node ) ;
         word = ( Word * ) node ;
-        if ( Is_NamespaceType ( word ) ) Tree_Map_Namespaces ( word->Lo_List, mf ) ;
+        if ( Is_NamespaceType ( word ) ) Tree_Map_Namespaces ( word->W_List, mf ) ;
         else mf ( ( Symbol* ) word ) ;
     }
 }
@@ -796,8 +801,10 @@ _dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int
         dobj->do_iData[i] = value ;
     }
     va_end ( args ) ;
-    //if ( dobj == (dobject*) 0x7ffff7a1ee28 ) 
-    //    Printf ( (byte*) "\nnode 0x7ffff7a1ee28" ) ;
+#if 1 // debugging    
+    if ( dobj == (dobject*) 0x7ffff7a9eb28 ) 
+        Printf ( (byte*) "\nnode 0x7ffff7a9eb28\n" ) ;
+#endif    
     _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
 
     return dobj ;
@@ -948,7 +955,7 @@ inline
 void
 _List_PushNew_ForWordList ( dllist *list, Word * word, int64 inUseFlag )
 {
-    _dllist_PushNew_M_Slot_Node ( list, COMPILER_TEMP, T_WORD, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
+    _dllist_PushNew_M_Slot_Node ( list, T_CSL, T_WORD, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
 }
 
 inline

@@ -506,6 +506,7 @@ CPrimitive CPrimitives [] = {
     { "purgeWordName", 0, 0, 0, CSL_Namespaces_PurgeWordExactName, 0, 0, 0, "Word", "Root" },
     { "purgeWordIfContainsName", 0, 0, 0, CSL_Namespaces_PurgeWordIfContainsName, 0, 0, 0, "Word", "Root" },
     { "wordNsListPrint", 0, 0, 0, CSL_Namespace_PrintWordList, 0, 0, 0, "Word", "Root" },
+    { "word_SC_WordList_Show", 0, 0, 0, CSL_SC_WordList_Show, 0, 0, 0, "Word", "Root" },
 
     // Dynamic Object - DObject
     { "dobject", 0, 0, 0, CSL_SetPropertiesAsDObject, 0, 0, 0, "DObject", "Root" },

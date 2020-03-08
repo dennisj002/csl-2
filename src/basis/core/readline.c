@@ -554,7 +554,7 @@ ReadLine_ReadFileIntoAString ( ReadLiner * rl, FILE * file )
 {
     int64 size, result ;
     size = _File_Size ( file ) ;
-    byte * fstr = Mem_Allocate ( size, COMPILER_TEMP ) ; // 2 : an extra so readline doesn't read into another area of allocated mem
+    byte * fstr = Mem_Allocate ( size, CONTEXT) ; //COMPILER_TEMP ) ; // 2 : an extra so readline doesn't read into another area of allocated mem
     result = fread ( fstr, 1, size, file ) ;
     if ( result != size )
     {
