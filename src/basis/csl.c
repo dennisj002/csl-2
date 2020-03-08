@@ -128,6 +128,13 @@ CSL_DataStack_Init ( )
 }
 
 void
+CSL_Setup_For_DObject_ValueDefinition_Init ( )
+{
+    _CSL_MachineCodePrimitive_NewAdd ( "call_ToAddressThruR8_TestAlignRSP", CSL_WORD | CSL_ASM_WORD, 0,
+        & _CSL_->Call_ToAddressThruR8_TestAlignRSP, ( byte* ) Compile_Call_ToAddressThruR8_TestAlignRSP, - 1 ) ;
+}
+
+void
 _CSL_Init ( CSL * csl, Namespace * nss )
 {
     uint64 allocType = T_CSL ;
@@ -175,6 +182,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     csl->cs_Cpu = CpuState_New ( allocType ) ;
     csl->cs_Cpu2 = CpuState_New ( allocType ) ;
     csl->PeekPokeByteArray = ByteArray_AllocateNew ( 32, allocType ) ;
+    CSL_Setup_For_DObject_ValueDefinition_Init ( ) ;
     if ( nss ) csl->Namespaces = nss ;
     else _CSL_NamespacesInit ( csl ) ;
     // with _O_->RestartCondition = STOP from Debugger_Stop
@@ -364,7 +372,7 @@ CSL_DeleteWordDebugInfo ( Word * word )
                 if ( word->W_SC_WordList )
                 {
 #if 0 // debugging                    
-                    SC_WordList_Show ( word->W_SC_WordList, word, 1, 0, (byte*) "CSL_DeleteWordDebugInfo" ) ; // debugging
+                    SC_WordList_Show ( word->W_SC_WordList, word, 1, 0, ( byte* ) "CSL_DeleteWordDebugInfo" ) ; // debugging
 #endif                    
                     DLList_Recycle_WordList ( word->W_SC_WordList ) ; // why not ??
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( word->NamespaceStack, 1, 1 ) ; // don't clear ; keep words for source code debugging, etc.

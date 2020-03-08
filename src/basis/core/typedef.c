@@ -75,8 +75,6 @@ Parse_Identifier ( Context * cntx, int64 t_type )
     TDSCI * tdsci = ( TDSCI * ) Stack_Top ( compiler->TDSCI_StructUnionStack ) ;
     byte *identifier = tdsci->TdsciToken ;
     Word * id, *addToNs ;
-    //if ( String_Equal ( identifier, "SC_WordIndex" ) )
-    //    Printf ( "" ) ;
     if ( GetState ( tdsci, TDSCI_PRINT ) )
     {
         if ( t_type == TYPE_NAME ) TDSCI_Print_Field ( cntx, t_type, tdsci->Tdsci_Field_Size ) ;
@@ -86,7 +84,6 @@ Parse_Identifier ( Context * cntx, int64 t_type )
         // with a nameless struct or union identifier are added to the background namespace
         addToNs = ( tdsci->Tdsci_StructureUnion_Namespace && tdsci->Tdsci_StructureUnion_Namespace->Name ) ?
             tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_InNamespace ;
-        //tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, identifier, 0, 0, 0, tdsci->Tdsci_Offset, tdsci->Tdsci_Field_Size, Word_UnAlias (addToNs), 0, 0, 0 ) ;
         tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, identifier, 0, 0, 0, tdsci->Tdsci_Offset, tdsci->Tdsci_Field_Size, addToNs, 0, 0, 0 ) ;
         TypeNamespace_Set ( id, tdsci->Tdsci_Field_Type_Namespace ) ;
     }
@@ -94,8 +91,8 @@ Parse_Identifier ( Context * cntx, int64 t_type )
     {
         if ( tdsci->Tdsci_StructureUnion_Namespace )
         {
-            if ( ( ! tdsci->Tdsci_StructureUnion_Namespace->Name ) || String_Equal ( tdsci->Tdsci_StructureUnion_Namespace->Name, "<unnamed namespace>" ) )
-                tdsci->Tdsci_StructureUnion_Namespace->Name = String_New ( identifier, DICTIONARY ) ;
+            //if ( ( ! tdsci->Tdsci_StructureUnion_Namespace->Name ) || String_Equal ( tdsci->Tdsci_StructureUnion_Namespace->Name, "<unnamed>" ) )
+            //    tdsci->Tdsci_StructureUnion_Namespace->Name = String_New ( identifier, DICTIONARY ) ;
             id = Parse_Do_IdentifierAlias ( cntx, identifier ) ; //else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
         }
         else
@@ -105,13 +102,12 @@ Parse_Identifier ( Context * cntx, int64 t_type )
             Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
         }
         id->W_ObjectAttributes |= ( STRUCT ) ; //??
-        //Class_Size_Set ( tdsci->Tdsci_BackgroundStructureNamespace, tdsci->Tdsci_BackgroundStructSize ) ; //>Tdsci_StructureUnion_Size ) ;
     }
     else if ( t_type == PRE_STRUCTURE_IDENTIFIER )
     {
+        //if ( ( ! tdsci->Tdsci_StructureUnion_Namespace->Name ) || String_Equal ( tdsci->Tdsci_StructureUnion_Namespace->Name, "<unnamed>" ) )
+        //    tdsci->Tdsci_StructureUnion_Namespace->Name = String_New ( identifier, DICTIONARY ) ;
         tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS, 0, identifier, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
-        //id->W_ObjectAttributes |= ( STRUCTURE ) ;
-
     }
     else CSL_Parse_Error ( "Parse_Identifier : No identifier type given", identifier ) ;
     if ( _O_->Verbosity > 1 ) TDSCI_DebugPrintWord ( cntx, id ) ; // print class field
@@ -323,7 +319,6 @@ Parse_Field ( Context * cntx )
         {
             Parse_StructOrUnion_Field ( cntx, 0, structOrUnionState ) ;
             SetState ( tdsci, TDSCI_UNION | TDSCI_STRUCT, false ) ;
-            tdsci->Tdsci_StructureUnion_Namespace->W_ObjectAttributes |= STRUCTURE ;
         }
         else
         {
@@ -378,8 +373,8 @@ Parse_PreStruct_Accounting ( Context * cntx, Namespace * ns, int64 state )
         tdsci->DataPtr = ctdsci->DataPtr ;
     }
     //else
-    if ( ( ! tdsci->Tdsci_StructureUnion_Namespace ) && ( ! GetState ( tdsci, TDSCI_PRINT ) ) ) tdsci->Tdsci_StructureUnion_Namespace =
-        DataObject_New ( CLASS, 0, "<unnamed namespace>", 0, 0, 0, 0, 0, tdsci->Tdsci_InNamespace, 0, 0, - 1 ) ;
+    //if ( ( ! tdsci->Tdsci_StructureUnion_Namespace ) && ( ! GetState ( tdsci, TDSCI_PRINT ) ) ) tdsci->Tdsci_StructureUnion_Namespace =
+    //    DataObject_New ( CLASS, 0, "<unnamed>", 0, 0, 0, 0, 0, tdsci->Tdsci_InNamespace, 0, 0, - 1 ) ;
     tdsci->State |= state ;
     return tdsci ;
 }

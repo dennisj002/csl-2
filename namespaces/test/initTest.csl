@@ -91,12 +91,8 @@ sp
 //"\ntest nested if 0 - wrong \n" ps pause
 #elif 1 
 "\ntest nested elif 1 - correct \n" ps //pause
-// { doTest _TestDone_ @ not && } { basicT testX <dbg> _TestDone_ ++ } if2  
-//: test0 { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  ; d: test0
-//{ doTest _TestDone_ @ not && } { <dbg> basicT testX _TestDone_ ++ } if2  
 sp
 { doTest _TestDone_ @ not && } { basicT _TestDone_ ++ } if2  
-//#endif // end if 1
 #elif 0
 "\ntest nested elif 1 - wrong \n" ps pause
 : shellOff "Shell" notUsing ;

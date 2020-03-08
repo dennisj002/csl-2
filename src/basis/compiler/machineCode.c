@@ -895,6 +895,7 @@ Compile_Call_ToAddressThruReg_TestAlignRSP ( byte * address, Boolean thruReg )
 {
     Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, CELL ) ;
     _Compile_Call_ThruReg_TestAlignRSP ( thruReg ) ;
+    //Compile_Call ( (byte*) _CSL_->Call_ToAddressThruR8_TestAlignRSP ) ;
 }
 
 void

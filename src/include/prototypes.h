@@ -72,7 +72,9 @@ void _Compile_Return(void);
 void _Compile_Call_Acc(void);
 void Compile_DataStack_PopAndCall(void);
 void Compile_Call_From_C_Address(uint64 bptr);
+void Compile_PushWord_Call_CSL_Function(Word *word, byte *cFunction);
 void Compile_CallCFunctionWithParameter_TestAlignRSP(byte *cFunction, Word *word);
+void Compile_CallCFunctionWithParameter_TestAlignRSP2(byte *cFunction, Word *word);
 void Compile_Call_CurrentBlock(void);
 void _Compile_RspReg_To(void);
 void _Compile_RspReg_Drop(void);
@@ -141,7 +143,8 @@ void CpuState_Save(void);
 void CpuState_Restore(void);
 /* src/basis/compiler/mcPrimitives.c */
 void Compile_WordRun(void);
-void _CSL_MachineCodePrimitive_NewAdd(const char *name, uint64 morphismAttributes, int64 objectAttributes, block *callHook, byte *function, int64 functionArg, const char *nameSpace, const char *superNamespace);
+Word *_CSL_MachineCodePrimitive_NewAdd(const char *name, uint64 morphismAttributes, int64 objectAttributes, block *callHook, byte *function, int64 functionArg);
+void CSL_MachineCodePrimitive_NewAdd(const char *name, uint64 morphismAttributes, int64 objectAttributes, block *callHook, byte *function, int64 functionArg, const char *nameSpace, const char *superNamespace);
 void CSL_MachineCodePrimitive_AddWords(CSL *csl);
 /* src/basis/compiler/stack.c */
 void _Compile_Stack_Drop(Boolean stackReg);
@@ -417,6 +420,7 @@ void CSL_PrintReturnStackWindow(void);
 void _CSL_NamespacesInit(CSL *csl);
 void _CSL_DataStack_Init(CSL *csl);
 void CSL_DataStack_Init(void);
+void CSL_Setup_For_DObject_ValueDefinition_Init(void);
 void _CSL_Init(CSL *csl, Namespace *nss);
 void CSL_ResetMemory(CSL *csl);
 CSL *_CSL_New(CSL *csl);

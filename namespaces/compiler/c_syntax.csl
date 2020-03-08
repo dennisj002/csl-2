@@ -28,7 +28,7 @@ Class
 
 c_syntaxOn
 libc C
-typedef struct _CObj
+typedef struct
 {
     int64 hi ;
     char chars [ 32 ] ;
@@ -37,7 +37,7 @@ typedef struct _CObj
     char chars2 [ 32 ] ;
     int64 heey ;
     int64 heey1 ;
-} cobj, CObj ;
+} CObj ;
 "CObj.size =" ps p ( CObj.size ) ; // 104
 CObj 'chey new ;
 CObj 
@@ -68,9 +68,9 @@ sp
 chey.chars [23] = 255 ;
 chey.chars [18] = #b10110 ; // #x16
 //chey.hey = #x12345678 ;
-dump ( &chey, cobj.size ) ; 
+dump ( &chey, CObj.size ) ; 
 sp
-printf ( "\ncobj.size = %d",cobj.size ) ; 
+printf ( "\nCObj.size = %d",CObj.size ) ; 
 printf ( "\n%s%lx", "\nchey = ", chey ) ;
 printf ( "\n%s%lx", "\nchey.hey = ", chey.hey ) ; sp 
 printf ( "\n%s%lx", "\n&chey.hey = ", &chey.hey ) ; sp
@@ -85,20 +85,20 @@ sprintf ( x7, "%s", "\n\thoot" ) ;
 printf ( "%s", x7 ) ;
 //pause
 sprintf ( &chey.chars, "%s", "well" ) ;
-dump ( chey, cobj.size ) ; 
+dump ( chey, CObj.size ) ; 
 //sprintf ( &chey.chars [ 24 ], "%s", "do or don't" ) ;
 sprintf ( &chey.chars [ 24 ], "%s", "don't" ) ;
-dump ( chey, cobj.size ) ; 
+dump ( chey, CObj.size ) ; 
 sprintf ( &chey.chars, "%s", "hoot" ) ;
-dump ( chey, cobj.size ) ; 
+dump ( chey, CObj.size ) ; 
 sprintf ( &chey.chars, "%s", "ok! don't hoot" ) ;
-dump ( chey, cobj.size ) ; 
+dump ( chey, CObj.size ) ; 
 sprintf ( &chey.chars, "%s", "well, do or don't hoot" ) ;
-dump ( chey, cobj.size ) ; 
+dump ( chey, CObj.size ) ; 
 
 printf ( "\n\t%s\n", &chey.chars [ 24 ] ) ;
 printf ( "\n\t%s\n", "hoot" ) ; //&chey.chars [ 24 ] ) ;
-dump ( chey, cobj.size ) ; // add '&' within parentheses for lvalue
+dump ( chey, CObj.size ) ; // add '&' within parentheses for lvalue
 //pause
 sp
 scOn
@@ -113,23 +113,23 @@ chi ( CObj chey0, d | a b c )
     p ( c ) ; c 3 "c should be 3" assert // 3
     p ( b ) ; b 5 "b should be 5" assert // 5
     p ( a ) ; a 8 "a should be 8" assert // 8
-    dump ( &chey0, cobj.size ) ; 
-    d = cobj.chey0.hey ;
+    dump ( &chey0, CObj.size ) ; 
+    d = CObj.chey0.hey ;
     hex p ( d ) ;
     printf ( "\n chi : d = %lx\n", d ) ;
-    sprintf ( &cobj.chey0.chars, "\n\t\they = %lx", d ) ; // add '&' within parentheses for lvalue
+    sprintf ( &CObj.chey0.chars, "\n\t\they = %lx", d ) ; // add '&' within parentheses for lvalue
     printf ( "\n chi : d = %lx\n", d ) ;
-    sprintf ( &cobj.chey0.chars2, "\n\t\they hey = %lx", cobj.chey0.hey ) ;
-    printf ( "\n cobj.chey0.chars = %s\n", &cobj.chey0.chars ) ;
-    printf ( "\n cobj.chey0.chars2 = %s\n", &cobj.chey0.chars2 ) ;
+    sprintf ( &CObj.chey0.chars2, "\n\t\they hey = %lx", CObj.chey0.hey ) ;
+    printf ( "\n CObj.chey0.chars = %s\n", &CObj.chey0.chars ) ;
+    printf ( "\n CObj.chey0.chars2 = %s\n", &CObj.chey0.chars2 ) ;
     printf ( "\n chi : d = %lx\n", d ) ;
-    d = cobj.chey0.hey ;
+    d = CObj.chey0.hey ;
     printf ( "\n%lx\n", d ) ;
     printf ( "\n chi : d = %lx\n", d ) ;
     _assert ( d #x0123456789abcdef ) ; 
-    printf ( "\n%x\n", cobj.chey0.hey ) ;
+    printf ( "\n%x\n", CObj.chey0.hey ) ;
     sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
-    dump ( &chey0, cobj.size ) ; 
+    dump ( &chey0, CObj.size ) ; 
 } prefix
 pwi chi
 chi ( chey, 7 ) ;
@@ -281,7 +281,7 @@ C
 sp
 c_syntaxOn
 C String libc
-typedef struct _CBuffer { byte buf [ 256 ] ; } CBuffer ;
+typedef struct { byte buf [ 256 ] ; } CBuffer ;
 void
 $ ( | atoken, buffer, CBuffer buffer0 ) 
 {

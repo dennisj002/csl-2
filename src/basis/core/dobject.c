@@ -139,7 +139,9 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
         word->CodeStart = Here ;
         word->Definition = ( block ) Here ;
         if ( arg ) _DObject_C_StartupCompiledWords_DefInit ( function, arg ) ;
-        else Compile_CallCFunctionWithParameter_TestAlignRSP ( ( byte* ) _DataObject_Run, word ) ;
+        //else Compile_CallCFunctionWithParameter_TestAlignRSP ( ( byte* ) _DataObject_Run, word ) ;
+        else Compile_CallCFunctionWithParameter_TestAlignRSP2 ( ( byte* ) _DataObject_Run, word ) ;
+        //else Compile_PushWord_Call_CSL_Function ( word, ( byte* ) _DataObject_Run ) ; 
         _Compile_Return ( ) ;
         //if ( Is_DebugOn ) Word_Disassemble ( word ) ; //_Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 64, 1 ) ;
         word->S_CodeSize = Here - word->CodeStart ; // for use by inline

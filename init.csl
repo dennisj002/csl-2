@@ -450,26 +450,12 @@ stringMacrosOff
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your extra init code maybe here if you like
 : mct "namespaces/compiler/machineCode.csl" include ;
 
-'doInitTest 1 const
-#if doInitTest
-// startup test code here ...
-
-#if 0 //tcOnv @
-tc demo
-//fload nt.csl
-//mct
-#endif //tcOnv @
-
-#endif //doInitTest 
-
 #endif // Is_DebugOn
 
 bnOff
 Shell
-infixOn
-((1 + 5) * 8) / ((2 + 1) * ( 2 * 4 )) 2 _assert
-infixOff
 rtw
+
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
 
 #if 0
@@ -486,6 +472,6 @@ C.Experimental
 #if 0 //forStarters @ 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; pwi hi 2 3 d: hi 5 _assert
 #endif 
-
+rdi //mem
 2 + 7 assertStkChk // stack checking 
 s

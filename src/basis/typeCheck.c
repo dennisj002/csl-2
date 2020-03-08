@@ -541,11 +541,14 @@ Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( Word * word )
 void
 Word_SetTypeNamespace ( Word * word, int64 attribute )
 {
-    if ( _Compiler_->AutoVarTypeNamespace ) word->TypeNamespace = _Compiler_->AutoVarTypeNamespace ;
-    else if ( attribute & T_INT ) word->TypeNamespace = _CSL_->IntegerNamespace ;
-    else if ( attribute & T_STRING ) word->TypeNamespace = _CSL_->StringNamespace ;
-    else if ( attribute & T_BIG_NUM ) word->TypeNamespace = _CSL_->BigNumNamespace ;
-    else if ( attribute & T_RAW_STRING ) word->TypeNamespace = _CSL_->RawStringNamespace ;
+    if ( word )
+    {
+        if ( _Compiler_->AutoVarTypeNamespace ) word->TypeNamespace = _Compiler_->AutoVarTypeNamespace ;
+        else if ( attribute & T_INT ) word->TypeNamespace = _CSL_->IntegerNamespace ;
+        else if ( attribute & T_STRING ) word->TypeNamespace = _CSL_->StringNamespace ;
+        else if ( attribute & T_BIG_NUM ) word->TypeNamespace = _CSL_->BigNumNamespace ;
+        else if ( attribute & T_RAW_STRING ) word->TypeNamespace = _CSL_->RawStringNamespace ;
+    }
 }
 
 void

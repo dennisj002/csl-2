@@ -24,10 +24,29 @@ Compile_Call_From_C_Address ( uint64 bptr )
 // c ffi : foreign function interface
 
 void
+Compile_PushWord_Call_CSL_Function ( Word * word, byte * cFunction )
+{
+    //DBI_ON ;
+    _Compile_Stack_Push ( DSP, RAX, (int64) word ) ;
+    Compile_Call ( (byte*) cFunction ) ;
+    //DBI_OFF ;
+}
+
+void
 Compile_CallCFunctionWithParameter_TestAlignRSP ( byte * cFunction, Word * word )
 {
     Compile_MoveImm_To_Reg ( RDI, ( int64 ) word, CELL ) ; // RDI is x64 abi first parameter 
     Compile_Call_ToAddressThruReg_TestAlignRSP ( cFunction, CALL_THRU_REG ) ; // compile call cFunction with RDI value as arg
+}
+
+void
+Compile_CallCFunctionWithParameter_TestAlignRSP2 ( byte * cFunction, Word * word )
+{
+    //DBI_ON ;
+    Compile_MoveImm_To_Reg ( RDI, ( int64 ) word, CELL ) ; // RDI is x64 abi first parameter 
+    Compile_MoveImm_To_Reg ( R8, ( int64 ) cFunction, CELL ) ;
+    Compile_Call ( (byte*) _CSL_->Call_ToAddressThruR8_TestAlignRSP ) ;
+    //DBI_OFF ;
 }
 
 void

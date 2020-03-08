@@ -656,7 +656,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     }
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
     Printf ( ( byte* ) "\nRecycledWordCount :: %5d x %3d bytes : Recycled = %9d", _O_->MemorySpace0->RecycledWordCount, wordSize, _O_->MemorySpace0->RecycledWordCount * wordSize ) ;
-    Printf ( ( byte* ) "\nWordsInRecycling :: %5d x %3d bytes : Recycling = %9d", _O_->MemorySpace0->WordsInRecycling, wordSize, _O_->MemorySpace0->WordsInRecycling * wordSize ) ;
+    Printf ( ( byte* ) "\nWrdInRecycling :: %5d x %3d bytes : InRecycling = %9d", _O_->MemorySpace0->WordsInRecycling, wordSize, _O_->MemorySpace0->WordsInRecycling * wordSize ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
