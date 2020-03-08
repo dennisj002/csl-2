@@ -776,7 +776,7 @@ typedef struct _Debugger
     int64 TerminalLineWidth, RL_ReadIndex, SaveTOS, SaveStackDepth, Key, SaveKey, LastScwi, Esi, Edi ;
     Word * w_Word, *w_Alias, *w_AliasOf, *EntryWord, *LastShowInfoWord, *LastShowEffectsWord, *NextEvalWord ;
     Word *LocalsNamespace, *LastPreSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord, *SubstitutedWord ;
-    byte * Token, *DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress, * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
+    byte * Token, *DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress, * PreHere, *SpecialPreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
     block SaveCpuState, RestoreCpuState ;
     Stack *ReturnStack, *LocalsCompilingNamespacesStack ;
     Cpu * cs_Cpu ;
@@ -1017,17 +1017,17 @@ typedef struct
     uint8 OpInsnCodeGroup ;
     uint8 OpInsnCode ;
     block blk_Definition ;
-    uint64 ui64_CAttribute ;
-    uint64 ui64_CAttribute2 ;
-    uint64 ui64_LAttribute ;
+    uint64 ui64_MorphismAttributes ;
+    uint64 ui64_ObjectAttributes ;
+    uint64 ui64_LispAttributes ;
     const char *NameSpace ;
     const char * SuperNamespace ;
 } CPrimitive ;
 typedef struct
 {
     const char * ccp_Name ;
-    uint64 ui64_CAttribute ;
-    uint64 ui64_CAttribute2 ;
+    uint64 ui64_MorphismAttributes ;
+    uint64 ui64_ObjectAttributes ;
     block blk_CallHook ;
     byte * Function ;
     int64 i32_FunctionArg ;

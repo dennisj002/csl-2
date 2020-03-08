@@ -32,7 +32,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
                             storeFixed = 1 ;
                             SetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION, true ) ;
                         }
-                        token = GetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) ? (byte*) "=" : word->Name ;
+                        token = GetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) ? ( byte* ) "=" : word->Name ;
                         buffer = DBG_PrepareSourceCodeString ( word, token, sourceCode, 0, 0, 1 ) ;
                         if ( buffer && buffer[0] ) Printf ( ( byte* ) "\n%s", buffer ) ;
                         if ( storeFixed ) word->Name = ( byte* ) "store" ;
@@ -197,7 +197,7 @@ DLList_RecycleInit_WordList ( Word * word )
 }
 
 void
-_CSL_RecycleInit_Compiler_N_M_Node_WordList (dllist * list, Boolean force)
+_CSL_RecycleInit_Compiler_N_M_Node_WordList ( dllist * list, Boolean force )
 {
     if ( force || ( ! GetState ( _CSL_, ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ) )
     {
@@ -209,18 +209,14 @@ _CSL_RecycleInit_Compiler_N_M_Node_WordList (dllist * list, Boolean force)
 void
 CSL_RecycleInit_Compiler_N_M_Node_WordList ( )
 {
-    _CSL_RecycleInit_Compiler_N_M_Node_WordList (_CSL_->Compiler_N_M_Node_WordList, 0) ;
+    _CSL_RecycleInit_Compiler_N_M_Node_WordList ( _CSL_->Compiler_N_M_Node_WordList, 0 ) ;
 }
 
 void
 CSL_WordList_Init ( Word * word )
 {
     CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
-    if ( word )
-    {
-        //if ( ! GetState ( _Compiler_, LISP_MODE ) ) word->W_SC_Index = 0 ; // before pushWord !
-        CSL_WordList_PushWord ( word ) ; // for source code
-    }
+    CSL_WordList_PushWord ( word ) ; // for source code
 }
 
 inline void
@@ -372,16 +368,19 @@ _CSL_WordList_PushWord ( Word * word, Boolean inUseFlag )
 void
 CSL_WordList_PushWord ( Word * word )
 {
-    int64 inUseFlag = 0 ;
-    if ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) ) ) inUseFlag = 0 ;
-    else
+    if ( word )
     {
-        // not the clearest logic ??
-        if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE ) ) || ( ! ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) )
-            || ( word->W_ObjectAttributes & ( NAMESPACE | OBJECT_FIELD ) ) ) ) ) inUseFlag |= SCN_IN_USE_FLAG_ALL ;
-        if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE | NAMESPACE | OBJECT_FIELD | LOCAL_OBJECT ) ) ) inUseFlag |= SCN_IN_USE_FOR_SOURCE_CODE ;
+        int64 inUseFlag = 0 ;
+        if ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) ) ) inUseFlag = 0 ;
+        else
+        {
+            // not the clearest logic ??
+            if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE ) ) || ( ! ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) )
+                || ( word->W_ObjectAttributes & ( NAMESPACE | OBJECT_FIELD ) ) ) ) ) inUseFlag |= SCN_IN_USE_FLAG_ALL ;
+            if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE | NAMESPACE | OBJECT_FIELD | LOCAL_OBJECT ) ) ) inUseFlag |= SCN_IN_USE_FOR_SOURCE_CODE ;
+        }
+        CSL_WordList_Push ( word, inUseFlag ) ;
     }
-    CSL_WordList_Push ( word, inUseFlag ) ;
 }
 
 // too many showWord functions ??
@@ -437,6 +436,7 @@ DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag, int64 prefix, i
         int64 iuFlag = dobject_Get_M_Slot ( ( dobject * ) anode, SCN_IN_USE_FLAG ) ;
         if ( word && ( ( ! inUseOnlyFlag ) || ( inUseOnlyFlag && iuFlag ) ) )
         {
+            //if ( word->Name ) // adhoc hack == has word been recycled already??
             _DWL_ShowWord_Print ( word, index, ( byte* ) prefix, word->Coding, word->SourceCoding, 0, scwi, iuFlag ) ;
         }
     }

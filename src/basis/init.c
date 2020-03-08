@@ -145,7 +145,7 @@ CSL_AddCPrimitives ( )
     for ( i = 0 ; CPrimitives [ i ].ccp_Name ; i ++ )
     {
         CPrimitive p = CPrimitives [ i ] ;
-        _CSL_CPrimitiveNewAdd ( p.ccp_Name, ( byte* ) p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+        _CSL_CPrimitiveNewAdd ( p.ccp_Name, ( byte* ) p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_MorphismAttributes, p.ui64_ObjectAttributes, p.ui64_LispAttributes, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
     }
     //_CSL_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
 }

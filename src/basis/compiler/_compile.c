@@ -239,7 +239,7 @@ Do_C_Pointer_StackAccess (  byte * ptr )
     {
         Compile_MoveImm_To_Reg ( RAX, ( int64 ) ptr, CELL ) ;
         Word_Set_StackPushRegisterCode_To_Here ( _Context_->CurrentEvalWord ) ;
-        _Compile_Stack_PushReg ( DSP, ACC ) ;
+        _Compile_Stack_PushReg ( DSP, RAX ) ;
     }
     else DataStack_Push ( ( int64 ) ptr ) ;
 }

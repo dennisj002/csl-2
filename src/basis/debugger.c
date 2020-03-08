@@ -53,7 +53,7 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
         debugger->w_Alias = 0 ;
         debugger->w_AliasOf = 0 ;
     }
-    debugger->PreHere = Here ;
+    debugger->PreHere = debugger->SpecialPreHere ? debugger->SpecialPreHere : Here ;
     if ( word ) debugger->RL_ReadIndex = word->W_RL_Index ;
     debugger->w_Word = word ;
     SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
@@ -80,6 +80,7 @@ Debugger_Setup_ResetState ( Debugger * debugger )
     debugger->w_AliasOf = 0 ;
     debugger->w_Word = 0 ;
     debugger->Token = 0 ;
+    debugger->SpecialPreHere = 0 ;
 }
 
 void

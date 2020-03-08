@@ -74,6 +74,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
         uint64 morphismAttributes = lexer->L_MorphismAttributes ;
         //_DObject_New ( byte * name, uint64 value, uint64 morphismType, uint64 objectType, uint64 lispType, uint64 functionType, byte * function, int64 arg,
         //    int64 addToInNs, Namespace * addToNs, uint64 allocType )
+        //int64 addToInNs = GetState ( _Compiler_, LC_ARG_PARSING ) ;
         Word * word = _DObject_New ( lexer->OriginalToken, lexer->Literal, IMMEDIATE | morphismAttributes,
             ( lexer->L_ObjectAttributes | LITERAL ), objectAttributes, lexer->L_ObjectAttributes | objectAttributes, ( byte* ) _DataObject_Run, 0, 0, 0, LISP ) ;
         if ( qidFlag ) word->W_ObjectAttributes &= ~ T_LISP_SYMBOL ;

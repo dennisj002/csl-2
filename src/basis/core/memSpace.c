@@ -122,7 +122,7 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
             }
             _O_->AllocationRequestLacks ++ ;
             //nba->NBA_DataSize += ( ( ( nba->CheckTimes ++ ) * ( nba->NBA_DataSize ) ) + size ) ; 
-            nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 128 ) ) + size ) ; 
+            nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 128 ) ) + size ) ;
             //nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 10 * K ) ) + size ) ; 
             //nba->NBA_DataSize += size ; // has to at least have this size available
             if ( _O_->Verbosity > 3 )
@@ -140,6 +140,7 @@ done:
 }
 
 //macros.h :  _Allocate( size, nba ) _ByteArray_AppendSpace ( nba->ba_CurrentByteArray, size ) 
+
 byte *
 _ByteArray_AppendSpace ( ByteArray * ba, int64 size ) // size in bytes
 {
@@ -376,7 +377,6 @@ OVT_MemList_DeleteNBAMemory ( byte * name, Boolean reinitFlag )
     NamedByteArray_Delete ( nba, reinitFlag ) ;
 }
 
-
 void
 OVT_MemList_FreeNBAMemory ( byte * name, uint64 moreThan, int64 always )
 {
@@ -411,7 +411,7 @@ _OVT_MemListFree_CompilerTempObjectSpace ( )
 void
 OVT_MemListFree_CompilerTempObjects ( )
 {
-    if ( ! GetState ( _CSL_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) _OVT_MemListFree_CompilerTempObjectSpace ( ) ;
+    if ( ! GetState ( _CSL_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) _OVT_MemListFree_CompilerTempObjectSpace ( ) ;
 }
 
 void
@@ -624,8 +624,8 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     Calculate_TotalNbaAccountedMemAllocated ( ovt, 1 ) ; //leak || vf ) ;
     _OVT_ShowPermanentMemList ( ovt ) ;
     int64 memDiff2 = ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted ;
-    byte * memDiff2s = (byte*) "\nCurrent Unaccounted Diff (leak?)                 = %9d : <=: ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted" ;
-    byte * leaks = (byte*) "\nleak?                                            = %9d : <=  (mmap_TotalMemAllocated - mmap_TotalMemFreed) - (ovt->TotalMemAllocated - ovt->TotalMemFreed) "
+    byte * memDiff2s = ( byte* ) "\nCurrent Unaccounted Diff (leak?)                 = %9d : <=: ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted" ;
+    byte * leaks = ( byte* ) "\nleak?                                            = %9d : <=  (mmap_TotalMemAllocated - mmap_TotalMemFreed) - (ovt->TotalMemAllocated - ovt->TotalMemFreed) "
         "\n                                                                    - ovt->OVT_InitialUnAccountedMemory" ;
     if ( memDiff2 ) Printf ( ( byte* ) c_ad ( memDiff2s ), memDiff2 ) ;
     else if ( vf ) Printf ( ( byte* ) c_ud ( memDiff2s ), memDiff2 ) ;
@@ -652,7 +652,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     }
     {
         Printf ( ( byte* ) "\nTotal Memory Allocated                            = %9d"
-                            "\nTotal Memory leaks                                = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
+            "\nTotal Memory leaks                                = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
     }
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
     Printf ( ( byte* ) "\nRecycledWordCount :: %5d x %3d bytes : Recycled = %9d", _O_->MemorySpace0->RecycledWordCount, wordSize, _O_->MemorySpace0->RecycledWordCount * wordSize ) ;
@@ -678,10 +678,23 @@ DLList_CheckRecycledForAllocation ( dllist * list, int64 size )
 }
 
 void
+OVT_RecyclingAccounting ( int64 flag )
+{
+    if ( flag == OVT_RA_RECYCLED )
+    {
+        _O_->MemorySpace0->RecycledWordCount ++ ;
+        _O_->MemorySpace0->WordsInRecycling -- ;
+    }
+    else if ( flag == OVT_RA_ADDED ) _O_->MemorySpace0->WordsInRecycling ++ ;
+
+}
+
+void
 OVT_Recycle ( dlnode * anode )
 {
     if ( anode ) dllist_AddNodeToTail ( _O_->MemorySpace0->RecycledWordList, anode ) ;
-    _O_->MemorySpace0->WordsInRecycling ++ ;
+    //_O_->MemorySpace0->WordsInRecycling ++ ;
+    OVT_RecyclingAccounting ( OVT_RA_ADDED ) ;
 }
 
 // put a word on the recycling list
@@ -690,13 +703,13 @@ void
 Word_Recycle ( Word * w )
 {
     OVT_Recycle ( ( dlnode * ) w ) ;
-    w->W_ObjectAttributes &=  ~( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ;
+    w->W_ObjectAttributes &= ~ ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ;
 }
 
 void
 _CheckRecycleWord ( Word * w )
 {
-    if ( w && ( w->W_ObjectAttributes & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) ) 
+    if ( w && ( w->W_ObjectAttributes & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) )
     {
         //if ( Is_DebugOn ) 
         if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;

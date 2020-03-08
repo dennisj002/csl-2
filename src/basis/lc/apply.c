@@ -297,7 +297,6 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
     byte * here = Here ;
 #if 1    
     word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
-    Word_SetCodingAndSourceCoding ( word, Here ) ;
     Word_Eval ( word ) ;
 #else    
     Interpreter_DoWord_Default ( _Interpreter_, word, l1->W_RL_Index, l1->W_SC_Index ) ;
@@ -308,9 +307,9 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
         if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
         else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
         Compile_Move_Reg_To_Reg ( RegParameterOrder ( (*i) ++ ), ACC, 0 ) ;
-        if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
         SetState ( cntx, ADDRESS_OF_MODE, false ) ;
-        _Debugger_->PreHere = here ;
+        if ( baseObject ) _Debugger_->SpecialPreHere = baseObject->Coding ;
+        else _Debugger_->SpecialPreHere = here ;
     }
 }
 
@@ -326,7 +325,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
     {
         Set_CompileMode ( false ) ;
         l2 = LO_Eval ( lc, l1 ) ;
-        _Debugger_->PreHere = Here ;
+        _Debugger_->SpecialPreHere = Here ;
         if ( ! l2 || ( l2->W_LispAttributes & T_NIL ) ) Compile_MoveImm_To_Reg ( RegParameterOrder ( (*i) ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         else Compile_MoveImm_To_Reg ( RegParameterOrder ( (*i) ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
         _DEBUG_SHOW ( l2, 1, 0 ) ;
@@ -364,16 +363,14 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         Set_CompileMode ( true ) ;
         if ( ! svcm ) CSL_BeginBlock ( ) ;
         if ( word->W_MorphismAttributes & ( DLSYM_WORD | C_PREFIX ) ) Set_CompileMode ( true ) ;
-        _Debugger_->PreHere = Here ;
+        //_Debugger_->PreHere = Here ;
         for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) _LO_Apply_Arg ( lc, &l1, &i ) ;
         Set_CompileMode ( true ) ;
-        _Debugger_->PreHere = Here ;
+        _Debugger_->SpecialPreHere = Here ;
         //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, i, CELL ) ; 
 #if 1        
         word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
-        Word_SetCodingAndSourceCoding ( word, Here ) ;
-        // for printf ?? others 
         Word_Eval ( word ) ;
 #else        
         Interpreter_DoWord_Default ( _Interpreter_, word, word->W_RL_Index, word->W_SC_Index ) ;
@@ -385,7 +382,6 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
             block b = ( block ) DataStack_Pop ( ) ;
             Set_CompileMode ( svcm ) ;
             Set_CompilerSpace ( scs ) ;
-            _Debugger_->PreHere = Here ; // prevent debugger from showing the 1 byte ret for 'word'
             Dbg_Block_Eval (word, b) ;
         }
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;

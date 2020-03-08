@@ -29,15 +29,13 @@ CSL_Stricmp ( )
 void
 CSL_StrCat ( )
 {
-    //Buffer * b = Buffer_New ( BUFFER_SIZE ) ;  
     byte * buffer = Buffer_Data ( _CSL_->StrCatBuffer );  byte *str ;
     char * src = (char*) DataStack_Pop ( ) ;
     char * dst = (char*) DataStack_Pop ( ) ;
-    strcpy ( (char*) buffer, dst ) ;
-    if (src) strcat ( (char *) buffer, src ) ; 
+    strncpy ( (char*) buffer, dst, BUFFER_IX_SIZE ) ;
+    if (src) strncat ( (char *) buffer, src, BUFFER_IX_SIZE ) ; 
     str = String_New ( buffer, TEMPORARY ) ; //String_New ( (byte*) buffer, DICTIONARY ) ;
     DataStack_Push ( (int64) str ) ;
-    //Buffer_SetAsUnused ( b ) ; ;
 }
 
 void

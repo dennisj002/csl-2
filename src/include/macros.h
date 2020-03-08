@@ -297,4 +297,8 @@
 #define NUMBER_BASE_GET _Context_->System0->NumberBase
 #define NUMBER_BASE_SET( value ) _Context_->System0->NumberBase = ( value )
 
+// OVT_RecyclingAccounting flags
+#define OVT_RA_ADDED 1
+#define OVT_RA_RECYCLED 2
+
 

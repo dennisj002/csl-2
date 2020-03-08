@@ -493,6 +493,7 @@ void _Calculate_TotalNbaAccountedMemAllocated(OpenVmTil *ovt, Boolean showFlag);
 void Calculate_TotalNbaAccountedMemAllocated(OpenVmTil *ovt, int64 flag);
 void _OVT_ShowMemoryAllocated(OpenVmTil *ovt);
 byte *DLList_CheckRecycledForAllocation(dllist *list, int64 size);
+void OVT_RecyclingAccounting(int64 flag);
 void OVT_Recycle(dlnode *anode);
 void Word_Recycle(Word *w);
 void _CheckRecycleWord(Word *w);
