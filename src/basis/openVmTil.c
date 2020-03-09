@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.906.960" ) 
+#define VERSION ((byte*) "0.906.970" ) 
 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -66,12 +66,13 @@ void
 OVT_RecycleAllWordsDebugInfo ( )
 {
     SetState ( _CSL_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ), false ) ;
-    OVT_MemListFree_CompilerTempObjects ( ) ;
 #if 0 
     CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
 #else // partially working ??    
     Tree_Map_Namespaces ( _CSL_->Namespaces->W_List, ( MapSymbolFunction ) CSL_DeleteWordDebugInfo ) ;
 #endif    
+    OVT_MemListFree_CompilerTempObjects ( ) ;
+    _CSL_->Compiler_N_M_Node_WordList = 0 ;
 }
 
 void

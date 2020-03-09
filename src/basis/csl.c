@@ -182,7 +182,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     csl->cs_Cpu = CpuState_New ( allocType ) ;
     csl->cs_Cpu2 = CpuState_New ( allocType ) ;
     csl->PeekPokeByteArray = ByteArray_AllocateNew ( 32, allocType ) ;
-    CSL_Setup_For_DObject_ValueDefinition_Init ( ) ;
+    CSL_Setup_For_DObject_ValueDefinition_Init ( ) ; // nb! before _CSL_NamespacesInit
     if ( nss ) csl->Namespaces = nss ;
     else _CSL_NamespacesInit ( csl ) ;
     // with _O_->RestartCondition = STOP from Debugger_Stop
@@ -340,17 +340,15 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
                 if ( ! word->W_SC_WordList )
                 {
                     word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
-                    _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( T_CSL ) ;
+                    _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( COMPILER_TEMP ) ;
                 }
                 else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
                 if ( compiler->NumberOfVariables )
                 {
                     word->W_NumberOfVariables = compiler->NumberOfVariables ;
-                    word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, T_CSL ) ;
+                    word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, COMPILER_TEMP ) ;
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, 0, 0 ) ; // don't clear ; keep words for source code debugging, etc.
                     _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 0, 0 ) ;
-                    ///Word_Recycle ( compiler->LocalsNamespace ) ;
-                    ///_CheckRecycleWord ( compiler->LocalsNamespace ) ;
                 }
                 Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
                 SetState ( word, DEBUG_INFO_SAVED, true ) ;
@@ -377,10 +375,12 @@ CSL_DeleteWordDebugInfo ( Word * word )
                     DLList_Recycle_WordList ( word->W_SC_WordList ) ; // why not ??
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( word->NamespaceStack, 1, 1 ) ; // don't clear ; keep words for source code debugging, etc.
                 }
-                List_Init ( word->W_SC_WordList ) ;
-                Stack_Init ( word->NamespaceStack ) ;
-                SetState ( word, DEBUG_INFO_SAVED, false ) ;
+                //List_Init ( word->W_SC_WordList ) ;
+                //Stack_Init ( word->NamespaceStack ) ;
+                word->NamespaceStack = 0 ; // this was allocate COMPILER_TEMP which will be deleted with 'rdi'
             }
+            word->W_SC_WordList = 0 ; // this was allocate COMPILER_TEMP which will be deleted with 'rdi'
+            SetState ( word, DEBUG_INFO_SAVED, false ) ;
         }
     }
 }

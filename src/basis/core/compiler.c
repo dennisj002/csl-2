@@ -256,7 +256,8 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     Stack_Init ( compiler->CombinatorInfoStack ) ;
     Stack_Init ( compiler->InfixOperatorStack ) ;
     Stack_Init ( compiler->TDSCI_StructUnionStack ) ;
-    Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+    //if ( compiler->LocalsCompilingNamespacesStack ) Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+    compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, COMPILER_TEMP ) ; // allow recycling across contexts
     _dllist_Init ( compiler->GotoList ) ;
     _dllist_Init ( compiler->CurrentSwitchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
@@ -279,7 +280,7 @@ Compiler_New ( uint64 allocType )
     compiler->TDSCI_StructUnionStack = Stack_New ( 64, allocType ) ;
     compiler->PointerToOffsetStack = Stack_New ( 64, allocType ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, allocType ) ;
-    compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, T_CSL ) ; // allow recycling across contexts
+    compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, COMPILER_TEMP ) ; // allow recycling across contexts
     compiler->InternalNamespacesStack = Stack_New ( 64, allocType ) ; //initialized when using
     compiler->PostfixLists = _dllist_New ( allocType ) ;
     compiler->GotoList = _dllist_New ( allocType ) ;
