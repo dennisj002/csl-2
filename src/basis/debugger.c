@@ -87,7 +87,6 @@ void
 Debugger_Setup_SaveState ( Debugger * debugger, Word * word )
 {
     SetState ( debugger, DBG_MENU, false ) ;
-    //debugger->PreHere = Here ;
     debugger->LastPreSetupWord = word ;
 }
 
@@ -123,6 +122,7 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
             if ( ( ! word ) && ( ! token ) ) word = Context_CurrentWord ( ) ;
             if ( force || ( word && word->Name[0] ) || token )
             {
+                if ( ( ! word ) && ( token ) ) Debugger_Setup_ResetState ( debugger ) ; //??
                 Debugger_Interpret ( debugger, word, token, address ) ;
                 rtn = true ;
             }
@@ -134,7 +134,6 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
 void
 _DEBUG_SETUP ( Word * word, byte * token, byte * address, Boolean force, int64 debugLevel )
 {
-    //_Debugger_->WordDsp = _Dsp_ ;
     Debugger_PreSetup ( _Debugger_, word, token, address, force, debugLevel ) ;
 }
 

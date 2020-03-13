@@ -42,7 +42,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         else jb = & _CSL_->JmpBuf0 ;
     }
     //OVT_SetExceptionMessage ( _O_ ) ;
-    Word * eword = _Context_->CurrentEvalWord ;
+    Word * eword = _Context_->CurrentTokenWord ; //_Context_->CurrentEvalWord ;
     snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUFFER_IX_SIZE, "\n%s\n%s %s from %s : the current evalWord is %s.%s -> ...", _O_->ExceptionMessage,
         ( jb == & _CSL_->JmpBuf0 ) ? "reseting csl" : "restarting OpenVmTil",
         ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ),
@@ -66,8 +66,10 @@ _OpenVmTil_ShowExceptionInfo ( )
         if ( ! word )
         {
             if ( _O_->SigAddress ) word = Word_GetFromCodeAddress ( ( byte* ) _O_->SigAddress ) ;
-            else word = _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord ;
-            debugger->w_Word = word ;
+            if ( ( ! debugger->w_Word ) && ( ! debugger->Token ) )
+            {
+                debugger->w_Word = _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord ;
+            }
         }
     }
     AlertColors ;
@@ -157,11 +159,12 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
         DebugColors ;
         int64 tlw = Strlen ( defaultPrompt ) ;
         if ( tlw > _Debugger_->TerminalLineWidth ) _Debugger_->TerminalLineWidth = tlw ;
-        if ( signalExceptionsHandled ) Printf ( ( byte* ) "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n", signalExceptionsHandled, _O_->Signal,
+        if ( signalExceptionsHandled ) Printf ( ( byte* ) "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n",
+            signalExceptionsHandled, _O_->Signal,
             _O_->RestartCondition ) ;
         do
         {
-            _Debugger_->w_Word = Context_CurrentWord ( ) ;
+            if ( ( ! debugger->w_Word ) && ( ! debugger->Token ) ) debugger->w_Word = Context_CurrentWord ( ) ;
             _Debugger_ShowInfo ( _Debugger_, ( byte* ) "\r", _O_->Signal, 0 ) ;
             Printf ( ( byte* ) "%s", buffer ) ;
 

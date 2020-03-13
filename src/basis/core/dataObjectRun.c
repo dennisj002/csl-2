@@ -95,8 +95,7 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean 
                 else if ( rvalueFlag ) value = word->W_Value ;
                 else value = ( int64 ) word->W_PtrToValue ;
             }
-            Interpreter * interp = cntx->Interpreter0 ;
-            if ( isReverseDotted && ( cntx->BaseObject && ( cntx->BaseObject != word ) //TOS = value ; //?? maybe needs more precise state logic
+            if ( isReverseDotted && ( cntx->BaseObject && ( cntx->BaseObject != word ) // guessing some logic here ??
                 && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
             else DataStack_Push ( value ) ;
         }
@@ -205,7 +204,8 @@ CSL_Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Bool
             if ( word->W_ObjectAttributes & THIS ) word->S_ContainingNamespace = _Context_->Interpreter0->ThisNamespace ;
         }
     }
-    if ( ( ! GetState ( compiler, ARRAY_MODE ) ) && ( ! isForwardDotted ) && ( ! isReverseDotted ) ) cntx->BaseObject = 0 ;
+    if ( ( ! GetState ( compiler, ARRAY_MODE ) ) && ( ! isForwardDotted ) && ( ! isReverseDotted ) ) 
+        cntx->BaseObject = 0 ;
     Do_Variable ( word, rvalueFlag, isForwardDotted, isReverseDotted ) ;
 }
 

@@ -178,9 +178,9 @@ testB2.nodes [ 3 ].BeforeReference 6 =
 testB2 32 dump
 DLLNodeAlloc "testD" new
 'testD find dobject
-testD.a112.b1138 77 =
+testD.a112.c1138 77 =
 "testC" 'testD find DObject.clone 
-testC.a112.b1138 @ dup p 77 _assert
+testC.a112.c1138 @ dup p 77 _assert
 sp
 User
 hex

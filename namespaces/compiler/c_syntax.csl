@@ -23,11 +23,12 @@ libc.printf ("\nhello %d\n", 7) //pause
 C
 User
 Class
-: sp ; //stack pause ; 
+//: sp ; //stack pause ; 
 //verbosity 3 =
 
 c_syntaxOn
 libc C
+sp
 typedef struct
 {
     int64 hi ;
@@ -38,8 +39,11 @@ typedef struct
     int64 heey ;
     int64 heey1 ;
 } CObj ;
-"CObj.size =" ps p ( CObj.size ) ; // 104
-CObj 'chey new ;
+sp
+//"CObj.size =" ps d: CObj.size dup 104 _assert p // 104 // fix this - it should work
+sp
+CObj 'chey new ; 
+sp
 CObj 
 C_Syntax
 sp
@@ -426,7 +430,6 @@ sp
 bt.a16_123 = 0x498 ;  
 hp ( bt.a16_123 ) ;
 sp
-#if 1    
 void bttt ( byteTest xbt | btt ) 
 { 
     printf ( "\nbtt" ) ;
@@ -448,7 +451,7 @@ byteTest 'bt new ;
 pwi bttt
 sp
 bttt ( bt ) ;  //pause // error size not considered
-#endif
+'bt find 'byteTest find wordStructPrint pause
 sp
 bt.a8_123 = 255 ; dump ( bt, bt.size ) ; 
 sp

@@ -20,7 +20,7 @@ CSL_TokenQID ( )
         if ( word )
         {
             Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
-            if ( ( isForwardDotted ) || ( token[0] == '.' ) ) Interpreter_DoWord_Default ( _Interpreter_, word, word->W_RL_Index, word->W_SC_Index ) ;//  Word_Eval ( word ) ;
+            if ( ( isForwardDotted ) || ( token[0] == '.' ) ) Interpreter_DoWord_Default ( _Interpreter_, word, word->W_RL_Index, word->W_SC_Index ) ; //  Word_Eval ( word ) ;
             else break ;
         }
     }
@@ -81,11 +81,12 @@ CSL_DoubleQuoteMacro ( )
 }
 
 void
-_CSL_Word_ClassStructure_PrintData ( Word * typedefWord, Word * word )
+_CSL_Word_ClassStructure_PrintData ( Word * typedefWord0, Word * word )
 {
-    typedefWord = Word_UnAlias ( typedefWord ) ;
+    Word * typedefWord = Word_UnAlias ( typedefWord0 ) ;
     CSL_NewLine ( ) ;
-    if ( typedefWord && word ) Object_PrintStructuredData ( (byte*) word, typedefWord->W_SourceCode ) ;
+    byte * dataBits = ( word->W_ObjectAttributes & ( STRUCTURE_TYPE ) ) ? ( byte* ) word->W_Value : ( byte* ) word ; //STRUCTURE_TYPE not quite right ??
+    if ( typedefWord && word ) Object_PrintStructuredData ( dataBits, typedefWord->W_SourceCode ) ;
 }
 
 void

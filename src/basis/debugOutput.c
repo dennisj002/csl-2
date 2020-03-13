@@ -118,7 +118,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         byte *location = ( rl->Filename ) ? rl->Filename : ( byte* ) "<command line>" ;
         byte signalAscii [ 128 ] ;
         int64 iw = false ;
-        Word * word = debugger->w_Word ? debugger->w_Word : 0 ; //_Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentTokenWord ;
+        Word * word = debugger->w_Word ? debugger->w_Word : ((!debugger->Token)? (_Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentTokenWord) : 0)  ;
         byte wordName [256], aliasName [256], * token0 ;
         if ( word && ( iw = String_Equal ( "init", word->Name ) ) ) { debugger->SubstitutedWord = word ; word = cntx->Interpreter0->w_Word ; } // 'new'
         debugger->w_AliasOf = debugger->SubstitutedWord ? debugger->SubstitutedWord : debugger->w_AliasOf ;
@@ -133,7 +133,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
             token0 = wordName ;
         }
         else token0 = word ? word->Name : debugger->Token ;
-        if ( debugger->w_Word == cntx->LastEvalWord ) word = 0, debugger->w_Word = 0, token0 = cntx->CurrentToken ;
+        //if ( debugger->w_Word == cntx->LastEvalWord ) word = 0, debugger->w_Word = 0, token0 = cntx->CurrentToken ;
 
         if ( ! ( cntx && cntx->Lexer0 ) ) Throw ( ( byte* ) "\n_CSL_ShowInfo:", ( byte* ) "\nNo token at _CSL_ShowInfo\n", QUIT ) ;
         if ( ( signal == 11 ) || _O_->SigAddress )
@@ -149,7 +149,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
 
-        if ( token0 ) Debugger_ShowInfo_Token ( debugger, word, prompt, signal, token0, location, signalAscii ) ;
+        if ( token0 ) Debugger_ShowInfo_Token (debugger, word, prompt, signal, token0, signalAscii ) ;
         else
         {
             byte *cc_line = ( char* ) Buffer_Data ( _CSL_->DebugB ) ;
@@ -535,7 +535,7 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, byte* to
 }
 
 void
-Debugger_ShowInfo_Token ( Debugger * debugger, Word * word, byte * prompt, int64 signal, byte * token0, byte * location, byte * signalAscii )
+Debugger_ShowInfo_Token (Debugger * debugger, Word * word, byte * prompt, int64 signal, byte * token0, byte * signalAscii )
 {
     ReadLiner * rl = _ReadLiner_ ;
     char * compileOrInterpret = ( char* ) ( ( signal || ( int64 ) signalAscii[0] ) ?
@@ -544,7 +544,7 @@ Debugger_ShowInfo_Token ( Debugger * debugger, Word * word, byte * prompt, int64
     byte * obuffer = Buffer_Data_Cleared ( _CSL_->DebugB1 ) ;
     byte * token1 = String_ConvertToBackSlash ( token0 ) ;
     char * cc_Token = ( char* ) cc ( token1, &_O_->Notice ) ;
-    char * cc_location = ( char* ) cc ( location, &_O_->Debug ) ;
+    char * cc_location = ( char* ) cc ( Context_Location (), &_O_->Debug ) ;
 
     prompt = prompt ? prompt : ( byte* ) "" ;
     strncpy ( buffer, prompt, BUFFER_IX_SIZE ) ;

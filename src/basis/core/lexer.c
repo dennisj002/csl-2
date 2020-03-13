@@ -814,7 +814,7 @@ Dot ( Lexer * lexer ) //  '.':
 void
 Comma ( Lexer * lexer )
 {
-    if ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) ) //&& lexer->TokenWriteIndex )
+    if ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) || GetState ( _Compiler_, TDSCI_PARSING ) ) //&& lexer->TokenWriteIndex )
     {
         if ( lexer->TokenWriteIndex )
         {

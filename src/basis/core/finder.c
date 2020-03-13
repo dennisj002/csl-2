@@ -142,7 +142,8 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, Boolean saveQns )
                     Finder_ClearQualifyingNamespace ( finder ) ; // nb. QualifyingNamespace is only good for one find unless we are in a quid
             }
         }
-        if ( ( ! rword ) && _Context_->QidInNamespace ) rword = _Finder_FindWord_InOneNamespace ( finder, Word_UnAlias ( _Context_->QidInNamespace ), name ) ;
+        //if ( ( ! rword ) && _Context_->QidInNamespace ) rword = _Finder_FindWord_InOneNamespace ( finder, Word_UnAlias ( _Context_->QidInNamespace ), name ) ;
+        if ( ( ! rword ) && _Context_->QidInNamespace ) rword = _Finder_FindWord_InOneNamespace ( finder, _Context_->QidInNamespace, name ) ;
         //if ( ( ! rword ) && _CSL_->InNamespace ) rword = _Finder_FindWord_InOneNamespace ( finder, Word_UnAlias ( _CSL_->InNamespace ), name ) ;
         if ( ( ! rword ) && _CSL_->InNamespace ) rword = _Finder_FindWord_InOneNamespace ( finder, _CSL_->InNamespace, name ) ;
         if ( ! rword ) rword = _Finder_Word_Find ( finder, flag, name ) ;

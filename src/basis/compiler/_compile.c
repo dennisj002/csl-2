@@ -27,8 +27,8 @@ void
 Compile_PushWord_Call_CSL_Function ( Word * word, byte * cFunction )
 {
     //DBI_ON ;
-    _Compile_Stack_Push ( DSP, RAX, (int64) word ) ;
-    Compile_Call ( (byte*) cFunction ) ;
+    _Compile_Stack_Push ( DSP, RAX, ( int64 ) word ) ;
+    Compile_Call ( ( byte* ) cFunction ) ;
     //DBI_OFF ;
 }
 
@@ -45,7 +45,7 @@ Compile_CallCFunctionWithParameter_TestAlignRSP2 ( byte * cFunction, Word * word
     //DBI_ON ;
     Compile_MoveImm_To_Reg ( RDI, ( int64 ) word, CELL ) ; // RDI is x64 abi first parameter 
     Compile_MoveImm_To_Reg ( R8, ( int64 ) cFunction, CELL ) ;
-    Compile_Call ( (byte*) _CSL_->Call_ToAddressThruR8_TestAlignRSP ) ;
+    Compile_Call ( ( byte* ) _CSL_->Call_ToAddressThruR8_TestAlignRSP ) ;
     //DBI_OFF ;
 }
 
@@ -109,8 +109,9 @@ _Compile_RspReg_Store ( ) // data stack pop to rsp [0] !
 }
 #endif
 #if 1
+
 void
-_Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
+_Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg, int size )
 {
     if ( ! size ) size = CSL_Get_ObjectByteSize ( word ) ;
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
@@ -119,13 +120,9 @@ _Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
         if ( word->RegToUse == reg ) return ;
         else Compile_Move_Reg_To_Reg ( reg, word->RegToUse, 0 ) ;
     }
-    //else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | THIS | T_LISP_SYMBOL | LOCAL_OBJECT ) || ( word->W_LispAttributes & T_LISP_SYMBOL ) )
-    else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL | LOCAL_OBJECT | THIS ) || ( word->W_LispAttributes & T_LISP_SYMBOL ) )
-        //else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL ) || ( word->LAttribute & T_LISP_SYMBOL ) )
+    else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL | LOCAL_OBJECT ) || ( word->W_LispAttributes & T_LISP_SYMBOL ) )
     {
-        //if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL | LOCAL_OBJECT  ) || ( word->W_LispAttributes & T_LISP_SYMBOL ) )
-            _Compile_Move_StackN_To_Reg ( reg, FP, LocalOrParameterVar_Offset ( word ) ) ;
-        //else if ( word->W_ObjectAttributes & ( THIS ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue, 0 ) ;
+        _Compile_Move_StackN_To_Reg ( reg, FP, LocalOrParameterVar_Offset ( word ) ) ;
     }
     else if ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | THIS ) )
     {
@@ -144,8 +141,9 @@ _Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
     else SyntaxError ( QUIT ) ;
 }
 #else //0.906.450
+
 void
-_Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
+_Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg, int size )
 {
     if ( ! size ) size = CSL_Get_ObjectByteSize ( word ) ;
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
@@ -194,9 +192,9 @@ Do_ObjectOffset ( Word * word, int64 reg )
 }
 
 void
-Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
+Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg, int size )
 {
-    _Compile_GetVarLitObj_RValue_To_Reg (word, reg , size) ;
+    _Compile_GetVarLitObj_RValue_To_Reg ( word, reg, size ) ;
     if ( word->W_ObjectAttributes & ( OBJECT | THIS ) )
     {
         Do_ObjectOffset ( word, reg ) ;
@@ -220,7 +218,7 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 }
 
 void
-_Compile_GetVarLitObj_LValue_To_Reg (Word * word, int64 reg , int size)
+_Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg, int size )
 {
     if ( ! size ) size = CSL_Get_ObjectByteSize ( word ) ;
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
@@ -232,7 +230,7 @@ _Compile_GetVarLitObj_LValue_To_Reg (Word * word, int64 reg , int size)
         //else if ( ( word->CAttribute & ( OBJECT )  ) ) 
         //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
     else if ( ( word->W_ObjectAttributes & ( OBJECT | THIS ) ) )
-        _Compile_GetVarLitObj_RValue_To_Reg (word, reg , 0) ;
+        _Compile_GetVarLitObj_RValue_To_Reg ( word, reg, 0 ) ;
     else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compile_LEA ( reg, FP, 0, LocalOrParameterVar_Disp ( word ) ) ;
     else if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value, size ) ;
     else if ( word->W_ObjectAttributes & DOBJECT ) _CSL_Do_DynamicObject_ToReg ( word, reg ) ;
@@ -252,9 +250,9 @@ _Compile_GetVarLitObj_LValue_To_Reg (Word * word, int64 reg , int size)
 }
 
 void
-Do_C_Pointer_StackAccess (  byte * ptr )
+Do_C_Pointer_StackAccess ( byte * ptr )
 {
-    if ( Compiling ) 
+    if ( Compiling )
     {
         Compile_MoveImm_To_Reg ( RAX, ( int64 ) ptr, CELL ) ;
         Word_Set_StackPushRegisterCode_To_Here ( _Context_->CurrentEvalWord ) ;

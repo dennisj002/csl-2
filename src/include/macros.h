@@ -193,8 +193,12 @@
 #define TokenBuffer_AppendPoint( lexer ) &lexer->TokenBuffer [ lexer->TokenWriteIndex ]
 #define _AppendCharacterToTokenBuffer( lex, character ) lexer->TokenBuffer [ lex->TokenWriteIndex ] = character
 
-
+#if 0
 #define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE | STRUCT )
+#else
+#define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE | STRUCT | OBJECT )
+#endif
+#define STRUCTURE_TYPE ( OBJECT | STRUCT )
 #define NAMESPACE_RELATED_TYPE ( NAMESPACE_TYPE | OBJECT_FIELD )
 #define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL | THIS ) // | T_LISP_SYMBOL
 #define VARIABLE_TYPE ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | OBJECT_FIELD | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL )
@@ -204,7 +208,7 @@
         && ( ! ( word->W_MorphismAttributes & ( DEBUG_WORD | OBJECT_OPERATOR ) ) ) \
         && ( ! ( word->W_LispAttributes & (T_LISP_SYMBOL ) ) ) ) || ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK|T_LAMBDA ) ))
 
-#define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->W_ObjectAttributes & NAMESPACE_TYPE) : 0 )
+#define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->W_ObjectAttributes & (NAMESPACE_TYPE)) : 0 )
 #define Is_ValueType( w ) ( w ? NON_MORPHISM_TYPE (w) : 0 )
 
 // memory allocation
@@ -288,7 +292,8 @@
 #define PP_DEBUG 1
 #define PRE_STRUCTURE_IDENTIFIER 1
 #define POST_STRUCTURE_NAME 2
-#define TYPE_NAME 4
+#define TD_CLASS_FIELD 4
+#define STRUCT_NAME 8
 #define PT_TYPEDEF 1
 #define PT_TYPE 2
 #define CONTEXT_TDSCI_STACK( cntx ) ((Context*) cntx) ? cntx->Compiler0->TDSCI_StructUnionStack : _Context_->Compiler0->TDSCI_StructUnionStack

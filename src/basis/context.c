@@ -252,16 +252,16 @@ CSL_Set_QidInNamespace ( Namespace * ns )
 }
 
 void
-Context_DoDotted_Pre ( Context * cntx, Word * ns )
+Context_DoDotted_Pre ( Context * cntx, Word * word )
 {
     int64 isForwardDotted, isReverseDotted ;
     isReverseDotted = Lexer_IsTokenReverseDotted ( cntx->Lexer0 ) ;
-    isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, cntx->Lexer0->TokenEnd_ReadLineIndex - 1 ) ; //word->W_RL_Index ) ;
+    isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ; //cntx->Lexer0->TokenEnd_ReadLineIndex - 1 ) ; //word->W_RL_Index ) ;
     if ( ( isForwardDotted ) ) //&& Is_NamespaceType ( ns ) )
     {
-        CSL_Set_QidInNamespace ( ns ) ;
-        Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
-        if ( ( ! isReverseDotted ) || ( ! cntx->BaseObject ) ) cntx->BaseObject = ns ;
+        CSL_Set_QidInNamespace ( word ) ;
+        Finder_SetQualifyingNamespace ( cntx->Finder0, word ) ;
+        if ( ( ! isReverseDotted ) || ( ! cntx->BaseObject ) ) cntx->BaseObject = word ;
     }
     SetState ( cntx, IS_FORWARD_DOTTED, isForwardDotted ) ;
     SetState ( cntx, IS_REVERSE_DOTTED, isReverseDotted ) ;

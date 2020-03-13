@@ -222,7 +222,7 @@ _CSL_C_Infix_EqualOp ( block op )
             if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) lhsWord->ObjectByteSize = sizeof (byte* ) ;
             Interpreter_DoWord_Default ( interp, lhsWord, lhsWord->W_RL_Index, lhsWord->W_SC_Index ) ;
             //CSL_TypeStack_Drop ( ) ;
-            cntx->State = svState ;
+            SetState ( cntx, C_SYNTAX | INFIX_MODE, svState ) ;
             wordr = _CSL_->StoreWord ;
         }
     }
@@ -600,23 +600,28 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
 }
 
 void
+_Object_Continue_PrintStructuredData ( Context * cntx, byte * objectBits )
+{
+    TDSCI * tdsci = TDSCI_Start ( cntx, 0, objectBits, TDSCI_PRINT ) ;
+    byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
+    if ( String_Equal ( token, "typedef" ) ) token = TDSCI_ReadToken ( cntx ) ;
+    Parse_Field ( cntx ) ;
+    tdsci = TDSCI_Finalize ( cntx ) ;
+}
+
+void
 Object_PrintStructuredData ( byte * objectBits, byte * typedefString )
 {
     if ( objectBits && typedefString && typedefString[0] )
     {
-        Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
+        Context * cntx0 = _Context_, * cntx = CSL_Context_PushNew ( _CSL_ ) ;
+        cntx->State = cntx0->State ; // preserve C_SYNTAX, etc
         ReadLiner * rl = cntx->ReadLiner0 ;
 
         Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
-        //TypeDefStructCompileInfo_New ( cntx, CONTEXT ) ;
-        //byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
-        TDSCI * tdsci = TDSCI_Start ( cntx, 0, objectBits, TDSCI_PRINT ) ;
-        //Parse_Structure ( cntx ) ;
-        byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
-        if ( String_Equal ( token, "typedef" ) ) token = TDSCI_ReadToken ( cntx ) ;
-        //CSL_Parse_A_Typed_Field ( cntx ) ;
-        Parse_Field ( cntx ) ;
-        tdsci = TDSCI_Finalize ( cntx ) ;
+        
+        _Object_Continue_PrintStructuredData ( cntx, objectBits ) ;
+        
         Readline_Restore_InputLine_State ( rl ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;
     }

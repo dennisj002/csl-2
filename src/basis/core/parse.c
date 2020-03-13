@@ -310,36 +310,20 @@ _CSL_ParseQid_Token ( byte * token0 )
         if ( token && _Lexer_IsTokenForwardDotted ( lexer, 0 ) )
         {
             if ( token0 ) cntx->BaseObject = 0 ;
-            //word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
             if ( ns ) word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
             else word = Finder_Word_FindUsing (_Finder_, token, 1) ; // maybe need to respect a possible qualifying namespace ??
-#if UIN            
-            if ( word && ( nst = word->W_ObjectAttributes & THIS ) ) ns = word, _CSL_SetAsInNamespace ( ns ), Finder_SetQualifyingNamespace ( finder, ns ) ;
-            //if ( word && ( nst = word->W_ObjectAttributes & THIS ) ) { ns = word ; _Context_SetAsQidInNamespace ( ns ) ;  Finder_SetQualifyingNamespace ( finder, ns ) ; }
-            else if ( word && ( nst = word->W_ObjectAttributes & ( token0 ? ( NAMESPACE_TYPE | THIS ) : ( C_TYPE | C_CLASS | NAMESPACE | THIS ) ) ) )
-            {
-                ns = word ;
-                Finder_SetQualifyingNamespace ( finder, ns ) ;
-                _CSL_SetAsInNamespace ( ns ) ;
-                //_Context_SetAsQidInNamespace ( ns ) ;
-
-            }
-#else
-            //if ( word && ( nst = word->W_ObjectAttributes & THIS ) ) ns = word, _CSL_SetAsInNamespace ( ns ), Finder_SetQualifyingNamespace ( finder, ns ) ;
             if ( word && ( nst = word->W_ObjectAttributes & THIS ) ) { ns = word ; _Context_SetAsQidInNamespace ( ns ) ;  }
             else if ( word && ( nst = word->W_ObjectAttributes & ( token0 ? ( NAMESPACE_TYPE | THIS ) : ( C_TYPE | C_CLASS | NAMESPACE | THIS ) ) ) )
             {
                 ns = word ;
                 Finder_SetQualifyingNamespace ( finder, ns ) ;
-                //_CSL_SetAsInNamespace ( ns ) ;
                 _Context_SetAsQidInNamespace ( ns ) ;
 
             }
-#endif            
             else if ( token0 )
             {
                 if ( ! nst ) _CSL_Do_Dot ( cntx, word ) ;
-                break ; //return (int64) word ;
+                break ; 
             }
             token = 0 ;
         }

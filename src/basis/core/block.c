@@ -28,6 +28,8 @@ Dbg_Block_Eval ( Word * word, block blck )
             _DEBUG_SHOW ( word, 1, 0 ) ;
         }
         SetState ( _Debugger_->w_Word, STEPPED, false ) ;
+        _Context_->LastRanWord = word ;
+        _Context_->CurrentlyRunningWord = 0 ;
     }
 }
 

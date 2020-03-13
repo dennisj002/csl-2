@@ -461,17 +461,61 @@ rtw
 #if 0
 : wtdInclude "namespaces/wordTypeDef.csl" include ;
 wtdInclude 
-C.Experimental
+cOn
+//C.Experimental
 'wtdInclude find 100 dump
-//'wtdInclude find 'C.Experimental.Word find d: wordStructPrint 
-'C.Experimental notUsing 
+'wtdInclude find 'C.Experimental.Word find d: wordStructPrint 
+//'C.Experimental notUsing 
 //pause
 #endif
-
+#if 1
+cOn
+C.Experimental 
+typedef struct _byteTest 
+{
+    byte a8_123 ; 
+    int64 a64_123 ;
+    byte b8_123 ;
+    byte c8_123 ; // test comment
+    union
+    {
+        int64 u64_123 ;
+        int32 u32_123 ;
+        int8 u8_123 ;
+    } ; //size = 11 
+    int32 a32_123 ;
+    byte d8_123 ;
+    int16 a16_123 ; 
+} byteTest, abyteTest ; // size = 26
+byteTest 'bt new ;
+pwi byteTest //pause
+ps ( "\nbt.size =" ) ; p ( bt.size ) ;
+void bttt ( byteTest xbt | btt ) 
+{ 
+    printf ( "\nbtt" ) ;
+    btt = xbt.a8_123 ; xbt.a8_123 = 'a' ; xbt.b8_123 = 'b' ; xbt.c8_123 = 'c' ; xbt.a16_123 = 0x1234 ; 
+    xbt.a32_123 = 0x12345678 ; xbt.a64_123 = 0x123456789abcdef0 ; //pause
+    xbt.u32_123 = 0x1234567 ; btt = 0xfedcba0987654321 ;
+    printf ( "\nbt.a16_123 = 0x%x ", xbt.a16_123 ) ; 
+    printf ( "\nbt.a32_123 = 0x%x ", xbt.a32_123 ) ; 
+    printf ( "\nbt.a64_123 = 0x%lx ", xbt.a64_123 ) ; 
+    printf ( "\nbt.u32_123 = 0x%lx ", xbt.u32_123 ) ; 
+    printf ( "\nbt.a8_123 = %c ", xbt.a8_123 ) ; 
+    printf ( "\nbt.b8_123 = %c ", xbt.b8_123 ) ; 
+    printf ( "\nbt.c8_123 = %c ", xbt.c8_123 ) ; 
+    printf ( "\nbtt = 0x%lx", btt ) ; 
+    dump ( &xbt, xbt.size ) ; 
+    hp ( xbt.a8_123 ) ;
+} 
+byteTest 'bt new ;
+pwi bttt
+bttt ( bt ) ;  //pause // error size not considered
+'bt find 'byteTest find wordStructPrint 
+cOff
+#endif
 
 #if 0 //forStarters @ 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; pwi hi 2 3 d: hi 5 _assert
 #endif 
-rdi //mem
 2 + 7 assertStkChk // stack checking 
 s

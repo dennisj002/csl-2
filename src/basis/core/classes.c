@@ -22,8 +22,9 @@ Class_Size_Set ( Namespace * classNs, int64 size )
 void
 _ClassTypedef ( Context * cntx, Namespace * ns, Boolean cloneFlag )
 {
+    //CSL_C_Syntax_On ( ) ;
     TDSCI * tdsci = TDSCI_Start (cntx, ns, 0, ( cloneFlag ? TDSCI_CLONE_FLAG : 0 ) ) ;
-    Parse_Structure ( cntx ) ;
+    Parse_StructOrUnion ( cntx ) ;
     tdsci = TDSCI_Finalize ( cntx ) ;
 }
 

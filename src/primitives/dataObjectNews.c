@@ -64,7 +64,8 @@ _CSL_Typedef (Word * word)
 void
 CSL_Typedef ( )
 {
-    //int64 size = CSL_Parse_A_Typed_Field (0, 0, 0) ; // really, yes, but we want to route all new object creation thru DataObject_New for understandability and debugging
+    //int64 size = CSL_Parse_A_Typed_Field (0, 0, 0) ; // really, yes, but 
+    //we want to route all new object creation thru DataObject_New for understandability and debugging
     DataObject_New ( C_TYPEDEF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ; //--> _CSL_TypeDef ( ) ;
 }
 
