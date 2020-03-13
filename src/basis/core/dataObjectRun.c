@@ -55,6 +55,7 @@ DataObject_Run ( )
     _DataObject_Run ( word ) ;
 }
 
+#if 1
 void
 Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean isReverseDotted )
 {
@@ -104,6 +105,59 @@ done:
         CSL_TypeStackPush ( word ) ;
     }
 }
+#else
+
+void
+Do_Variable (Word * word, Boolean rvalueFlag, Boolean isForwardDotted , Boolean isReverseDotted)
+{
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
+    int64 value ;
+    if ( CompileMode ) //&& ( ! GetState ( compiler, LC_ARG_PARSING )))
+    {
+        if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! rvalueFlag )
+            && ( ! compiler->LHS_Word ) && ( ! isForwardDotted ) ) compiler->LHS_Word = word ;
+        _Do_Compile_Variable ( word, rvalueFlag ) ;
+    }
+    else
+    {
+        if ( word->W_ObjectAttributes & ( OBJECT | THIS ) )
+        {
+            if ( word->W_ObjectAttributes & ( THIS ) )
+            {
+                if ( rvalueFlag ) value = ( int64 ) word->W_Value ;
+                value = ( int64 ) word->W_PtrToValue ;
+            }
+            else value = ( int64 ) word->W_Value ;
+        }
+        else
+        {
+            if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) )
+            {
+                if ( rvalueFlag ) value = ( int64 ) * word->W_PtrToValue ;
+                else
+                {
+                    if ( ! compiler->LHS_Word ) compiler->LHS_Word = word ;
+                    goto done ; // LHS_Word : delayed compile by _CSL_C_Infix_EqualOp
+                    //else value = ( int64 ) word->W_PtrToValue ;
+                }
+            }
+            else if ( rvalueFlag ) value = word->W_Value ;
+            else value = ( int64 ) word->W_PtrToValue ;
+        }
+        //if ( isReverseDotted ) TOS = value ; //?? maybe needs more precise state logic
+        if ( isReverseDotted && ( cntx->BaseObject && ( cntx->BaseObject != word )  //TOS = value ; //?? maybe needs more precise state logic
+            && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
+        //if ( ( interp->BaseObject && ( interp->BaseObject != word )  //TOS = value ; //?? maybe needs more precise state logic
+        //    && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
+        else 
+        DataStack_Push ( value ) ;
+    }
+done:
+    if ( ( word->W_ObjectAttributes & STRUCT ) || isForwardDotted ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
+    CSL_TypeStackPush ( word ) ;
+}
+#endif
 
 void
 CSL_Do_Object ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean isReverseDotted )

@@ -1001,7 +1001,7 @@ void Context_Interpret(Context *cntx);
 byte *Context_IsInFile(Context *cntx);
 void Qid_Save_Set_InNamespace(Namespace *ns);
 void CSL_Set_QidInNamespace(Namespace *ns);
-void Context_DoDotted_Pre(Context *cntx, Word *ns);
+void Context_DoDotted_Pre(Context *cntx, Word *word);
 void Context_DoDotted_Post(Context *cntx);
 /* src/basis/core/word.c */
 void Word_PreRun_Init(Word *word);

@@ -39,14 +39,8 @@ typedef struct
     int64 heey ;
     int64 heey1 ;
 } CObj ;
-sp
-//"CObj.size =" ps d: CObj.size dup 104 _assert p // 104 // fix this - it should work
-sp
+"CObj.size =" ps CObj size dup 104 _assert p 
 CObj 'chey new ; 
-sp
-CObj 
-C_Syntax
-sp
 chey.hi = 1234 ;
 _assert0 ( chey.hi 1234 ) ; sp
 dump ( chey, chey.size ) ; sp
