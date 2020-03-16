@@ -344,6 +344,7 @@
 #define CLASS               ( (uint64) 1 << 58 )
 #define LOCAL_OBJECT        ( (uint64) 1 << 59 )
 #define CLASS_FIELD         ( (uint64) 1 << 60 ) 
+#define T_POINTER           ( (uint64) 1 << 61 ) 
 
 // WAttribute for interpreter word types : added in primitives.c in th LAttribute field
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 
@@ -453,6 +454,8 @@
 #define WORD_COPY_MEM ( (uint64) 1 << 20 )
 #define SESSION_CODE ( (uint64) 1 << 21 )
 #define INTERNAL_OBJECT_MEM ( (uint64) 1 << 22 )
+#define WORD_RECYCLING ( (uint64) 1 << 23 )
+
 //#define ALL      ( INTERNAL | EXTERNAL | csl | TEMPORARY | DATA_STACK | SESSION )
 
 #define OPTIMIZE_RM ( (uint64) 1 << 0 )

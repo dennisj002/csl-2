@@ -39,7 +39,7 @@ typedef struct
     int64 heey ;
     int64 heey1 ;
 } CObj ;
-"CObj.size =" ps CObj size dup 104 _assert p 
+"CObj size =" ps CObj size dup 104 _assert p 
 CObj 'chey new ; 
 chey.hi = 1234 ;
 _assert0 ( chey.hi 1234 ) ; sp
@@ -445,7 +445,8 @@ byteTest 'bt new ;
 pwi bttt
 sp
 bttt ( bt ) ;  //pause // error size not considered
-'bt find 'byteTest find wordStructPrint pause
+'bt find 'byteTest find wordStructPrint 
+//pause
 sp
 bt.a8_123 = 255 ; dump ( bt, bt.size ) ; 
 sp

@@ -272,7 +272,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
         }
         if ( word )
         {
-            _List_PushNew_1Value ( retStackList, COMPILER_TEMP, 0, cpu->Rsp[i0] ) ;
+            _List_PushNew_1Value ( retStackList, WORD_RECYCLING, 0, cpu->Rsp[i0] ) ;
             if ( word == currentlyRunning ) break ;
         }
     }

@@ -236,6 +236,8 @@ _NamedByteArray_Init ( NamedByteArray * nba, byte * name, int64 size, int64 atyp
     dllist_Init ( &nba->NBA_BaList, &nba->NBA_ML_HeadNode, &nba->NBA_ML_TailNode ) ;
     nba->NBA_DataSize = size ;
     nba->MemInitial = size ;
+    nba->SmallestRemaining = size ;
+    nba->LargestRemaining = size ; 
     nba->TotalAllocSize = sizeof ( NamedByteArray ) ;
     Set_NBA_Symbol_To_NBA ( nba ) ;
     nba->NBA_Symbol.S_unmap = nba->NBA_MemChunk.S_unmap ;

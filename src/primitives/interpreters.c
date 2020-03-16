@@ -141,7 +141,7 @@ _CSL_Interpret_ReadToList ( )
 
             _Word_Interpret ( word ) ;
             //List_Push_A_1Value_Node ( interp->InterpList, word ) ;
-            List_PushNew_T_WORD ( interp->InterpList, ( int64 ) word, COMPILER_TEMP ) ;
+            List_PushNew_T_WORD ( interp->InterpList, ( int64 ) word, WORD_RECYCLING ) ;
         }
     }
     return interp->InterpList ;

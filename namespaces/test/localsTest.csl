@@ -176,8 +176,9 @@ testA2 32 dump
 testB2.nodes [ 1 ].AfterReference 5 =
 testB2.nodes [ 3 ].BeforeReference 6 =
 testB2 32 dump
-DLLNodeAlloc "testD" new
-'testD find dobject
+DLLNodeAlloc "testD" new 
+Root DObject 
+'testD find DObject dobject
 testD.a112.c1138 77 =
 "testC" 'testD find DObject.clone 
 testC.a112.c1138 @ dup p 77 _assert

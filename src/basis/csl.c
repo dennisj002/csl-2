@@ -340,13 +340,13 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
                 if ( ! word->W_SC_WordList )
                 {
                     word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
-                    _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( COMPILER_TEMP ) ;
+                    _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( WORD_RECYCLING ) ;
                 }
                 else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
                 if ( compiler->NumberOfVariables )
                 {
                     word->W_NumberOfVariables = compiler->NumberOfVariables ;
-                    word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, COMPILER_TEMP ) ;
+                    word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, WORD_RECYCLING ) ;
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, 0, 0 ) ; // don't clear ; keep words for source code debugging, etc.
                     _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 0, 0 ) ;
                 }

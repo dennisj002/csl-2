@@ -639,11 +639,11 @@ CSL_SetSourceCodeWord ( )
 }
 
 void
-CSL_Finish_WordSourceCode ( CSL * csl, Word * word )
+CSL_Finish_WordSourceCode (CSL * csl, Word * word , Boolean force)
 {
     if ( word )
     {
-        if ( ! word->W_SourceCode ) word->W_SourceCode = _CSL_GetSourceCode ( ) ;
+        if ( ( ! word->W_SourceCode ) || force ) word->W_SourceCode = _CSL_GetSourceCode ( ) ;
         Lexer_SourceCodeOff ( _Lexer_ ) ;
         word->SC_FileIndex_Start = csl->SCI.SciFileIndexScStart ;
         word->SC_FileIndex_End = csl->SCI.SciFileIndexScEnd ;

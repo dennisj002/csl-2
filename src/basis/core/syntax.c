@@ -279,9 +279,9 @@ CSL_IncDec ( int64 op ) // ++/--
                 //if ( one ) SetHere (one->Coding, 1) ;
                 // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
                 dllist * postfixList = List_New ( SESSION ) ;
-                List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ;
-                if ( one ) List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, COMPILER_TEMP ) ;
-                List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
+                List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, WORD_RECYCLING ) ;
+                if ( one ) List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, WORD_RECYCLING ) ;
+                List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, WORD_RECYCLING ) ;
                 return ;
             }
             else
@@ -305,9 +305,9 @@ CSL_IncDec ( int64 op ) // ++/--
                     if ( GetState ( _CSL_, OPTIMIZE_ON ) && ( ! two ) ) SetHere ( one->Coding, 1 ) ;
                     CSL_WordList_PushWord ( one ) ; // variable
                     dllist * postfixList = List_New ( SESSION ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ; // op : setup a prefix inc/dec variable list ??
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, COMPILER_TEMP ) ; // variable
-                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, WORD_RECYCLING ) ; // op : setup a prefix inc/dec variable list ??
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, WORD_RECYCLING ) ; // variable
+                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, WORD_RECYCLING ) ;
                     _CSL_WordList_PopWords ( 1 ) ;
                     return ;
                 }
@@ -340,10 +340,10 @@ CSL_IncDec ( int64 op ) // ++/--
                     int64 i ;
                     Word * word ;
                     dllist * postfixList = List_New ( SESSION ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ; // remember : this will be lifo
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, WORD_RECYCLING ) ; // remember : this will be lifo
                     for ( i = 1 ; word = _CSL_WordList ( i ), ( word->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) _CSL_WordList ( i ), COMPILER_TEMP ) ;
-                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) _CSL_WordList ( i ), WORD_RECYCLING ) ;
+                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, WORD_RECYCLING ) ;
                     List_DropN ( _CSL_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;
                 }
@@ -598,33 +598,4 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
     }
     return false ;
 }
-
-void
-_Object_Continue_PrintStructuredData ( Context * cntx, byte * objectBits )
-{
-    TDSCI * tdsci = TDSCI_Start ( cntx, 0, objectBits, TDSCI_PRINT ) ;
-    byte * token = TDSCI_ReadToken ( cntx ) ; // read 'typedef' token
-    if ( String_Equal ( token, "typedef" ) ) token = TDSCI_ReadToken ( cntx ) ;
-    Parse_Field ( cntx ) ;
-    tdsci = TDSCI_Finalize ( cntx ) ;
-}
-
-void
-Object_PrintStructuredData ( byte * objectBits, byte * typedefString )
-{
-    if ( objectBits && typedefString && typedefString[0] )
-    {
-        Context * cntx0 = _Context_, * cntx = CSL_Context_PushNew ( _CSL_ ) ;
-        cntx->State = cntx0->State ; // preserve C_SYNTAX, etc
-        ReadLiner * rl = cntx->ReadLiner0 ;
-
-        Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
-        
-        _Object_Continue_PrintStructuredData ( cntx, objectBits ) ;
-        
-        Readline_Restore_InputLine_State ( rl ) ;
-        CSL_Context_PopDelete ( _CSL_ ) ;
-    }
-}
-
 

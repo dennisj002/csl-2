@@ -72,7 +72,7 @@ _CSL_BeginBlock0 ( )
     BlockInfo *bi = BlockInfo_New ( ) ;
     if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler ) ) )// first block
     {
-        CheckCodeSpaceForRoom ( ) ;
+        OVT_CheckCodeSpaceForRoom ( ) ;
         _Context_->CurrentWordBeingCompiled = compiler->Current_Word_Create ;
         CSL_TurnOnBlockCompiler ( ) ;
     }

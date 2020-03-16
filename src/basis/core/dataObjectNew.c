@@ -70,7 +70,7 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttribute
             word = Class_New ( name, CLASS, 0 ) ;
             break ;
         }
-        case TD_CLASS_FIELD:
+        case TD_TYPE_FIELD:
         {
             word = CSL_ClassField_New ( name, addToNs, value, index ) ;
             break ;

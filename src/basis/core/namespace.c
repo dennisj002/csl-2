@@ -120,11 +120,11 @@ CSL_Namespace_InNamespaceSet ( byte * name )
 Namespace *
 _CSL_Namespace_InNamespaceGet ( )
 {
-    //if ( _CSL_->Namespaces ) //&& ( ! _CSL_->InNamespace ) )
+    if ( _CSL_->Namespaces && ( ! _CSL_->InNamespace ) )
     {
         return _CSL_Namespace_InNamespaceSet ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) _Tree_Map_FromANode ( ( dlnode* ) CSL->Namespaces, ( cMapFunction_1 ) _Namespace_IsUsing ) ;
     }
-    //return Word_UnAlias ( _CSL_->InNamespace ) ;
+    return Word_UnAlias ( _CSL_->InNamespace ) ;
 }
 
 Namespace *

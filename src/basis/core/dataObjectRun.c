@@ -55,7 +55,6 @@ DataObject_Run ( )
     _DataObject_Run ( word ) ;
 }
 
-#if 1
 void
 Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean isReverseDotted )
 {
@@ -105,59 +104,6 @@ done:
         CSL_TypeStackPush ( word ) ;
     }
 }
-#else
-
-void
-Do_Variable (Word * word, Boolean rvalueFlag, Boolean isForwardDotted , Boolean isReverseDotted)
-{
-    Context * cntx = _Context_ ;
-    Compiler * compiler = cntx->Compiler0 ;
-    int64 value ;
-    if ( CompileMode ) //&& ( ! GetState ( compiler, LC_ARG_PARSING )))
-    {
-        if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! rvalueFlag )
-            && ( ! compiler->LHS_Word ) && ( ! isForwardDotted ) ) compiler->LHS_Word = word ;
-        _Do_Compile_Variable ( word, rvalueFlag ) ;
-    }
-    else
-    {
-        if ( word->W_ObjectAttributes & ( OBJECT | THIS ) )
-        {
-            if ( word->W_ObjectAttributes & ( THIS ) )
-            {
-                if ( rvalueFlag ) value = ( int64 ) word->W_Value ;
-                value = ( int64 ) word->W_PtrToValue ;
-            }
-            else value = ( int64 ) word->W_Value ;
-        }
-        else
-        {
-            if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) )
-            {
-                if ( rvalueFlag ) value = ( int64 ) * word->W_PtrToValue ;
-                else
-                {
-                    if ( ! compiler->LHS_Word ) compiler->LHS_Word = word ;
-                    goto done ; // LHS_Word : delayed compile by _CSL_C_Infix_EqualOp
-                    //else value = ( int64 ) word->W_PtrToValue ;
-                }
-            }
-            else if ( rvalueFlag ) value = word->W_Value ;
-            else value = ( int64 ) word->W_PtrToValue ;
-        }
-        //if ( isReverseDotted ) TOS = value ; //?? maybe needs more precise state logic
-        if ( isReverseDotted && ( cntx->BaseObject && ( cntx->BaseObject != word )  //TOS = value ; //?? maybe needs more precise state logic
-            && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
-        //if ( ( interp->BaseObject && ( interp->BaseObject != word )  //TOS = value ; //?? maybe needs more precise state logic
-        //    && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
-        else 
-        DataStack_Push ( value ) ;
-    }
-done:
-    if ( ( word->W_ObjectAttributes & STRUCT ) || isForwardDotted ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
-    CSL_TypeStackPush ( word ) ;
-}
-#endif
 
 void
 CSL_Do_Object ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean isReverseDotted )
@@ -169,15 +115,8 @@ CSL_Do_Object ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolea
     {
         if ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) || GetState ( word, QID ) ) //|| isForwardDotted ) 
         {
-            if ( isForwardDotted && ( ( ! cntx->BaseObject ) || ( ! isReverseDotted ) ) )
-            {
-                cntx->BaseObject = word ;
-                Finder_SetQualifyingNamespace ( cntx->Finder0, Word_UnAlias ( word ) ) ; //Word_UnAlias : that's where we add CLASS_FIELDs in Parse_Identifier
-            }
-            //Qid_Save_Set_InNamespace ( word->S_ContainingNamespace ) ;
             interp->CurrentObjectNamespace = TypeNamespace_Get ( word ) ;
             Compiler_Init_AccumulatedOffsetPointers ( compiler, word ) ;
-            //word->W_ObjectAttributes |= OBJECT ;
             if ( word->W_ObjectAttributes & THIS ) word->S_ContainingNamespace = interp->ThisNamespace ;
         }
     }
@@ -243,14 +182,6 @@ CSL_Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Bool
     {
         if ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) || GetState ( word, QID ) ) //|| isForwardDotted ) 
         {
-#if 0            
-            if ( isForwardDotted || ( ! cntx->BaseObject ) || ( ! isReverseDotted ) )
-            {
-                cntx->BaseObject = word ;
-                //Finder_SetQualifyingNamespace ( cntx->Finder0, Word_UnAlias ( word ) ) ;
-                //_CSL_Namespace_InNamespaceSet ( word->S_ContainingNamespace ) ;
-            }
-#endif            
             word->AccumulatedOffset = 0 ;
             interp->CurrentObjectNamespace = TypeNamespace_Get ( word ) ;
             Compiler_Init_AccumulatedOffsetPointers ( compiler, word ) ;

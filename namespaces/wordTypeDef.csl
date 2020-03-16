@@ -50,10 +50,10 @@ typedef struct
         uint64 T_MorphismAttributes ;
         uint64 T_ObjectAttributes ;
         uint64 T_LispAttributes ;
-        uint32 T_WordAttributes ;
-        uint8 T_NumberOfPrefixedArgs ;
-        uint8 T_Unused ;
         uint64 T_WAllocationType ;
+        uint32 T_WordAttributes ;
+        uint16 T_NumberOfPrefixedArgs ;
+        uint16 T_Unused ;
     } ;
     union
     {
@@ -133,7 +133,6 @@ typedef struct
     AttributeInfo n_Attributes ;
 } DLNode, Node, ListNode, DLList, List ;
 
-typedef struct _ListObject { int64 test ; } ListObject ;
 typedef struct _WordData
 {
     uint64 RunType ;
@@ -178,7 +177,7 @@ typedef struct _WordData
     Stack * WD_NamespaceStack ; // arrays don't have runtime debug code
     union
     {
-        ListObject * LambdaBody ;
+        ListObject * LambdaBody ; // forwawrd reference
         int64 AccumulatedOffset ; // used by Do_Object 
     } ;
     union

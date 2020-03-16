@@ -134,7 +134,7 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
         ByteArray * svcs = _O_CodeByteArray ;
         int64 sscm = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
         //CSL_DbgSourceCodeOff ( ) ;
-        _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->MemorySpace0->InternalObjectSpace, 4 * K ) ;
+        _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->MemorySpace0->InternalObjectSpace, 40 ) ; 
         Word_SetCoding ( word, Here ) ;
         word->CodeStart = Here ;
         word->Definition = ( block ) Here ;

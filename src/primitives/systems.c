@@ -258,6 +258,12 @@ CSL_SystemState_Print ( )
 }
 
 void
+CSL_SystemState_PrintAll ( )
+{
+    _CSL_SystemState_Print ( 1 ) ;
+}
+
+void
 _SetEcho ( int64 boolFlag )
 {
     SetState ( _Context_->ReadLiner0, CHAR_ECHO, boolFlag ) ;
@@ -365,14 +371,6 @@ CSL_ShellEscape ( )
 {
     _ShellEscape ( ( char* ) DataStack_Pop ( ) ) ;
     NewLine ( _Context_->Lexer0 ) ;
-}
-
-void
-OVT_Mem_ShowAllocated ( )
-{
-    _OVT_ShowPermanentMemList ( _O_ ) ;
-    OVT_ShowNBAs ( _O_, 1 ) ;
-    OVT_ShowMemoryAllocated ( ) ;
 }
 
 #if 0

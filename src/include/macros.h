@@ -249,6 +249,7 @@
 #define Is_DebugOn_DBI ( Is_DebugOn ? DBI_ON : 0 )
 #define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _O_->Verbosity > n ) )
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber
+#define Is_DbiOn _O_->Dbi
 
 #define List_Init( list ) _dllist_Init ( list )
 #define List_DropN( list, n ) _dllist_DropN ( list, n )
@@ -288,16 +289,12 @@
 #define Map0( dllist, mf ) dllist_Map ( dllist, (MapFunction0) mf )
 
 // typedef/parse defines
-#define P_DEBUG 0
-#define PP_DEBUG 1
-#define PRE_STRUCTURE_IDENTIFIER 1
-#define POST_STRUCTURE_NAME 2
-#define TD_CLASS_FIELD 4
-#define STRUCT_NAME 8
-#define PT_TYPEDEF 1
-#define PT_TYPE 2
-#define CONTEXT_TDSCI_STACK( cntx ) ((Context*) cntx) ? cntx->Compiler0->TDSCI_StructUnionStack : _Context_->Compiler0->TDSCI_StructUnionStack
-#define Is_DbiOn _O_->Dbi
+#define PRE_STRUCTURE_ID 1
+#define POST_STRUCTURE_ID 2
+#define TD_TYPE_FIELD 4
+#define STRUCT_ID 8
+#define _CONTEXT_TDSCI_STACK (_Context_->Compiler0->TDSCI_StructUnionStack)
+#define CONTEXT_TDSCI_STACK( cntx ) (((Context*) cntx) ? cntx->Compiler0->TDSCI_StructUnionStack : _CONTEXT_TDSCI_STACK)
 
 #define NUMBER_BASE_GET _Context_->System0->NumberBase
 #define NUMBER_BASE_SET( value ) _Context_->System0->NumberBase = ( value )

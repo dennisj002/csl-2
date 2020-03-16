@@ -498,7 +498,7 @@ DBG_PrepareSourceCodeString ( Word * word, byte* token0, byte* il, int tvw, int 
         token2 = String_ConvertToBackSlash ( token1 ) ;
         slt = Strlen ( token2 ) ;
         slsc = strlen ( ( char* ) il ) ;
-        scswi0 = useScFlag ? word->W_SC_Index : word ? word->W_RL_Index : rlIndex ? rlIndex : word->W_SC_Index ;
+        scswi0 = useScFlag ? word->W_SC_Index : rlIndex ? rlIndex : 0 ; //word->W_SC_Index ;
         scswci = String_FindStrnCmpIndex ( il, token2, scswi0, slt, slt ) ;
         if ( scswci != - 1 ) // did we find token in scs
         {
@@ -529,7 +529,7 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, byte* to
         fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
         tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
         tvw = tw - ( ( twAlreayUsed > fel ) ? ( twAlreayUsed - fel ) : fel ) ; //subtract the formatting chars which don't add to visible length
-        cc_line = DBG_PrepareSourceCodeString ( word, token, il, tvw, word ? word->W_RL_Index : _Lexer_->CurrentReadIndex, 0 ) ; //tvw, tvw/2 ) ;// sc : source code ; scwi : source code word index
+        cc_line = DBG_PrepareSourceCodeString ( word, token, il, tvw, word ? word->W_RL_Index : _Lexer_->TokenStart_ReadLineIndex, 0 ) ; //tvw, tvw/2 ) ;// sc : source code ; scwi : source code word index
     }
     return cc_line ;
 }

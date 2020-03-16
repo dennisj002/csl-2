@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.907.090" ) 
+#define VERSION ((byte*) "0.907.290" ) 
 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -66,12 +66,9 @@ void
 OVT_RecycleAllWordsDebugInfo ( )
 {
     SetState ( _CSL_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ), false ) ;
-#if 0 
-    CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
-#else // partially working ??    
     Tree_Map_Namespaces ( _CSL_->Namespaces->W_List, ( MapSymbolFunction ) CSL_DeleteWordDebugInfo ) ;
-#endif    
-    OVT_MemListFree_CompilerTempObjects ( ) ;
+    _OVT_MemListFree_WordRecyclingSpace () ;
+    OVT_FreeTempMem ( ) ;
     _CSL_->Compiler_N_M_Node_WordList = 0 ;
 }
 
@@ -297,15 +294,19 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     int64 totalMemSizeTarget = ( ovt->TotalMemSizeTarget < 5 * M ) ? ovt->TotalMemSizeTarget : - 1 ; // 0 or -1 : gets default values     
     _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, - 1 ) ; //totalMemSizeTarget ) ;
 #else    
-    ovt->InternalObjectsSize = 100 * K ; //1 * M ; 
-    ovt->ObjectsSize = 100 * K ; //1 * M ; 
-    ovt->BufferSpaceSize = 100 * K ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
-    ovt->StringSpaceSize = 100 * K ;
-    ovt->MachineCodeSize = 300 * K ;
-    ovt->DictionarySize = 100 * K ;
-    ovt->CSLSize = ( 23 * K ) ;
-    ovt->OpenVmTilSize = ( 9 * K ) ;
+    ovt->InternalObjectsSize = 75 * K ; //1 * M ; 
+    //ovt->ObjectsSize = 10 * K ; //1 * M ; 
+    ovt->BufferSpaceSize = 59 * K ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
+    //ovt->StringSpaceSize = 100 * K ;
+    ovt->MachineCodeSize = 100 * K ;
+    ovt->DictionarySize = 100 * K ; // * K ; //1 * M ; //100 * K ;
+    ovt->CSLSize = ( 80 * K ) ;
+    ovt->OpenVmTilSize = ( 6 * K ) ;
     ovt->DataStackSize = 8 * KB ;
+    ovt->CompilerTempObjectsSize = 50 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
+    ovt->WordRecylingSize = 300 * ( sizeof (Word) + sizeof (WordData) ) ; //50 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
+    ovt->SessionObjectsSize = 50 * K ; 
+    ovt->StringSpaceSize = 20 * K ;
 #endif    
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can

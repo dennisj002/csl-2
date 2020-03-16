@@ -218,7 +218,7 @@ CSL_Constant ( )
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     cword = DataObject_New (CONSTANT, 0, name, 0, CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
     if ( tword ) cword->W_ObjectAttributes |= tword->W_ObjectAttributes ;
-    CSL_Finish_WordSourceCode ( _CSL_, cword ) ;
+    CSL_Finish_WordSourceCode (_CSL_, cword , 0) ;
 }
 
 void
@@ -226,7 +226,7 @@ CSL_Variable ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = DataObject_New (NAMESPACE_VARIABLE, 0, name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
-    if ( ! Compiling ) CSL_Finish_WordSourceCode ( _CSL_, word ) ;
+    if ( ! Compiling ) CSL_Finish_WordSourceCode (_CSL_, word , 0) ;
 }
 
 // "{|" - exit the Compiler start interpreting

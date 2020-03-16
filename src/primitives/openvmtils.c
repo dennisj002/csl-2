@@ -98,38 +98,31 @@ OpenVmTil_Print_DataSizeofInfo ( int64 flag )
 {
     if ( flag || ( _O_->Verbosity > 1 ) )
     {
-        Printf ( ( byte* ) "\nOpenVimTil size : %d bytes, ", sizeof (OpenVmTil ) ) ;
-        Printf ( ( byte* ) "Object size : %d bytes, ", sizeof (Object ) ) ;
-        Printf ( ( byte* ) "dobject size : %d bytes, ", sizeof ( dobject ) ) ;
-        Printf ( ( byte* ) "DLNode size : %d bytes, ", sizeof ( DLNode ) ) ;
-        Printf ( ( byte* ) "PropInfo size : %d bytes, ", sizeof (AttributeInfo ) ) ;
-        //_Printf ( ( byte* ) "\nCAttribute0 size : %d bytes, ", sizeof (struct _T_CAttribute0 ) ) ;
-        Printf ( ( byte* ) "\nCSL size : %d bytes, ", sizeof (CSL ) ) ;
-        Printf ( ( byte* ) "Context size : %d bytes, ", sizeof (Context ) ) ;
-        Printf ( ( byte* ) "System size : %d bytes, ", sizeof (System ) ) ;
-        Printf ( ( byte* ) "Debugger size : %d bytes, ", sizeof (Debugger ) ) ;
-        Printf ( ( byte* ) "\nMemorySpace size : %d bytes, ", sizeof (MemorySpace ) ) ;
-        Printf ( ( byte* ) "ReadLiner size : %d bytes, ", sizeof (ReadLiner ) ) ;
-        Printf ( ( byte* ) "Lexer size : %d bytes, ", sizeof (Lexer ) ) ;
-        Printf ( ( byte* ) "Interpreter size : %d bytes, ", sizeof (Interpreter ) ) ;
-        Printf ( ( byte* ) "\nFinder size : %d bytes, ", sizeof (Finder ) ) ;
-        Printf ( ( byte* ) "Compiler size : %d bytes, ", sizeof (Compiler ) ) ;
-        Printf ( ( byte* ) "Word size : %d bytes, ", sizeof (Word ) ) ;
-        Printf ( ( byte* ) "Symbol size : %d bytes, ", sizeof (Symbol ) ) ;
         Printf ( ( byte* ) "\ndlnode size : %d bytes, ", sizeof (dlnode ) ) ;
         Printf ( ( byte* ) "dllist size : %d bytes, ", sizeof (dllist ) ) ;
-        Printf ( ( byte* ) "WordData size : %d bytes, ", sizeof (WordData ) ) ;
+        Printf ( ( byte* ) "dobject size : %d bytes, ", sizeof ( dobject ) ) ;
+        Printf ( ( byte* ) "DLNode size : %d bytes, ", sizeof ( DLNode ) ) ;
+        Printf ( ( byte* ) "AttributeInfo size : %d bytes, ", sizeof (AttributeInfo ) ) ;
+        Printf ( ( byte* ) "\nObject size : %d bytes, ", sizeof (Object ) ) ;
+        Printf ( ( byte* ) "Symbol size : %d bytes, ", sizeof (Symbol ) ) ;
+        Printf ( ( byte* ) "Word size : %d bytes, ", sizeof (Word ) ) ;
         Printf ( ( byte* ) "ListObject size : %d bytes, ", sizeof ( ListObject ) ) ;
+        Printf ( ( byte* ) "WordData size : %d bytes, ", sizeof (WordData ) ) ;
+        Printf ( ( byte* ) "\nContext size : %d bytes, ", sizeof (Context ) ) ;
+        Printf ( ( byte* ) "System size : %d bytes, ", sizeof (System ) ) ;
+        Printf ( ( byte* ) "Debugger size : %d bytes, ", sizeof (Debugger ) ) ;
+        Printf ( ( byte* ) "MemorySpace size : %d bytes, ", sizeof (MemorySpace ) ) ;
+        Printf ( ( byte* ) "\nReadLiner size : %d bytes, ", sizeof (ReadLiner ) ) ;
+        Printf ( ( byte* ) "Lexer size : %d bytes, ", sizeof (Lexer ) ) ;
+        Printf ( ( byte* ) "Interpreter size : %d bytes, ", sizeof (Interpreter ) ) ;
+        Printf ( ( byte* ) "Finder size : %d bytes, ", sizeof (Finder ) ) ;
+        Printf ( ( byte* ) "Compiler size : %d bytes, ", sizeof (Compiler ) ) ;
         Printf ( ( byte* ) "\nByteArray size : %d bytes, ", sizeof (ByteArray ) ) ;
         Printf ( ( byte* ) "NamedByteArray size : %d bytes, ", sizeof (NamedByteArray ) ) ;
         Printf ( ( byte* ) "MemChunk size : %d bytes", sizeof ( MemChunk ) ) ;
+        Printf ( ( byte* ) "CSL size : %d bytes, ", sizeof (CSL ) ) ;
+        Printf ( ( byte* ) "OpenVimTil size : %d bytes", sizeof (OpenVmTil ) ) ;
     }
-}
-
-void
-OVT_ShowMemoryAllocated ( )
-{
-    _OVT_ShowMemoryAllocated ( _O_ ) ;
 }
 
 void

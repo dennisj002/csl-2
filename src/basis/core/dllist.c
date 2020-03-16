@@ -951,7 +951,7 @@ inline
 void
 _List_PushNew_ForWordList ( dllist *list, Word * word, int64 inUseFlag )
 {
-    _dllist_PushNew_M_Slot_Node ( list, COMPILER_TEMP, T_WORD, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
+    _dllist_PushNew_M_Slot_Node ( list, WORD_RECYCLING, T_WORD, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
 }
 
 inline

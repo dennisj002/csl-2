@@ -41,10 +41,10 @@ typedef struct
         uint64 T_MorphismAttributes ;
         uint64 T_ObjectAttributes ;
         uint64 T_LispAttributes ;
-        uint32 T_WordAttributes ;
-        uint8 T_NumberOfPrefixedArgs ;
-        uint8 T_Unused ;
         uint64 T_WAllocationType ;
+        uint32 T_WordAttributes ;
+        uint16 T_NumberOfPrefixedArgs ;
+        uint16 T_Unused ;
     } ;
     union
     {
@@ -476,8 +476,8 @@ typedef struct NamedByteArray
     int64 NBA_DataSize, TotalAllocSize ;
     int64 MemInitial ;
     int64 MemAllocated ;
-    int64 MemRemaining ;
-    int64 NumberOfByteArrays, CheckTimes, InitFreedRandMarker ;
+    int64 MemRemaining, LargestRemaining, SmallestRemaining ;
+    int64 NumberOfByteArrays, ReAllocations, InitFreedRandMarker ;
     dllist NBA_BaList ;
     dlnode NBA_ML_HeadNode ;
     dlnode NBA_ML_TailNode ;
@@ -704,13 +704,13 @@ typedef struct TypeDefStructCompileInfo
     byte *DataPtr, * TdsciToken ;
 } TypeDefStructCompileInfo, TDSCI ;
 //TypeDefStructCompileInfo State flags
-#define TDSCI_CLONE_FLAG                ( (uint64) 1 << 0 ) 
-#define TDSCI_STRUCT                 ( (uint64) 1 << 1 ) 
-#define TDSCI_UNION                     ( (uint64) 1 << 2 ) 
-#define TDSCI_STRUCTURE_COMPLETED       ( (uint64) 1 << 3 ) 
-#define TDSCI_PRINT                     ( (uint64) 1 << 4 ) 
-#define TDSCI_POINTER                     ( (uint64) 1 << 5 ) 
-#define TDSCI_UNION_PRINTED              ( (uint64) 1 << 6 ) 
+#define TDSCI_CLONE_FLAG                    ( (uint64) 1 << 0 ) 
+#define TDSCI_STRUCT                        ( (uint64) 1 << 1 ) 
+#define TDSCI_UNION                         ( (uint64) 1 << 2 ) 
+#define TDSCI_STRUCTURE_COMPLETED           ( (uint64) 1 << 3 ) 
+#define TDSCI_PRINT                         ( (uint64) 1 << 4 ) 
+#define TDSCI_POINTER                       ( (uint64) 1 << 5 ) 
+#define TDSCI_UNION_PRINTED                 ( (uint64) 1 << 6 ) 
 
 typedef struct
 {
@@ -917,6 +917,7 @@ typedef struct
     NamedByteArray * TempObjectSpace ; // lasts for one line
     NamedByteArray * CompilerTempObjectSpace ; // lasts for compile of one word
     NamedByteArray * ContextSpace ;
+    NamedByteArray * WordRecylingSpace ;
     NamedByteArray * LispTempSpace ;
     // quasi long term
     NamedByteArray * BufferSpace ;
@@ -997,7 +998,7 @@ typedef struct
     // variables accessible from csl
     int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, AllocationRequestLacks, Dbi ;
     int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectsSize, InternalObjectsSize, LispSize, ContextSize ;
-    int64 TempObjectsSize, CompilerTempObjectsSize, SessionObjectsSize, DataStackSize, HistorySize, OpenVmTilSize ;
+    int64 TempObjectsSize, CompilerTempObjectsSize, WordRecylingSize, SessionObjectsSize, DataStackSize, HistorySize, OpenVmTilSize ;
     int64 CSLSize, BufferSpaceSize, StringSpaceSize, Thrown ;
     Buffer *ThrowBuffer ;
     sigjmp_buf JmpBuf0 ;
