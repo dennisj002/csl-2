@@ -367,7 +367,7 @@ CSL_DeleteWordDebugInfo ( Word * word )
         {
             if ( word->NamespaceStack ) // already done earlier
             {
-                if ( word->W_SC_WordList )
+                if (( word->W_SC_WordList ) ) //&& (word != _Debugger_->w_Word)) 
                 {
 #if 0 // debugging                    
                     SC_WordList_Show ( word->W_SC_WordList, word, 1, 0, ( byte* ) "CSL_DeleteWordDebugInfo" ) ; // debugging

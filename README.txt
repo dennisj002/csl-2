@@ -1,4 +1,4 @@
-CSL really has no grammar, just one word after another with namespaces - forth like - with some words being defined as operating infix or prefix. It may be more powerful and flexible than a context-sensitive language in the Chomsky hierarchy of language types. For me it's an exercise in theoretical and applied computer science - a renamed outgrowth of openVm and openvmtil64.
+CSL really has no grammar, just one word after another with namespaces - forth like - with some words being defined as operating infix or prefix. It may be more powerful and flexible than a context-sensitive language in the Chomsky hierarchy of language types. For me it's an exercise in theoretical and applied computer science - a renamed outgrowth of openVm and openvmtil64. I originally designed this with the thought that it could be useful for natural language processing (NLP) and language translation particularly sanskrit but also tibetan because it is closer to a natural language than context free languages.
 
 openVm : Tookit for Implementing (and exploring) Languages - a bottom-up, optimizing native code vm, that is an extensible, contatenative, RPN, scripting language 
 

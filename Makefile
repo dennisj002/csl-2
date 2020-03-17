@@ -183,10 +183,10 @@ cproto :
 	sudo apt-get install cproto
 	
 tar.xz :	
-	tar -c --xz --exclude=lib/* --exclude=bin/* --exclude=nbproject --exclude=objects --exclude=archive --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=csl-gdb  --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * *.*
+	tar -c --xz --exclude=lib --exclude=archive --exclude=nbproject --exclude=objects --exclude=archive--exclude=mpfr* --exclude=.git --exclude=*.png --exclude=*-gdb  --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * *.*
 
 all.tar.xz :	
-	tar -c --xz --exclude=nbproject --exclude=objects  --exclude=mpfr* --exclude=.git --exclude=*.png  --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * *.*
+	tar -c --xz --exclude=nbproject --exclude=objects  --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=*-gdb --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * *.*
 
 xz : 
 	-rm ~/csl/core

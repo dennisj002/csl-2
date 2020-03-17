@@ -259,7 +259,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     //if ( compiler->LocalsCompilingNamespacesStack ) Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
     compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, WORD_RECYCLING ) ; // allow recycling across contexts
     _dllist_Init ( compiler->GotoList ) ;
-    _dllist_Init ( compiler->CurrentSwitchList ) ;
+    _dllist_Init ( compiler->CurrentMatchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
     CSL_TypeStackReset ( ) ;

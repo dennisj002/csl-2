@@ -239,7 +239,7 @@ typedef struct _Identifier // _Symbol
     int64 SC_WordIndex, SC_FileIndex_Start, SC_FileIndex_End ;
     struct _Identifier * CSLWord, * BaseObject ;
     struct _WordData * W_WordData ;
-} Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
+} Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer, CaseNode ;
 #define S_Car S_Node.n_After
 #define S_Cdr S_Node.n_Before
 #define S_After S_Cdr
@@ -485,12 +485,9 @@ typedef struct NamedByteArray
 #define NBA_AAttribute NBA_Symbol.S_WAllocType
 #define NBA_Chunk_Size NBA_Symbol.S_ChunkSize
 #define NBA_Name NBA_Symbol.S_Name
-typedef struct
-{
-    Symbol CN_Symbol ;
-    block CaseBlock ;
-} CaseNode ;
-#define CN_CaseValue CN_Symbol.S_pb_Data2
+#define CN_CaseBlock S_Value 
+#define CN_CaseBytePtrValue S_pb_Data2
+#define CN_CaseUint64Value S_Value2
 typedef struct
 {
     Symbol GI_Symbol ;
@@ -737,7 +734,7 @@ typedef struct
     Word * ReturnVariableWord, * Current_Word_New, *Current_Word_Create, * LHS_Word ;
     Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *Qid_BackgroundNamespace, *LocalsNamespace, *AutoVarTypeNamespace, *NonCompilingNs ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
-    dllist * CurrentSwitchList ;
+    dllist * CurrentMatchList ;
     dllist * RegisterParameterList ;
     CompileOptimizeInfo * OptInfo ;
     dllist *PostfixLists ;

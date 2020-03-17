@@ -360,7 +360,7 @@ infixOn
 void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
 void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 _assert s
 cOff
-forStarters 1 =
+//forStarters 1 =
 #endif
 
 

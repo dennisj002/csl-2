@@ -82,7 +82,7 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean 
             }
             else
             {
-                if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) )
+                if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) ) //| C_INFIX_EQUAL ) ) )
                 {
                     if ( rvalueFlag ) value = ( int64 ) * word->W_PtrToValue ;
                     else
@@ -95,8 +95,8 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean 
                 else if ( rvalueFlag ) value = word->W_Value ;
                 else value = ( int64 ) word->W_PtrToValue ;
             }
-            if ( isReverseDotted && ( cntx->BaseObject && ( cntx->BaseObject != word ) // guessing some logic here ??
-                && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
+            if ( isReverseDotted && ( cntx->BaseObject && ( cntx->BaseObject != word ) ) // guessing some logic here ??
+                && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) )  TOS = value ; //?? maybe needs more precise state logic
             else DataStack_Push ( value ) ;
         }
 done:

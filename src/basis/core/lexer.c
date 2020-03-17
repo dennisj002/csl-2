@@ -36,7 +36,7 @@ Lexer_Do_MakeItAutoVar ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
         if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
     }
     else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
-    word->W_ObjectAttributes |= ( RAW_STRING ) ;
+    word->W_ObjectAttributes |= ( T_RAW_STRING ) ;
     return word ;
 }
 
@@ -58,14 +58,18 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
             {
                 if ( GetState ( _O_, AUTO_VAR ) && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) )
                 {
-                    if ( ! ( word = Lexer_Do_MakeItAutoVar ( lexer, token, tsrli, scwi ) ) ) return 0 ;
+                    word = Lexer_Do_MakeItAutoVar ( lexer, token, tsrli, scwi ) ;
+                    goto done ;
                 }
-                else Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, "\nLexer_ObjectToken_New : unknown token" ) ;
             }
-            else word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0,
+            word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0,
                 lexer->Literal, 0, 0, tsrli, scwi ) ;
-            Word_SetTypeNamespace ( word, lexer->L_ObjectAttributes ) ;
-            word->ObjectByteSize = lexer->TokenObjectSize ;
+done:
+            if ( word )
+            {
+                Word_SetTypeNamespace ( word, lexer->L_ObjectAttributes ) ;
+                word->ObjectByteSize = lexer->TokenObjectSize ;
+            }
         }
         lexer->TokenWord = word ;
     }

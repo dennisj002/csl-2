@@ -1,15 +1,15 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.907.310" ) 
+#define VERSION ((byte*) "0.907.345" ) 
 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
 // Formal Language Theory (Panini, Chomsky) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // State Machines, Push Down Automata (PDA), Turing Machines :: 
-// Also Laws of Form, by G.S. Brown, Kurt Goedel and Quantum Field Theory, ACIM, etc.
+// Also Laws of Form, by G.S. Brown, Kurt Goedel, Quantum Field Theory, ACIM, etc.
 // csl : context sensitive language
-// (til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas),
+// til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas,
 
 OpenVmTil * _O_ ;
 
@@ -299,7 +299,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     ovt->BufferSpaceSize = 59 * K ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
     //ovt->StringSpaceSize = 100 * K ;
     ovt->MachineCodeSize = 100 * K ;
-    ovt->DictionarySize = 100 * K ; // * K ; //1 * M ; //100 * K ;
+    ovt->DictionarySize = 1 * M ; //100 * K ;
     ovt->CSLSize = ( 80 * K ) ;
     ovt->OpenVmTilSize = ( 6 * K ) ;
     ovt->DataStackSize = 8 * KB ;

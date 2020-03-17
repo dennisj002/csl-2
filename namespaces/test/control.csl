@@ -10,14 +10,14 @@ Root
 // "aret" { "here" label { kbhit } { return } { 1 p "here" goto } ifElse 2 p } word
 // " aret { " here label { kbhit } { return } { 1 p " here goto } ifElse 2 p } word
 // x 10 = "abrkcon" { { { kbhit 27 == } { break } { 1 p continue } ifElse 2 p } loop } word
-#if 1
+
 x 10 = 
 : abrkcon { { x @ 0 == } { break } { x @ p x dup @ 1 - = continue } ifElse 2 p } loop ;
 'abrkcon find wdiss sp
 abrkcon
 : abrk0 ( x ) { { x @ 0 == } { break } { x @ p x 1 -= continue } ifElse 2 p } loop ;
-nl 10 abrk0 sp
-#endif
+nl 10 abrk0 sp //pause
+
 
 #if 0 // kbhit needs to be adjusted for these to work
 : abrk ( | x ) x 0 = { { kbhit 0 > x @ 10 > || } { break } { x @ p } ifElse  } loop ; d: abrk 
@@ -90,25 +90,27 @@ ct2
 Compiler Logic User
 
 : caseSwitchExample ( n ) 
-    cr
-    { 1 p } 1 case
-    { 2 p } 2 case
-    { 3 p } 3 case
-    { 7 p } 7 case
-    n @ switch
+    '1 { nl 1 p } case
+    '2 { nl 2 p } case
+    '3 { nl 3 p } case
+    'seven { nl 7 p } case
+    n @ match
 ; 
 
-// ' caseSwitchExample find wdiss
-7 caseSwitchExample
+' caseSwitchExample find wdiss
+'seven caseSwitchExample 
+'3 caseSwitchExample  
+'2 caseSwitchExample  
+'1 caseSwitchExample 
+pause 
 
 : t0 1 2 > if_ 1 p jmpHere 2 p ; 
 : t1 1 2 > if_ 1 p _else_ 2 p _fi ; 
 //: t2 1 2 > if_ 1 p jmp jmpHere 2 p _fi jmpHere ; 
 : t3 1 2 > if_ 1 p _else_ 2 p _fi ; 
-//: t4 1 2 Asm.test {| N ZERO |} jcc 1 p _else_ 2 p _fi ; 
-//' t4 find wdiss
-nl t0 t1 t3 //pause
-"\nlast line should show : 2 2 2" ps
+nl t0 t1 t3 
+"\nlast line should show : 2 2 2" ps 
+//pause
 #endif 
 sp
 2 + 7 assertStkChk // stack checking
