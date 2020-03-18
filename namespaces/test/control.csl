@@ -94,7 +94,7 @@ Compiler Logic User
     '2 { nl 2 p } case
     '3 { nl 3 p } case
     'seven { nl 7 p } case
-    n @ match
+    n @ switch
 ; 
 
 ' caseSwitchExample find wdiss
@@ -104,24 +104,25 @@ Compiler Logic User
 '1 caseSwitchExample 
 //pause 
 
-#if 0
 cOn
-d: void
+void
 csMatchEx ( n )
 {
-    C_Syntax match ( n )
+    match n 
     {
-        case '1 { nl 1 p } ;
-        case '2 { nl 2 p } ;
-        case '3 { nl 3 p } ;
-        case 'seven { nl 7 p } ;
-    d1: } ;
+        mcase '1 { nl p (1) ; } 
+        mcase '2 { nl p (2) ; } 
+        mcase '3 { nl p (3) ; } 
+        mcase 'seven { nl p (7) ; } 
+    } 
 }
-pwi csMatchEx
-d: csMatchEx ( 'seven ) ;
+//pwi csMatchEx
+csMatchEx ( 'seven ) ;
+csMatchEx ( '3 ) ;
+csMatchEx ( '2 ) ;
+csMatchEx ( '1 ) ;
 cOff
-pause
-#endif
+//pause
 
 : t0 1 2 > if_ 1 p jmpHere 2 p ; 
 : t1 1 2 > if_ 1 p _else_ 2 p _fi ; 

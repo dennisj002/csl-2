@@ -1,14 +1,5 @@
 #include "../../include/csl.h"
 
-CaseNode *
-_CaseNode_New ( uint64 type, block block, int64 value )
-{
-    CaseNode * cnode = ( CaseNode* ) Mem_Allocate ( sizeof ( CaseNode ), type ) ;
-    cnode->CN_CaseBlock = ( uint64 ) block ;
-    cnode->CN_CaseUint64Value = value ; //nb. CN_CaseUint64Value is member of a union 
-    return cnode ;
-}
-
 void
 Match_MapFunction ( dlnode * node, uint64 switchValue )
 {
@@ -22,6 +13,15 @@ MatchAccessFunction ( )
 {
     dllist_Map1 ( ( dllist* ) TOS, ( MapFunction1 ) Match_MapFunction, _Dsp_ [ - 1 ] ) ;
     DataStack_DropN ( 2 ) ;
+}
+
+CaseNode *
+_CaseNode_New ( uint64 type, block block, int64 value )
+{
+    CaseNode * cnode = ( CaseNode* ) Mem_Allocate ( sizeof ( CaseNode ), type ) ;
+    cnode->CN_CaseBlock = ( uint64 ) block ;
+    cnode->CN_CaseUint64Value = value ; //nb. CN_CaseUint64Value is member of a union 
+    return cnode ;
 }
 
 void
@@ -40,7 +40,7 @@ CSL_Case ( )
 {
     _CSL_Case ( DICTIONARY ) ;
 }
- 
+
 void
 _CSL_Match ( uint64 allocType )
 {
@@ -64,10 +64,12 @@ CSL_Match ( )
     _CSL_Match ( DICTIONARY ) ;
 }
 
+// CS_ : c syntax version 
+// match case
 void
-_CS_Case ( uint64 allocType )
+_CS_MCase ( uint64 allocType )
 {
-    _Interpret_Until_Token ( _Interpreter_, ";", 0 ) ;
+    CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;
     block caseBlock = ( block ) TOS ;
     int64 caseValue = ( uint64 ) String_New ( ( byte* ) NOS, STRING_MEM ) ;
     DataStack_DropN ( 2 ) ;
@@ -77,33 +79,35 @@ _CS_Case ( uint64 allocType )
 }
 
 void
-CS_Case ( )
+CS_MCase ( )
 {
-    _CS_Case ( DICTIONARY ) ;
+    _CS_MCase ( DICTIONARY ) ;
 }
 
 void
 _CS_Match ( uint64 allocType )
 {
-    if ( ! _Compiler_->CurrentMatchList ) _Compiler_->CurrentMatchList = _dllist_New ( allocType ) ;
     Interpreter * interp = _Interpreter_ ;
-    byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
-    Word * word = _Interpreter_TokenToWord ( interp, token, -1, -1 ) ;
-    //CSL_Interpret_C_Blocks ( 2, 0, 0 ) ;
-    _Interpret_Until_Token ( _Interpreter_, ";", 0 ) ;
-    Interpreter_DoWord ( interp, word, -1, -1 ) ;
-    if ( CompileMode )
+    Word * word ;
+    byte * token ;
+    if ( ! _Compiler_->CurrentMatchList ) _Compiler_->CurrentMatchList = _dllist_New ( allocType ) ;
+    token = Lexer_ReadToken ( interp->Lexer0 ) ;
+    word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
+    CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;
+    Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+    //if ( CompileMode )
     {
         _Do_LiteralValue ( ( int64 ) _Compiler_->CurrentMatchList ) ;
         Compile_Call_TestRSP ( ( byte* ) MatchAccessFunction ) ;
     }
+#if 0  // has to be compiled 
     else
     {
         dllist_Map1 ( _Compiler_->CurrentMatchList, ( MapFunction1 ) Match_MapFunction, TOS ) ;
-        DataStack_DropN ( 1 ) ;
     }
+#endif    
+    DataStack_DropN ( 1 ) ;
     _Compiler_->CurrentMatchList = 0 ; // this allows no further "case"s to be added to this "switch" list a new list will be started with the next "case"
-    //CSL_BlockRun ( ) ;
 }
 
 void

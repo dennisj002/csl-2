@@ -267,8 +267,8 @@ void _CSL_Case(uint64 allocType);
 void CSL_Case(void);
 void _CSL_Match(uint64 allocType);
 void CSL_Match(void);
-void _CS_Case(uint64 allocType);
-void CS_Case(void);
+void _CS_MCase(uint64 allocType);
+void CS_MCase(void);
 void _CS_Match(uint64 allocType);
 void CS_Match(void);
 /* src/basis/compiler/compile.c */

@@ -60,7 +60,7 @@ CPrimitive CPrimitives [] = {
     { "}fi", 0, 0, 0, CSL_EndIf, IMMEDIATE, 0, 0, "C", "Root" },
     { "case", 0, 0, 0, CSL_Case, IMMEDIATE, 0, 0, "C", "Root" },
     { "switch", 0, 0, 0, CSL_Match, IMMEDIATE, 0, 0, "C", "Root" },
-    { "match", 0, 0, 0, CSL_Match, IMMEDIATE, 0, 0, "C", "Root" },
+    //{ "match", 0, 0, 0, CSL_Match, IMMEDIATE, 0, 0, "C", "Root" },
     { ">?", 0, 0, 0, CSL_EndIf, IMMEDIATE, 0, 0, "C", "Root" },
     { ">:<", 0, 0, 0, CSL_Else, IMMEDIATE, 0, 0, "C", "Root" },
     { "?<", 0, 0, 0, CSL_If_ConditionalExpression, IMMEDIATE, 0, 0, "C", "Root" },
@@ -95,8 +95,8 @@ CPrimitive CPrimitives [] = {
     { "type", 0, 0, 0, ( block ) CSL_Type_New, 0, 0, 0, "C_Syntax", "C" },
     { "typedef", 0, 0, 0, CSL_Typedef, 0, 0, 0, "C_Syntax", "C" },
     { "&", 0, 0, 0, CSL_AddressOf, ( NO_CODING | ADDRESS_OF_OP | IMMEDIATE ), 0, 0, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
-    { "case", 0, 0, 0, CS_Case, IMMEDIATE, 0, 0, "C_Syntax", "C" },
-    { "switch", 0, 0, 0, CS_Match, IMMEDIATE, 0, 0, "C_Syntax", "C" },
+    { "mcase", 0, 0, 0, CS_MCase, IMMEDIATE, 0, 0, "C_Syntax", "C" },
+    //{ "switch", 0, 0, 0, CS_Match, IMMEDIATE, 0, 0, "C_Syntax", "C" },
     { "match", 0, 0, 0, CS_Match, IMMEDIATE, 0, 0, "C_Syntax", "C" },
 
     //{ "}", 0, 0, 0, CSL_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
