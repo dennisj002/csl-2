@@ -253,7 +253,7 @@ _CSL_C_Infix_EqualOp ( block op )
     compiler->LHS_Word = 0 ;
     if ( ! Compiling ) CSL_InitSourceCode ( _CSL_ ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
-    SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+    
 }
 
 void
@@ -545,7 +545,7 @@ Is_LValue ( Context * cntx, Word * word )
         if ( GetState ( compiler, ARRAY_MODE ) ) isLValue = Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( cntx->Lexer0, word ) ;
         else isLValue = Lexer_CheckForwardToStatementEnd_Is_LValue ( cntx->Lexer0, word ) ;
     }
-    //SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+    //
     return isLValue ;
 }
 

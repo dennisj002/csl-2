@@ -412,8 +412,6 @@ lispOff
 
 // === controls ===
 Root 
-dbgOff
-//dbgOn 
 
 'todo 0 const  
 'doX64 1 const
@@ -424,7 +422,8 @@ dbgOff
 forStarters 0 =
 '_doDemo 0 const
     
-//dbgOn
+//dbgOff
+//dbgOn 
 // === controls ===
 
 #if Is_DebugOn 

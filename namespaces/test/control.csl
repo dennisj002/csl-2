@@ -102,7 +102,26 @@ Compiler Logic User
 '3 caseSwitchExample  
 '2 caseSwitchExample  
 '1 caseSwitchExample 
-pause 
+//pause 
+
+#if 0
+cOn
+d: void
+csMatchEx ( n )
+{
+    C_Syntax match ( n )
+    {
+        case '1 { nl 1 p } ;
+        case '2 { nl 2 p } ;
+        case '3 { nl 3 p } ;
+        case 'seven { nl 7 p } ;
+    d1: } ;
+}
+pwi csMatchEx
+d: csMatchEx ( 'seven ) ;
+cOff
+pause
+#endif
 
 : t0 1 2 > if_ 1 p jmpHere 2 p ; 
 : t1 1 2 > if_ 1 p _else_ 2 p _fi ; 

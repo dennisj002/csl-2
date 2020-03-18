@@ -261,11 +261,16 @@ void Compile_BlockLogicTest(BlockInfo *bi);
 byte *Block_CopyCompile(byte *srcAddress, int64 bindex, Boolean jccFlag);
 /* src/basis/core/conditionals.c */
 CaseNode *_CaseNode_New(uint64 type, block block, int64 value);
+void Match_MapFunction(dlnode *node, uint64 switchValue);
+void MatchAccessFunction(void);
 void _CSL_Case(uint64 allocType);
 void CSL_Case(void);
-void Switch_MapFunction(dlnode *node, uint64 switchValue);
-void MatchAccessFunction(void);
+void _CSL_Match(uint64 allocType);
 void CSL_Match(void);
+void _CS_Case(uint64 allocType);
+void CS_Case(void);
+void _CS_Match(uint64 allocType);
+void CS_Match(void);
 /* src/basis/compiler/compile.c */
 void _Compile_C_Call_1_Arg(byte *function, int64 arg);
 void _CompileN(byte *data, int64 size);

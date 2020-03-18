@@ -307,7 +307,6 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
         if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
         else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
         Compile_Move_Reg_To_Reg ( RegParameterOrder ( (*i) ++ ), ACC, 0 ) ;
-        SetState ( cntx, ADDRESS_OF_MODE, false ) ;
         if ( baseObject ) _Debugger_->SpecialPreHere = baseObject->Coding ;
         else _Debugger_->SpecialPreHere = here ;
     }

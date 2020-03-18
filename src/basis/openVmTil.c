@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.907.345" ) 
+#define VERSION ((byte*) "0.907.350" ) 
 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -44,6 +44,7 @@ OpenVmTil_Run ( int64 argc, char * argv [ ] )
         ovt->Verbosity = 1 ;
         ovt->Restarts = restarts ;
         if ( ovt->Restarts ) OVT_ExceptionState_Print ( ) ;
+        if ( ovt->Restarts > 100 ) OVT_Exit () ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) ) // nb. siglongjmp always comes to beginning of the block 
             CSL_Run ( ovt->OVT_CSL, ovt->RestartCondition ) ;
         restartCondition = ovt->RestartCondition ;

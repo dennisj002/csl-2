@@ -315,6 +315,7 @@ byte *
 _Lexer_ReadToken ( Lexer * lexer, byte * delimiters )
 {
     Lexer_LexNextToken_WithDelimiters ( lexer, delimiters ) ;
+    DEBUG_SETUP_TOKEN ( lexer->OriginalToken, 1 ) ;
     return lexer->OriginalToken ;
 }
 
@@ -827,7 +828,7 @@ Comma ( Lexer * lexer )
         }
         else //if ( Lexer_IsCurrentInputCharADelimiter ( lexer ) ) 
         {
-            CSL_C_Comma ( ) ; // ??  SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+            CSL_C_Comma ( ) ; // ??  
             //return ;
         }
     }

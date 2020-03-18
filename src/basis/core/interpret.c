@@ -13,7 +13,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
     {
         interp->Token = token ;
         cntx->CurrentToken = token ;
-        DEBUG_SETUP_TOKEN ( token, 1 ) ;
+        //DEBUG_SETUP_TOKEN ( token, 1 ) ;
         word = Lexer_ParseToken_ToWord ( interp->Lexer0, token, tsrli, scwi ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         DEBUG_SETUP ( word, 1 ) ;

@@ -86,14 +86,14 @@ CSL_C_Semi ( )
     {
         CSL_InitSourceCode ( _CSL_ ) ;
     }
-    SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+    
     Context_ClearQidInNamespace ( ) ;
 }
 
 void
 CSL_C_Comma ( void )
 {
-    SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+    
 }
 
 void

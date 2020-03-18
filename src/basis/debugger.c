@@ -122,7 +122,7 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
             if ( ( ! word ) && ( ! token ) ) word = Context_CurrentWord ( ) ;
             if ( force || ( word && word->Name[0] ) || token )
             {
-                if ( ( ! word ) && ( token ) ) Debugger_Setup_ResetState ( debugger ) ; //??
+                //if ( ( ! word ) && ( token ) ) Debugger_Setup_ResetState ( debugger ) ; //??
                 Debugger_Interpret ( debugger, word, token, address ) ;
                 rtn = true ;
             }

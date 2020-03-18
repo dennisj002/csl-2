@@ -24,7 +24,7 @@ CPrimitive CPrimitives [] = {
     { "macro", 0, 0, 0, ( block ) _LO_Macro, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" }, // nb. too many clashes with other 'if's
     { ".if", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "cond", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    { "car", 0, 0, 0, ( block ) LO_Car, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
+    { "car", 0, 0, 0, ( block ) LO_Car, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" }, 
     { "cdr", 0, 0, 0, ( block ) LO_Cdr, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "quote", 0, 0, 0, ( block ) LO_Quote, 0, 0, T_LISP_READ_MACRO, "Lisp", "Root" },
     { "eval", 0, 0, 0, ( block ) _LC_Eval, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
@@ -95,6 +95,9 @@ CPrimitive CPrimitives [] = {
     { "type", 0, 0, 0, ( block ) CSL_Type_New, 0, 0, 0, "C_Syntax", "C" },
     { "typedef", 0, 0, 0, CSL_Typedef, 0, 0, 0, "C_Syntax", "C" },
     { "&", 0, 0, 0, CSL_AddressOf, ( NO_CODING | ADDRESS_OF_OP | IMMEDIATE ), 0, 0, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
+    { "case", 0, 0, 0, CS_Case, IMMEDIATE, 0, 0, "C_Syntax", "C" },
+    { "switch", 0, 0, 0, CS_Match, IMMEDIATE, 0, 0, "C_Syntax", "C" },
+    { "match", 0, 0, 0, CS_Match, IMMEDIATE, 0, 0, "C_Syntax", "C" },
 
     //{ "}", 0, 0, 0, CSL_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
     //{ "{", 0, 0, 0, CSL_TypedefStructBegin, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },

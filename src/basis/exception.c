@@ -559,16 +559,14 @@ _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
     byte key, * instr = ".: (p)ause, e(x)it, <key> restart" ;
     printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, Context_Location ( ), ovt->SigSegvs ) ;
     fflush ( stdout ) ;
+    key = Key ( ) ;
+    if ( key == 'p' )
     {
-        key = Key ( ) ;
-        if ( key == 'p' )
-        {
-            Pause ( ) ;
-            return false ;
-        }
-        else if ( key == 'x' ) OVT_Exit ( ) ;
-        else return false ;
+        Pause ( ) ;
+        return false ;
     }
+    else if ( key == 'x' ) OVT_Exit ( ) ;
+    else return false ;
 }
 
 void
