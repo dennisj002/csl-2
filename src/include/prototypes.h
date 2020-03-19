@@ -260,16 +260,16 @@ BlockInfo *BI_Block_Copy(BlockInfo *bi, byte *dstAddress, byte *srcAddress, int6
 void Compile_BlockLogicTest(BlockInfo *bi);
 byte *Block_CopyCompile(byte *srcAddress, int64 bindex, Boolean jccFlag);
 /* src/basis/core/conditionals.c */
-CaseNode *_CaseNode_New(uint64 type, block block, int64 value);
 void Match_MapFunction(dlnode *node, uint64 switchValue);
 void MatchAccessFunction(void);
+CaseNode *_CaseNode_New(uint64 type, block block, int64 value);
 void _CSL_Case(uint64 allocType);
-void CSL_Case(void);
-void _CSL_Match(uint64 allocType);
-void CSL_Match(void);
-void _CS_MCase(uint64 allocType);
-void CS_MCase(void);
+void _CSL_Switch(uint64 allocType);
+void _CS_Case(uint64 allocType);
 void _CS_Match(uint64 allocType);
+void CSL_Case(void);
+void CSL_Switch(void);
+void CS_Case(void);
 void CS_Match(void);
 /* src/basis/compiler/compile.c */
 void _Compile_C_Call_1_Arg(byte *function, int64 arg);
@@ -660,6 +660,7 @@ void Interpreter_SetLexState(Interpreter *interp);
 /* src/basis/core/lexer.c */
 void Lexer_Exception(byte *token, uint64 exceptionNumber, byte *message);
 Word *Lexer_Do_MakeItAutoVar(Lexer *lexer, byte *token, int64 tsrli, int64 scwi);
+Word *_Lexer_ParseToken_ToWord(Lexer *lexer, byte *token, int64 tsrli, int64 scwi);
 Word *Lexer_ParseToken_ToWord(Lexer *lexer, byte *token, int64 tsrli, int64 scwi);
 byte *_Lexer_LexNextToken_WithDelimiters(Lexer *lexer, byte *delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state);
 void Lexer_Init(Lexer *lexer, byte *delimiters, uint64 state, uint64 allocType);

@@ -115,6 +115,7 @@ OVT_PauseInterpret ( Context * cntx, byte key )
     Boolean svDbgState = GetState ( _CSL_, DEBUG_MODE | _DEBUG_SHOW_ ) ;
     Boolean svcm = GetState ( cntx->Compiler0, ( COMPILE_MODE ) ) ;
     Boolean svath = GetState ( rl, ADD_TO_HISTORY ) ;
+    int64 lastKey = 0, loop = 0 ;
     OpenVmTil_AddStringToHistoryOn ( ) ;
     Set_CompileMode ( false ) ;
     DebugOff ;
@@ -131,9 +132,12 @@ OVT_PauseInterpret ( Context * cntx, byte key )
         if ( ReadLine_PeekNextChar ( rl ) < ' ' ) break ; // '\n', <esc>, etc.
         Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
         CSL_NewLine ( ) ;
+        if ( key == lastKey ) loop ++ ; // stop looping here, just noticed 0.907.39x??
+        else loop = 0 ;
+        lastKey = key ;
         key = 0 ;
     }
-    while ( 1 ) ;
+    while ( loop < 5 ) ;
     ReadLine_SetPrompt ( rl, svPrompt ) ;
     SetState ( cntx, AT_COMMAND_LINE, false ) ;
     ReadLine_SetRawInputFunction ( rl, ReadLine_GetNextCharFromString ) ;

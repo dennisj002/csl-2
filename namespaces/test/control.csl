@@ -90,11 +90,24 @@ ct2
 Compiler Logic User
 
 : caseSwitchExample ( n ) 
+#if 0
     '1 { nl 1 p } case
     '2 { nl 2 p } case
     '3 { nl 3 p } case
     'seven { nl 7 p } case
     n @ switch
+#else
+    mcase '1 { nl 1 p ; } 
+    mcase '2 { nl 2 p ; } 
+    mcase '3 { nl 3 p ; } 
+    mcase 3 { nl 3 p ; } 
+    mcase 77 { nl 77 p ; } 
+    mcase 'seven { nl 7 p ; } 
+    mcase 'eight { nl 8 p ; } 
+    mcase "nine" { nl 9 p ; } 
+#endif
+    match ( n @ )
+    //n @ switch
 ; 
 
 ' caseSwitchExample find wdiss
@@ -102,6 +115,10 @@ Compiler Logic User
 '3 caseSwitchExample  
 '2 caseSwitchExample  
 '1 caseSwitchExample 
+77 caseSwitchExample 
+"seven" caseSwitchExample 
+"nine" caseSwitchExample 
+'nine caseSwitchExample 
 //pause 
 
 cOn
@@ -113,16 +130,25 @@ csMatchEx ( n )
         mcase '1 { nl p (1) ; } 
         mcase '2 { nl p (2) ; } 
         mcase '3 { nl p (3) ; } 
+        mcase 3 { nl p (3) ; } 
+        mcase 77 { nl p (77) ; } 
         mcase 'seven { nl p (7) ; } 
+        mcase 'eight { nl p (8) ; } 
+        d: mcase "nine" { nl p (9) ; } 
     } 
 }
 //pwi csMatchEx
 csMatchEx ( 'seven ) ;
+csMatchEx ( "seven" ) ;
 csMatchEx ( '3 ) ;
 csMatchEx ( '2 ) ;
 csMatchEx ( '1 ) ;
+csMatchEx ( 77 ) ;
+csMatchEx ( 3 ) ;
+csMatchEx ( 'eight ) ;
+csMatchEx ( 'nine ) ;
 cOff
-//pause
+pause
 
 : t0 1 2 > if_ 1 p jmpHere 2 p ; 
 : t1 1 2 > if_ 1 p _else_ 2 p _fi ; 
