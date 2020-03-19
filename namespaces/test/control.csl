@@ -90,23 +90,15 @@ ct2
 Compiler Logic User
 
 : caseSwitchExample ( n ) 
-#if 0
-    '1 { nl 1 p } case
-    '2 { nl 2 p } case
-    '3 { nl 3 p } case
-    'seven { nl 7 p } case
-    n @ switch
-#else
-    mcase '1 { nl 1 p ; } 
-    mcase '2 { nl 2 p ; } 
-    mcase '3 { nl 3 p ; } 
-    mcase 3 { nl 3 p ; } 
-    mcase 77 { nl 77 p ; } 
-    mcase 'seven { nl 7 p ; } 
-    mcase 'eight { nl 8 p ; } 
-    mcase "nine" { nl 9 p ; } 
-#endif
-    match ( n @ )
+    case '1 { nl 1 p ; } 
+    case '2 { nl 2 p ; } 
+    case '3 { nl 3 p ; } 
+    case 3 { nl 3 p ; } 
+    case 77 { nl 77 p ; } 
+    case 'seven { nl 7 p ; } 
+    case 'eight { nl 8 p ; } 
+    case "nine" { nl 9 p ; } 
+    match ( n @ ) // either or ...
     //n @ switch
 ; 
 
@@ -127,14 +119,14 @@ csMatchEx ( n )
 {
     match n 
     {
-        mcase '1 { nl p (1) ; } 
-        mcase '2 { nl p (2) ; } 
-        mcase '3 { nl p (3) ; } 
-        mcase 3 { nl p (3) ; } 
-        mcase 77 { nl p (77) ; } 
-        mcase 'seven { nl p (7) ; } 
-        mcase 'eight { nl p (8) ; } 
-        d: mcase "nine" { nl p (9) ; } 
+        case '1 { nl p (1) ; } 
+        case '2 { nl p (2) ; } 
+        case '3 { nl p (3) ; } 
+        case 3 { nl p (3) ; } 
+        case 77 { nl p (77) ; } 
+        case 'seven { nl p (7) ; } 
+        case 'eight { nl p (8) ; } 
+        case "nine" { nl p (9) ; } 
     } 
 }
 //pwi csMatchEx
@@ -147,8 +139,9 @@ csMatchEx ( 77 ) ;
 csMatchEx ( 3 ) ;
 csMatchEx ( 'eight ) ;
 csMatchEx ( 'nine ) ;
+csMatchEx ( '77 ) ;
 cOff
-pause
+//pause
 
 : t0 1 2 > if_ 1 p jmpHere 2 p ; 
 : t1 1 2 > if_ 1 p _else_ 2 p _fi ; 

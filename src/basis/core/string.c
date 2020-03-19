@@ -894,7 +894,7 @@ int64
 _IsString ( byte * address, int64 maxLength )
 {
     int64 i, count ;
-    if ( address < (byte*) 0x7ffff0000000 ) return false ; // prevent integer 'string's 
+    if ( address < (byte*) 0x7f0000000000 ) return false ; // prevent integer 'string's 
     for ( i = 0, count = 0 ; i < maxLength ; i ++ )
     {
         //if ( ! ( isprint ( address [i] ) || iscntrl ( address [i] ) ) ) return false ;
