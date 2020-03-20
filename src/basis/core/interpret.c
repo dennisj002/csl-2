@@ -40,7 +40,7 @@ void
 Interpreter_InterpretNextToken ( Interpreter * interp )
 {
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
-    interp->LastLexedChar = interp->Lexer0->LastLexedChar ;
+    //interp->LastLexedChar = interp->Lexer0->LastLexedChar ;
     Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
 }
 
@@ -158,7 +158,7 @@ Word_IsSyntactic ( Word * word )
 void
 Interpreter_SetLexState ( Interpreter * interp )
 {
-    byte llc = interp->LastLexedChar ;
+    byte llc = _Lexer_->LastLexedChar ;
     if ( llc == 0 ) SetState ( interp, END_OF_STRING, true ) ;
     else if ( llc == eof ) SetState ( interp, END_OF_FILE, true ) ;
     else if ( llc == '\n' ) SetState ( interp, END_OF_LINE, true ) ;

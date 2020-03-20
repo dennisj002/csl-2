@@ -350,7 +350,7 @@ User
 //'vck find wdiss //pause
 : opOn ( n )
     optimizeOn inlineOn 
-    n @ ' state literal vck  // literal pops the stack and turns 'state into a string -- for testing
+    n @ 'state literal vck  // literal pops the stack and turns 'state into a string -- for testing
 ;
 //' opOn find winfo //pause 2 opOn 1 opOn 
 
@@ -408,6 +408,8 @@ Root
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
 lispOff
 : mrm mem rdi mem ; 
+: mem2 verbosity 2 = mem verbosity 1 = ; 
+: typesInclude "namespaces/types.csl" include ;
 
 
 // === controls ===
@@ -423,7 +425,7 @@ forStarters 0 =
 '_doDemo 0 const
     
 //dbgOff
-dbgOn 
+//dbgOn 
 // === controls ===
 
 #if Is_DebugOn 

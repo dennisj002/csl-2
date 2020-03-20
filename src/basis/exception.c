@@ -313,7 +313,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc ) //nb. void ptr 
     d0 ( Printf ( ( byte* ) "\nOpenVmTil_SignalAction :: signal = %d\n", signal ) ) ;
     if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) || ( signal == SIGSTOP ) ) OVT_Exit ( ) ;
     _O_->Signal = signal ;
-    _O_->SigAddress = ( Is_DebugOn && _Debugger_->DebugAddress ) ? _Debugger_->DebugAddress : si->si_addr ;
+    _O_->SigAddress = si->si_addr ; //( Is_DebugOn && _Debugger_->DebugAddress ) ? _Debugger_->DebugAddress : si->si_addr ;
     _O_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
     OVT_ResetSignals ( _O_->Signal ) ;
     if ( ( signal >= SIGCHLD ) || ( signal == SIGTRAP ) ) //||( signal == SIGBUS ))
@@ -561,7 +561,7 @@ _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
 {
     byte * msg = ovt->ThrowBuffer->Data ;
     byte key, * instr = ".: (p)ause, e(x)it, <key> restart" ;
-    printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, Context_Location ( ), ovt->SigSegvs ) ;
+    printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, ((ovt->SigSegvs < 2) ? Context_Location ( ) : (byte*)""), ovt->SigSegvs ) ;
     fflush ( stdout ) ;
     key = Key ( ) ;
     if ( key == 'p' )

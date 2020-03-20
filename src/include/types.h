@@ -22,7 +22,6 @@ typedef int64( *cFunction_1_Arg ) ( int64 ) ;
 typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;
 typedef VoidFunction block ; // code block
 typedef byte AsciiCharSet [ 256 ] ;
-
 typedef struct
 {
     int64 StackSize ;
@@ -50,6 +49,9 @@ typedef struct
     {
         uint64 T_NumberOfSlots ;
         uint64 T_NumberOfBytes ;
+    } ;
+    union
+    {
         uint64 T_Size ;
         uint64 T_ChunkSize ; // remember MemChunk is prepended at memory allocation time
     } ;
@@ -89,7 +91,7 @@ typedef struct _dllist
         dlnode * n_Tail ;
     } ;
     node * n_CurrentNode ;
-} dllist ; 
+} dllist ;
 #define Head n_Head
 #define Tail n_Tail
 enum types
@@ -112,6 +114,7 @@ typedef struct _dobject
     } ;
     union
     {
+        byte * do_unmap ;
         byte * do_bData ;
         int64 * do_iData ;
     } ;
@@ -133,7 +136,12 @@ typedef struct
             Boolean n_Slots ;
             Boolean n_InUseFlag ;
         } ;
-        byte * n_unmap ;
+        union
+        {
+            byte * n_unmap ;
+            byte * n_bData ;
+            int64 * n_iData ;
+        } ;
     } ;
 } _DLNode, _Node, _ListNode, _DLList ; // size : 3 x 64 bits
 typedef struct
@@ -173,7 +181,7 @@ typedef struct
                 {
                     int32 do_Type ;
                     int16 do_Size ;
-                    Boolean do_Slots ;
+                    uint8 do_Slots ;
                     Boolean do_InUseFlag ;
                 } ;
                 byte * do_bData ;
@@ -201,7 +209,7 @@ Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
 typedef struct _Identifier // _Symbol
 {
     DLNode S_Node ;
-    int64 Slots ; // number of slots in Object
+    //int64 Slots ; // number of slots in Object
     //int64 ObjectByteSize ; -> S_Size // number of bytes in Object
     int64 CodeSize ;
     byte * S_Name ;
@@ -236,7 +244,7 @@ typedef struct _Identifier // _Symbol
     block Definition ;
     dllist * DebugWordList ;
     int64 StartCharRlIndex ;
-    int64 SC_WordIndex, SC_FileIndex_Start, SC_FileIndex_End ;
+    int64 SC_WordIndex ; //, SC_FileIndex_Start, SC_FileIndex_End ;
     struct _Identifier * CSLWord, * BaseObject ;
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer, CaseNode ;
@@ -285,7 +293,7 @@ typedef struct _Identifier // _Symbol
 #define Lo_Size ObjectByteSize
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr
-#define Lo_NumberOfSlots Slots
+#define Lo_NumberOfSlots S_NumberOfSlots //Slots
 #define Lo_CSLWord CSLWord 
 #define Lo_List S_SymbolList 
 #define Lo_Value S_Value
@@ -335,11 +343,10 @@ typedef struct location
     Word * LocationWord ;
     byte * LocationAddress ;
 } Location ;
-
-typedef union 
+typedef union
 {
-        byte TypeSignatureCodes [8] ;
-        Word * TypeNamespace ;
+    byte TypeSignatureCodes [8] ;
+    Word * TypeNamespace ;
 } TypeSignatureInfo ;
 typedef struct _WordData
 {
@@ -362,7 +369,7 @@ typedef struct _WordData
     {
         uint8 RegToUse ;
         uint8 Opt_Rm ;
-        uint8 Opt_Reg ; 
+        uint8 Opt_Reg ;
         uint8 SrcReg ;
         uint8 DstReg ;
         uint8 RegFlags ; // future uses available here !!
@@ -370,7 +377,7 @@ typedef struct _WordData
         uint8 OpInsnCode ;
     } ;
     byte TypeSignature [16] ;
-    Namespace * TypeObjectsNamespaces [16] ; // 16 : increase if need more than 15 objects as args
+    //Namespace * TypeObjectsNamespaces [16] ; // 16 : increase if need more than 15 objects as args
     union
     {
         dllist * LocalNamespaces ;
@@ -561,8 +568,8 @@ typedef struct ReadLiner
     int64 MaxEndPosition ; // index where the next input character is put
     int64 CursorPosition, EscapeModeFlag, InputStringIndex, InputStringLength, LineStartFileIndex ;
     byte *Filename, LastCheckedInputKeyedCharacter, * DebugPrompt, * DebugAltPrompt, * NormalPrompt, * AltPrompt, * Prompt ;
-    byte InputLine [ BUFFER_SIZE ], * InputLineString, * InputStringOriginal, * InputStringCurrent, *svLine;
-    ReadLiner_KeyFunction Key ; 
+    byte InputLine [ BUFFER_SIZE ], * InputLineString, * InputStringOriginal, * InputStringCurrent, *svLine ;
+    ReadLiner_KeyFunction Key ;
     FILE *InputFile, *OutputFile ;
     HistoryStringNode * HistoryNode ;
     TabCompletionInfo * TabCompletionInfo0 ;
@@ -572,7 +579,7 @@ typedef void ( * ReadLineFunction ) ( ReadLiner * ) ;
 typedef struct
 {
     uint64 State ;
-    Word *FoundWord ;   
+    Word *FoundWord ;
     Namespace * QualifyingNamespace ;
 } Finder ;
 
@@ -603,7 +610,6 @@ typedef struct Lexer
     SourceCodeInfo SCI ;
     dllist * TokenList ;
 } Lexer ;
-
 typedef struct
 {
     DLNode S_Node ;
@@ -691,10 +697,9 @@ typedef struct
 #define ARG2_R                   ( 1 << 3 )
 #define OP_RESULT                ( 1 << 4 )
 } CompileOptimizeInfo, COI ;
-
 typedef struct TypeDefStructCompileInfo
 {
-    int64 State, Tdsci_Offset, Tdsci_StructureUnion_Size, Tdsci_Field_Size ; 
+    int64 State, Tdsci_Offset, Tdsci_StructureUnion_Size, Tdsci_Field_Size ;
     int64 LineNumber, Token_EndIndex, Token_StartIndex ;
     Namespace *Tdsci_InNamespace, * Tdsci_StructureUnion_Namespace, * Tdsci_Field_Type_Namespace ;
     Word * Tdsci_Field_Object ;
@@ -708,7 +713,6 @@ typedef struct TypeDefStructCompileInfo
 #define TDSCI_PRINT                         ( (uint64) 1 << 4 ) 
 #define TDSCI_POINTER                       ( (uint64) 1 << 5 ) 
 #define TDSCI_UNION_PRINTED                 ( (uint64) 1 << 6 ) 
-
 typedef struct
 {
     uint64 State ;
@@ -717,7 +721,7 @@ typedef struct
     byte * BreakPoint ;
     byte * StartPoint ;
     int64 NumberOfNonRegisterLocals, NumberOfRegisterLocals, NumberOfLocals ;
-    int64 NumberOfNonRegisterVariables, NumberOfRegisterVariables, NumberOfVariables ; 
+    int64 NumberOfNonRegisterVariables, NumberOfRegisterVariables, NumberOfVariables ;
     int64 NumberOfNonRegisterArgs, NumberOfRegisterArgs, NumberOfArgs ;
     int64 LocalsFrameSize ; //, CastSize ;
     int64 SaveCompileMode, SaveOptimizeState ; //, SaveScratchPadIndex ;
@@ -756,9 +760,8 @@ typedef struct Interpreter
     Finder * Finder0 ;
     Lexer * Lexer0 ;
     Compiler * Compiler0 ;
-    byte * Token, LastLexedChar ;
+    byte * Token ; 
     Word *w_Word, *LastWord ;
-    //Word * BaseObject ;
     Word *CurrentObjectNamespace, *ThisNamespace ;
     int64 WordType ;
     dllist * InterpList ;

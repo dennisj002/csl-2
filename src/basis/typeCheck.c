@@ -107,8 +107,8 @@ TSI_TypeCheck_TypeVariable ( TSI * tsi )
                         if ( swSize > wbctsSize )
                         {
                             tsi->WordBeingCompiled->W_TypeSignatureString [lvalue->Index - 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( rvalue ) ;
-                            if ( rvalue->W_ObjectAttributes & OBJECT )
-                                tsi->WordBeingCompiled->W_TypeObjectsNamespaces [lvalue->Index - 1] = rvalue->TypeNamespace ; // ??
+                            //if ( rvalue->W_ObjectAttributes & OBJECT )
+                            //    tsi->WordBeingCompiled->W_TypeObjectsNamespaces [lvalue->Index - 1] = rvalue->TypeNamespace ; // ??
                         }
                     }
                 }
@@ -369,7 +369,7 @@ Word_TypeChecking_SetSigInfoForAnObject ( Word * word )
 {
     Word * cwbc = _Context_->CurrentWordBeingCompiled ;
     cwbc->W_TypeSignatureString [word->Index - 1] = 'O' ;
-    cwbc->W_TypeObjectsNamespaces [word->Index - 1] = word->TypeNamespace ;
+    //cwbc->W_TypeObjectsNamespaces [word->Index - 1] = word->TypeNamespace ;
 }
 
 byte

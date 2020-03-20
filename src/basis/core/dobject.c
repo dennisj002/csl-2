@@ -235,7 +235,7 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
     Namespace_DoAddWord ( parent, dobject ) ;
     dobject->W_MorphismAttributes |= parent->W_MorphismAttributes ;
     dobject->W_ObjectAttributes |= T_ANY ;
-    dobject->Slots = parent->Slots ;
+    dobject->S_NumberOfSlots = parent->S_NumberOfSlots ;
     Namespace_SetState_AdjustListPosition ( parent, USING, 1 ) ;
 }
 
@@ -263,7 +263,7 @@ _DObject_NewSlot ( DObject * proto, byte * name, int64 value )
     DObject * dobject = DObject_Sub_New ( proto, name, DOBJECT ) ;
     dobject->W_DObjectValue = value ;
     dobject->W_PtrToValue = & dobject->W_DObjectValue ;
-    proto->Slots ++ ;
+    proto->S_NumberOfSlots ++ ;
 
     return dobject ;
 }

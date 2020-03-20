@@ -185,7 +185,6 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
 void
 Lexer_ParseObject ( Lexer * lexer, byte * token )
 {
-    Context * cntx = _Context_ ;
     int64 offset = 0 ;
     lexer->OriginalToken = token ;
     lexer->Literal = 0 ;
@@ -199,8 +198,6 @@ Lexer_ParseObject ( Lexer * lexer, byte * token )
             if ( ( c = tolower ( token [1] ) ) == 'x' )
             {
                 token [1] = c ;
-                //if ( token [0] == '#' ) token [0] = '0' ; // Scheme format to C format
-                //_Lexer_ParseHex ( lexer, token[0] == '#' ? &token[1] : token ) ; // #x
                 _Lexer_ParseHex ( lexer, token ) ; // #x
                 return ;
             }
@@ -258,7 +255,7 @@ Parse_Macro ( int64 type )
     return value ;
 }
 
-byte *
+void
 _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTermChar )
 {
     ReadLiner * rl = _ReadLiner_ ;
@@ -270,8 +267,7 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
     do
     {
         lexer->TokenInputByte = ReadLine_NextChar ( rl ) ;
-        if ( lexer->TokenInputByte == '\\' )
-            _BackSlash ( lexer, 1 ) ;
+        if ( lexer->TokenInputByte == '\\' ) _BackSlash ( lexer, 1 ) ;
         else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
     }
     while ( lexer->TokenInputByte != termChar ) ;
@@ -283,12 +279,9 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
     if ( termChar == '\"' )
     {
         if ( GetState ( _CSL_, STRING_MACROS_ON ) && GetState ( &_CSL_->Sti, STI_INITIALIZED ) ) _CSL_StringMacros_Do ( lexer->TokenBuffer ) ;
-        Word * word = Lexer_ParseToken_ToWord ( lexer, token, - 1, - 1 ) ;
-        //Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ;
-        //Interpreter_DoWord_Default ( _Interpreter_, word, - 1, - 1 ) ;
+        Word * word = _Lexer_ParseToken_ToWord ( lexer, token, -1, -1 ) ;
         Word_Eval ( word ) ;
     }
-    return token ;
 }
 
 int64
@@ -343,60 +336,6 @@ _CSL_ParseQid_Token ( byte * token0 )
         else return ( int64 ) token ;
     }
 }
-
-#if 0
-
-int64
-CSL_ParseQid_Word ( Word * word )
-{
-    Context * cntx = _Context_ ;
-    Lexer * lexer = cntx->Lexer0 ;
-    Finder * finder = cntx->Finder0 ;
-    int64 nst ;
-    Word *ns = 0 ;
-    byte * token = 0 ; //= finderToken ; // finderToken is also a flag of the caller : (finderToken > 0) ? finder : parser
-    ///if ( word0 ) { word = word0 ; goto gotWord0 ; }
-    while ( 1 )
-    {
-        if ( word && ( nst = word->W_ObjectAttributes & THIS ) ) ns = word, _CSL_SetAsInNamespace ( ns ), Finder_SetQualifyingNamespace ( finder, ns ) ;
-        else if ( word && ( nst = word->W_ObjectAttributes & ( NAMESPACE_TYPE | THIS ) ) ) //: ( C_TYPE | C_CLASS | NAMESPACE | THIS ) ) ) )
-        {
-            ns = word ;
-            Finder_SetQualifyingNamespace ( finder, ns ) ;
-            _CSL_SetAsInNamespace ( ns ) ;
-
-        }
-        //else if ( finderToken )
-        {
-            if ( ! nst ) _CSL_Do_Dot ( cntx, word ) ;
-            //break ; //return (int64) word ;
-        }
-        token = Lexer_ReadToken ( lexer ) ;
-        if ( token && ( token [0] == '.' ) ) token = Lexer_ReadToken ( lexer ) ;
-        {
-            //if ( finderToken ) cntx->BaseObject = 0 ;
-            //word = _Finder_Word_Find ( finder, USING, token ) ; //Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-            if ( ns ) word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
-            else word = Finder_Word_FindUsing (_Finder_, token, 0) ; // maybe need to respect a possible qualifying namespace ??
-        }
-        if ( ! _Lexer_IsTokenForwardDotted ( lexer, 0 ) ) break ;
-    }
-#if 0    
-    if ( ns )
-    {
-        //word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
-        if ( finderToken ) return ( int64 ) word ;
-        else return ( int64 ) token ; //( word ? word->Name : token ) ;
-    }
-    else
-#endif        
-    {
-        //if ( finderToken ) 
-        return ( int64 ) word ;
-        //else return ( int64 ) token ;
-    }
-}
-#endif
 
 // _CSL_SingleQuote : ?? seems way to complicated and maybe should be integrated with Lexer_ParseObject
 

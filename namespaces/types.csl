@@ -3,7 +3,8 @@ c_syntaxOn
 'C.Experimental namespace
 Experimental
 
-#if 0
+#if 1
+#define unsigned 
 // see readme.txt for a text description
 // TODO : types, database, garbage collection : integration
 typedef char int8 ;
@@ -235,7 +236,7 @@ typedef union
 typedef struct _Identifier // _Symbol
 {
     DLNode S_Node ;
-    int64 Slots ; // number of slots in Object
+    //int64 Slots ; // number of slots in Object
     //int64 ObjectByteSize ; -> S_Size // number of bytes in Object
     int64 CodeSize ;
     byte * S_Name ;
@@ -381,7 +382,7 @@ struct _WordData
 #define Lo_Size ObjectByteSize
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr
-#define Lo_NumberOfSlots Slots
+#define Lo_NumberOfSlots S_NumberOfSlots //Slots
 #define Lo_CSLWord CSLWord 
 #define Lo_List S_SymbolList 
 #define Lo_Value S_Value

@@ -10,9 +10,6 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttribute
     int64 index, int64 value, Namespace * addToNs, int allocType, int64 tsrli, int64 scwi )
 {
     Context * cntx = _Context_ ;
-    Word_SetTsrliScwi ( word, tsrli, scwi )
-    if ( word && ( ! ( type & ( T_LC_NEW | T_LC_LITERAL ) ) ) )
-        Word_Recycle ( word ) ;
     switch ( type )
     {
         case T_LC_NEW:

@@ -645,8 +645,8 @@ CSL_Finish_WordSourceCode (CSL * csl, Word * word , Boolean force)
     {
         if ( ( ! word->W_SourceCode ) || force ) word->W_SourceCode = _CSL_GetSourceCode ( ) ;
         Lexer_SourceCodeOff ( _Lexer_ ) ;
-        word->SC_FileIndex_Start = csl->SCI.SciFileIndexScStart ;
-        word->SC_FileIndex_End = csl->SCI.SciFileIndexScEnd ;
+        //word->SC_FileIndex_Start = csl->SCI.SciFileIndexScStart ;
+        //word->SC_FileIndex_End = csl->SCI.SciFileIndexScEnd ;
         _CSL_SourceCode_Init ( csl ) ;
     }
 }

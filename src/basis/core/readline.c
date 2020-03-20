@@ -615,7 +615,6 @@ _ReadLine_GetLine ( ReadLiner * rl, byte c )
     {
         if ( ! c ) ReadLine_Get_Key ( rl ) ;
         else ReadLine_Set_KeyedChar ( rl, c ), c = 0 ;
-
         if ( AtCommandLine ( rl ) ) _ReadLine_TabCompletion_Check ( rl ) ;
         _CSL_->ReadLine_FunctionTable [ _CSL_->ReadLine_CharacterTable [ rl->InputKeyedCharacter ] ] ( rl ) ;
         SetState ( rl, ANSI_ESCAPE, false ) ;

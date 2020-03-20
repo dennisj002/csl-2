@@ -290,7 +290,7 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
             //  C cast code here ; 
             // nb! : we have no (fully) implemented operations on operand size less than 8 bytes
             token1 = Lexer_ReadToken ( interp->Lexer0 ) ;
-            interp->LastLexedChar = interp->Lexer0->LastLexedChar ;
+            //interp->LastLexedChar = interp->Lexer0->LastLexedChar ;
             if ( token1 )
             {
                 Word * word0 = _Interpreter_TokenToWord ( interp, token1, - 1, - 1 ) ;

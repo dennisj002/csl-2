@@ -90,14 +90,14 @@ ct2
 Compiler Logic User
 
 : caseSwitchExample ( n ) 
-    case '1 { nl 1 p ; } 
-    case '2 { nl 2 p ; } 
-    case '3 { nl 3 p ; } 
-    case 3 { nl 3 p ; } 
-    case 77 { nl 77 p ; } 
-    case 'seven { nl 7 p ; } 
-    case 'eight { nl 8 p ; } 
-    case "nine" { nl 9 p ; } 
+    case '1 { nl 1 p } 
+    case '2 { nl 2 p } 
+    case '3 { nl 3 p } 
+    case 3 { nl 3 p } 
+    case 77 { nl 77 p } 
+    case 'seven { nl 7 p } 
+    case 'eight { nl 8 p } 
+    case "nine" { nl 9 p } 
     match ( n @ ) // either or ...
     //n @ switch
 ; 
@@ -139,7 +139,7 @@ csMatchEx ( 77 ) ;
 csMatchEx ( 3 ) ;
 csMatchEx ( 'eight ) ;
 csMatchEx ( 'nine ) ;
-csMatchEx ( '77 ) ;
+csMatchEx ( '77 ) ; // should not match : string != int
 cOff
 //pause
 
