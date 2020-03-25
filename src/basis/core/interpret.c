@@ -128,7 +128,7 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
         interp->w_Word = word ;
         if ( ! Interpreter_DoInfixOrPrefixWord ( interp, word ) ) Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->W_MorphismAttributes & DEBUG_WORD ) ) interp->LastWord = word ;
-        if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ; // with C_SYNTAX this is done in by _CSL_C_Infix_EqualOp or CSL_Interpret_C_Blocks
+        //if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ; // with C_SYNTAX this is done in by _CSL_C_Infix_EqualOp or CSL_Interpret_C_Blocks
     }
 }
 // interpret with find after parse for known objects

@@ -46,7 +46,7 @@ Word *
 Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
-    Word * word = DataObject_New ( CSL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
+    Word * word = DataObject_New ( CSL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
     word->W_TypeAttributes |= WT_C_PREFIX_RTL_ARGS ;
     return word ;
 }
@@ -307,7 +307,7 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
         if ( word->W_MorphismAttributes & IMMEDIATE ) Printf ( ( byte* ) ", %s", "immediate" ) ;
         if ( word->W_MorphismAttributes & PREFIX ) Printf ( ( byte* ) ", %s", "prefix" ) ;
         if ( word->W_MorphismAttributes & C_PREFIX ) Printf ( ( byte* ) ", %s", "c_prefix" ) ;
-        if ( word->W_MorphismAttributes & C_RETURN ) Printf ( ( byte* ) ", %s", "c_return" ) ;
+        //if ( word->W_MorphismAttributes & C_RETURN ) Printf ( ( byte* ) ", %s", "c_return" ) ;
         if ( word->W_MorphismAttributes & INFIXABLE ) Printf ( ( byte* ) ", %s", "infixable" ) ;
         if ( word->W_WordData )
         {

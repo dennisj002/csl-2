@@ -274,7 +274,7 @@
 #define WORD_CREATE ( (uint64) 1 << 50 ) 
 #define INTERPRET_DBG ( (uint64) 1 << 51 ) 
 #define INFIX_WORD      ( (uint64) 1 << 52 ) 
-#define C_RETURN        ( (uint64) 1 << 53 ) 
+//#define C_RETURN        ( (uint64) 1 << 53 ) 
 #define DLSYM_WORD      ( (uint64) 1 << 54 ) 
 
 #define RAX_RETURN          ( (uint64) 1 << 55 ) 
@@ -610,7 +610,7 @@
 #define SAVE_Rsp ( (uint64) 1 << 3 ) 
 #define RETURN_NONE ( (uint64) 1 << 5 ) 
 #define RETURN_TOS ( (uint64) 1 << 6 )
-#define RETURN_ACCUM ( (uint64) 1 << 7 ) 
+//#define RETURN_ACCUM ( (uint64) 1 << 7 ) 
 #define LISP_COMBINATOR_MODE ( (uint64) 1 << 8 )
 #define LISP_MODE ( (uint64) 1 << 9 )
 #define INFIX_MODE ( (uint64) 1 << 10 )

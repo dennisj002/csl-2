@@ -62,10 +62,10 @@ c_syntaxOff
 pwi factorial
 7 factorial dup p 5040 _assert sp //pause
 
-: fac ( n  | rec -- TOS ) 
+: fac ( n  | rec ) 
     rec 1 = 
     { n @ 1 > } { n @ rec @ * rec store n -- } while 
-    rec @ 
+    return rec
 ;
 ' fac find wdiss 
 7 fac dup p 5040 _assert //pause
@@ -142,14 +142,14 @@ Compiler C
 : _fib2 dup 2 < ? : dup -- _fib2 swap 2 - _fib2 + ; 
 ' _fib2 find wdiss 
 20 _fib2 nl dup p 6765 assert0 //pause
-: _fib1 ( n -- TOS ) { n @ 2 < } { n @ } { n @ -- _fib1 n @ 2 - _fib1 + } ifElse ;
+: _fib1 ( n ) { n @ 2 < } { n @ } { n @ -- _fib1 n @ 2 - _fib1 + } ifElse return tos ;
 // ' _fib1 find wdiss
  20 _fib1 dup p 6765 _assert0 
 c_syntaxOn
 int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; } }
 c_syntaxOff
 20 int._fib1c dup p 6765 _assert0 
-: fibPTC? ( n | fn fn1 fn2 -- TOS ) 
+: fibPTC? ( n | fn fn1 fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ } { n n @ 1 - = } 
     {   
         fn1 fn2 @ = 
@@ -157,7 +157,7 @@ c_syntaxOff
         fn fn1 @ fn2 @ + = 
     }
     for
-    fn @ 
+    return fn 
 ;
 ' fibPTC? find wdiss 
 20 fibPTC? dup p 6765 _assert0 
@@ -199,7 +199,7 @@ BigNum
 bnOn
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn " : should be 9" ps
 // 9 _assert //_assert won't work here, it is not compiled with BigNum
-: fibBN ( n | svn fn fn1 fn2 -- TOS ) 
+: fibBN ( n | svn fn fn1 fn2 ) 
     { svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -208,7 +208,7 @@ bnOn
     }
     for
     //nl svn @ fprint ":" ps fn @ fprint 
-    fn @
+    return fn
 ;
 sp
 nl 200 dup "\nfib" ps p "=" ps fibBN p //pause
@@ -485,7 +485,7 @@ pwi fib01
 pwi fib01
 20 fib01 dup p 6765 _assert sp
 scOn
-: fib01 ( REG n | fn fn1 REG fn2 -- TOS ) 
+: fib01 ( REG n | fn fn1 REG fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -494,11 +494,11 @@ scOn
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    fn @
+    return fn
 ;
 pwi fib01
 20 fib01 dup p 6765 _assert sp
-: fib01 ( REG n | fn REG fn1 REG fn2 -- TOS ) 
+: fib01 ( REG n | fn REG fn1 REG fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -507,11 +507,11 @@ pwi fib01
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    fn @
+    return fn
 ;
 pwi fib01
 20 fib01 dup p 6765 _assert sp
-: fib01 ( REG n | REG fn fn1 REG fn2 -- TOS ) 
+: fib01 ( REG n | fn fn1 REG fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -520,7 +520,7 @@ pwi fib01
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    fn @
+    return fn
 ;
 pwi fib01 
 20 fib01 dup p 6765 _assert sp

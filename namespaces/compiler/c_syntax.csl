@@ -193,7 +193,7 @@ interpret2
 using sp
 #if 1
 int
-fac4 ( n  | facc -- TOS ) 
+fac4 ( n  | facc ) 
 { 
     int facc = 1 ;
 #if 1

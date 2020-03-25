@@ -78,7 +78,7 @@ CPrimitive CPrimitives [] = {
     { "cfactorial3_O3", 0, 0, 0, CFactorial3_O3, 0, 0, 0, "C", "Root" },
     { "c_rtl", 0, 0, 0, CSL_C_Prefix, IMMEDIATE, 0, 0, "C", "Root" },
     { "c_prefix", 0, 0, 0, CSL_C_Prefix, IMMEDIATE, 0, 0, "C", "Root" },
-    { "c_return", 0, 0, 0, CSL_C_Return, IMMEDIATE, 0, 0, "C", "Root" },
+    //{ "c_return", 0, 0, 0, CSL_C_Return, IMMEDIATE, 0, 0, "C", "Root" },
     { "void_return", 0, 0, 0, CSL_Void_Return, IMMEDIATE, 0, 0, "C", "Root" },
     { "rax_return", 0, 0, 0, CSL_RAX_Return, IMMEDIATE, 0, 0, "C", "Root" },
     { ",", 0, 0, 0, CSL_C_Comma, IMMEDIATE | NO_OP_WORD | RIGHT_PAREN | KEYWORD, 0, 0, "C", "Root" },
@@ -441,6 +441,7 @@ CPrimitive CPrimitives [] = {
 
     { "_dup", "A.AA", 0, 0, CSL_Dup, CATEGORY_DUP | KEYWORD | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
     { "dup", "A.AA", 0, 0, CSL_Dup, IMMEDIATE | KEYWORD | CATEGORY_DUP | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
+    { "tos", "A.AA", 0, 0, CSL_Tos, IMMEDIATE | KEYWORD | CATEGORY_DUP | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
     { "ndup", 0, 0, 0, CSL_NDup, CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "drop", 0, 0, 0, CSL_Drop, IMMEDIATE | KEYWORD | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "dropN", 0, 0, 0, CSL_DropN, IMMEDIATE | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },

@@ -489,7 +489,7 @@ rtw
 #if 1 
 c_syntaxOn
 int
-faccs ( REG int32 n | REG in64 rec -- RAX ) 
+faccs ( REG int32 n | REG in64 rec ) 
 {
     rec = 1 ; 
     while ( n > 1 )
@@ -505,6 +505,6 @@ c_syntaxOff
 #endif
 
 #if forStarters 
-: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 d: _assert
+: hi ( n m ) n @ m @ + dup <dbg> p return tos ; 2 3 d: hi 5 d: _assert
 #endif 
 2 + 7 assertStkChk // stack checking 

@@ -24,10 +24,10 @@ mem
 
 lispOff //pause
 Int
-: fac ( n  | rec1 -- TOS ) 
+: fac ( n  | rec1 ) 
     rec1 1 = 
     { n @ 1 > } { n @ rec1 @ * rec1 store n -- } while 
-    rec1 @ 
+    return rec1
 ;
 ' fac find wdiss
 7 fac dup p 5040 _assert0 

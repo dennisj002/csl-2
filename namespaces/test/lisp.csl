@@ -204,7 +204,7 @@ tick bexp44 find wdiss //pause
 
 s
 lispOff
-: goedel3 (| n -- TOS ) 
+: goedel3 (| n ) 
     "\n goedel3 :: " ps 
     n 9 =
     { 
@@ -221,6 +221,7 @@ lispOff
         n @ dup p 7 "goedel3_assert5" assert
     } ix // n should be garbage here
     n @ dup p
+    return tos
 ;
 //' goedel3 find wdiss pause   
 "goedel3 :: " ps 
@@ -228,7 +229,7 @@ lispOff
 //pause
 Debug Lisp 
 ( :: 
-    : goedel6 (| n -- TOS ) 
+    : goedel6 (| n ) 
         "\n goedel6 :: " ps 
         n 9 =
         { 
@@ -243,6 +244,7 @@ Debug Lisp
             n @ dup p 7 "goedel6_4_assert" assert 
         } ix // n should be garbage here
         n @ dup p
+        return tos
     ; ".I" typeSignature
     ' goedel6 find wdiss //pause   
     9 goedel6 "goedel6_0_assert" assert
@@ -251,7 +253,7 @@ Debug Lisp
 scOn
 ( ::
     "\ngoedel8 output : " ps  
-    : goedel8 (| n -- TOS -t "V.I"  ) 
+    : goedel8 (| n -t "V.I"  ) 
         n 1 =
         { 
             'n var n @ p 
@@ -267,6 +269,7 @@ scOn
             n @ dup p 10 "goedel8_5_assert" assert 
         } ix // first n should be garbage here; second 7
         n @ 8 + dup p
+        return tos 
     ;
     goedel8 9 "goedel8_6_assert" assert1 "\ngoedel8 output should read : \n'junk' 2 'junk' 7 'junk' 10 9" ps //pause
 ) 

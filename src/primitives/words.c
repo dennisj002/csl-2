@@ -344,6 +344,7 @@ CSL_C_Prefix ( void )
     }
 }
 
+#if 0
 void
 CSL_C_Return ( void )
 {
@@ -354,6 +355,7 @@ CSL_C_Return ( void )
         word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
     }
 }
+#endif
 
 void
 CSL_Void_Return ( void )
@@ -361,7 +363,7 @@ CSL_Void_Return ( void )
     Word * word = _CSL_->LastFinished_Word ;
     if ( word )
     {
-        word->W_MorphismAttributes &= ~ C_RETURN ;
+        //word->W_MorphismAttributes &= ~ C_RETURN ;
         word->W_MorphismAttributes |= VOID_RETURN ;
         if ( GetState ( _Context_, C_SYNTAX ) )
         {
@@ -377,7 +379,7 @@ CSL_RAX_Return ( void )
     Word * word = _CSL_->LastFinished_Word ;
     if ( word )
     {
-        word->W_MorphismAttributes &= ~ C_RETURN ;
+        //word->W_MorphismAttributes &= ~ C_RETURN ;
         word->W_MorphismAttributes |= RAX_RETURN ;
     }
 }

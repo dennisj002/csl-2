@@ -39,10 +39,10 @@ factoriali ( 7 ) ; p () ;
 'factoriali find wdiss //pause
 factoriali (7) ; dup p 5040 _assert //pause //sp
 c_syntaxOff 
-: factorial ( n  | fac -- TOS ) 
+: factorial ( n  | fac ) 
     fac 1 = 
     { n @ 1 > } { n @ fac @ * fac store n -- } while 
-    fac @ 
+    return fac 
 ;
 7 factorial dup p 5040 _assert
 : qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp dup p 5040 _assert 'qexp find wdiss
@@ -54,13 +54,13 @@ c_syntaxOff
 pwi bexp3 //pause
 c_syntaxOn
 int
-faccs3 ( n | rec -- TOS ) 
+faccs3 ( n | rec ) 
 {
     for ( rec = 1 ; n > 1 ; n-- )
     { 
         rec = rec * n ; 
     } 
-    //return facc ;
+    return rec ;
 }
 ' faccs3 find wdiss
 faccs3 ( 7 ) dup p 5040 _assert 
@@ -83,7 +83,7 @@ fac5 ( 7 ) dup p 5040 _assert
 sp
 
 int
-faccs ( REG n | REG rec -- RAX ) 
+faccs ( REG n | REG rec ) 
 {
     rec = 1 ; 
     while ( n > 1 )
@@ -123,10 +123,10 @@ faccs2 ( 7 ) dup p 5040 _assert
 sp
 c_syntaxOff
 Locals User
-: fac ( n  | res -- TOS ) 
+: fac ( n  | res ) 
     res 1 = 
     { n @ 1 > } { res n @ res @ * = n -- } while 
-    res @ 
+    return res
 ;
 7 fac dup p 5040 _assert 
 // : bexp2 ( n | res ) { n @ 1 <= } { 1 } { n @ dup -- bexp2 * } ifElse ;
@@ -135,7 +135,7 @@ Locals User
 sp
 User
 //'dn 'dfnba find alias  
-: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 jcc8_Off
 'reps0 var
 : _ifx ( w | j ) 
@@ -331,7 +331,7 @@ c_syntaxOff
 : sp ;
 sp
 
-: _fibn1 ( n -- TOS ) { n @ 2 < } { n @ } { n -- n @ _fibn1 n -- n @  _fibn1 + } ifElse ;
+: _fibn1 ( n ) { n @ 2 < } { n @ } { n -- n @ _fibn1 n -- n @  _fibn1 + } ifElse return tos ;
 ' _fibn1 find wdiss 20 _fibn1 p // sp
 : _fib1 ( n ) { n @ 2 < } { n @ } { n @ -- _fib1 n @ 2 - _fib1 + } ifElse ;
 sp
@@ -443,7 +443,7 @@ bnOn
 : sp ;
 sp
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn nl "should be 9" ps
-: fibBN ( n | fn fn1 fn2 -- TOS ) 
+: fibBN ( n | fn fn1 fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -452,7 +452,7 @@ sp
     }
     for
     // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
+    return fn
 ;
 ' fibBN find wdiss
 20 fibBN p 

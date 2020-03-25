@@ -142,13 +142,14 @@ CSL_Label_Prefix ( )
 }
 
 // 'return' is a prefix word now C_SYNTAX or not
-
+#if 1
+// not satisfied yet with how 'return' works with blocks and locals ???
 void
 CSL_Return ( )
 {
     Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-    Word * word = Finder_Word_FindUsing (_Finder_, token, 0) ;
+    Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
     int64 tsrli = - 1, scwi = - 1 ;
     Word_SetTsrliScwi ( word, tsrli, scwi ) ;
     if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
@@ -170,6 +171,7 @@ CSL_Return ( )
         }
         //Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
     }
+    else if ( word->W_MorphismAttributes & (CATEGORY_DUP) ) _Compiler_->State |= RETURN_TOS ;
     else
     {
         if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
@@ -179,6 +181,36 @@ CSL_Return ( )
         }
     }
 }
+#else
+
+void
+CSL_Return ( )
+{
+    Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+    Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+    int64 tsrli = - 1, scwi = - 1 ;
+    Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+    if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
+    {
+        Lexer_ReadToken ( _Lexer_ ) ;
+        CSL_WordList_PushWord ( word ) ;
+        _Compiler_->ReturnVariableWord = word ;
+        if ( GetState ( _CSL_, TYPECHECK_ON ) )
+        {
+            Word * cwbc = _Context_->CurrentWordBeingCompiled ;
+            if ( ( word->W_ObjectAttributes & LOCAL_VARIABLE ) && cwbc )
+            {
+                cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs] = '.' ;
+                int8 swtsCodeSize = Tsi_ConvertTypeSigCodeToSize ( Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ) ;
+                int8 cwbctsCodeSize = Tsi_ConvertTypeSigCodeToSize ( cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] ) ;
+                if ( swtsCodeSize > cwbctsCodeSize )
+                    cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
+            }
+        }
+    }
+}
+#endif
 
 void
 CSL_Continue ( )
@@ -204,7 +236,7 @@ CSL_Literal ( )
     int64 value = DataStack_Pop ( ) ;
     ByteArray * svcs = _O_CodeByteArray ;
     _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->MemorySpace0->TempObjectSpace, 4 * K ) ;
-    Word * word = DataObject_New (LITERAL, 0, ( byte* ) "<literal>", 0, LITERAL | CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
+    Word * word = DataObject_New ( LITERAL, 0, ( byte* ) "<literal>", 0, LITERAL | CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
     Set_CompilerSpace ( svcs ) ;
     Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }
@@ -216,17 +248,17 @@ CSL_Constant ( )
     int64 value = DataStack_Pop ( ) ;
     tword = CSL_TypeStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    cword = DataObject_New (CONSTANT, 0, name, 0, CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
+    cword = DataObject_New ( CONSTANT, 0, name, 0, CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
     if ( tword ) cword->W_ObjectAttributes |= tword->W_ObjectAttributes ;
-    CSL_Finish_WordSourceCode (_CSL_, cword , 0) ;
+    CSL_Finish_WordSourceCode ( _CSL_, cword, 0 ) ;
 }
 
 void
 CSL_Variable ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    Word * word = DataObject_New (NAMESPACE_VARIABLE, 0, name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
-    if ( ! Compiling ) CSL_Finish_WordSourceCode (_CSL_, word , 0) ;
+    Word * word = DataObject_New ( NAMESPACE_VARIABLE, 0, name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
+    if ( ! Compiling ) CSL_Finish_WordSourceCode ( _CSL_, word, 0 ) ;
 }
 
 // "{|" - exit the Compiler start interpreting
@@ -254,7 +286,7 @@ _CSL_RightBracket ( )
 void
 CSL_RightBracket ( )
 {
-    if ( ! Compiling ) Compiler_Init (_Compiler_, 0) ;
+    if ( ! Compiling ) Compiler_Init ( _Compiler_, 0 ) ;
     _CSL_RightBracket ( ) ;
 }
 

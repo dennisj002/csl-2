@@ -346,8 +346,7 @@ Compile_LogicalNot ( Compiler * compiler )
     else
     {
         if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ; // PREFIX_PARSING : nb! could be a prefix function 
-        else if ( one->W_MorphismAttributes & RAX_RETURN ) ; // do nothing
-        else _Compile_Stack_PopToReg ( DSP, ACC ) ;
+        else if ( ! ( one->W_MorphismAttributes & RAX_RETURN ) ) _Compile_Stack_PopToReg ( DSP, ACC ) ;
     }
     _Compile_LogicalNot ( compiler ) ;
 }

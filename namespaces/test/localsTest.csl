@@ -50,9 +50,9 @@ sp
 : hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey nl     
 C
 dscOn //verbosity 3 =
-: hi ( m x | n -- n ) n m @ = n @ p ; 
-: hey ( m x | n -- n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p ; 
-: heey ( m x | n -- n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p ; 
+: hi ( m x | n ) n m @ = n @ p return n ; 
+: hey ( m x | n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p return n ; 
+: heey ( m x | n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p return n ; 
 7 1 heey dup p 7 _assert verbosity 1 = //pause
 nl
 // demonstrate calling order of local variables
@@ -76,9 +76,9 @@ sp
 : hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey       
 C
 dscOn //verbosity 3 =
-: hi ( m x | n -- n ) n m @ = n @ p ; 
-: hey ( m x | n -- n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p ; 
-: heey ( m x | n -- n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p ; 
+: hi ( m x | n ) n m @ = n @ p return n ; 
+: hey ( m x | n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p return n ; 
+: heey ( m x | n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p return n ; 
 7 1 heey dup p 7 _assert verbosity 1 = //pause
 
 // demonstrate calling order of local variables
@@ -219,7 +219,7 @@ nl "goedel :: " ps sp goedel sp
 'goedel2 find wdiss
 nl "goedel2 :: " ps sp goedel2 sp
 
-: goedel4 (| n -- TOS ) 
+: goedel4 (| n ) 
     nl "goedel4 :: " ps nl
     n 9 =
     { 
@@ -237,11 +237,12 @@ nl "goedel2 :: " ps sp goedel2 sp
         n @ p n @ 7 "goedel4_4_assert" assert // 7
     } ix 
     n @ dup p // 9
+    return tos
 ; ".I" typeSignature
 ' goedel4 find wdiss     
 sp 9 goedel4 sp "goedel4_0_assert" assert //pause
 "\ngoedel4 :: output should have read : \n'junk' 2 'junk' 7 'junk' 7 7 9" ps //pause
-: goedel5 (| n -- TOS ) 
+: goedel5 (| n ) 
     nl "goedel5 :: " ps nl
     n 9 =
     { 
@@ -256,11 +257,12 @@ sp 9 goedel4 sp "goedel4_0_assert" assert //pause
         n @ dup p 7 "goedel5_4_assert" assert // 7
     } ix // n should be garbage here
     n @ dup p
+    return tos
 ; ".I" typeSignature
 9 sp goedel5 sp "goedel5_0_assert" assert 
 "\ngoedel5 :: output should read : junk' 2 'junk' 7 7 9" ps //pause
 //s pause
-: goedel6 (| n -- TOS ) 
+: goedel6 (| n ) 
     nl "goedel6 :: " ps nl
     n 9 =
     { 
@@ -275,12 +277,13 @@ sp 9 goedel4 sp "goedel4_0_assert" assert //pause
         n @ dup p 7 "goedel6_4_assert" assert 
     } ix // n should be garbage here
     n @ dup p
+    return tos
 ; ".I" typeSignature
 //' goedel6 find wdiss pause   
 9 sp goedel6 sp "goedel6_0_assert" assert
 "\ngoedel6 :: goedel6 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause
 
-: goedel7 (| n -- TOS ) 
+: goedel7 (| n ) 
     nl "goedel7 :: " ps nl
     n 1 =
     { 
@@ -294,6 +297,7 @@ sp 9 goedel4 sp "goedel4_0_assert" assert //pause
         n 7 += 
     } ix 
     n @ 8 + dup p
+    return tos
 ; ".I" typeSignature
 //' goedel7 find wdiss pause   
 nl "goedel7 :: " ps nl

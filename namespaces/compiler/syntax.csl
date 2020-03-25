@@ -3,29 +3,29 @@ User Compiler
 infixOn 
 : _assert1 _assert s ;
 : sp ; //stack pause ; sp
-: hi ( | x -- TOS ) x = ( 2 + ( 3 * 4 ) ), x dup p ; // x p : infix mode 
+: hi ( | x ) x = ( 2 + ( 3 * 4 ) ), x p return x ; // x p : infix mode 
 ' hi find wdiss
 hi 14 _assert1 //pause
 sp
 dscOn
-: hi1 ( a b | x -- x ) x = 2 + ( ( a ) / ( b ) ) * ( 3 * 4 ) ; 
+: hi1 ( a b | x ) x = 2 + ( ( a ) / ( b ) ) * ( 3 * 4 ) return x ; 
 ' hi1 find wdiss
 6 3 hi1 dup p 48 _assert //pause
-: hi1 ( a b | x -- x ) x = ( 2 + ( a / b ) * ( 3 * 4 ) ) ; 
+: hi1 ( a b | x ) x = ( 2 + ( a / b ) * ( 3 * 4 ) ) return x ; 
 ' hi1 find wdiss
 6 3 hi1 dup p 48 _assert //pause
 
 10 5 hi1 dup p 48 _assert1
-: hi2 ( a b | x -- x ) ( x = ( ( ( ( 2 + ( a / b ) ) * ( ( 3 * 4 ) ) ) ) ) ) ; 
+: hi2 ( a b | x ) ( x = ( ( ( ( 2 + ( a / b ) ) * ( ( 3 * 4 ) ) ) ) ) ) return x ; 
 ' hi2 find wdiss
 6 3 hi2 dup p 48 _assert1
 sp
 10 5 hi2 dup p 48 _assert1
-: h3 ( a b | x -- x ) ( x = ( ( ( ( 2 + ( ( 3 * 4 ) ) - ( (a) / (b) ) ) ) ) ) ) ; 
+: h3 ( a b | x ) ( x = ( ( ( ( 2 + ( ( 3 * 4 ) ) - ( (a) / (b) ) ) ) ) ) ) return x ; 
 ' h3 find wdiss
 6 3 h3 dup p 12 "6 3 h3_assert1" assert
 10 5 h3 dup p 12 _assert1
-: h4 ( a b | x -- x ) x = ( 20 - ( 3 * 4 ) - ( a / b ) ) ; 
+: h4 ( a b | x ) x = ( 20 - ( 3 * 4 ) - ( a / b ) ) return x ; 
 ' h4 find wdiss
 6 3 h4 dup p 6 _assert1
 10 5 h4 dup p 6 _assert1

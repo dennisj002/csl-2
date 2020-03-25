@@ -425,7 +425,7 @@ forStarters 0 =
 '_doDemo 0 const
     
 //dbgOff
-//dbgOn 
+dbgOn 
 // === controls ===
 
 #if Is_DebugOn 
@@ -460,7 +460,7 @@ rtw
 
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
 #if forStarters @ 
-: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; pwi hi 2 3 d: hi 5 _assert
+: hi ( n m ) n @ m @ + dup <dbg> p return tos ; pwi hi 2 3 d: hi 5 _assert
 #endif 
 2 + 7 assertStkChk // stack checking 
 

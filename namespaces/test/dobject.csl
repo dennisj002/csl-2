@@ -1,4 +1,6 @@
-5
+5   
+#if 1
+
 : sp ; //stack pause ;
 "\ndynamic object test\n" ddps
 DObject 
@@ -19,14 +21,18 @@ o4.x @ 123 "object clone test4 : " assert1
 o4.ay @ 2 "object clone test5 : " assert1
 : ott o1.x.zzz 456 = o1.x.zzz @ ; ".I" typeSignature
 ott 456 "object compile test6 : " assert1
-: ott2 ( n -- TOS ) o1.x.xxy n @ =  o1.x.zzx o1.x.xxy @ = o1.x.zzx @  ;
+: ott2 ( n ) o1.x.xxy n @ =  o1.x.zzx o1.x.xxy @ = o1.x.zzx @ return tos ;
 987 dup ott2 "object compile test7 : " assert1    
-: ott3 ( n -- TOS ) 
+: ott3 ( n ) 
     o1.x.xxy.a n @ = 
     o1.x.zzx  o1.x.xxy.a @ = 
     o1.x.zzx @  
+    return tos
 ;
 123987 dup ott3 "object compile test8 : " assert1   
 sp 
 "DO_Experimental" notUsing
+
+#endif
+    
 2 + 7 assertStkChk // stack checking

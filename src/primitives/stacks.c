@@ -51,6 +51,15 @@ CSL_Dup ( )
     else DataStack_Dup ( ) ;
     CSL_TypeStack_Dup ( ) ;
 }
+
+void
+CSL_Tos ( )
+{
+    if ( CompileMode ) _Compile_Stack_Dup ( DSP ) ;
+    else DataStack_Dup ( ) ;
+    CSL_TypeStack_Dup ( ) ;
+    _Compiler_->State |= RETURN_TOS ;
+}
 #if 0
 void
 CSL_Ndrop ( )
