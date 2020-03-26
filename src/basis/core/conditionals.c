@@ -82,6 +82,7 @@ _CS_Match ( uint64 allocType )
     word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
     if ( GetState ( _Context_, C_SYNTAX ) ) CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;
     Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+    //if ( GetState ( _Context_, C_SYNTAX ) ) DataStack_DropN ( 1 ) ;
     _Do_LiteralValue ( ( int64 ) _Compiler_->CurrentMatchList ) ;
     Compile_Call_TestRSP ( ( byte* ) MatchAccessFunction ) ;
     if ( GetState ( _Context_, C_SYNTAX ) ) DataStack_DropN ( 1 ) ;

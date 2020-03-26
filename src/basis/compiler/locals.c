@@ -206,13 +206,13 @@ CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
         byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
         Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
         Boolean isForwardDotted = word ? ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) : 0 ;
-        if ( isForwardDotted || (word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) )
+        if ( isForwardDotted || ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) )
         {
             if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
             do
             {
                 Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
-                word = Interpreter_DoWord_Default ( _Interpreter_, word, -1, -1 ) ;
+                word = Interpreter_DoWord_Default ( _Interpreter_, word, - 1, - 1 ) ;
                 if ( ( token[0] != '@' ) && ( token[0] != ')' ) ) compiler->ReturnLParenVariableWord = word ;
                 token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
                 word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
@@ -267,7 +267,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
             Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC, 0 ) ;
         // need to copy because ReturnVariableWord may have been used within the word already
     }
-    else if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag ) ) 
+    else if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag ) )
     {
         Word * one = GetState ( compiler, LISP_MODE ) ? 0 : WordStack ( 1 ) ;
         if ( one && one->StackPushRegisterCode )

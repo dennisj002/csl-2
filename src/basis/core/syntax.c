@@ -115,6 +115,15 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                 else CSL_C_Semi ( ) ;
                 break ;
             }
+            case 'r':
+            {
+                if ( String_Equal ( ( char* ) token, "return" ) )
+                {
+                    CSL_Return ( ) ;
+                    continue ;
+                 }
+                else goto doDefault ;
+            }
             case 'e':
             {
                 if ( String_Equal ( ( char* ) token, "else" ) )
@@ -133,7 +142,7 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                 }
                 // ... drop thru to default:
             }
-doDefault:
+ doDefault:
             default:
             {
                 word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;

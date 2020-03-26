@@ -141,37 +141,37 @@ csMatchEx ( 'eight ) ;
 csMatchEx ( 'nine ) ;
 csMatchEx ( '77 ) ; // should not match : string != int
 cOff
-pause
+//pause
 
-#if 0
+#if 1
 void
 csMatchExWithReturn ( n )
 {
     match n
     {
         case '1 { nl p (1) ; return n ; } 
-        case '2 { nl p (2) return n ; } 
-        case '3 { nl p (3) return n ; } 
-        case 3 { nl p (3) return n ; } 
-        case 77 { nl p (77) return n ; } 
-        case 'seven { nl p (7) return n ; } 
-        case 'eight { nl p (8) return n ; } 
-        case "nine" { nl p (9) return n ; } 
+        case '2 { nl p (2) ; return n ; } 
+        case '3 { nl p (3) ; return n ; } 
+        case 3 { nl p (3) ; return n ; } 
+        case 77 { nl p (77) ; return n ; } 
+        case 'seven { nl p (7) ; return n ; } 
+        case 'eight { nl p (8) ; return n ; } 
+        case "nine" { nl p (9) ; return n ; } 
     } 
 }
 pwi csMatchExWithReturn
-csMatchExWithReturn ( 'seven ) ;
-csMatchExWithReturn ( "seven" ) ;
-csMatchExWithReturn ( '3 ) ;
-csMatchExWithReturn ( '2 ) ;
-csMatchExWithReturn ( '1 ) ;
-csMatchExWithReturn ( 77 ) ;
-csMatchExWithReturn ( 3 ) ;
-csMatchExWithReturn ( 'eight ) ;
-csMatchExWithReturn ( 'nine ) ;
-csMatchExWithReturn ( '77 ) ; // should not match : string != int
+csMatchExWithReturn ( 'seven ) ; ps
+csMatchExWithReturn ( "seven" ) ; ps
+csMatchExWithReturn ( '3 ) ; ps
+csMatchExWithReturn ( '2 ) ; ps
+csMatchExWithReturn ( '1 ) ; ps
+csMatchExWithReturn ( 77 ) ; p
+csMatchExWithReturn ( 3 ) ; p
+csMatchExWithReturn ( 'eight ) ; ps
+csMatchExWithReturn ( 'nine ) ; ps
+csMatchExWithReturn ( '77 ) ; ps // should not match : string != int
 cOff
-pause
+//pause
 #endif
 
 : t0 1 2 > if_ 1 p jmpHere 2 p ; 
