@@ -221,13 +221,7 @@ CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
             }
             while ( token [0] != ')' ) ;
             Word_Check_ReSet_To_Here_StackPushRegisterCode ( compiler->ReturnLParenVariableWord, 0 ) ;
-            //if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-            //if ( ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) && ( ! ( GetState ( _Compiler_, DOING_CASE ) ) ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-            if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
-            {
-                //if ( GetState ( _Compiler_, DOING_CASE ) ) _Compile_Stack_DropN ( RSP, RSP_DROP ) ;
-                _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-            }
+            if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
             return ;
         }
     }
@@ -242,20 +236,12 @@ CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
     {
         if ( readTokenFlag ) Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
         CSL_WordList_PushWord ( word ) ;
-        //compiler->ReturnVariableWord = word ;
-        //if ( ! ( word->W_ObjectAttributes & ( REGISTER_VARIABLE ) ) ) Compile_GetVarLitObj_RValue_To_Reg ( word, ACC, 0 ) ;
         word = Interpreter_DoWord_Default ( _Interpreter_, word, - 1, - 1 ) ;
         token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
         if ( token[0] == '@' ) Interpreter_InterpretNextToken ( _Interpreter_ ) ;
         Word_Check_ReSet_To_Here_StackPushRegisterCode ( word, 1 ) ;
         compiler->ReturnLParenVariableWord = word ;
-        //if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-        //if ( ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) && ( ! ( GetState ( _Compiler_, DOING_CASE ) ) ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
-        {
-            //if ( GetState ( _Compiler_, DOING_CASE ) ) _Compile_Stack_DropN ( RSP, RSP_DROP ) ;
-            _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-        }
+        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
         if ( GetState ( _CSL_, TYPECHECK_ON ) )
         {
             Word * cwbc = _Context_->CurrentWordBeingCompiled ;
@@ -269,13 +255,7 @@ CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
             }
         }
     }
-    else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
-    {
-        //if ( GetState ( _Compiler_, DOING_CASE ) ) _Compile_Stack_DropN ( RSP, RSP_DROP ) ;
-        _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-
-    }
-    //if ( ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) && ( ! ( GetState ( _Compiler_, DOING_CASE ) ) ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+    else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
 }
 
 // Compiler_RemoveLocalFrame : the logic definitely needs to be simplified???
