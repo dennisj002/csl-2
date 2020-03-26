@@ -231,7 +231,13 @@ CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
             return ;
         }
     }
-    if ( word->W_MorphismAttributes & ( T_TOS ) ) SetState ( compiler, RETURN_TOS, true ) ;
+    if ( word->W_MorphismAttributes & ( T_TOS ) ) 
+    {
+        SetState ( compiler, RETURN_TOS, true ) ;
+        byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ; //mov [r14], rax
+        if ( memcmp ( mov_r14_rax, Here - 3, 3 ) )
+            Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
+    }
     else if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
     {
         if ( readTokenFlag ) Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
@@ -286,17 +292,9 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     Word * returnWord = compiler->ReturnVariableWord ? compiler->ReturnVariableWord : compiler->ReturnLParenVariableWord ;
     Boolean returnValueFlag = GetState ( compiler, RETURN_TOS ) || returnWord ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
-    if ( GetState ( compiler, RETURN_TOS ) ) 
-    {
-        // probably needs to be in CSL_DoReturnWord and not in this cryptic form
-        byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ; //mov [r14], rax
-        if ( memcmp ( mov_r14_rax, Here - 3, 3 ) )
-            Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
-    }
     if ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs )
     {
         // remove the incoming parameters -- like in C
-        //if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
         _Compile_LEA ( DSP, FP, 0, - CELL ) ; // restore sp - release locals stack frame
         _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
     }

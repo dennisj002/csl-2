@@ -56,8 +56,9 @@ nl "1000 ! = " ps x @ fprint nl
 'aexp find wdiss //sp
 : bexp ( n ) { n @ 1 <= } { 1 } { n @ dup 1 - bexp * } ifElse return tos ; 
 : bexp0 ( n ) { n @ 1 <= } { 1 } { n @ dup -- bexp0 * } ifElse return tos ; 
-' bexp find wdiss ' bexp0 find wdiss
-7 bexp0 p //pause
+' bexp find wdiss ' bexp0 find wdiss 
+7 bexp0 p 
+//pause
 7 ! p 8 ! p 8 ! p
 nl 7 ! p
 //pause
