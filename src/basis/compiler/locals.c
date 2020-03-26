@@ -197,6 +197,7 @@ Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 }
 
 //#define RSP_DROP 2
+
 void
 CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
 {
@@ -222,11 +223,11 @@ CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
             Word_Check_ReSet_To_Here_StackPushRegisterCode ( compiler->ReturnLParenVariableWord, 0 ) ;
             //if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
             //if ( ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) && ( ! ( GetState ( _Compiler_, DOING_CASE ) ) ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
-        {
-            //if ( GetState ( _Compiler_, DOING_CASE ) ) _Compile_Stack_DropN ( RSP, RSP_DROP ) ;
-            _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-        }
+            if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+            {
+                //if ( GetState ( _Compiler_, DOING_CASE ) ) _Compile_Stack_DropN ( RSP, RSP_DROP ) ;
+                _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+            }
             return ;
         }
     }
@@ -282,35 +283,28 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
     if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     int64 parameterVarsSubAmount = 0 ;
-    Boolean returnValueFlag, already = false ;
     Word * returnWord = compiler->ReturnVariableWord ? compiler->ReturnVariableWord : compiler->ReturnLParenVariableWord ;
-    returnValueFlag = GetState ( compiler, RETURN_TOS ) || returnWord ;
+    Boolean returnValueFlag = GetState ( compiler, RETURN_TOS ) || returnWord ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
-    // nb. these variables have no lasting lvalue - they exist on the stack - we can only return their rvalue
-    if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag ) )
+    if ( GetState ( compiler, RETURN_TOS ) ) 
     {
-        if ( ! compiler->ReturnLParenVariableWord )
-        {
-            byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ; //mov [r14], rax
-            if ( memcmp ( mov_r14_rax, Here - 3, 3 ) )
-                Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
-        }
+        // probably needs to be in CSL_DoReturnWord and not in this cryptic form
+        byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ; //mov [r14], rax
+        if ( memcmp ( mov_r14_rax, Here - 3, 3 ) )
+            Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
     }
     if ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs )
     {
         // remove the incoming parameters -- like in C
-        if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
+        //if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
         _Compile_LEA ( DSP, FP, 0, - CELL ) ; // restore sp - release locals stack frame
         _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
     }
     if ( ( parameterVarsSubAmount > 0 ) && ( ! IsWordRecursive ) ) Compile_SUBI ( REG, DSP, 0, parameterVarsSubAmount, 0 ) ; // remove stack variables
-    else if ( ! already )
-    {
         // add a place on the stack for return value
-        if ( parameterVarsSubAmount < 0 ) Compile_ADDI ( REG, DSP, 0, abs ( parameterVarsSubAmount ), 0 ) ;
-        else if ( returnValueFlag && ( ! compiler->NumberOfNonRegisterArgs ) && ( parameterVarsSubAmount == 0 ) && ( ! compiler->NumberOfArgs ) )
-            Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
-    }
+    else if ( parameterVarsSubAmount < 0 ) Compile_ADDI ( REG, DSP, 0, abs ( parameterVarsSubAmount ), 0 ) ;
+    else if ( returnValueFlag && ( ! compiler->NumberOfNonRegisterArgs ) && ( parameterVarsSubAmount == 0 ) && ( ! compiler->NumberOfArgs ) )
+        Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
     // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
     if ( returnValueFlag || IsWordRecursive )
     {

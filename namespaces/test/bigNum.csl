@@ -60,7 +60,7 @@ nl "1000 ! = " ps x @ fprint nl
 7 bexp0 p //pause
 7 ! p 8 ! p 8 ! p
 nl 7 ! p
-
+//pause
 //"!" ' qexp find alias
 //"!" ' aexp find alias
 //"!" ' bexp find alias

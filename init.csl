@@ -1,3 +1,4 @@
+//_dbgOn 
 5 // stack checking marker
 Root 
 jcc8_Off
@@ -199,11 +200,15 @@ BigNum
 // the result is padded with blank spaces. The value is not truncated even if the result is larger."
 : bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
 //'bnInit find wdis 
+
 bnInit ( 16 16 )
+
 Root
 : bigNumOff "BigNum" notUsing ;
+
 'bnOff 'bigNumOff find alias
 : bnOn BigNum bnInit ( 16 16 ) ;
+
 : _bassert ( n m ) { n @ m @ != } { nl "error" ps _info pause } if ; 
 bnOff
 
@@ -219,7 +224,7 @@ Namespace
 : notUsing: { token dup ";" strcmp } { notUsing } while drop ; 
 : usingLast: { token dup ";" strcmp } { usingLast } while drop ; 
 notUsing: PrefixCombinators C Lisp ;
-sp
+
 System
 "Black" 0 const
 "Red" 1 const
@@ -390,7 +395,7 @@ Lisp OpenVmTil
 : lispOn lcOn ;
 postfixOn 
 Root
-sp 
+ 
 : ash _sh ; prefix
 
 //================================================================================
