@@ -158,7 +158,7 @@ csMatchExWithReturn ( n | x rtn )
         case 'eight { nl ; p (8) ; rtn = n ; } 
         case "nine" { nl ; p (9) ; rtn = x ; } 
     } 
-    p ( x + 1 ) ;
+    p ( x - 103 ) ;
     return rtn ;
 }
 pwi csMatchExWithReturn
@@ -173,7 +173,7 @@ csMatchExWithReturn ( 'eight ) ; ps
 csMatchExWithReturn ( 'nine ) ; p
 csMatchExWithReturn ( '77 ) ; p // should not match : string != int
 cOff
-pause
+//pause
 
 : t0 1 2 > if_ 1 p jmpHere 2 p ; 
 : t1 1 2 > if_ 1 p _else_ 2 p _fi ; 

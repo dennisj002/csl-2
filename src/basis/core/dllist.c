@@ -575,6 +575,17 @@ dllist_Map1 ( dllist * list, MapFunction1 mf, int64 one )
 }
 
 void
+dllist_Map1_Break ( dllist * list, MapFunction1 mf, int64 one )
+{
+    dlnode * node, *nextNode ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ;
+        if ( mf ( node, one ) ) break;
+    }
+}
+
+void
 dllist_Map1_FromNode ( dlnode * node0, MapFunction1 mf, int64 one )
 {
     dlnode *node, *nextNode, *previousNode ;

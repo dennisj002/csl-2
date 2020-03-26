@@ -1,6 +1,6 @@
 #include "../../include/csl.h"
 
-void
+Boolean
 Match_MapFunction ( dlnode * node, uint64 switchValue )
 {
     CaseNode * cnode = ( CaseNode* ) node ;
@@ -8,14 +8,20 @@ Match_MapFunction ( dlnode * node, uint64 switchValue )
         && String_Equal ( cnode->CN_CaseBytePtrValue, ( byte* ) switchValue ) )
     {
         ( ( block ) ( cnode->CN_CaseBlock ) ) ( ) ;
+        return true ;
     }
-    else if ( switchValue == cnode->CN_CaseUint64Value ) ( ( block ) ( cnode->CN_CaseBlock ) ) ( ) ;
+    else if ( switchValue == cnode->CN_CaseUint64Value ) 
+    {
+        ( ( block ) ( cnode->CN_CaseBlock ) ) ( ) ;
+        return true ;
+    }
+    else return false ;
 }
 
 void
 MatchAccessFunction ( )
 {
-    dllist_Map1 ( ( dllist* ) TOS, ( MapFunction1 ) Match_MapFunction, _Dsp_ [ - 1 ] ) ;
+    dllist_Map1_Break ( ( dllist* ) TOS, ( MapFunction1 ) Match_MapFunction, _Dsp_ [ - 1 ] ) ;
     DataStack_DropN ( 2 ) ;
 }
 

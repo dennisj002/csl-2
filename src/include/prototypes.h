@@ -260,7 +260,7 @@ BlockInfo *BI_Block_Copy(BlockInfo *bi, byte *dstAddress, byte *srcAddress, int6
 void Compile_BlockLogicTest(BlockInfo *bi);
 byte *Block_CopyCompile(byte *srcAddress, int64 bindex, Boolean jccFlag);
 /* src/basis/core/conditionals.c */
-void Match_MapFunction(dlnode *node, uint64 switchValue);
+Boolean Match_MapFunction(dlnode *node, uint64 switchValue);
 void MatchAccessFunction(void);
 CaseNode *_CaseNode_New(uint64 type, block block, int64 value);
 void _CSL_Switch(uint64 allocType);
@@ -605,6 +605,7 @@ void dllist_Map2_FromFirstFlag(dllist *list, MapFunction2 mf, int64 one, int64 t
 void dllist_Map(dllist *list, MapFunction0 mf);
 void dllist_Map1_FromEnd(dllist *list, MapFunction1 mf, int64 one);
 void dllist_Map1(dllist *list, MapFunction1 mf, int64 one);
+void dllist_Map1_Break(dllist *list, MapFunction1 mf, int64 one);
 void dllist_Map1_FromNode(dlnode *node0, MapFunction1 mf, int64 one);
 int64 dllist_Map1_WReturn(dllist *list, MapFunction1 mf, int64 one);
 void dllist_Map2_FromEnd(dllist *list, MapFunction2 mf, int64 one, int64 two);
