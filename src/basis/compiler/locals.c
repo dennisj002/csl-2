@@ -196,19 +196,20 @@ Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
     if ( fsize ) *( ( int32* ) ( compiler->FrameSizeCellOffset ) ) = fsize ; //compiler->LocalsFrameSize ; //+ ( IsSourceCodeOn ? 8 : 0 ) ;
 }
 
+//#define RSP_DROP 2
 void
 CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
 {
     Compiler * compiler = _Compiler_ ;
+    byte * token ;
     if ( word->Name [0] == '(' )
     {
         Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
-        byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-        Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+        token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+        word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
         Boolean isForwardDotted = word ? ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) : 0 ;
         if ( isForwardDotted || ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) )
         {
-            if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
             do
             {
                 Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
@@ -219,6 +220,13 @@ CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
             }
             while ( token [0] != ')' ) ;
             Word_Check_ReSet_To_Here_StackPushRegisterCode ( compiler->ReturnLParenVariableWord, 0 ) ;
+            //if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+            //if ( ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) && ( ! ( GetState ( _Compiler_, DOING_CASE ) ) ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+        {
+            //if ( GetState ( _Compiler_, DOING_CASE ) ) _Compile_Stack_DropN ( RSP, RSP_DROP ) ;
+            _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+        }
             return ;
         }
     }
@@ -227,7 +235,20 @@ CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
     {
         if ( readTokenFlag ) Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
         CSL_WordList_PushWord ( word ) ;
-        _Compiler_->ReturnVariableWord = word ;
+        //compiler->ReturnVariableWord = word ;
+        //if ( ! ( word->W_ObjectAttributes & ( REGISTER_VARIABLE ) ) ) Compile_GetVarLitObj_RValue_To_Reg ( word, ACC, 0 ) ;
+        word = Interpreter_DoWord_Default ( _Interpreter_, word, - 1, - 1 ) ;
+        token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+        if ( token[0] == '@' ) Interpreter_InterpretNextToken ( _Interpreter_ ) ;
+        Word_Check_ReSet_To_Here_StackPushRegisterCode ( word, 1 ) ;
+        compiler->ReturnLParenVariableWord = word ;
+        //if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+        //if ( ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) && ( ! ( GetState ( _Compiler_, DOING_CASE ) ) ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+        {
+            //if ( GetState ( _Compiler_, DOING_CASE ) ) _Compile_Stack_DropN ( RSP, RSP_DROP ) ;
+            _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+        }
         if ( GetState ( _CSL_, TYPECHECK_ON ) )
         {
             Word * cwbc = _Context_->CurrentWordBeingCompiled ;
@@ -242,7 +263,12 @@ CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
         }
     }
     else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+    {
+        //if ( GetState ( _Compiler_, DOING_CASE ) ) _Compile_Stack_DropN ( RSP, RSP_DROP ) ;
         _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+
+    }
+    //if ( ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) && ( ! ( GetState ( _Compiler_, DOING_CASE ) ) ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
 }
 
 // Compiler_RemoveLocalFrame : the logic definitely needs to be simplified???
@@ -261,28 +287,14 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     returnValueFlag = GetState ( compiler, RETURN_TOS ) || returnWord ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
     // nb. these variables have no lasting lvalue - they exist on the stack - we can only return their rvalue
-    if ( compiler->ReturnVariableWord )
+    if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag ) )
     {
-        if ( ! ( compiler->ReturnVariableWord->W_ObjectAttributes & ( REGISTER_VARIABLE ) ) )
-            Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC, 0 ) ;
-        // need to copy because ReturnVariableWord may have been used within the word already
-    }
-    else if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag ) )
-    {
-        Word * one = GetState ( compiler, LISP_MODE ) ? 0 : WordStack ( 1 ) ;
-        if ( one && one->StackPushRegisterCode )
-        {
-            already = true ;
-            SetHere ( one->StackPushRegisterCode, 1 ) ;
-        }
-        else if ( ! compiler->ReturnLParenVariableWord )
+        if ( ! compiler->ReturnLParenVariableWord )
         {
             byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ; //mov [r14], rax
             if ( memcmp ( mov_r14_rax, Here - 3, 3 ) )
                 Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
         }
-        //if ( compiler->ReturnLParenVariableWord ) already = true ;
-
     }
     if ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs )
     {

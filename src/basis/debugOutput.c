@@ -28,7 +28,7 @@ _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // u
 
         byte * stringValue = String_CheckForAtAdddress ( address ) ;
         if ( address && ( ! stringValue ) ) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
-        if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s >", word2->ContainingNamespace->Name, c_u ( word2->Name ) ) ;
+        if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s %s", word2->ContainingNamespace->Name, c_u ( word2->Name ), c_g ( ">" ) ) ;
 
         if ( localsWord->W_ObjectAttributes & REGISTER_VARIABLE )
         {

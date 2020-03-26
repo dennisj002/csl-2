@@ -4,9 +4,6 @@ void
 Match_MapFunction ( dlnode * node, uint64 switchValue )
 {
     CaseNode * cnode = ( CaseNode* ) node ;
-    //if ( Is_DebugOn ) Printf ( (byte*) "\nswitchValue = 0x%lx : cnode->CN_CaseUint64Value = 0x%lx", switchValue, cnode->CN_CaseUint64Value ) ;
-    //if (( Is_DebugOn ) && ( IsString ( ( byte* ) switchValue ) && IsString ( ( byte* ) cnode->CN_CaseBytePtrValue ) ))
-    //    Printf ( (byte*) "\nswitchValue = %s : cnode->CN_CaseBytePtrValue = %s", switchValue, cnode->CN_CaseBytePtrValue ) ;
     if ( IsString ( ( byte* ) switchValue ) && IsString ( ( byte* ) cnode->CN_CaseBytePtrValue )
         && String_Equal ( cnode->CN_CaseBytePtrValue, ( byte* ) switchValue ) )
     {

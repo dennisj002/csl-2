@@ -111,7 +111,11 @@ dscOn
 //postifx verbosity 3 =
 #endif    
 //scOn
-: abs( n ) { n > 0 } { return n } { return ( 0 n - ) } ifElse ; // funky but it works ???
+int abs ( n ) 
+{
+    if ( n < 0 ) n = 0 - n ;
+    return n ; 
+}
 //: abs( n | rtn ) { n > 0 } { rtn n = } { rtn 0 n - = } ifElse return rtn ; 
 'fa 'findAlias find alias
 '_Compile_Int8 'compileByte fa

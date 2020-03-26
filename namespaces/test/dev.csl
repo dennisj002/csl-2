@@ -42,7 +42,7 @@ c_syntaxOff
 : factorial ( n  | fac ) 
     fac 1 = 
     { n @ 1 > } { n @ fac @ * fac store n -- } while 
-    return fac 
+    return fac @
 ;
 7 factorial dup p 5040 _assert
 : qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp dup p 5040 _assert 'qexp find wdiss
@@ -126,7 +126,7 @@ Locals User
 : fac ( n  | res ) 
     res 1 = 
     { n @ 1 > } { res n @ res @ * = n -- } while 
-    return res
+    return res @
 ;
 7 fac dup p 5040 _assert 
 // : bexp2 ( n | res ) { n @ 1 <= } { 1 } { n @ dup -- bexp2 * } ifElse ;
@@ -246,32 +246,32 @@ c_syntaxOff
 2 30 int.cpow dup p  1073741824 _assert //pause
 
 : sp ; //stack pause ;
-: pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ; //"II.I" typeSignature
+: pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ; //"II.I" typeSignature
 //'pow find wdiss
 2 30 pow dup p  1073741824 _assert 
 "pow" ffx2 
-: powReg ( REG base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+: powReg ( REG base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
 2 30 powReg dup p  1073741824 _assert 
 "powReg" ffx2 
-: powReg2 ( base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+: powReg2 ( base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
 2 30 powReg2 dup p  1073741824 _assert 
 "powReg2" ffx2 
-: powReg3 ( REG base power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+: powReg3 ( REG base power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
 //'powReg3 find wdiss
 2 30 powReg3 dup p  1073741824 _assert 
 "powReg3" ffx2 
-: powReg4 ( REG base REG power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+: powReg4 ( REG base REG power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
 2 30 powReg4 dup p  1073741824 _assert 
 //'powReg4 find wdiss
 "powReg4" ffx2 
-: powReg5 ( base REG power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+: powReg5 ( base REG power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
 2 30 powReg5 dup p  1073741824 _assert 
 //'powReg5 find wdiss
 "powReg5" ffx2 
-: powReg6 ( REG base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+: powReg6 ( REG base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
 2 30 powReg6 dup p  1073741824 _assert 
 "powReg6" ffx2 
-: powReg7 ( base power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+: powReg7 ( base power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
 2 30 powReg7 dup p  1073741824 _assert 
 //'powReg7 find wdiss
 "powReg7" ffx2 
@@ -452,7 +452,7 @@ sp
     }
     for
     // nl svn @ fprint ":" ps fn @ fprint 
-    return fn
+    return fn @
 ;
 ' fibBN find wdiss
 20 fibBN p 

@@ -931,7 +931,7 @@ String_CheckForAtAdddress ( byte * address )
             str = Buffer_Data_Cleared ( _CSL_->StringInsertB5 ) ;
             byte * bstr = c_gd ( String_ConvertToBackSlash ( address ) ) ;
             snprintf ( ( char* ) str, 128, "< string : \'%s", bstr ) ;
-            strcat ( str, c_d ( "\' >" ) ) ;
+            strcat ( str, c_g ( "\' >" ) ) ;
         }
     }
     return str ;

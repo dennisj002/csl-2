@@ -23,7 +23,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         }
         if ( ( restartCondition > QUIT ) || ( _O_->Signal == SIGFPE ) )
         {
-            if ( ++ _O_->SigSegvs < 2 )
+            if ( _O_->SigSegvs < 2 )
             {
                 jb = & _CSL_->JmpBuf0 ;
                 OpenVmTil_ShowExceptionInfo ( ) ;

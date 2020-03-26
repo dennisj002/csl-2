@@ -92,7 +92,13 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             Debugger_CASOI_Do_Return_Insn ( debugger ) ;
             Debugger_CASOI_UpdateInfo ( debugger ) ;
         }
-        else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == CALLI32 ) || ( * debugger->DebugAddress == JMPI8 ) )
+        else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == JMPI8 ) )
+        {
+            jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
+            //Debugger_CASOI_Do_JmpOrCall_Insn ( debugger, jcAddress ) ;
+            debugger->DebugAddress = jcAddress ;
+        }
+        else if ( ( * debugger->DebugAddress == CALLI32 ) )
         {
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
             Debugger_CASOI_Do_JmpOrCall_Insn ( debugger, jcAddress ) ;
@@ -101,6 +107,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
         {
             jcAddress = JumpCallInstructionAddress_X64ABI ( debugger->DebugAddress ) ;
             Debugger_CASOI_Do_JmpOrCall_Insn ( debugger, jcAddress ) ;
+            //debugger->DebugAddress = (byte*) *((uint64*) (debugger->DebugAddress - 8))  ; //jcAddress ;
         }
 #if 0 // old code ??       
         else if ( ( * debugger->DebugAddress == CALL_JMP_MOD_RM ) && ( _RM ( debugger->DebugAddress ) == 16 ) ) // inc/dec are also opcode == 0xff
@@ -497,11 +504,12 @@ Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
         SetState ( debugger, DBG_STACK_OLD, true ) ;
         debugger->CopyRSP = 0 ;
         if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
-        else SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING ) ;
+        else SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING | DBG_SETUP_ADDRESS ) ;
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
         debugger->DebugAddress = 0 ;
         SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
         Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+        SetState ( debugger, DBG_SETUP_ADDRESS, false ) ;
     }
 }
 

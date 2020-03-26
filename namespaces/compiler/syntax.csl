@@ -8,24 +8,24 @@ infixOn
 hi 14 _assert1 //pause
 sp
 dscOn
-: hi1 ( a b | x ) x = 2 + ( ( a ) / ( b ) ) * ( 3 * 4 ) return x ; 
+: hi1 ( a b | x ) x = 2 + ( ( a ) / ( b ) ) * ( 3 * 4 ), return x ; 
 ' hi1 find wdiss
 6 3 hi1 dup p 48 _assert //pause
-: hi1 ( a b | x ) x = ( 2 + ( a / b ) * ( 3 * 4 ) ) return x ; 
+: hi1 ( a b | x ) x = ( 2 + ( a / b ) * ( 3 * 4 ) ), return x ; 
 ' hi1 find wdiss
 6 3 hi1 dup p 48 _assert //pause
 
 10 5 hi1 dup p 48 _assert1
-: hi2 ( a b | x ) ( x = ( ( ( ( 2 + ( a / b ) ) * ( ( 3 * 4 ) ) ) ) ) ) return x ; 
+: hi2 ( a b | x ) ( x = ( ( ( ( 2 + ( a / b ) ) * ( ( 3 * 4 ) ) ) ) ) ), return x ; 
 ' hi2 find wdiss
 6 3 hi2 dup p 48 _assert1
 sp
 10 5 hi2 dup p 48 _assert1
-: h3 ( a b | x ) ( x = ( ( ( ( 2 + ( ( 3 * 4 ) ) - ( (a) / (b) ) ) ) ) ) ) return x ; 
+: h3 ( a b | x ) ( x = ( ( ( ( 2 + ( ( 3 * 4 ) ) - ( (a) / (b) ) ) ) ) ) ), return x ; 
 ' h3 find wdiss
 6 3 h3 dup p 12 "6 3 h3_assert1" assert
 10 5 h3 dup p 12 _assert1
-: h4 ( a b | x ) x = ( 20 - ( 3 * 4 ) - ( a / b ) ) return x ; 
+: h4 ( a b | x ) x = ( 20 - ( 3 * 4 ) - ( a / b ) ), return x ; 
 ' h4 find wdiss
 6 3 h4 dup p 6 _assert1
 10 5 h4 dup p 6 _assert1
@@ -79,7 +79,7 @@ c_syntaxOff
 1 ? "ok" ps : "er" ps   
 //pause
 infixOff 
-: hi ( n ) 1 2 + infixOn + n @ + 3 infixOff n ! return n ; 3 hi 9 _assert
-: hip ( n ) 1 2 + {| infixOn |} + n @ + 3 infixOff n ! return n ; 3 hip 9 _assert
+: hi ( n ) 1 2 + infixOn + n @ + 3 infixOff n ! return n @ ; 3 hi 9 _assert
+: hip ( n ) 1 2 + {| infixOn |} + n @ + 3 infixOff n ! return n @ ; 3 hip 9 _assert
 2 + 7 assertStkChk // stack checking
 sp

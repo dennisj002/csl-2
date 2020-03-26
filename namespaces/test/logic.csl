@@ -50,7 +50,7 @@ sp
 0 tnot 1 "tnot3_assert" assert
 1 tnot 0 "tnot4_assert" assert 
 sp
-: tnot2 ( n m | v ) n @ m @ | not dup v store p return v ;  
+: tnot2 ( n m | v ) n @ m @ | not dup v store p return ( v @ ) ;  
 ' tnot2 find wdiss 
 0 0 tnot2 1 _assert 
 1 1 tnot2 0 _assert

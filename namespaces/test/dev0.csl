@@ -65,7 +65,7 @@ pwi factorial
 : fac ( n  | rec ) 
     rec 1 = 
     { n @ 1 > } { n @ rec @ * rec store n -- } while 
-    return rec
+    return rec @
 ;
 ' fac find wdiss 
 7 fac dup p 5040 _assert //pause
@@ -157,7 +157,7 @@ c_syntaxOff
         fn fn1 @ fn2 @ + = 
     }
     for
-    return fn 
+    return fn @
 ;
 ' fibPTC? find wdiss 
 20 fibPTC? dup p 6765 _assert0 
@@ -208,7 +208,7 @@ bnOn
     }
     for
     //nl svn @ fprint ":" ps fn @ fprint 
-    return fn
+    return fn @
 ;
 sp
 nl 200 dup "\nfib" ps p "=" ps fibBN p //pause
@@ -381,8 +381,8 @@ sp
 cpow (2 30 ) ; "2 ^ 30 : " ps dup p 1073741824 assert0
 c_syntaxOff 
 sp
-: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ; "II.I" typeSignature
-: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out ; "II.I" typeSignature
+: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ; "II.I" typeSignature
+: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out @ ; "II.I" typeSignature
 //: pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 2 30 pow0 dup p 1073741824 assert0 //pause
 2 30 pow dup p 1073741824 assert0 //pause
@@ -440,7 +440,7 @@ sp
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    return fn
+    return fn @
 ;
 pwi fib01
 20 fib01 dup p 6765 _assert sp
@@ -453,7 +453,7 @@ pwi fib01
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    return fn
+    return fn @
 ;
 pwi fib01
 20 fib01 dup p 6765 _assert sp
@@ -466,7 +466,7 @@ pwi fib01
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    return fn
+    return fn @
 ;
 pwi fib01
 20 fib01 dup p 6765 _assert sp
@@ -480,7 +480,7 @@ pwi fib01
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    return fn
+    return fn @
 ;
 pwi fib01
 20 fib01 dup p 6765 _assert sp
@@ -494,7 +494,7 @@ scOn
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    return fn
+    return fn @
 ;
 pwi fib01
 20 fib01 dup p 6765 _assert sp
@@ -507,7 +507,7 @@ pwi fib01
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    return fn
+    return fn @
 ;
 pwi fib01
 20 fib01 dup p 6765 _assert sp
@@ -520,7 +520,7 @@ pwi fib01
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    return fn
+    return fn @
 ;
 pwi fib01 
 20 fib01 dup p 6765 _assert sp

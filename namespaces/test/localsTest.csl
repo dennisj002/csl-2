@@ -50,9 +50,9 @@ sp
 : hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey nl     
 C
 dscOn //verbosity 3 =
-: hi ( m x | n ) n m @ = n @ p return n ; 
-: hey ( m x | n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p return n ; 
-: heey ( m x | n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p return n ; 
+: hi ( m x | n ) n m @ = n @ p return ( n @ ) ; 
+: hey ( m x | n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p return ( n @ ) ; 
+: heey ( m x | n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p return ( n @ ) ; 
 7 1 heey dup p 7 _assert verbosity 1 = //pause
 nl
 // demonstrate calling order of local variables
@@ -76,9 +76,9 @@ sp
 : hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey       
 C
 dscOn //verbosity 3 =
-: hi ( m x | n ) n m @ = n @ p return n ; 
-: hey ( m x | n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p return n ; 
-: heey ( m x | n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p return n ; 
+: hi ( m x | n ) n m @ = n @ p return ( n @ ) ; 
+: hey ( m x | n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p return ( n @ ) ; 
+: heey ( m x | n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p return n @ ; 
 7 1 heey dup p 7 _assert verbosity 1 = //pause
 
 // demonstrate calling order of local variables
