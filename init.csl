@@ -460,7 +460,8 @@ rtw
 
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
 #if forStarters @ 
-: hi ( n m ) n @ m @ + dup <dbg> p return tos ; pwi hi 2 3 d: hi 5 _assert
+: hi ( n m ) n @ m @ + dup <dbg> p return tos ; pwi hi 2 9 d: hi 11 _assert
 #endif 
+: hi ( n m | x ) x n @ m @ + = x @ p return ( x @ ) ; pwi hi 2 9 hi 11 _assert
 2 + 7 assertStkChk // stack checking 
 

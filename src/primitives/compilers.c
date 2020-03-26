@@ -142,75 +142,26 @@ CSL_Label_Prefix ( )
 }
 
 // 'return' is a prefix word now C_SYNTAX or not
-#if 1
 // not satisfied yet with how 'return' works with blocks and locals ???
 void
 CSL_Return ( )
 {
     Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+#if 0    
+    if ( token[0] == ';' ) 
+    {
+        Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
+        token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+    }
+#endif    
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
     int64 tsrli = - 1, scwi = - 1 ;
     Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-    if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
-    {
-        Lexer_ReadToken ( _Lexer_ ) ;
-        CSL_WordList_PushWord ( word ) ;
-        _Compiler_->ReturnVariableWord = word ;
-        if ( GetState ( _CSL_, TYPECHECK_ON ) )
-        {
-            Word * cwbc = _Context_->CurrentWordBeingCompiled ;
-            if ( ( word->W_ObjectAttributes & LOCAL_VARIABLE ) && cwbc )
-            {
-                cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs] = '.' ;
-                int8 swtsCodeSize = Tsi_ConvertTypeSigCodeToSize ( Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ) ;
-                int8 cwbctsCodeSize = Tsi_ConvertTypeSigCodeToSize ( cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] ) ;
-                if ( swtsCodeSize > cwbctsCodeSize )
-                    cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
-            }
-        }
-        //Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
-    }
-    else if ( word->W_MorphismAttributes & (CATEGORY_DUP) ) _Compiler_->State |= RETURN_TOS ;
-    else
-    {
-        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
-        {
-            //WordStack_SCHCPUSCA ( 0, 1 ) ;
-            _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-        }
-    }
+    SetState ( _Compiler_, DOING_RETURN, true ) ;
+    CSL_DoReturnWord ( word, 1 ) ;
+    SetState ( _Compiler_, DOING_RETURN, false ) ;
 }
-#else
-
-void
-CSL_Return ( )
-{
-    Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-    Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-    int64 tsrli = - 1, scwi = - 1 ;
-    Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-    if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
-    {
-        Lexer_ReadToken ( _Lexer_ ) ;
-        CSL_WordList_PushWord ( word ) ;
-        _Compiler_->ReturnVariableWord = word ;
-        if ( GetState ( _CSL_, TYPECHECK_ON ) )
-        {
-            Word * cwbc = _Context_->CurrentWordBeingCompiled ;
-            if ( ( word->W_ObjectAttributes & LOCAL_VARIABLE ) && cwbc )
-            {
-                cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs] = '.' ;
-                int8 swtsCodeSize = Tsi_ConvertTypeSigCodeToSize ( Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ) ;
-                int8 cwbctsCodeSize = Tsi_ConvertTypeSigCodeToSize ( cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] ) ;
-                if ( swtsCodeSize > cwbctsCodeSize )
-                    cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
-            }
-        }
-    }
-}
-#endif
 
 void
 CSL_Continue ( )

@@ -264,8 +264,8 @@
 #define C_PREFIX ( (uint64) 1 << 40 )
 #define ALIAS ( (uint64) 1 << 41 )
 #define NO_CODING           ( (uint64) 1 <<  42 ) 
-
 #define C_PREFIX_RTL_ARGS ( (uint64) 1 << 43 )
+#define T_TOS ( (uint64) 1 << 44 )
 
 #define BLOCK_DELIMITER     ( (uint64) 1 << 47 )
 
@@ -639,6 +639,8 @@
 #define TDSCI_PARSING ( (uint64) 1 << 35 )
 #define C_BLOCK_INTERPRETER ( (uint64) 1 << 36 )
 #define DOING_C_TYPE_DECLARATION ( (uint64) 1 << 37 )
+#define DOING_CASE ( (uint64) 1 << 38 )
+#define DOING_RETURN ( (uint64) 1 << 39 )
 
 // Context flags
 #define C_SYNTAX ( (uint64) 1 << 20 )

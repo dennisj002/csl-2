@@ -13,7 +13,7 @@ CSL_Drop ( )
     {
         //Word * one = Compiler_WordStack ( - 1 ) ;
         Word * one = CSL_WordList ( 1 ) ;
-        if ( GetState ( _CSL_, OPTIMIZE_ON ) && one && ( one->StackPushRegisterCode ) ) SetHere (one->StackPushRegisterCode, 1) ;
+        if ( GetState ( _CSL_, OPTIMIZE_ON ) && one && ( one->StackPushRegisterCode ) ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else _Compile_Stack_Drop ( DSP ) ;
     }
     else
@@ -30,6 +30,7 @@ CSL_DropN ( )
 }
 
 #if 0 // ??not needed 
+
 void
 _CSL_Push ( int64 value )
 {
@@ -55,12 +56,12 @@ CSL_Dup ( )
 void
 CSL_Tos ( )
 {
-    if ( CompileMode ) _Compile_Stack_Dup ( DSP ) ;
-    else DataStack_Dup ( ) ;
-    CSL_TypeStack_Dup ( ) ;
-    _Compiler_->State |= RETURN_TOS ;
+    //CSL_Dup ( ) ;
+    SetState ( _Context_->Compiler0, RETURN_TOS, true ) ;
 }
+
 #if 0
+
 void
 CSL_Ndrop ( )
 {
@@ -68,7 +69,7 @@ CSL_Ndrop ( )
     {
         //Compile_SUBI( mod, operandReg, offset, immediateData, size ) 
         Word * one = CSL_WordList ( 1 ) ;
-        SetHere (one->Coding, 1) ;
+        SetHere ( one->Coding, 1 ) ;
         Compile_SUBI ( REG, DSP, 0, one->W_Value * CELL_SIZE, BYTE ) ;
     }
     else
@@ -127,6 +128,7 @@ CSL_Swap ( )
         _Dsp_ [ - 1 ] = a ;
     }
 }
+
 void
 CSL_PrintNDataStack ( )
 {
@@ -137,6 +139,7 @@ CSL_PrintNDataStack ( )
 }
 
 #if 0
+
 void
 CSL_PrintRspRegStack ( )
 {
@@ -154,7 +157,6 @@ CSL_PrintReturnStack ( )
 
 }
 
-
 void
 CSL_PrintNReturnStack ( )
 {
@@ -162,7 +164,7 @@ CSL_PrintNReturnStack ( )
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
     int64 size = DataStack_Pop ( ) ;
     _CSL_PrintNReturnStack ( size, 1 ) ;
-    CSL_NewLine () ;
+    CSL_NewLine ( ) ;
 }
 
 void

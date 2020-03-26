@@ -380,7 +380,7 @@ Symbol *Symbol_CompareName(Symbol *symbol, byte *name);
 /* src/basis/repl.c */
 void _Repl(block repl);
 /* src/basis/core/syntax.c */
-void Interpret_DoParenthesizedRValue(void);
+void Interpret_DoParenthesizedValue(void);
 void Interpret_C_Block_EndBlock(byte *tokenToUse, Boolean insertFlag);
 void Interpret_C_Block_BeginBlock(byte *tokenToUse, Boolean insertFlag);
 int64 CSL_Interpret_C_Blocks(int64 blocks, Boolean takesAnElseFlag, Boolean semicolonEndsThisBlock);
@@ -1642,6 +1642,7 @@ Boolean Compiler_IsFrameNecessary(Compiler *compiler);
 void Compile_Init_LocalRegisterParamenterVariables(Compiler *compiler);
 void _Compiler_AddLocalFrame(Compiler *compiler);
 void Compiler_SetLocalsFrameSize_AtItsCellOffset(Compiler *compiler);
+void CSL_DoReturnWord(Word *word, Boolean readTokenFlag);
 void Compiler_RemoveLocalFrame(Compiler *compiler);
 void CSL_LocalsAndStackVariablesBegin(void);
 void CSL_LocalVariablesBegin(void);
@@ -1857,7 +1858,6 @@ ListObject *LO_Cdr(ListObject *l0);
 ListObject *_LC_Eval(ListObject *l0);
 void _LO_Semi(Word *word);
 Word *_LO_Colon(ListObject *lfirst);
-void _LO_Return(Word *word);
 ListObject *_LO_CSL(ListObject *lfirst);
 /* src/primitives/strings.c */
 void MultipleEscape(void);

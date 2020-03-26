@@ -441,7 +441,7 @@ CPrimitive CPrimitives [] = {
 
     { "_dup", "A.AA", 0, 0, CSL_Dup, CATEGORY_DUP | KEYWORD | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
     { "dup", "A.AA", 0, 0, CSL_Dup, IMMEDIATE | KEYWORD | CATEGORY_DUP | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
-    { "tos", "A.AA", 0, 0, CSL_Tos, IMMEDIATE | KEYWORD | CATEGORY_DUP | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
+    { "tos", "A.AA", 0, 0, CSL_Tos, IMMEDIATE | KEYWORD | T_TOS | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
     { "ndup", 0, 0, 0, CSL_NDup, CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "drop", 0, 0, 0, CSL_Drop, IMMEDIATE | KEYWORD | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "dropN", 0, 0, 0, CSL_DropN, IMMEDIATE | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
@@ -544,7 +544,8 @@ CPrimitive CPrimitives [] = {
     { "postfixOn", 0, 0, 0, CSL_PostfixModeOn, IMMEDIATE | KEYWORD, 0, 0, "Compiler", "Root" },
     { "goto", 0, 0, 0, CSL_Goto, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "continue", 0, 0, 0, CSL_Continue, IMMEDIATE, 0, 0, "Compiler", "Root" },
-    { "return", 0, 0, 0, CSL_Return, IMMEDIATE, 0, 0, "Compiler", "Root" },
+    { "return", 0, 0, 0, CSL_Return, (IMMEDIATE), 0, 0, "Compiler", "Root" },
+    //{ "return", 0, 0, 0, CSL_Return, (IMMEDIATE|PREFIX), 0, 0, "Compiler", "Root" },
     { "break", 0, 0, 0, CSL_Break, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "noop", 0, 0, 0, CSL_NoOp, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "macro", 0, 0, 0, CSL_Word, IMMEDIATE, 0, 0, "Compiler", "Root" },

@@ -381,7 +381,8 @@ CSL_WordList_PushWord ( Word * word )
             // not the clearest logic ??
             if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE ) ) || ( ! ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) )
                 || ( word->W_ObjectAttributes & ( NAMESPACE | OBJECT_FIELD ) ) ) ) ) inUseFlag |= SCN_IN_USE_FLAG_ALL ;
-            if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE | NAMESPACE | OBJECT_FIELD | LOCAL_OBJECT ) ) ) inUseFlag |= SCN_IN_USE_FOR_SOURCE_CODE ;
+            if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE | NAMESPACE | OBJECT_FIELD | LOCAL_OBJECT ) ) ) 
+                inUseFlag |= SCN_IN_USE_FOR_SOURCE_CODE ;
         }
         CSL_WordList_Push ( word, inUseFlag ) ;
     }

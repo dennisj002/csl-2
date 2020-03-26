@@ -107,6 +107,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
     }
     lexer->LastToken = lexer->OriginalToken ;
 
+    DEBUG_SETUP_TOKEN ( lexer->OriginalToken, 1 ) ;
     return lexer->OriginalToken ;
 }
 
@@ -262,19 +263,14 @@ Lexer_IsNextWordLeftParen ( Lexer * lexer )
 Boolean
 Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
-#if 1   
     if ( word->Name[0] == '(' ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
-        && ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) )
+    else if ( (( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ))
+        && ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) )
     {
         return Lexer_IsNextWordLeftParen ( lexer ) ;
     }
-
     else return false ;
-#else
-    return Lexer_IsNextWordLeftParen ( lexer ) ;
-#endif    
 }
 
 byte *
@@ -282,12 +278,9 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
 {
     ReadLiner * rl = _ReadLiner_ ;
     int64 svReadIndex = rl->ReadIndex ;
-    //int64 svInterpState = lexer->OurInterpreter ? lexer->OurInterpreter->State : 0 ;
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     CSL_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
-    //if (lexer->OurInterpreter) lexer->OurInterpreter->State = svInterpState ;
-
     return token ;
 }
 
@@ -310,7 +303,6 @@ Lexer_DoNextChar ( Lexer * lexer )
 void
 Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters )
 {
-
     _Lexer_LexNextToken_WithDelimiters ( lexer, delimiters, 1, 0, 1, 0 ) ;
 }
 
@@ -318,7 +310,6 @@ byte *
 _Lexer_ReadToken ( Lexer * lexer, byte * delimiters )
 {
     Lexer_LexNextToken_WithDelimiters ( lexer, delimiters ) ;
-    DEBUG_SETUP_TOKEN ( lexer->OriginalToken, 1 ) ;
 
     return lexer->OriginalToken ;
 }

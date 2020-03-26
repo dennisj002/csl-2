@@ -248,6 +248,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->LocalsFrameSize = 0 ;
     compiler->AccumulatedOffsetPointer = 0 ;
     compiler->ReturnVariableWord = 0 ;
+    compiler->ReturnLParenVariableWord = 0 ;
     compiler->Current_Word_New = 0 ;
     compiler->Current_Word_Create = 0 ;
     Stack_Init ( compiler->BlockStack ) ;

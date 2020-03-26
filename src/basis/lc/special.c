@@ -336,38 +336,6 @@ _LO_Colon ( ListObject * lfirst )
     return word ;
 }
 
-void
-_LO_Return ( Word * word )
-{
-    //Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-    if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
-    {
-        CSL_WordList_PushWord ( word ) ;
-        _Compiler_->ReturnVariableWord = word ;
-        if ( GetState ( _CSL_, TYPECHECK_ON ) )
-        {
-            Word * cwbc = _Context_->CurrentWordBeingCompiled ;
-            if ( ( word->W_ObjectAttributes & LOCAL_VARIABLE ) && cwbc )
-            {
-                cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs] = '.' ;
-                int8 swtsCodeSize = Tsi_ConvertTypeSigCodeToSize ( Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ) ;
-                int8 cwbctsCodeSize = Tsi_ConvertTypeSigCodeToSize ( cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] ) ;
-                if ( swtsCodeSize > cwbctsCodeSize )
-                    cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
-            }
-        }
-        //Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
-    }
-    else if ( word->W_MorphismAttributes & (CATEGORY_DUP) ) _Compiler_->State |= RETURN_TOS ;
-    else
-    {
-        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
-        {
-            //WordStack_SCHCPUSCA ( 0, 1 ) ;
-            _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-        }
-    }
-}
 // compile csl code in Lisp/Scheme
 ListObject *
 _LO_CSL ( ListObject * lfirst )
@@ -414,8 +382,8 @@ _LO_CSL ( ListObject * lfirst )
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "return" ) )
         {
-            ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
-            _LO_Return ( ldata ) ;
+            ldata = _LO_Next ( ldata ) ; 
+            CSL_DoReturnWord ( ldata, 0 ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";s" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {

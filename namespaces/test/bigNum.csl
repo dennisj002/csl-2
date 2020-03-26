@@ -6,10 +6,12 @@ Int
 C
 //jcc8_Off
 // testing before bignum starts // - tail recursion ideas from http://c2.com/cgi/wiki?TailCallOptimization
-: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+//: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return ( rec @ ) ;
 'factorial find wdiss //pause
 7 factorial dup p 5040 "factorial" _assert1 
-: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return ( rec @ ) ;
+//: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 'factorial find wdiss 
 7 factorial dup p 5040 "factorial" _assert1
 //verbosity 3 =

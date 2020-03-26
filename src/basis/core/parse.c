@@ -345,13 +345,14 @@ _CSL_SingleQuote ( )
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     ReadLiner * rl = cntx->ReadLiner0 ;
+    Compiler * compiler = cntx->Compiler0 ;
     Word *word, * sqWord = _CSL_WordList_TopWord ( ) ; //single quote word
     byte buffer [5] ;
     byte c0, c1, c2 ;
     uint64 charLiteral = 0 ;
 
     _CSL_->SC_QuoteMode = true ;
-    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CSL ) ) ) )
+    if ( ( ! ( GetState ( compiler, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CSL ) ) ) )
         && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) ) CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 0 ) ;
     c0 = _ReadLine_PeekOffsetChar ( rl, 0 ) ; // parse a char type, eg. 'c' 
     c1 = _ReadLine_PeekOffsetChar ( rl, 1 ) ;
@@ -386,7 +387,7 @@ _CSL_SingleQuote ( )
     }
     else
     {
-        if ( ! Compiling ) CSL_InitSourceCode_WithName ( _CSL_, lexer->OriginalToken, 0 ) ;
+        if ( ( ! Compiling ) && ( ! ( GetState ( compiler, DOING_CASE ) ) ) ) CSL_InitSourceCode_WithName ( _CSL_, lexer->OriginalToken, 0 ) ;
         byte * token = ( byte* ) _CSL_ParseQid_Token ( 0 ) ;
         DataStack_Push ( ( int64 ) token ) ;
         if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) )

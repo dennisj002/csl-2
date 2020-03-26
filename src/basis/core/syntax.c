@@ -2,7 +2,7 @@
 #include "../../include/csl.h"
 
 void
-Interpret_DoParenthesizedRValue ( )
+Interpret_DoParenthesizedValue ( )
 {
     Compiler * compiler = _Compiler_ ;
     int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
@@ -176,20 +176,17 @@ CSL_C_LeftParen ( )
         // this is for "#define" (which is parsed as '#' 'define', two words)
         //if ( isalnum ( ReadLine_LastReadChar ( rl ) ) ) CSL_LocalsAndStackVariablesBegin ( ) ;
         //else 
-        Interpret_DoParenthesizedRValue ( ) ;
-        return ;
+        Interpret_DoParenthesizedValue ( ) ;
     }
-    if ( ReadLine_CheckForLocalVariables ( rl ) )
+    else if ( ReadLine_CheckForLocalVariables ( rl ) )
     {
         CSL_LocalsAndStackVariablesBegin ( ) ;
-        return ;
     }
     else if ( CompileMode && ( ( ! GetState ( cntx->Compiler0, VARIABLE_FRAME ) ) || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' ) ) )
     {
         CSL_LocalsAndStackVariablesBegin ( ) ;
-        return ;
     }
-    Interpret_DoParenthesizedRValue ( ) ;
+    else Interpret_DoParenthesizedValue ( ) ;
 }
 
 void

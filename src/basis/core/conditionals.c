@@ -55,7 +55,7 @@ _CS_Case ( uint64 allocType )
     int64 caseValue ;
     byte * token = Lexer_ReadToken ( _Lexer_ ) ;
     Word * word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
-    SetState ( _Compiler_, ( COMPILE_MODE ), false ) ;
+    SetState_TrueFalse ( _Compiler_, DOING_CASE, COMPILE_MODE ) ;
     if ( ( token[0] == '\'' ) || ( token[0] == '"' ) )
     {
         Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
@@ -68,6 +68,7 @@ _CS_Case ( uint64 allocType )
     if ( ! _Compiler_->CurrentMatchList ) _Compiler_->CurrentMatchList = _dllist_New ( allocType ) ;
     CaseNode * cnode = _CaseNode_New ( allocType, caseBlock, caseValue ) ;
     dllist_AddNodeToTail ( _Compiler_->CurrentMatchList, ( dlnode* ) cnode ) ;
+    SetState ( _Compiler_, DOING_CASE, false ) ;
 }
 
 void
