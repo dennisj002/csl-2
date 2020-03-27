@@ -196,36 +196,45 @@ Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
     if ( fsize ) *( ( int32* ) ( compiler->FrameSizeCellOffset ) ) = fsize ; //compiler->LocalsFrameSize ; //+ ( IsSourceCodeOn ? 8 : 0 ) ;
 }
 
-//#define RSP_DROP 2
+Word *
+CSL_Parse_LParen_For_OperandWord ( Word * word, Boolean otherwiseFlag )
+{
+    Compiler * compiler = _Compiler_ ;
+    byte * token ;
+    compiler->ReturnLParenOperandWord = 0 ;
+    if ( word->Name [0] == '(' ) // remember this was a peeked word
+    {
+        Compiler * compiler = _Compiler_ ;
+        Lexer_ReadToken ( _Lexer_ ) ; // remember this was a peeked word
+        while ( (token = Lexer_ReadToken ( _Lexer_ )), ( token [0] != ')' ) ) 
+        {
+            word = Interpreter_InterpretAToken ( _Interpreter_, token, - 1, - 1 ) ;
+            if ( token[0] != '@' ) compiler->ReturnLParenOperandWord = word ;
+        }
+    }
+    else if ( otherwiseFlag && ( ! ( word->W_MorphismAttributes & ( T_TOS ) ) ) )
+    {
+        token = Lexer_ReadToken ( _Lexer_ ) ; // remember this was a peeked word
+        word = Interpreter_InterpretAToken ( _Interpreter_, token, - 1, - 1 ) ;
+        compiler->ReturnLParenOperandWord = word ;
+    }
+    return compiler->ReturnLParenOperandWord ;
+}
 
 void
 CSL_DoReturnWord ( Word * word, Boolean readTokenFlag )
 {
     Compiler * compiler = _Compiler_ ;
     byte * token ;
-    if ( word->Name [0] == '(' )
+    Word * word1 = CSL_Parse_LParen_For_OperandWord ( word, 0 ) ;
+    if ( word1 )
     {
-        Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
-        token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-        word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-        Boolean isForwardDotted = word ? ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) : 0 ;
-        if ( isForwardDotted || ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) )
-        {
-            do
-            {
-                Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
-                word = Interpreter_DoWord_Default ( _Interpreter_, word, - 1, - 1 ) ;
-                if ( ( token[0] != '@' ) && ( token[0] != ')' ) ) compiler->ReturnLParenVariableWord = word ;
-                token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-                word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-            }
-            while ( token [0] != ')' ) ;
-            Word_Check_ReSet_To_Here_StackPushRegisterCode ( compiler->ReturnLParenVariableWord, 0 ) ;
-            if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
-            return ;
-        }
+        compiler->ReturnLParenVariableWord = word1 ; 
+        Word_Check_ReSet_To_Here_StackPushRegisterCode ( word1, 0 ) ;
+        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
+        return ;
     }
-    if ( word->W_MorphismAttributes & ( T_TOS ) ) 
+    if ( word->W_MorphismAttributes & ( T_TOS ) )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
         byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ; //mov [r14], rax
@@ -278,10 +287,10 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         _Compile_LEA ( DSP, FP, 0, - CELL ) ; // restore sp - release locals stack frame
         _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
     }
-    if ( ( parameterVarsSubAmount > 0 ) && ( ! IsWordRecursive ) ) Compile_SUBI ( REG, DSP, 0, parameterVarsSubAmount, 0 ) ; // remove stack variables
+    if ( ( parameterVarsSubAmount > 0 ) && ( ! IsWordRecursive ) ) Compile_SUBI ( REG, DSP, 0, parameterVarsSubAmount, 0 ) ; // remove stack variables ; recursive handled below
         // add a place on the stack for return value
     else if ( parameterVarsSubAmount < 0 ) Compile_ADDI ( REG, DSP, 0, abs ( parameterVarsSubAmount ), 0 ) ;
-    else if ( returnValueFlag && ( ! compiler->NumberOfNonRegisterArgs ) && ( parameterVarsSubAmount == 0 ) && ( ! compiler->NumberOfArgs ) )
+    else if ( ( parameterVarsSubAmount == 0 ) && returnValueFlag && ( ! compiler->NumberOfNonRegisterArgs ) && ( ! compiler->NumberOfArgs ) )
         Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
     // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
     if ( returnValueFlag || IsWordRecursive )

@@ -86,7 +86,7 @@ ct2
 #if 1 //dbOn @ not
 7 hic2
 #endif
-//s pause
+: maybePause ; //pause ;
 Compiler Logic User
 
 : caseSwitchExample ( n ) 
@@ -102,7 +102,7 @@ Compiler Logic User
     //n @ switch
 ; 
 
-' caseSwitchExample find wdiss
+//' caseSwitchExample find wdiss
 'seven caseSwitchExample 
 '3 caseSwitchExample  
 '2 caseSwitchExample  
@@ -111,13 +111,13 @@ Compiler Logic User
 "seven" caseSwitchExample 
 "nine" caseSwitchExample 
 'nine caseSwitchExample 
-//pause 
+maybePause 
 
 cOn
 void
 csMatchEx ( n )
 {
-    match n 
+    match ( n )
     {
         case '1 { nl p (1) ; } 
         case '2 { nl p (2) ; } 
@@ -129,7 +129,7 @@ csMatchEx ( n )
         case "nine" { nl p (9) ; } 
     } 
 }
-pwi csMatchEx
+//pwi csMatchEx
 csMatchEx ( 'seven ) ;
 csMatchEx ( "seven" ) ;
 csMatchEx ( '3 ) ;
@@ -140,14 +140,13 @@ csMatchEx ( 3 ) ;
 csMatchEx ( 'eight ) ;
 csMatchEx ( 'nine ) ;
 csMatchEx ( '77 ) ; // should not match : string != int
-cOff
-//pause
+maybePause
 
 void
 csMatchExWithReturn ( n | x rtn )
 {
     x = 1111 ;
-    match n
+    match n // syntax supports either with or without parentheses
     {
         case '1 { nl ; p (1) ; rtn = x ; } 
         case '2 { nl ; p (2) ; rtn = n ; } 
@@ -173,7 +172,7 @@ csMatchExWithReturn ( 'eight ) ; ps
 csMatchExWithReturn ( 'nine ) ; p
 csMatchExWithReturn ( '77 ) ; p // should not match : string != int
 cOff
-//pause
+maybePause
 
 : t0 1 2 > if_ 1 p jmpHere 2 p ; 
 : t1 1 2 > if_ 1 p _else_ 2 p _fi ; 

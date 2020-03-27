@@ -30,7 +30,7 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tsrli, i
     {
         interp->Token = token ;
         word = _Interpreter_TokenToWord ( interp, token, tsrli, scwi ) ;
-        Interpreter_DoWord ( interp, word, tsrli, scwi ) ;
+        word = Interpreter_DoWord ( interp, word, tsrli, scwi ) ;
     }
     return word ;
 }
@@ -39,6 +39,7 @@ void
 Interpreter_InterpretNextToken ( Interpreter * interp )
 {
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
+    //Printf ( (byte*) "\nInterpreter_InterpretNextToken : token = %s", token ) ;
     Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
 }
 
@@ -51,7 +52,7 @@ Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, in
     return word ; //let callee know about actual word evaled here after Compiler_CopyDuplicatesAndPush
 }
 
-void
+Word * 
 Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
 {
     byte * token = 0 ;
@@ -65,47 +66,50 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
     SetState ( compiler, DOING_BEFORE_AN_INFIX_WORD, false ) ; //svState ) ;
-    Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-    SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ; //svState ) ;
+    word = Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
+    SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ; 
+    return word ;
 }
 
-void
+Word *
 _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
     SetState ( cntx->Compiler0, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ), true ) ;
-    Interpret_PrefixFunction_OrUntil_RParen ( interp, word ) ;
+    word = Interpret_PrefixFunction_OrUntil_RParen ( interp, word ) ;
     SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
+    return word ;
 }
 
-void
+Word *
 Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
-    if ( Lexer_IsNextWordLeftParen ( interp->Lexer0 ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
-    else if ( word->W_MorphismAttributes & CATEGORY_OP_1_ARG ) Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
+    if ( Lexer_IsNextWordLeftParen ( interp->Lexer0 ) ) word = _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
+    else if ( word->W_MorphismAttributes & CATEGORY_OP_1_ARG ) word = Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
     else _SyntaxError ( ( byte* ) "Attempting to call a prefix function without following parenthesized args", 1 ) ;
+    return word ;
 }
 
-void
+Word *
 Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
 {
-    LC_CompileRun_C_ArgList ( word ) ;
+    word = LC_CompileRun_C_ArgList ( word ) ;
+    return word ;
 }
 
-Boolean
+Word *
 Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
 {
     if ( word ) 
     {
         Context * cntx = _Context_ ;
-        if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) Interpreter_DoInfixWord ( interp, word ) ;
+        if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) word = Interpreter_DoInfixWord ( interp, word ) ;
             // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) )
-            _Interpreter_DoPrefixWord ( cntx, interp, word ) ; 
-        else if ( word->W_TypeAttributes == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
-        else return false ;
-        return true ;
+            word = _Interpreter_DoPrefixWord ( cntx, interp, word ) ; 
+        else if ( word->W_TypeAttributes == WT_C_PREFIX_RTL_ARGS ) word = Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
+        else return 0 ;
     }
-    return false ;
+    return word ;
 }
 // four types of words related to syntax
 // 1. regular rpn - reverse polish notation
@@ -114,16 +118,18 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
 // 4. C arg lists which are left to right but are evaluated right to left, ie. the rightmost operand goes on the stack first then the next rightmost and so on such that topmost is the left operand
 // we just rearrange the functions and args such that they all become regular rpn - forth like
 
-void
+Word *
 Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi )
 {
+    Word * word1 ;
     if ( word )
     {
         Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
         interp->w_Word = word ;
-        if ( ! Interpreter_DoInfixOrPrefixWord ( interp, word ) ) Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; 
-        if ( ! ( word->W_MorphismAttributes & DEBUG_WORD ) ) interp->LastWord = word ;
+        if ( ! ( word1 = Interpreter_DoInfixOrPrefixWord ( interp, word ) ) ) word1 = Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; 
+        if ( word1 && ( ! ( word1->W_MorphismAttributes & DEBUG_WORD ) ) ) word = word1, interp->LastWord = word1 ;
     }
+    return word ;
 }
 // interpret with find after parse for known objects
 // !! this version eliminates the possiblity of numbers being used as words !!

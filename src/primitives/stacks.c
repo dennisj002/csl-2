@@ -29,22 +29,6 @@ CSL_DropN ( )
     else DataStack_DropN ( TOS + 1 ) ;
 }
 
-#if 0 // ??not needed 
-
-void
-_CSL_Push ( int64 value )
-{
-    if ( CompileMode )
-    {
-        _Compile_Stack_Push ( DSP, value ) ;
-    }
-    else
-    {
-        DataStack_Push ( value ) ;
-    }
-}
-#endif
-
 void
 CSL_Dup ( )
 {

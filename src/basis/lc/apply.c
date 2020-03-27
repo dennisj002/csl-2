@@ -389,7 +389,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
     return nil ;
 }
 
-void
+Word *
 LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
 {
     Namespace * backgroundNamespace = _CSL_Namespace_InNamespaceGet ( ) ;
@@ -425,6 +425,7 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
     _CSL_Namespace_InNamespaceSet ( backgroundNamespace ) ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
     LC_RestoreStackPointer ( lc ) ;
+    return word ;
 }
 
 // assumes list contains only one application 

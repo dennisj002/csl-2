@@ -101,12 +101,12 @@ Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFuncti
     if ( prefixFunction ) Interpreter_DoWord_Default ( interp, prefixFunction, - 1, svscwi ) ;
 }
 
-void
+Word *
 Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFunction )
 {
+    Word * word = 0 ;
     if ( prefixFunction )
     {
-        Word * word ;
         byte * token ;
         int64 i, svs_c_rhs, flag = 0 ;
         Compiler * compiler = interp->Compiler0 ;
@@ -140,11 +140,12 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
             else Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
         }
         SetState ( compiler, ( DOING_BEFORE_A_PREFIX_WORD ), false ) ;
-        if ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) Interpreter_DoWord_Default ( interp, prefixFunction, prefixFunction->W_RL_Index, prefixFunction->W_SC_Index ) ;
+        if ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) word = Interpreter_DoWord_Default ( interp, prefixFunction, prefixFunction->W_RL_Index, prefixFunction->W_SC_Index ) ;
         SetState ( compiler, ( PREFIX_ARG_PARSING | DOING_A_PREFIX_WORD ), false ) ;
         SetState ( _Debugger_, DBG_INFIX_PREFIX, false ) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
     }
+    return word ;
 }
 
 void
