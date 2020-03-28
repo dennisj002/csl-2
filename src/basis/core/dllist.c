@@ -851,7 +851,7 @@ inline
 dlnode *
 List_Top ( dllist *list )
 {
-    return _dllist_First ( list ) ;
+    return dllist_First ( list ) ;
 }
 
 inline

@@ -172,7 +172,7 @@ Symbol *
 Lexer_GetTokenFromTokenList ( Lexer * lexer, Boolean peekFlag )
 {
     Symbol * tknSym = lexer->NextPeekListItem ;
-    if ( ! ( peekFlag && tknSym ) ) tknSym = ( Symbol* ) _dllist_First ( ( dllist* ) lexer->TokenList ) ;
+    if ( ! ( peekFlag && tknSym ) ) tknSym = ( Symbol* ) dllist_First ( ( dllist* ) lexer->TokenList ) ;
     if ( tknSym )
     {
         if ( peekFlag ) lexer->NextPeekListItem = ( Symbol* ) dlnode_Next ( ( dlnode * ) tknSym ) ;
