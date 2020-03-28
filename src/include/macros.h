@@ -272,8 +272,8 @@
 #define Word_SetTsrliScwi( word, tsrli, scwi ) \
     if ( word )\
     {\
-    word->W_RL_Index = tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;\
-    word->W_SC_Index = scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;\
+        word->W_RL_Index = ( tsrli == - 1 ) ? _Lexer_->TokenStart_ReadLineIndex : tsrli ;\
+        word->W_SC_Index = ( scwi == - 1 ) ? _Lexer_->SC_Index : scwi ;\
     }
 
 #define Stringn_Equal( string1, string2, n ) (Strncmp ( (byte *) string1, (byte *) string2, n ) == 0 )

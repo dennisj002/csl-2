@@ -465,8 +465,9 @@ sp
 ;
 //nl nl 47 tfib3 //sp pause
 nl nl 92 tfib3 //sp pause
-nl 92 dup p fibBN p //sp
-bnOff //pause
+nl 92 dup p fibBN p 
+20 fibBN dup p 6765 == { "ok" ps } { "error" ps } tf2 drop //pause 
+bnOff 
 : sp ;
 nl
 // verbosity 1 =

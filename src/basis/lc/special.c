@@ -383,7 +383,7 @@ _LO_CSL ( ListObject * lfirst )
         else if ( String_Equal ( ldata->Name, ( byte * ) "return" ) )
         {
             ldata = _LO_Next ( ldata ) ; 
-            CSL_DoReturnWord ( ldata, 0 ) ;
+            CSL_DoReturnWord ( ldata ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";s" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {

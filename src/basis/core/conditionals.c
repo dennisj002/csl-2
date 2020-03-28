@@ -38,16 +38,8 @@ void
 _CSL_Switch ( uint64 allocType )
 {
     if ( ! _Compiler_->CurrentMatchList ) _Compiler_->CurrentMatchList = _dllist_New ( allocType ) ;
-    if ( CompileMode )
-    {
-        _Do_LiteralValue ( ( int64 ) _Compiler_->CurrentMatchList ) ;
-        Compile_Call_TestRSP ( ( byte* ) MatchAccessFunction ) ;
-    }
-    else
-    {
-        dllist_Map1 ( _Compiler_->CurrentMatchList, ( MapFunction1 ) Match_MapFunction, TOS ) ;
-        DataStack_DropN ( 1 ) ;
-    }
+    _Do_LiteralValue ( ( int64 ) _Compiler_->CurrentMatchList ) ;
+    Compile_Call_TestRSP ( ( byte* ) MatchAccessFunction ) ;
     _Compiler_->CurrentMatchList = 0 ; // this allows no further "case"s to be added to this "switch" list a new list will be started with the next "case"
 }
 
@@ -56,20 +48,12 @@ _CS_Case ( uint64 allocType )
 {
     Interpreter * interp = _Interpreter_ ;
     int64 caseValue = 0 ;
-    byte * token = Lexer_ReadToken ( _Lexer_ ) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
     Word * word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ), *word1 ;
-    word1 = CSL_Parse_LParen_For_OperandWord ( word, 0 ) ;
+    word = CSL_Parse_KeywordOperand ( word, 1 ) ;
     SetState ( _Compiler_, DOING_CASE, true ) ;
-    if ( ( ! word1 ) && ( token[0] == '\'' ) || ( token[0] == '"' ) )
-    {
-        SetState ( _Compiler_, ( COMPILE_MODE ), false ) ;
-        Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
-        SetState ( _Compiler_, ( COMPILE_MODE ), true ) ;
-        caseValue = ( uint64 ) String_New ( ( byte* ) DataStack_Pop ( ), STRING_MEM ) ;
-    }
-    else if ( word1 ) word = word1 ;
-    if ( ! caseValue ) caseValue = word->S_Value ;
-    CSL_Interpret_C_Blocks ( 1, 0, 0 ) ; // needed function - CSL_Interpret_Blocks
+    caseValue = word->S_Value ;
+    CSL_Interpret_C_Blocks ( 1, 0, 0 ) ; // mabye we need another function - CSL_Interpret_Blocks
     block caseBlock = ( block ) DataStack_Pop ( ) ;
     CaseNode * cnode = _CaseNode_New ( allocType, caseBlock, caseValue ) ;
     if ( ! _Compiler_->CurrentMatchList ) _Compiler_->CurrentMatchList = _dllist_New ( allocType ) ;
@@ -85,16 +69,8 @@ _CS_Match ( uint64 allocType )
     byte * token ;
     token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
     word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
-    if ( GetState ( _Context_, C_SYNTAX ) )
-    {
-        CSL_Parse_LParen_For_OperandWord ( word, 1 ) ;
-        CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;
-    }
-    else
-    {
-        Lexer_ReadToken ( interp->Lexer0 ) ;
-        Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
-    }
+    CSL_Parse_KeywordOperand ( word, 1 ) ;
+    if ( GetState ( _Context_, C_SYNTAX ) ) CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;
     if ( ! _Compiler_->CurrentMatchList ) _Compiler_->CurrentMatchList = _dllist_New ( allocType ) ;
     _Do_LiteralValue ( ( int64 ) _Compiler_->CurrentMatchList ) ;
     Compile_Call_TestRSP ( ( byte* ) MatchAccessFunction ) ;

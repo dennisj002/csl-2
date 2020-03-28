@@ -351,11 +351,12 @@ User
 : pause nl _pause ;
 : opOff optimizeOff inlineOff state ;
 : opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ; //'opOn1 find wdiss //pause
-: vck ( n w ) { verbosity @ n @ != } { verbosity n @ = w @ _findUsing wordRun } if2 ; // for testing
+: vck ( n str ) { verbosity @ n @ != } { verbosity n @ = str @ _findUsing wordRun } if2 ; // for testing
 //'vck find wdiss //pause
 : opOn ( n )
     optimizeOn inlineOn 
-    n @ 'state literal vck  // literal pops the stack and turns 'state into a string -- for testing
+    //n @ 'state literal vck  // literal pops the stack and turns 'state into a string -- for testing
+    n @ "state" vck  // literal pops the stack and turns 'state into a string -- for testing
 ;
 //' opOn find winfo //pause 2 opOn 1 opOn 
 

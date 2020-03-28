@@ -48,6 +48,7 @@ Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, in
 {
     Word * word = Compiler_CopyDuplicatesAndPush ( word0, tsrli, scwi ) ;
     interp->w_Word = word ;
+    Word_SetTsrliScwi ( word, tsrli, scwi ) ;
     Word_Eval ( word ) ;
     return word ; //let callee know about actual word evaled here after Compiler_CopyDuplicatesAndPush
 }

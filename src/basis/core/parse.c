@@ -255,8 +255,8 @@ Parse_Macro ( int64 type )
     return value ;
 }
 
-void
-_Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTermChar )
+Word *
+_Lexer_ParseTerminatingMacro (Lexer * lexer, byte termChar, Boolean includeTermChar , Boolean evalFlag)
 {
     ReadLiner * rl = _ReadLiner_ ;
     byte * token ;
@@ -275,12 +275,17 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
     _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
     _CSL_->SC_QuoteMode = false ;
     SetState ( lexer, LEXER_DONE, true ) ;
+    if ( GetState ( _CSL_, STRING_MACROS_ON ) && GetState ( &_CSL_->Sti, STI_INITIALIZED ) ) _CSL_StringMacros_Do ( lexer->TokenBuffer ) ;
     token = String_New ( lexer->TokenBuffer, STRING_MEM ) ;
     if ( termChar == '\"' )
     {
-        if ( GetState ( _CSL_, STRING_MACROS_ON ) && GetState ( &_CSL_->Sti, STI_INITIALIZED ) ) _CSL_StringMacros_Do ( lexer->TokenBuffer ) ;
         Word * word = _Lexer_ParseToken_ToWord ( lexer, token, -1, -1 ) ;
-        Word_Eval ( word ) ;
+        if ( evalFlag ) 
+        {
+            Word_Eval ( word ) ;
+            return 0 ;
+        }
+        else return word ;
     }
 }
 

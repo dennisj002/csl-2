@@ -5,7 +5,7 @@ CPrimitive CPrimitives [] = {
     { "locationPrint", 0, 0, 0, CSL_Location_Printf, 0, 0, 0, "Experimental", "Root" },
     { "do>", 0, 0, 0, CSL_Do, IMMEDIATE, 0, 0, "Experimental", "Root" },
     { "does>", 0, 0, 0, CSL_Does, IMMEDIATE, 0, 0, "Experimental", "Root" },
-    { "<do", 0, 0, 0, CSL_NoOp, IMMEDIATE, 0, 0, "Experimental", "Root" }, 
+    { "<do", 0, 0, 0, CSL_NoOp, IMMEDIATE, 0, 0, "Experimental", "Root" },
 
     { "(", 0, 0, 0, ( block ) LC_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD | LEFT_PAREN, 0, 0, "Lisp", "Root" },
     { "_(", 0, 0, 0, ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
@@ -24,7 +24,7 @@ CPrimitive CPrimitives [] = {
     { "macro", 0, 0, 0, ( block ) _LO_Macro, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" }, // nb. too many clashes with other 'if's
     { ".if", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "cond", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    { "car", 0, 0, 0, ( block ) LO_Car, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" }, 
+    { "car", 0, 0, 0, ( block ) LO_Car, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "cdr", 0, 0, 0, ( block ) LO_Cdr, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "quote", 0, 0, 0, ( block ) LO_Quote, 0, 0, T_LISP_READ_MACRO, "Lisp", "Root" },
     { "eval", 0, 0, 0, ( block ) _LC_Eval, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
@@ -96,9 +96,9 @@ CPrimitive CPrimitives [] = {
     { "typedef", 0, 0, 0, CSL_Typedef, 0, 0, 0, "C_Syntax", "C" },
     { "&", 0, 0, 0, CSL_AddressOf, ( NO_CODING | ADDRESS_OF_OP | IMMEDIATE ), 0, 0, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
     //{ "mcase", 0, 0, 0, CS_Case, IMMEDIATE, 0, 0, "C_Syntax", "C" },
-    { "case", 0, 0, 0, CS_Case, IMMEDIATE, 0, 0, "C_Syntax", "C" },
+    { "case", 0, 0, 0, CS_Case, IMMEDIATE | KEYWORD, 0, 0, "C_Syntax", "C" },
     //{ "switch", 0, 0, 0, CS_Match, IMMEDIATE, 0, 0, "C_Syntax", "C" },
-    { "match", 0, 0, 0, CS_Match, IMMEDIATE, 0, 0, "C_Syntax", "C" },
+    { "match", 0, 0, 0, CS_Match, IMMEDIATE | KEYWORD, 0, 0, "C_Syntax", "C" },
 
     //{ "}", 0, 0, 0, CSL_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
     //{ "{", 0, 0, 0, CSL_TypedefStructBegin, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
@@ -544,7 +544,7 @@ CPrimitive CPrimitives [] = {
     { "postfixOn", 0, 0, 0, CSL_PostfixModeOn, IMMEDIATE | KEYWORD, 0, 0, "Compiler", "Root" },
     { "goto", 0, 0, 0, CSL_Goto, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "continue", 0, 0, 0, CSL_Continue, IMMEDIATE, 0, 0, "Compiler", "Root" },
-    { "return", 0, 0, 0, CSL_Return, (IMMEDIATE), 0, 0, "Compiler", "Root" },
+    { "return", 0, 0, 0, CSL_Return, IMMEDIATE | KEYWORD, 0, 0, "Compiler", "Root" },
     //{ "return", 0, 0, 0, CSL_Return, (IMMEDIATE|PREFIX), 0, 0, "Compiler", "Root" },
     { "break", 0, 0, 0, CSL_Break, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "noop", 0, 0, 0, CSL_NoOp, IMMEDIATE, 0, 0, "Compiler", "Root" },

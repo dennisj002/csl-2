@@ -1,9 +1,10 @@
 5
-: sp ; //stack pause ;
 #if 1
 Root 
 "Control" namespace
  Bits Control
+: sp ; //stack pause ;
+sp
 'x var
 // d: "agoto" { "here" label { kbhit dup p } { "end" goto } { 1 p "here" goto } ifElse "end" label 2 p } word
 // " agoto { " here label { kbhit dup p } { " end goto } { 1 p " here goto } ifElse " end label 2 p } word
@@ -27,7 +28,7 @@ nl 10 abrk0 sp //pause
 : abrk5 { { kbhit 0 > } { return } { continue } ifElse  } loop nl "ok" ps ;
 : abrk6 x 10 = nl "Hit any key : " ps { { kbhit 0 > } { { x @ 0 == } { break } { x 1 -= } ifElse decimal x @ p } { continue } ifElse  } loop nl "ok" ps ;
 #endif
-
+sp
 : leaving ( str n j ) s "leaving" ps str @ ps "n =" ps n @ p "j = " ps j @ p s ;
 
 : ct00 ( n | j ) 
@@ -38,7 +39,8 @@ nl 10 abrk0 sp //pause
     for
 ;
 'ct00 find wdiss
-17 ct00 //pause
+17 ct00 
+sp
 : ct0 ( n | j ) 
     nl "ct0 : " ps nl
     { 
@@ -56,7 +58,8 @@ nl 10 abrk0 sp //pause
     "ct0" n @ j @ leaving
 ;
 'ct0 find wdiss
-17 ct0 //pause
+17 ct0 
+sp
 : ct1 ( n | j ) 
     nl "ct1 : " ps nl
     { j 1 = } { j @ n @ <= } { j ++ }
@@ -68,7 +71,8 @@ nl 10 abrk0 sp //pause
     { { { label: hi "ct1 after nested goto/label1 works" ps nl return } _ } _ } _
 ;
 //'ct1 find wdiss
-17 ct1 //pause
+17 ct1
+sp
 : ct2 
     nl "ct2 : " ps nl
     { nl "testing ct2 : goto/label2 ->" ps goto: hi } ix
@@ -90,29 +94,32 @@ ct2
 Compiler Logic User
 
 : caseSwitchExample ( n ) 
-    case '1 { nl 1 p } 
+    case ( 1 ) { nl 1 p } 
+    case ( '1 ) { nl "'1" ps } 
     case '2 { nl 2 p } 
     case '3 { nl 3 p } 
     case 3 { nl 3 p } 
     case 77 { nl 77 p } 
     case 'seven { nl 7 p } 
-    case 'eight { nl 8 p } 
-    case "nine" { nl 9 p } 
+    case ( 'eight ) { nl 8 p } 
+    case ( "nine" ) { nl 9 p } 
     match ( n @ ) // either or ...
     //n @ switch
 ; 
-
+sp
 //' caseSwitchExample find wdiss
 'seven caseSwitchExample 
 '3 caseSwitchExample  
 '2 caseSwitchExample  
 '1 caseSwitchExample 
+1 caseSwitchExample 
 77 caseSwitchExample 
 "seven" caseSwitchExample 
 "nine" caseSwitchExample 
 'nine caseSwitchExample 
+'eight caseSwitchExample 
 maybePause 
-
+nl
 cOn
 void
 csMatchEx ( n )
@@ -126,7 +133,7 @@ csMatchEx ( n )
         case 77 { nl p (77) ; } 
         case 'seven { nl p (7) ; } 
         case 'eight { nl p (8) ; } 
-        case "nine" { nl p (9) ; } 
+        case 'nine { nl p (9) ; } 
     } 
 }
 //pwi csMatchEx
@@ -141,12 +148,12 @@ csMatchEx ( 'eight ) ;
 csMatchEx ( 'nine ) ;
 csMatchEx ( '77 ) ; // should not match : string != int
 maybePause
-
+nl
 void
 csMatchExWithReturn ( n | x rtn )
 {
     x = 1111 ;
-    match n // syntax supports either with or without parentheses
+    match ( n ) // syntax supports either with or without parentheses
     {
         case '1 { nl ; p (1) ; rtn = x ; } 
         case '2 { nl ; p (2) ; rtn = n ; } 
@@ -155,7 +162,9 @@ csMatchExWithReturn ( n | x rtn )
         case 77 { nl ; p (77) ; rtn = n ; } 
         case 'seven { nl ; p (7) ; rtn = n ; } 
         case 'eight { nl ; p (8) ; rtn = n ; } 
-        case "nine" { nl ; p (9) ; rtn = x ; } 
+        case ( 'nine ) { nl ; ps ( n ) ; p (9) ; ps ( "singleQuote1" ) ; rtn = x ; } 
+        case 'nine { nl ; ps ( n ) ; p (9) ; ps ( "singleQuote2" ) ; rtn = x ; } 
+        case ( "nine" ) { nl ; ps (n) ; p (9) ; ps ( "doubleQuote" ) ; rtn = x ; } 
     } 
     p ( x - 103 ) ;
     return rtn ;
@@ -169,7 +178,9 @@ csMatchExWithReturn ( '2 ) ; ps
 csMatchExWithReturn ( 77 ) ; p
 csMatchExWithReturn ( 3 ) ; p
 csMatchExWithReturn ( 'eight ) ; ps
+csMatchExWithReturn ( "nine" ) ; p
 csMatchExWithReturn ( 'nine ) ; p
+nl
 csMatchExWithReturn ( '77 ) ; p // should not match : string != int
 cOff
 maybePause

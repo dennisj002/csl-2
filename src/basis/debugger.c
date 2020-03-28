@@ -48,11 +48,13 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
         debugger->w_Alias = word ;
         debugger->w_AliasOf = Word_UnAlias ( word ) ;
     }
+#if 0    
     else
     {
         debugger->w_Alias = 0 ;
         debugger->w_AliasOf = 0 ;
     }
+#endif    
     debugger->PreHere = debugger->SpecialPreHere ? debugger->SpecialPreHere : Here ;
     if ( word ) debugger->RL_ReadIndex = word->W_RL_Index ;
     debugger->w_Word = word ;

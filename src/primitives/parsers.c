@@ -77,7 +77,7 @@ CSL_ParseObject ( )
 void
 CSL_DoubleQuoteMacro ( )
 {
-    _Lexer_ParseTerminatingMacro ( _Lexer_, '\"', 1 ) ;
+    _Lexer_ParseTerminatingMacro ( _Lexer_, '\"', 1, 1 ) ;
 }
 
 void

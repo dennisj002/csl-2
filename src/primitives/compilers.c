@@ -152,7 +152,7 @@ CSL_Return ( )
     int64 tsrli = - 1, scwi = - 1 ;
     Word_SetTsrliScwi ( word, tsrli, scwi ) ;
     SetState ( _Compiler_, DOING_RETURN, true ) ;
-    CSL_DoReturnWord ( word, 1 ) ;
+    CSL_DoReturnWord ( word ) ;
     SetState ( _Compiler_, DOING_RETURN, false ) ;
 }
 
@@ -174,15 +174,21 @@ CSL_SetupRecursiveCall ( )
     _CSL_CompileCallGoto ( 0, GI_RECURSE ) ;
 }
 
+Word *
+_CSL_Literal ( )
+{
+    int64 value = DataStack_Pop ( ) ;
+    Word * word = DataObject_New ( LITERAL, 0, ( byte* ) value, 0, LITERAL | CONSTANT, 0, 0, value, 0, STRING_MEMORY, - 1, - 1 ) ;
+    word->S_Value = (int64) word->Name ;
+    return word ; 
+}
+
 void
 CSL_Literal ( )
 {
-    int64 value = DataStack_Pop ( ) ;
-    ByteArray * svcs = _O_CodeByteArray ;
-    _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->MemorySpace0->TempObjectSpace, 4 * K ) ;
-    Word * word = DataObject_New ( LITERAL, 0, ( byte* ) "<literal>", 0, LITERAL | CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
-    Set_CompilerSpace ( svcs ) ;
+    Word * word = _CSL_Literal ( ) ;
     Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
+    //DataStack_Push ( (int64) word ) ;
 }
 
 void

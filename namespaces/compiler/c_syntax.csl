@@ -304,9 +304,9 @@ $ ( | atoken, buffer, CBuffer buffer0 )
         }
     }
 } 
-//void sp () { stack ; pause ; }
-'void.$ find wdiss sp
-void
+'void.$ find wdiss 
+sp
+
 c_syntaxOff 
 #if 1 //doScript2 
 "\n\nnew $ test\n" ps
@@ -321,8 +321,7 @@ sp
 verbosity 1 =
 infixOff
 1 opOn
-//stack pause
-: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ; 1 2 hi //pause
+: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ; 1 2 hi 
 sp
 c_syntaxOn
 sp

@@ -15,10 +15,10 @@ Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
 {
     if ( tokenToUse ) _CSL_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
-    int64 tsrli = - 1, scwi = - 1 ;
-    Word_SetTsrliScwi ( _CSL_->EndBlockWord, tsrli, scwi ) ;
-    _Debugger_->SubstitutedWord = _CSL_->BeginBlockWord ;
-    Interpreter_DoWord_Default ( _Interpreter_, _CSL_->EndBlockWord, tsrli, scwi ) ;
+    //int64 tsrli = - 1, scwi = - 1 ;
+    //Word_SetTsrliScwi ( _CSL_->EndBlockWord, tsrli, scwi ) ;
+    if ( tokenToUse ) _Debugger_->SubstitutedWord = _CSL_->EndBlockWord ;
+    Interpreter_DoWord_Default ( _Interpreter_, _CSL_->EndBlockWord, -1, -1 ) ;
     _CSL_->EndBlockWord->Name = ( byte* ) "}" ;
     _Debugger_->SubstitutedWord = 0 ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -32,10 +32,10 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     // ? source code adjustments ?
     if ( tokenToUse ) _CSL_->BeginBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
-    int64 tsrli = - 1, scwi = - 1 ;
-    Word_SetTsrliScwi ( _CSL_->BeginBlockWord, tsrli, scwi ) ;
-    _Debugger_->SubstitutedWord = _CSL_->BeginBlockWord ;
-    Interpreter_DoWord_Default ( _Interpreter_, _CSL_->BeginBlockWord, tsrli, scwi ) ;
+    //int64 tsrli = - 1, scwi = - 1 ;
+    //Word_SetTsrliScwi ( _CSL_->BeginBlockWord, tsrli, scwi ) ;
+    if ( tokenToUse ) _Debugger_->SubstitutedWord = _CSL_->BeginBlockWord ;
+    Interpreter_DoWord_Default ( _Interpreter_, _CSL_->BeginBlockWord, -1, -1) ;
     _CSL_->BeginBlockWord->Name = ( byte* ) "{" ;
     _Debugger_->SubstitutedWord = 0 ;
     compiler->BeginBlockFlag = false ;
