@@ -284,7 +284,7 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
                 ( tsl ? "signature " : "" ), c_gd ( ts ) ) ;
         }
     }
-    else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;
+    else string = String_CheckForAtAdddress (( byte* ) stackPointer[i], &_O_->Debug, &_O_->User) ;
     Printf ( ( byte* ) "\n  %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
         stackName, i, ( uint64 ) & stackPointer [ i ], stackPointer [ i ], word ? buffer : string ? string : ( byte* ) "" ) ;
 }
@@ -293,14 +293,11 @@ void
 _Stack_PrintHeader ( Stack * stack, byte * name )
 {
     int64 depth = Stack_Depth ( stack ) ;
-    //if ( size )
-    {
-        uint64 * sp = stack->StackPointer ; // 0 based stack
-        byte * location = c_gd ( Context_Location ( ) ) ;
-        Printf ( ( byte* ) "\n%s at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT,
-            name, location, name, depth, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CSLRsp (Rbx)" : "", ( int64 ) sp,
-            ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
-    }
+    uint64 * sp = stack->StackPointer ; // 0 based stack
+    byte * location = c_gd ( Context_Location ( ) ) ;
+    Printf ( ( byte* ) "\n%s at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT,
+        name, location, name, depth, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CSLRsp (Rbx)" : "", ( int64 ) sp,
+        ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
 }
 
 void

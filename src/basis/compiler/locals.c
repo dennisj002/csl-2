@@ -197,42 +197,6 @@ Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 }
 
 void
-CSL_CheckDo_KeywordOperand ( byte * token )
-{
-    Compiler * compiler = _Compiler_ ;
-    Word * word ;
-    token = Lexer_ReadToken ( _Lexer_ ) ; // remember this was a peeked word
-    if ( token[0] == '\"' ) word = _Lexer_ParseTerminatingMacro ( _Lexer_, '\"', 1, 0 ) ;
-    else
-    {
-        word = Interpreter_InterpretAToken ( _Interpreter_, token, - 1, - 1 ) ;
-        if ( token[0] == '\'' ) word = _CSL_Literal ( ) ;
-    }
-    if ( ( token[0] != '@' ) && ( ! compiler->ReturnLParenOperandWord ) ) compiler->ReturnLParenOperandWord = word ;
-}
-
-Word *
-CSL_Parse_KeywordOperand ( Word * word, Boolean otherwiseFlag )
-{
-    Compiler * compiler = _Compiler_ ;
-    byte * token ;
-    compiler->ReturnLParenOperandWord = 0 ;
-    if ( word && ( word->Name [0] == '(' ) ) // remember this was a peeked word
-    {
-        token = Lexer_ReadToken ( _Lexer_ ) ; // remember this was a peeked word
-        //while ( token = Lexer_ReadToken ( _Lexer_ ), ( token [0] != ')' ) )
-        while ( token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ), ( token [0] != ')' ) ) CSL_CheckDo_KeywordOperand ( token ) ;
-        Lexer_ReadToken ( _Lexer_ ) ;
-    }
-    else if ( otherwiseFlag && ( ! ( word->W_MorphismAttributes & ( T_TOS ) ) ) )
-    {
-        while ( token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ), ( ( token [0] != '{' ) && ( token [0] != '}' ) && ( token [0] != ';' ) ) )
-            CSL_CheckDo_KeywordOperand ( token ) ;
-    }
-    return compiler->ReturnLParenOperandWord ;
-}
-
-void
 CSL_DoReturnWord ( Word * word )
 {
     Compiler * compiler = _Compiler_ ;
@@ -251,17 +215,9 @@ CSL_DoReturnWord ( Word * word )
         if ( memcmp ( mov_r14_rax, Here - 3, 3 ) )
             Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
     }
-#if 0    
-    else if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
+#if 1    
+    if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
     {
-        if ( readTokenFlag ) Lexer_ReadToken ( _Lexer_ ) ; // don't compile anything let end block or locals deal with the return
-        CSL_WordList_PushWord ( word ) ;
-        word = Interpreter_DoWord_Default ( _Interpreter_, word, - 1, - 1 ) ;
-        token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-        if ( token[0] == '@' ) Interpreter_InterpretNextToken ( _Interpreter_ ) ;
-        Word_Check_ReSet_To_Here_StackPushRegisterCode ( word, 1 ) ;
-        compiler->ReturnLParenVariableWord = word ;
-        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
         if ( GetState ( _CSL_, TYPECHECK_ON ) )
         {
             Word * cwbc = _Context_->CurrentWordBeingCompiled ;

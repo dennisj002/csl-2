@@ -279,7 +279,7 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
     ReadLiner * rl = _ReadLiner_ ;
     int64 svReadIndex = rl->ReadIndex ;
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
-    CSL_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
+    CSL_PushToken_OnTokenList ( token ) ; 
     if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
     return token ;
 }

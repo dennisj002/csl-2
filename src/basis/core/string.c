@@ -169,7 +169,6 @@ _String_InsertColors ( byte * s, Colors * c )
     else return ( byte* ) "" ;
 }
 
-#if 1
 byte*
 String_New_RemoveColors ( byte * str, uint64 allocType )
 {
@@ -189,7 +188,6 @@ String_New_RemoveColors ( byte * str, uint64 allocType )
     buf1 = String_New ( buf0, allocType ) ;
     return buf1 ;
 }
-#endif
 
 byte *
 _String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * color )
@@ -917,7 +915,7 @@ IsString ( byte * address )
 }
 
 byte *
-String_CheckForAtAdddress ( byte * address )
+String_CheckForAtAdddress (byte * address, Colors * c1, Colors * c2)
 {
     byte *str = 0 ;
     if ( NamedByteArray_CheckAddress ( _O_->MemorySpace0->StringSpace, address )
@@ -929,22 +927,15 @@ String_CheckForAtAdddress ( byte * address )
         if ( IsString ( address ) )
         {
             str = Buffer_Data_Cleared ( _CSL_->StringInsertB5 ) ;
-            byte * bstr = c_gd ( String_ConvertToBackSlash ( address ) ) ;
-            snprintf ( ( char* ) str, 128, "< string : \'%s", bstr ) ;
-            strcat ( str, c_g ( "\' >" ) ) ;
+            byte * bstr = String_ConvertToBackSlash ( address ) ;
+            byte * prefix = cc ( "< string : \'", c2 ) ;
+            byte * cbstr = cc ( bstr, c1 ) ;
+            byte * postfx = cc ( "\' >", c2 ) ; 
+            snprintf ( ( char* ) str, 128, "%s%s%s", prefix, cbstr, postfx ) ;
+            //strcat ( str, cc ( "\' >", c2 ) ) ; 
         }
     }
     return str ;
-}
-
-byte *
-String_CheckGetValueAtAddress ( byte * address )
-{
-    byte * string = 0 ;
-    Word * word = Word_GetFromCodeAddress ( address ) ;
-    if ( word ) string = word->Name ;
-    else string = String_CheckForAtAdddress ( address ) ;
-    return string ;
 }
 
 byte *

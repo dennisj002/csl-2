@@ -26,7 +26,7 @@ _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // u
             IsFrameNecessary ( scWord->W_NumberOfNonRegisterLocals, scWord->W_NumberOfNonRegisterArgs ) ) ;
         byte * address = ( byte* ) ( uint64 ) ( fp ? fp [ varOffset ] : 0 ) ;
 
-        byte * stringValue = String_CheckForAtAdddress ( address ) ;
+        byte * stringValue = String_CheckForAtAdddress (address, &_O_->Default, &_O_->User) ;
         if ( address && ( ! stringValue ) ) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
         if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s %s", word2->ContainingNamespace->Name, c_u ( word2->Name ), c_g ( ">" ) ) ;
 

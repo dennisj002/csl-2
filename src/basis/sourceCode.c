@@ -284,7 +284,7 @@ Word *
 _CSL_WordList_TopWord ( )
 {
     Word * word = 0 ;
-    node * first = _dllist_First ( _CSL_->Compiler_N_M_Node_WordList ) ;
+    node * first = dllist_First ( _CSL_->Compiler_N_M_Node_WordList ) ;
     if ( first ) word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) first, SCN_T_WORD ) ;
     return word ;
 }

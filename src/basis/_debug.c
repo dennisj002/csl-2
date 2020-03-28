@@ -47,7 +47,7 @@ JumpCallInstructionAddress_X64ABI ( byte * address )
 {
     int64 offset ;
     if ( ( ( * ( address - 20 ) ) == 0x49 ) && ( ( * ( address - 19 ) ) == 0xb8 ) ) offset = 18 ;
-    else offset = 8 ; 
+    else offset = 8 ;
     byte * jcAddress = * ( byte** ) ( address - offset ) ; //JumpCallInstructionAddress ( debugger->DebugAddress ) ;
     return jcAddress ;
 }
@@ -85,33 +85,25 @@ byte *
 GetPostfix ( byte * address, byte* postfix, byte * buffer )
 {
     byte * iaddress = 0, *str ;
-    Word * word = 0, *dbgWord = _Debugger_->w_Word ;
+    Word * word = 0 ;
     char * prePostfix = ( char* ) "  \t" ;
-    if ( iaddress = Calculate_Address_FromOffset_ForCallOrJump ( address ) ) 
+    if ( iaddress = Calculate_Address_FromOffset_ForCallOrJump ( address ) )
     {
-        //if ( dbgWord ) //&& ( Is_NamespaceType ( dbgWord ) ) )
+        if ( ( word = Word_GetFromCodeAddress_NoAlias ( iaddress ) ) )
         {
-            if ( ( word = Word_GetFromCodeAddress_NoAlias ( iaddress ) ) )
+            byte * name = ( byte* ) c_gd ( word->Name ) ;
+            byte *postfx = c_u ( " >" ) ;
+            byte *containingNamespace = word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ;
+            if ( ( byte* ) word->CodeStart == iaddress )
             {
-                //if ( word = Word_GetFromCodeAddress ( iaddress ) )
-                {
-                    byte * name = ( byte* ) c_gd ( word->Name ) ;
-                    byte *containingNamespace = word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ;
-                    if ( ( byte* ) word->CodeStart == iaddress )
-                    {
-                        snprintf ( ( char* ) buffer, 128, "%s< %s.%s : " UINT_FRMT " >%s", prePostfix, containingNamespace, name, 
-                            ( uint64 ) iaddress, postfix ) ;
-                    }
-                    else
-                    {
-                        //snprintf ( ( char* ) buffer, 128, "%s< %s.%s+%ld >%s", prePostfix,
-                        //    containingNamespace, name, iaddress - ( byte* ) word->CodeStart, postfix ) ;
-                        snprintf ( ( char* ) buffer, 128, "%s< %s.%s+%ld", prePostfix,
-                            containingNamespace, name, iaddress - ( byte* ) word->CodeStart ) ;//, postfix ) ;
-                        strcat ( buffer, c_u ( " >") ) ;
-                        //strcat ( buffer, postfix ) ;
-                    }
-                }
+                snprintf ( ( char* ) buffer, 128, "%s< %s.%s : " UINT_FRMT "%s%s", 
+                    prePostfix, containingNamespace, name, ( uint64 ) iaddress, postfx, postfix ) ;
+            }
+            else
+            {
+                snprintf ( ( char* ) buffer, 128, "%s< %s.%s+%ld%s", 
+                    prePostfix, containingNamespace, name, iaddress - ( byte* ) word->CodeStart, postfx ) ; //, postfix ) ;
+                //strcat ( buffer, c_u ( " >" ) ) ;
             }
         }
         if ( ! word ) snprintf ( ( char* ) buffer, 128, "%s< %s >", prePostfix, ( char * ) "C compiler code" ) ;
@@ -119,7 +111,7 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
     }
     else
     {
-        str = String_CheckForAtAdddress ( *( ( byte ** ) ( address + 2 ) ) ) ;
+        str = String_CheckForAtAdddress ( *( ( byte ** ) ( address + 2 ) ), &_O_->Default, &_O_->User ) ;
         if ( str )
         {
             snprintf ( ( char* ) buffer, 128, "%s%s", prePostfix, str ) ;
@@ -142,7 +134,7 @@ void
 CSL_SetRtDebugOn ( )
 {
     SetState ( _CSL_, RT_DEBUG_ON, true ) ;
-    SetState ( _Debugger_, (DBG_INTERPRET_LOOP_DONE), true ) ;
+    SetState ( _Debugger_, ( DBG_INTERPRET_LOOP_DONE ), true ) ;
 }
 
 void

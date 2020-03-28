@@ -131,6 +131,7 @@ chi ( CObj chey0, d | a b c )
 } prefix
 pwi chi
 chi ( chey, 7 ) ;
+//pause
 sp
 #if 1
 void

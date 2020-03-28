@@ -452,6 +452,8 @@ byte *Parse_Macro(int64 type);
 Word *_Lexer_ParseTerminatingMacro(Lexer *lexer, byte termChar, Boolean includeTermChar, Boolean evalFlag);
 int64 _CSL_ParseQid_Token(byte *token0);
 void _CSL_SingleQuote(void);
+void CSL_CheckDo_KeywordOperand(byte *token);
+Word *CSL_Parse_KeywordOperand(Word *word, Boolean otherwiseFlag);
 /* src/basis/core/memSpace.c */
 byte *_mmap_AllocMem(int64 size);
 void mmap_FreeMem(byte *chunk, int64 size);
@@ -1464,7 +1466,7 @@ int64 String_FindStrnCmpIndex(byte *sc, byte *name0, int64 wrli, int64 wl0, int6
 byte *_String_HighlightTokenInputLine(byte *nvw, Boolean lef, int64 leftBorder, int64 tokenStart, byte *token, byte *token0, int64 rightBorder, Boolean ref);
 int64 _IsString(byte *address, int64 maxLength);
 byte *IsString(byte *address);
-byte *String_CheckForAtAdddress(byte *address);
+byte *String_CheckForAtAdddress(byte *address, Colors * c1, Colors * c2);
 byte *String_CheckGetValueAtAddress(byte *address);
 byte *String_DelimitSourceCodeStartForLispCSL(char *sc);
 byte *Buffer_Data_QuickReset(Buffer *b);
@@ -1643,7 +1645,6 @@ Boolean Compiler_IsFrameNecessary(Compiler *compiler);
 void Compile_Init_LocalRegisterParamenterVariables(Compiler *compiler);
 void _Compiler_AddLocalFrame(Compiler *compiler);
 void Compiler_SetLocalsFrameSize_AtItsCellOffset(Compiler *compiler);
-Word *CSL_Parse_KeywordOperand(Word *word, Boolean otherwiseFlag);
 void CSL_DoReturnWord(Word *word);
 void Compiler_RemoveLocalFrame(Compiler *compiler);
 void CSL_LocalsAndStackVariablesBegin(void);

@@ -208,7 +208,7 @@ _install :
 	-sudo rm -rf /usr/local/lib/csl/
 	-sudo cp -r ~/csl /usr/local/lib/csl/
 	-sudo cp -r ~/csl/etc /usr/local/
-	-sudo cp ~/csl/lib/lib*.* /usr/lib
+	-sudo cp ~/csl/lib/* /usr/local/lib
 	-sudo cp bin/* /usr/local/bin
 	-sudo ldconfig
 	ls -l /usr/local/bin/csl*

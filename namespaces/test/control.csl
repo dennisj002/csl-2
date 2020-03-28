@@ -103,8 +103,8 @@ Compiler Logic User
     case 'seven { nl 7 p } 
     case ( 'eight ) { nl 8 p } 
     case ( "nine" ) { nl 9 p } 
-    match ( n @ ) // either or ...
-    //n @ switch
+    //match ( n @ ) // either or ...
+    n @ switch
 ; 
 sp
 //' caseSwitchExample find wdiss

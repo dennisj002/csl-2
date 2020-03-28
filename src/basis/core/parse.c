@@ -260,6 +260,7 @@ _Lexer_ParseTerminatingMacro (Lexer * lexer, byte termChar, Boolean includeTermC
 {
     ReadLiner * rl = _ReadLiner_ ;
     byte * token ;
+    Word * word = 0 ;
     if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CSL ) ) ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) )
         CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 0 ) ;
     _CSL_->SC_QuoteMode = true ;
@@ -279,14 +280,14 @@ _Lexer_ParseTerminatingMacro (Lexer * lexer, byte termChar, Boolean includeTermC
     token = String_New ( lexer->TokenBuffer, STRING_MEM ) ;
     if ( termChar == '\"' )
     {
-        Word * word = _Lexer_ParseToken_ToWord ( lexer, token, -1, -1 ) ;
+        word = _Lexer_ParseToken_ToWord ( lexer, token, -1, -1 ) ;
         if ( evalFlag ) 
         {
             Word_Eval ( word ) ;
-            return 0 ;
+            word = 0 ;
         }
-        else return word ;
     }
+    return word ;
 }
 
 int64
@@ -399,5 +400,41 @@ _CSL_SingleQuote ( )
             CSL_InitSourceCode_WithName ( _CSL_, token, 0 ) ;
     }
     _CSL_->SC_QuoteMode = false ;
+}
+
+void
+CSL_CheckDo_KeywordOperand ( byte * token )
+{
+    Compiler * compiler = _Compiler_ ;
+    Word * word ;
+    token = Lexer_ReadToken ( _Lexer_ ) ; // remember this was a peeked word
+    if ( token[0] == '\"' ) word = _Lexer_ParseTerminatingMacro ( _Lexer_, '\"', 1, 0 ) ;
+    else
+    {
+        word = Interpreter_InterpretAToken ( _Interpreter_, token, - 1, - 1 ) ;
+        if ( token[0] == '\'' ) word = _CSL_Literal ( ) ;
+    }
+    if ( ( token[0] != '@' ) && ( ! compiler->ReturnLParenOperandWord ) ) compiler->ReturnLParenOperandWord = word ;
+}
+
+Word *
+CSL_Parse_KeywordOperand ( Word * word, Boolean otherwiseFlag )
+{
+    Compiler * compiler = _Compiler_ ;
+    byte * token ;
+    compiler->ReturnLParenOperandWord = 0 ;
+    if ( word->W_MorphismAttributes & T_TOS ) return 0 ;
+    if ( word && ( word->Name [0] == '(' ) ) // remember this was a peeked word
+    {
+        token = Lexer_ReadToken ( _Lexer_ ) ; // remember this was a peeked word
+        while ( token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ), ( token [0] != ')' ) ) CSL_CheckDo_KeywordOperand ( token ) ;
+        Lexer_ReadToken ( _Lexer_ ) ; // read final ')' which was just peeked
+    }
+    else if ( otherwiseFlag ) //&& ( ! ( word->W_MorphismAttributes & ( T_TOS ) ) ) )
+    {
+        while ( token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ), ( ( token [0] != '{' ) && ( token [0] != '}' ) && ( token [0] != ';' ) ) )
+            CSL_CheckDo_KeywordOperand ( token ) ;
+    }
+    return compiler->ReturnLParenOperandWord ;
 }
 
