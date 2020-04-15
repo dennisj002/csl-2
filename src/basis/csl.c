@@ -170,7 +170,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
 
     if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nSystem Memory is being reallocated.  " ) ;
 
-    csl->ContextDataStack = Stack_New ( 256, allocType ) ;
+    csl->ContextStack = Stack_New ( 256, allocType ) ;
     //csl->ObjectStack = Stack_New ( 1 * K, allocType ) ;
     csl->TypeWordStack = Stack_New ( 1 * K, allocType ) ;
     //csl->TokenList = _dllist_New ( allocType ) ;
@@ -217,21 +217,21 @@ void
 CSL_ResetMemory ( CSL * csl )
 {
 #if 0    
-    if ( csl->ContextDataStack )
+    if ( csl->ContextStack )
     {
-        while ( Stack_Depth ( csl->ContextDataStack ) )
+        while ( Stack_Depth ( csl->ContextStack ) )
         {
-            Context * cntx = ( Context* ) _Stack_Pop ( csl->ContextDataStack ) ;
+            Context * cntx = ( Context* ) _Stack_Pop ( csl->ContextStack ) ;
             Context_Recycle ( cntx ) ;
         }
         //if ( csl->Context0 ) NamedByteArray_Delete ( csl->Context0->ContextNba ) ;
     }
 #else
-    if ( csl->ContextDataStack )
+    if ( csl->ContextStack )
     {
-        while ( Stack_Depth ( csl->ContextDataStack ) )
+        while ( Stack_Depth ( csl->ContextStack ) )
         {
-            Context * cntx = ( Context* ) _Stack_Pop ( csl->ContextDataStack ) ;
+            Context * cntx = ( Context* ) _Stack_Pop ( csl->ContextStack ) ;
             NamedByteArray_Delete ( cntx->ContextNba, 0 ) ;
         }
         if ( csl->Context0 ) NamedByteArray_Delete ( csl->Context0->ContextNba, 0 ) ;

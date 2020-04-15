@@ -1466,8 +1466,7 @@ int64 String_FindStrnCmpIndex(byte *sc, byte *name0, int64 wrli, int64 wl0, int6
 byte *_String_HighlightTokenInputLine(byte *nvw, Boolean lef, int64 leftBorder, int64 tokenStart, byte *token, byte *token0, int64 rightBorder, Boolean ref);
 int64 _IsString(byte *address, int64 maxLength);
 byte *IsString(byte *address);
-byte *String_CheckForAtAdddress(byte *address, Colors * c1, Colors * c2);
-byte *String_CheckGetValueAtAddress(byte *address);
+byte *String_CheckForAtAdddress(byte *address, Colors *c1, Colors *c2);
 byte *String_DelimitSourceCodeStartForLispCSL(char *sc);
 byte *Buffer_Data_QuickReset(Buffer *b);
 byte *Buffer_Data_Cleared(Buffer *b);

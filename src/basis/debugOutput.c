@@ -491,8 +491,6 @@ DBG_PrepareSourceCodeString ( Word * word, byte* token0, byte* il, int tvw, int 
         if ( GetState ( debugger, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) )
         {
             token1 = debugger->SubstitutedWord ? debugger->SubstitutedWord->Name : token0 ? token0 : word->Name ;
-            //subsToken = debugger->SubstitutedWord->Name ;
-            //if ( String_Equal ( token0, token ) ) sub_ins = 0 ;
         }
         else token1 = token0 ;
         token2 = String_ConvertToBackSlash ( token1 ) ;
@@ -502,7 +500,7 @@ DBG_PrepareSourceCodeString ( Word * word, byte* token0, byte* il, int tvw, int 
         scswci = String_FindStrnCmpIndex ( il, token2, scswi0, slt, slt ) ;
         if ( scswci != - 1 ) // did we find token in scs
         {
-            // these two functions can probably be integrated
+            // these two functions maybe should be integrated ; the whole series of 'ShowInfo' functions could be reworked
             if ( useScFlag ) cc_line = PSCS_Using_WordSC (il, token2, scswci ) ;
             else cc_line = PSCS_Using_ReadlinerInputString ( il, token2, token, scswci, tvw ) ; // scs : source code string
         }

@@ -6,9 +6,14 @@
 uint64
 DataStack_Pop ( )
 {
+#if 0   
     int64 value = _Dsp_ [ 0 ] ; //
-    _Dsp_ -- ;
+#else
+    _DSP_ = _Dsp_ ;
+    int64 value = Stack_Pop_WithExceptionFlag ( _DataStack_, 1 ) ;
+#endif    
     //CSL_TypeStack_Drop ( ) ;
+    _Dsp_ -- ;
     return value ;
 }
 
@@ -24,7 +29,7 @@ DataStack_Dup ( )
 {
     _Dsp_ [ 1 ] = _Dsp_[0] ;
     _Dsp_ ++ ;
-    CSL_TypeStack_Dup ( ) ;
+    //CSL_TypeStack_Dup ( ) ;
 }
 
 void
@@ -38,6 +43,7 @@ DataStack_Drop ( )
 {
     _Dsp_ -- ;
     CSL_TypeStack_Drop ( ) ;
+    //_DSP_ = _Dsp_ ;
 }
 
 inline int64
@@ -66,7 +72,8 @@ DataStack_Depth ( )
 {
     if ( _O_ && _CSL_ && _DataStack_ )
     {
-        _DataStackPointer_ = _Dsp_ ;
+        //_DataStackPointer_ = _Dsp_ ;
+        _DSP_ = _Dsp_ ;
         return Stack_Depth ( _DataStack_ ) ;
     }
     return 0 ;

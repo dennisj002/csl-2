@@ -103,7 +103,7 @@ _Context_Run ( Context * cntx, ContextFunction contextFunction )
 Context *
 CSL_Context_PushNew ( CSL * csl )
 {
-    _Stack_Push ( csl->ContextDataStack, ( int64 ) csl->Context0 ) ;
+    _Stack_Push ( csl->ContextStack, ( int64 ) csl->Context0 ) ;
     Context * cntx = _Context_New ( csl ) ;
     return cntx ;
 }
@@ -112,7 +112,7 @@ void
 CSL_Context_PopDelete ( CSL * csl )
 {
     NBA * cnba = csl->Context0->ContextNba ;
-    Context * cntx = ( Context* ) _Stack_Pop ( csl->ContextDataStack ) ;
+    Context * cntx = ( Context* ) _Stack_Pop ( csl->ContextStack ) ;
     //Compiler_DeleteDebugInfo ( cntx->Compiler0 ) ;
     _Context_ = csl->Context0 = cntx ;
     _O_->MemorySpace0->ContextSpace = cntx->ContextNba ;
@@ -206,7 +206,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
         else
         {
             Printf ( ( byte* ) "\nError : _CSL_IncludeFile : \"%s\" : not found! :: %s\n", filename,
-                _Context_Location ( ( Context* ) _CSL_->ContextDataStack->StackPointer [0] ) ) ;
+                _Context_Location ( ( Context* ) _CSL_->ContextStack->StackPointer [0] ) ) ;
         }
     }
 }

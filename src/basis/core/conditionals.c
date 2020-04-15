@@ -49,7 +49,7 @@ _CS_Case ( uint64 allocType )
     Interpreter * interp = _Interpreter_ ;
     int64 caseValue = 0 ;
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-    Word * word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ), *word1 ;
+    Word * word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
     word = CSL_Parse_KeywordOperand ( word, 1 ) ;
     SetState ( _Compiler_, DOING_CASE, true ) ;
     caseValue = word->S_Value ;

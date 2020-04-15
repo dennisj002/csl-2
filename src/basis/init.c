@@ -11,7 +11,7 @@ CSL_RuntimeInit ( CSL * csl, int64 cntxDelFlag )
     csl->SC_Word = 0 ;
     if ( cntxDelFlag )
     {
-        int64 i, stackDepth = Stack_Depth ( csl->ContextDataStack ) ;
+        int64 i, stackDepth = Stack_Depth ( csl->ContextStack ) ;
         for ( i = 0 ; i < stackDepth ; i ++ ) CSL_Context_PopDelete ( csl ) ;
     }
     SetState_TrueFalse ( csl, CSL_RUN, DEBUG_MODE ) ;
@@ -63,10 +63,10 @@ CSL_ResetAll_Init ( CSL * csl )
     byte * startDirectory = ( byte* ) "namespaces" ;
     if ( ! GetState ( _O_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/csl/namespaces" ;
     DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", 0, NAMESPACE_VARIABLE, 0, 0, ( int64 ) startDirectory, 0, 0, 0, - 1 ) ;
+    _CSL_Init_SessionCore ( csl, 1, 0 ) ;
     if ( ( _O_->RestartCondition >= RESET_ALL ) )
     {
         _O_->StartIncludeTries = 0 ;
-        _CSL_Init_SessionCore ( csl, 1, 0 ) ;
         _CSL_Namespace_NotUsing ( ( byte* ) "BigNum" ) ;
         _CSL_Namespace_NotUsing ( ( byte* ) "Lisp" ) ;
         if ( _O_->StartupFilename )

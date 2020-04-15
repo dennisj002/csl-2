@@ -882,7 +882,7 @@ typedef struct _CSL
     Stack *ReturnStack, * DataStack ;
     Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace ;
     Context * Context0 ;
-    Stack * ContextDataStack, * TypeWordStack ;
+    Stack * ContextStack, * TypeWordStack ;
     Debugger * Debugger0 ;
     LambdaCalculus * LC ;
     FILE * LogFILE ;
