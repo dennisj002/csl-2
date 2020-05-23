@@ -216,7 +216,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag )
 {
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ;
     //int64 tsrli = - 1, scwi = - 1 ;
-    Word_SetTsrliScwi ( word, -1, -1 ) ;
+    Word_SetTsrliScwi ( word, - 1, - 1 ) ;
     if ( word && ( word->W_TypeAttributes & W_COMMENT ) )
     {
         Word_Eval ( word ) ;
@@ -265,7 +265,7 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
     if ( word->Name[0] == '(' ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( (( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ))
+    else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ) )
         && ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) )
     {
         return Lexer_IsNextWordLeftParen ( lexer ) ;
@@ -279,7 +279,7 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
     ReadLiner * rl = _ReadLiner_ ;
     int64 svReadIndex = rl->ReadIndex ;
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
-    CSL_PushToken_OnTokenList ( token ) ; 
+    CSL_PushToken_OnTokenList ( token ) ;
     if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
     return token ;
 }
@@ -772,7 +772,7 @@ GreaterThan ( Lexer * lexer ) // '>':
 }
 
 // package the dot to be lexed as a token
-
+#if 0
 void
 Dot ( Lexer * lexer ) //  '.':
 {
@@ -800,6 +800,34 @@ Dot ( Lexer * lexer ) //  '.':
     }
     Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
 }
+
+#else
+void
+Dot ( Lexer * lexer ) //  '.':
+{
+    if ( ( Lexer_LastChar ( lexer ) != '/' ) && ( ! GetState ( lexer, LEXER_ALLOW_DOT ) ) ) //allow for lisp special char sequence "/." as a substitution for lambda
+    {
+        int64 i ;
+        if ( ( ! GetState ( lexer, PARSING_STRING ) ) ) //&& ( ! GetState ( _Context_, CONTEXT_PARSING_QUALIFIED_ID ) ) ) // if we are not parsing a String ?
+        {
+            if ( lexer->TokenWriteIndex )
+            {
+                for ( i = lexer->TokenWriteIndex - 1 ; i >= 0 ; i -- ) // go back into previous chars read, check if it is a number
+                {
+                    if ( ! isdigit ( lexer->TokenBuffer [ i ] ) )
+                    {
+                        ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '.' as next token
+                        SetState ( lexer, LEXER_DONE, true ) ;
+                        return ;
+                    }
+                }
+            }
+            if ( ! isdigit ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ) ) SetState ( lexer, LEXER_DONE, true ) ;
+        }
+    }
+    Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
+}
+#endif
 
 void
 Comma ( Lexer * lexer )
