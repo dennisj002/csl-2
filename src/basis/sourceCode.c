@@ -350,7 +350,8 @@ _CSL_WordList ( int64 n )
 Word *
 CSL_WordList ( int64 n )
 {
-    return ( Word * ) _CSL_WordList ( n ) ;
+    Word * rword = ( Word * ) _CSL_WordList ( n ) ;
+    return rword ;
 }
 
 void

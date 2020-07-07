@@ -70,7 +70,8 @@ OVT_RecycleAllWordsDebugInfo ( )
     Tree_Map_Namespaces ( _CSL_->Namespaces->W_List, ( MapSymbolFunction ) CSL_DeleteWordDebugInfo ) ;
     _OVT_MemListFree_WordRecyclingSpace () ;
     OVT_FreeTempMem ( ) ;
-    _CSL_->Compiler_N_M_Node_WordList = 0 ;
+    //_CSL_->Compiler_N_M_Node_WordList = 0 ;
+    _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( T_CSL ) ;
 }
 
 void
