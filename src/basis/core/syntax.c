@@ -267,7 +267,7 @@ CSL_IncDec ( int64 op ) // ++/--
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    int64 sd = List_Depth ( _CSL_->Compiler_N_M_Node_WordList ) ;
+    int64 sd = List_Depth ( _CSL_->CSL_N_M_Node_WordList ) ;
     if ( ( sd > 1 ) && ( ! GetState ( cntx, LC_CSL ) ) )
     {
         Word * currentWord = _CSL_WordList ( 0 ) ;
@@ -350,7 +350,7 @@ CSL_IncDec ( int64 op ) // ++/--
                     for ( i = 1 ; word = _CSL_WordList ( i ), ( word->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) _CSL_WordList ( i ), WORD_RECYCLING ) ;
                     List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, WORD_RECYCLING ) ;
-                    List_DropN ( _CSL_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
+                    List_DropN ( _CSL_->CSL_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;
                 }
             }

@@ -135,6 +135,7 @@ Locals User
 sp
 User
 //'dn 'dfnba find alias  
+jcc8_On
 : factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 jcc8_Off
 'reps0 var
@@ -475,5 +476,5 @@ namespaceTreeWithWords
 Interpreter
 sp
 2 + 7 assertStkChk // stack checking
-d: rdi mem    
+rdi mem    
 s

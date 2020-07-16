@@ -60,7 +60,7 @@ _Context_Init ( Context * cntx0, Context * cntx )
 {
     if ( cntx0 && cntx0->System0 ) cntx->System0 = System_Copy ( cntx0->System0, CONTEXT ) ; // nb : in this case System is copied -- DataStack is shared
     else cntx->System0 = System_New ( CONTEXT ) ;
-    List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
+    List_Init ( _CSL_->CSL_N_M_Node_WordList ) ;
     Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " \n\r\t", CONTEXT ) ;
     cntx->Interpreter0 = Interpreter_New ( CONTEXT ) ;
     cntx->Lexer0 = cntx->Interpreter0->Lexer0 ;

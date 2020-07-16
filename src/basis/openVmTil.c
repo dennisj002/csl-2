@@ -1,8 +1,8 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.908.000" ) 
+#define VERSION ((byte*) "0.908.300" ) 
 
-// inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), 
+// inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
 // Formal Language Theory (Panini, Chomsky) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
@@ -70,8 +70,8 @@ OVT_RecycleAllWordsDebugInfo ( )
     Tree_Map_Namespaces ( _CSL_->Namespaces->W_List, ( MapSymbolFunction ) CSL_DeleteWordDebugInfo ) ;
     _OVT_MemListFree_WordRecyclingSpace () ;
     OVT_FreeTempMem ( ) ;
-    //_CSL_->Compiler_N_M_Node_WordList = 0 ;
-    _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( T_CSL ) ;
+    //_CSL_->CSL_N_M_Node_WordList = 0 ;
+    _CSL_->CSL_N_M_Node_WordList = _dllist_New ( T_CSL ) ;
 }
 
 void

@@ -234,7 +234,7 @@ _CSL_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
         {
             if ( ! variableFlag )
             {
-                _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CSL_->Compiler_N_M_Node_WordList ),
+                _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CSL_->CSL_N_M_Node_WordList ),
                     ( VMapNodeFunction ) SCN_Set_NotInUseForOptimization, baseObject ) ; // old version : SCN_Set_NotInUse but now keep use for source code
             }
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;

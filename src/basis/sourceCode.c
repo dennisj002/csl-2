@@ -15,7 +15,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
         else scWord = scWord0 ;
         if ( scWord )
         {
-            list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CSL_->Compiler_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _O_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //CSL->CompilerWordList ;
+            list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CSL_->CSL_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _O_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //CSL->CompilerWordList ;
             if ( list )
             {
                 sourceCode = scWord->W_SourceCode ; //? scWord->W_SourceCode : String_New ( CSL->SC_Buffer, TEMPORARY ) ;
@@ -172,7 +172,7 @@ SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
 void
 CSL_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
 {
-    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
+    dllist * list = _CSL_->CSL_N_M_Node_WordList ;
     if ( list ) dllist_Map2 ( list, ( MapFunction2 ) SC_List_AdjustAddress, ( int64 ) address, ( int64 ) newAddress ) ;
 }
 
@@ -197,7 +197,7 @@ DLList_RecycleInit_WordList ( Word * word )
 }
 
 void
-_CSL_RecycleInit_Compiler_N_M_Node_WordList ( dllist * list, Boolean force )
+_CSL_RecycleInit_CSL_N_M_Node_WordList ( dllist * list, Boolean force )
 {
     if ( force || ( ! GetState ( _CSL_, ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ) )
     {
@@ -207,15 +207,15 @@ _CSL_RecycleInit_Compiler_N_M_Node_WordList ( dllist * list, Boolean force )
 }
 
 void
-CSL_RecycleInit_Compiler_N_M_Node_WordList ( )
+CSL_RecycleInit_CSL_N_M_Node_WordList ( )
 {
-    _CSL_RecycleInit_Compiler_N_M_Node_WordList ( _CSL_->Compiler_N_M_Node_WordList, 0 ) ;
+    _CSL_RecycleInit_CSL_N_M_Node_WordList ( _CSL_->CSL_N_M_Node_WordList, 0 ) ;
 }
 
 void
 CSL_WordList_Init ( Word * word )
 {
-    CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    CSL_RecycleInit_CSL_N_M_Node_WordList ( ) ;
     CSL_WordList_PushWord ( word ) ; // for source code
 }
 
@@ -269,7 +269,7 @@ Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( Word * word, byte * codin
 {
     if ( Compiling && word )
     {
-        if ( clearPreviousFlag ) dllist_Map1_FromEnd ( _CSL_->Compiler_N_M_Node_WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) coding ) ; //dllist_Map1_FromEnd ( CSL->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ; //( int64 ) word, ( int64 ) Here ) ;
+        if ( clearPreviousFlag ) dllist_Map1_FromEnd ( _CSL_->CSL_N_M_Node_WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) coding ) ; //dllist_Map1_FromEnd ( CSL->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ; //( int64 ) word, ( int64 ) Here ) ;
         Word_SetCodingAndSourceCoding ( word, coding ) ;
     }
 }
@@ -284,7 +284,7 @@ Word *
 _CSL_WordList_TopWord ( )
 {
     Word * word = 0 ;
-    node * first = dllist_First ( _CSL_->Compiler_N_M_Node_WordList ) ;
+    node * first = dllist_First ( _CSL_->CSL_N_M_Node_WordList ) ;
     if ( first ) word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) first, SCN_T_WORD ) ;
     return word ;
 }
@@ -296,7 +296,7 @@ _CSL_WordList_TopWord ( )
 Word *
 CSL_WordList_DoOp ( int64 n, int64 op, int64 condition )
 {
-    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
+    dllist * list = _CSL_->CSL_N_M_Node_WordList ;
     dlnode * node, *nextNode ;
     Word * wordn = 0 ;
     int64 inUseFlag, numDone = 0 ;
@@ -342,7 +342,7 @@ CSL_WordLists_PopWord ( )
 Word *
 _CSL_WordList ( int64 n )
 {
-    //Word * rword = ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CSL_->Compiler_N_M_Node_WordList, n, SCN_T_WORD ) ;
+    //Word * rword = ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CSL_->CSL_N_M_Node_WordList, n, SCN_T_WORD ) ;
     Word * rword = CSL_WordList_DoOp ( n, WL_GET_NODE, SCN_IN_USE_FOR_OPTIMIZATION ) ;
     return rword ;
 }
@@ -361,7 +361,7 @@ CSL_WordList_Push ( Word * word, Boolean inUseFlag )
     if ( ( word == (Word*) 0x7ffff711ef58 ) || ( word == (Word*) 0x7ffff711af58 ) )
         Printf ( (byte*) "\nword 0x7ffff711ef58\n" ) ;
 #endif    
-    _List_PushNew_ForWordList ( _CSL_->Compiler_N_M_Node_WordList, word, inUseFlag ) ;
+    _List_PushNew_ForWordList ( _CSL_->CSL_N_M_Node_WordList, word, inUseFlag ) ;
 }
 
 void
@@ -460,8 +460,8 @@ SC_WordList_Show ( dllist * list, Word * scWord, Boolean fromFirstFlag, Boolean 
 void
 CSL_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors )
 {
-    //dllist * list = Compiling ? CSL->Compiler_N_M_Node_WordList : ( word && word->W_SC_WordList ) ? word->W_SC_WordList : CSL->Compiler_N_M_Node_WordList ;
-    dllist * list = ( word && word->W_SC_WordList ) ? word->W_SC_WordList : _CSL_->Compiler_N_M_Node_WordList ;
+    //dllist * list = Compiling ? CSL->CSL_N_M_Node_WordList : ( word && word->W_SC_WordList ) ? word->W_SC_WordList : CSL->CSL_N_M_Node_WordList ;
+    dllist * list = ( word && word->W_SC_WordList ) ? word->W_SC_WordList : _CSL_->CSL_N_M_Node_WordList ;
     byte *buffer = Buffer_Data ( _CSL_->ScratchB1 ) ;
     buffer[0] = 0 ;
     if ( list )
@@ -470,7 +470,7 @@ CSL_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Boolean s
         if ( word )
         {
             sprintf ( ( char* ) buffer, "%sWord = %s = %lx :: list = %s %lx : %s", prefix ? prefix : ( byte* ) "", ( char* ) word->Name, ( int64 ) word,
-                ( list == _CSL_->Compiler_N_M_Node_WordList ) ? "CSL WordList" : "source code word list = ", ( int64 ) list, inUseOnlyFlag ? "in use only" : "all" ) ;
+                ( list == _CSL_->CSL_N_M_Node_WordList ) ? "CSL WordList" : "source code word list = ", ( int64 ) list, inUseOnlyFlag ? "in use only" : "all" ) ;
         }
         SC_WordList_Show ( list, word, 0, inUseOnlyFlag, buffer ) ;
         if ( Is_DebugModeOn || showInDebugColors ) DefaultColors ;
@@ -771,7 +771,7 @@ SC_List_Set_NotInUseForSC ( dlnode * node, byte * address )
 void
 CSL_AdjustDbgSourceCode_ScInUseFalse ( byte * address )
 {
-    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
+    dllist * list = _CSL_->CSL_N_M_Node_WordList ;
     if ( list ) dllist_Map1 ( list, ( MapFunction1 ) SC_List_Set_NotInUseForSC, ( int64 ) address ) ;
 }
 #endif

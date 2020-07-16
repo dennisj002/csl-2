@@ -174,7 +174,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     //csl->ObjectStack = Stack_New ( 1 * K, allocType ) ;
     csl->TypeWordStack = Stack_New ( 1 * K, allocType ) ;
     //csl->TokenList = _dllist_New ( allocType ) ;
-    csl->Compiler_N_M_Node_WordList = _dllist_New ( T_CSL ) ;
+    csl->CSL_N_M_Node_WordList = _dllist_New ( T_CSL ) ;
 
     _Context_ = csl->Context0 = _Context_New ( csl ) ;
 
@@ -339,10 +339,10 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
             {
                 if ( ! word->W_SC_WordList )
                 {
-                    word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
-                    _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( WORD_RECYCLING ) ;
+                    word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
+                    _CSL_->CSL_N_M_Node_WordList = _dllist_New ( WORD_RECYCLING ) ;
                 }
-                else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
+                else List_Init ( _CSL_->CSL_N_M_Node_WordList ) ;
                 if ( compiler->NumberOfVariables )
                 {
                     word->W_NumberOfVariables = compiler->NumberOfVariables ;
@@ -389,7 +389,7 @@ void
 CSL_DeleteDebugInfo ( )
 {
     Compiler_FreeLocalsNamespaces ( _Compiler_ ) ;
-    if ( ! _Context_->CurrentWordBeingCompiled ) CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    if ( ! _Context_->CurrentWordBeingCompiled ) CSL_RecycleInit_CSL_N_M_Node_WordList ( ) ;
 }
 
 void

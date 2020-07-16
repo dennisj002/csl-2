@@ -22,7 +22,7 @@ CSL_RuntimeInit ( CSL * csl, int64 cntxDelFlag )
     DefaultColors ;
     CSL_CheckInitDataStack ( ) ;
     _CSL_TypeStackReset ( ) ;
-    CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    CSL_RecycleInit_CSL_N_M_Node_WordList ( ) ;
     Context_ClearQualifyingNamespace () ;
 }
 

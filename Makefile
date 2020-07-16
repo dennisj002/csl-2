@@ -140,33 +140,24 @@ udis :
 	sudo ldconfig
 	
 _gmp : 
-	wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.xz 
-	tar -xvf gmp-6.1.2.tar.xz
-	cd gmp-6.1.2 && \
+	wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.lz
+	tar -xvf gmp-6.2.0.tar.lz
+	cd gmp-6.2.0 && \
 	./configure --enable-shared && \
 	make && \
 	sudo make install && \
 	sudo ldconfig
 	
 _mpfr :	
-	wget https://www.mpfr.org/mpfr-current/mpfr-4.0.1.tar.xz 
-	tar xvf mpfr-4.0.1.tar.xz
-	cd mpfr-4.0.1 && \
+	wget https://www.mpfr.org/mpfr-current/mpfr-4.1.0.tar.xz
+	tar xvf mpfr-4.1.0.tar.xz
+	cd mpfr-4.1.0 && \
 	./configure --enable-shared && \
 	make && \
 	sudo make install && \
 	sudo ldconfig
 mpfr :
 	sudo apt-get install libmpfr4 libmpfr-dev
-	
-_mpc :	_mpfr
-	wget https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz.sig 
-	tar xzf mpc-1.1.0.tar.gz
-	cd mpc-1.1.0 && \
-	./configure --enable-shared && \
-	make && \
-	sudo make install && \
-	sudo ldconfig
 	
 gmp :
 	sudo apt-get install libgmp10 libgmp-dev

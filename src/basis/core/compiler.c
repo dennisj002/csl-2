@@ -35,7 +35,7 @@ _CSL_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
     if ( word0->W_MorphismAttributes & ( KEYWORD | CSL_WORD | T_LISP_SYMBOL ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
-    else word1 = ( Word * ) dllist_Map1_WReturn ( _CSL_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
+    else word1 = ( Word * ) dllist_Map1_WReturn ( _CSL_->CSL_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
     else wordToBePushed = word0 ;
     return wordToBePushed ;
@@ -161,7 +161,7 @@ CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo, uint64 state )
     dlnode * node ;
     int64 i ;
     // we don't really use optInfo->COIW much 
-    for ( i = 0, node = dllist_First ( ( dllist* ) _CSL_->Compiler_N_M_Node_WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
+    for ( i = 0, node = dllist_First ( ( dllist* ) _CSL_->CSL_N_M_Node_WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
         if ( dobject_Get_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG ) )
         {

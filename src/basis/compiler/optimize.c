@@ -88,7 +88,7 @@ _Compiler_GetWordStackState ( Compiler * compiler, Word * word )
     CompileOptimizeInfo_Init ( optInfo, state ) ; // State : not used yet ??
     optInfo->opWord = word ;
     SetState ( _CSL_, IN_OPTIMIZER, true ) ;
-    for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) _CSL_->Compiler_N_M_Node_WordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
+    for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) _CSL_->CSL_N_M_Node_WordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
         optInfo->node ; optInfo->node = optInfo->nextNode )
     {
         optInfo->nextNode = dlnode_Next ( optInfo->node ) ;

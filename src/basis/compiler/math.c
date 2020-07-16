@@ -131,7 +131,7 @@ _CSL_Do_IncDec ( int64 op )
     else
     {
         Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
-        int64 sd = List_Depth ( _CSL_->Compiler_N_M_Node_WordList ) ;
+        int64 sd = List_Depth ( _CSL_->CSL_N_M_Node_WordList ) ;
         Word *one = ( Word* ) _CSL_WordList ( 1 ) ; // the operand
         if ( op == INC )
         {

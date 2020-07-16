@@ -204,7 +204,8 @@ CSL_DoReturnWord ( Word * word )
     if ( word1 )
     {
         compiler->ReturnLParenVariableWord = word1 ;
-        Word_Check_ReSet_To_Here_StackPushRegisterCode ( word1, 0 ) ;
+        if ( word1->W_ObjectAttributes & REGISTER_VARIABLE ) SetHere ( word1->Coding, 1 ) ;
+        else Word_Check_ReSet_To_Here_StackPushRegisterCode ( word1, 0 ) ;
         if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) ) _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
         return ;
     }

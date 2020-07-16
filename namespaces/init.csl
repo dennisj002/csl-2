@@ -468,6 +468,15 @@ rtw
 #if forStarters @ 
 : hi ( n m ) n @ m @ + dup <dbg> p return tos ; pwi hi 2 9 d: hi 11 _assert
 #endif 
-//: hi ( n m | x ) x n @ m @ + = x @ p return ( x @ ) ; pwi hi 2 9 hi 11 _assert
+#if 0
+: hi ( n m | x ) x n @ m @ + = x @ p return ( x @ ) ; pwi hi 2 9 hi 11 _assert
+cOn
+jcc8_On
+int fac5 ( REG n | REG facc )  {  facc = 1 ; while ( n > 1 )  { facc = facc * (n --) ; } return facc ; } 
+fac5 ( 7 ) ; p
+jcc8_Off
+pwi fac5    
+cOff
+#endif    
 2 + 7 assertStkChk // stack checking 
 

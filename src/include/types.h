@@ -899,7 +899,7 @@ typedef struct _CSL
     Buffer *StringB, * TokenB, *OriginalInputLineB, *InputLineB, *svLineB, *SourceCodeBuffer, *StringInsertB, *StringInsertB2, *StringInsertB3, *StringInsertB4, *StringInsertB5, *StrCatBuffer ;
     Buffer *TabCompletionBuf, * LC_PrintB, * LC_DefineB, *DebugB, *DebugB1, *DebugB2, *DebugB3, *ScratchB1, *ScratchB2, *ScratchB3, *StringMacroB ; // token buffer, tab completion backup, source code scratch pad, 
     StrTokInfo Sti ;
-    dllist * Compiler_N_M_Node_WordList ; //, *TokenList,  ;
+    dllist * CSL_N_M_Node_WordList ; //, *TokenList,  ;
     SourceCodeInfo SCI ;
     sigjmp_buf JmpBuf0 ;
 } CSL, ContextSensitiveLanguage ;
