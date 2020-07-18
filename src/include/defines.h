@@ -547,6 +547,7 @@
 #define END_OF_FILE ( (uint64) 1 << 12 )
 #define GET_NEWLINE ( (uint64) 1 << 13 )
 #define PRINTED ( (uint64) 1 << 14 )
+#define JCC8_ON ( (uint64) 1 << 17 ) // Runtime Debug
 #define DO_PROMPT ( (uint64) 1 << 18 )
 #define AUTO_VAR ( (uint64) 1 << 19 )
 #define DO_OK ( (uint64) 1 << 20 )
@@ -561,7 +562,6 @@
 #define SCA_ON ( (uint64) 1 << 29 )
 #define TYPECHECK_ON ( (uint64) 1 << 30 )
 #define RT_DEBUG_ON ( (uint64) 1 << 31 ) // Runtime Debug
-#define JCC8_ON ( (uint64) 1 << 32 ) // Runtime Debug
 
 // interpreter flags
 #define INTERPRETER_DONE ( (uint64) 1 << 28 )
@@ -686,6 +686,7 @@
 #define USING ( (uint64) 1 << 25 )
 #define ANY (NOT_USING|USING)
 #define DEBUG_INFO_SAVED ( (uint64) 1 << 26 )
+#define W_JCC8_ON ( (uint64) 1 << 27 ) // Runtime Debug
 
 // Lisp State flags 
 #define LC_PRINT_VALUE          ( (uint64) 1 << 0 )

@@ -53,6 +53,7 @@ c_syntaxOff
 7 bexp3 dup nl p 5040 _assert //sp
 pwi bexp3 //pause
 c_syntaxOn
+jcc8_On
 int
 faccs3 ( n | rec ) 
 {
@@ -81,7 +82,6 @@ fac5 ( REG n  | REG facc )
 wdiss ( ' fac5 find ) ; 
 fac5 ( 7 ) dup p 5040 _assert 
 sp
-
 int
 faccs ( REG n | REG rec ) 
 {
@@ -130,6 +130,7 @@ Locals User
 ;
 7 fac dup p 5040 _assert 
 // : bexp2 ( n | res ) { n @ 1 <= } { 1 } { n @ dup -- bexp2 * } ifElse ;
+jcc8_Off
 
 : sdbg ( j ) { stackDepth 20 > } { state regs nl "stackDepth = " ps stackDepth p nl hex { j stackDepth = } { j @ 0 > } { j -- } { p } for quit } if2 ;
 sp

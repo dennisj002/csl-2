@@ -323,9 +323,10 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
             if ( ( word->W_LispAttributes & T_LC_DEFINE ) && ( ! ( word->W_LispAttributes & T_LISP_COMPILED_WORD ) ) ) Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
             else if ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) )
             {
-                Printf ( ( byte* ) "\nCompiled with : %s%s%s%s",
+                Printf ( ( byte* ) "\nCompiled with : %s%s%s%s%s",
                     GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
-                    ( ( word->W_TypeAttributes & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
+                    ( ( word->W_TypeAttributes & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", 
+                    GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "", GetState ( word, W_JCC8_ON ) ? ", Jcc8 on" : ", Jcc8 off" ) ;
                 Boolean dsc = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
                 Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
                 Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;

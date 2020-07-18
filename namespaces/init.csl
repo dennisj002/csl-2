@@ -428,10 +428,10 @@ Root
 'doScript2 1 const
 'forStarters var 
 forStarters 0 =
-'_doDemo 0 const
+'_doDemo 1 const
     
 //dbgOff
-//dbgOn 
+dbgOn 
 // === controls ===
 
 #if Is_DebugOn 
