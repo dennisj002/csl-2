@@ -414,7 +414,8 @@ CSL_CheckDo_KeywordOperand ( byte * token )
         word = Interpreter_InterpretAToken ( _Interpreter_, token, - 1, - 1 ) ;
         if ( token[0] == '\'' ) word = _CSL_Literal ( ) ;
     }
-    if ( ( token[0] != '@' ) && ( ! compiler->ReturnLParenOperandWord ) ) compiler->ReturnLParenOperandWord = word ;
+    //if ( ( token[0] != '@' ) && ( ! compiler->ReturnLParenOperandWord ) ) compiler->ReturnLParenOperandWord = word ;
+    if ( ( token[0] != '@' ) ) compiler->ReturnLParenOperandWord = word ;
 }
 
 Word *

@@ -146,7 +146,7 @@ GetIfStatus ( )
     cstatus->Filename = _ReadLiner_->Filename ;
     cstatus->LineNumber = _ReadLiner_->LineNumber ;
     //_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
-    _List_PushNew_1Value (_Context_->PreprocessorStackList, TEMPORARY , T_PREPROCESSOR, ( int64 ) cstatus) ; //SESSION ) ;
+    _List_PushNew_1Value (_Context_->PreprocessorStackList, CONTEXT , T_PREPROCESSOR, ( int64 ) cstatus) ; //SESSION ) ;
     dbg ( Ppibs_Print ( cstatus, ( byte* ) "IfStatus" ) ) ;
     return cstatus->IfBlockStatus ;
 }
