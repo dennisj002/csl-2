@@ -246,7 +246,7 @@ sp
 ;
 
 : adump ( x y z Ar9 a )
-    nl "a8 : " ps 
+    nl "Ar9 : " ps 
     location 
     ": x =" ps x @ p 
     "y =" ps y @ p 
@@ -258,11 +258,11 @@ sp
 //verbosity 3 =
 jcc8_Off
 #if 1
-: a9 ( Ar9 a | x y z )
-    x 0 = y 0 = z 0 =
+: a9 ( Ar9 a | x y z ) 
+    x 0 = y 0 = z 0 = 
 #else
 : a9 ( Ar9 a ) 
-    byte x 0 = y 0 = z 0 =
+    byte x 0 = y 0 = z 0 = 
 #endif
     { z @ 256 < }
     {
@@ -275,6 +275,7 @@ jcc8_Off
             }
             while 
             x 0 =
+            //adump ( x @ y @ z @ a ) 
             y ++ 
         }
         while
@@ -283,11 +284,11 @@ jcc8_Off
         z ++
     }
     while
-    adump ( 0 246 67 a  ) 
+    adump ( 0 246 67 a )
 ;
 jcc8_On
 ' a9 find wdiss s //pause
-Ar9 "arr9" d: new arr9 a9 sp //pause
+Ar9 "arr9" new arr9 a9 sp //pause
 adump ( 0 123 234 arr9 ) 
 sp //pause
 #endif

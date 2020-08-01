@@ -77,7 +77,7 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
 void
 Debugger_Setup_ResetState ( Debugger * debugger )
 {
-    debugger->DebugAddress = 0 ;
+    if ( ! GetState ( debugger, DBG_STEPPING ) ) debugger->DebugAddress = 0 ;
     debugger->w_Alias = 0 ;
     debugger->w_AliasOf = 0 ;
     debugger->w_Word = 0 ;
