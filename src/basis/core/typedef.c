@@ -99,8 +99,8 @@ Parse_Array ( )
         {
             if ( i )
             {
-                tdsci->Tdsci_Field_Object->ArrayDimensions = ( int64 * ) Mem_Allocate ( tdsci->Tdsci_Field_Size, DICTIONARY ) ;
-                MemCpy ( tdsci->Tdsci_Field_Object->ArrayDimensions, arrayDimensions, tdsci->Tdsci_Field_Size ) ;
+                tdsci->Tdsci_Field_Object->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64), DICTIONARY ) ; //tdsci->Tdsci_Field_Size, DICTIONARY ) ;
+                MemCpy ( tdsci->Tdsci_Field_Object->ArrayDimensions, arrayDimensions, i * sizeof (int64) ) ; //tdsci->Tdsci_Field_Size ) ;
                 tdsci->Tdsci_Field_Object->ArrayNumberOfDimensions = i ;
             }
             break ;

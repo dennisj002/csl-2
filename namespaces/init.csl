@@ -430,8 +430,8 @@ Root
 forStarters 0 =
 '_doDemo 1 const
     
-//dbgOff
-dbgOn 
+dbgOff
+//dbgOn 
 // === controls ===
 
 #if Is_DebugOn 

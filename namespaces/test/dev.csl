@@ -314,7 +314,7 @@ fibPTC? ( n )
 } prefix
 ' fibPTC? find wdiss
 fibPTC? (20) dup p 6765 _assert sp
-
+//pause
 int
 fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 {
@@ -327,7 +327,7 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
     return fn ;
 }
 pwi fibPTC2? 
-20 fibPTC2? dup p 6765 _assert sp 
+20 fibPTC2? dup p 6765 _assert sp //pause
 "fibPTC?" ffx 
 c_syntaxOff
 : sp ;
@@ -478,4 +478,3 @@ Interpreter
 sp
 2 + 7 assertStkChk // stack checking
 rdi mem    
-s

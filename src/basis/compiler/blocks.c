@@ -14,7 +14,8 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     //CSL_AdjustDbgSourceCode_ScInUseFalse ( srcAddress ) ;
     for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
-        if ( optSetupFlag ) PeepHole_Optimize ( ) ;
+        //if ( optSetupFlag ) 
+        PeepHole_Optimize ( ) ;
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         CSL_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
@@ -110,7 +111,7 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
     byte * compiledAtAddress = 0 ;
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ;
-    BI_Block_Copy ( bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 0 ) ; //nb!! 0 : turns off peephole optimization ; peephole optimization will be done in CSL_EndCombinator
+    BI_Block_Copy ( bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 1 ) ; //nb!! 0 : turns off peephole optimization ; peephole optimization will be done in CSL_EndCombinator
     if ( jccFlag )
     {
         Compile_BlockLogicTest ( bi ) ;

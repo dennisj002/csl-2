@@ -8,7 +8,7 @@
 // and factor programming languages. It works out
 // to be an intuitive idea ; you may not need to understand it, but you can
 // see how it works. It simplifies syntax beyond Forth because
-// it reduces the number of necessary prefix operators to one - tick ("'") = quote.
+// it reduces the number of necessary prefix operators to one - tick ( ' = "'") = quote.
 
 // nb : can't fully optimize if there is code between blocks
 // check if there is any code between blocks if so we can't optimize fully
@@ -22,7 +22,7 @@ CSL_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     _CSL_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
     bi->CombinatorEndsAt = Here ;
     if ( moveFlag && Compiling ) BI_Block_Copy ( bi, bi->OriginalActualCodeStart,
-        bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt, 0 ) ; // 0 : can't generally peephole optimize (arrayTest.csl problems) ??
+        bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt, 1 ) ; // 0 : can't generally peephole optimize (arrayTest.csl problems) ??
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
     if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
     {

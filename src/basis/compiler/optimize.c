@@ -817,7 +817,7 @@ Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
                 if ( word->StackPushRegisterCode )
                 {
                     byte * src = word->StackPushRegisterCode + STACK_PUSH_REGISTER_CODE_SIZE ;
-                    BI_Block_Copy ( 0, word->StackPushRegisterCode, src, Here - src, 0 ) ;
+                    BI_Block_Copy ( 0, word->StackPushRegisterCode, src, Here - src, 1 ) ;
                 }
                 compiler->OptInfo->wordArg0_ForOpEqual = 0 ;
                 return ;
