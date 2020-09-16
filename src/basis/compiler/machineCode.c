@@ -501,11 +501,11 @@ _Compile_X_Group1_Immediate ( Boolean code, Boolean mod, Boolean rm, int64 disp,
         //DBI_OFF ;
         return ;
     }
-    else if ( ( iSize > BYTE ) || ( abs ( imm ) >= 0x7f ) ) //( imm >= 0x100 ) )
+    else if ( ( iSize > BYTE ) || ( abs ( (long) imm ) >= 0x7f ) ) //( imm >= 0x100 ) )
     {
         opCode |= 1 ;
     }
-    else if ( ( iSize <= BYTE ) || ( abs ( imm ) < 0x100 ) ) //( imm < 0x100 ) ) 
+    else if ( ( iSize <= BYTE ) || ( abs ( (long) imm ) < 0x100 ) ) //( imm < 0x100 ) ) 
         opCode |= 3 ;
     // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter

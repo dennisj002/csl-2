@@ -120,14 +120,14 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         byte signalAscii [ 128 ] ;
         int64 iw = false ;
         Word * word = debugger->w_Word ? debugger->w_Word : ((!debugger->Token)? (_Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentTokenWord) : 0)  ;
-        byte wordName [256], aliasName [256], * token0 ;
+        byte wordName [300], aliasName [256], * token0 ;
         if ( word && ( iw = String_Equal ( "init", word->Name ) ) ) { debugger->SubstitutedWord = word ; word = cntx->Interpreter0->w_Word ; } // 'new'
         debugger->w_AliasOf = debugger->SubstitutedWord ? debugger->SubstitutedWord : debugger->w_AliasOf ;
         if ( debugger->w_AliasOf ) //= Word_UnAlias ( word ) )
         {
             if ( iw ) snprintf ( aliasName, 255, "%s.%s", 
                 (debugger->w_AliasOf->S_ContainingNamespace ? debugger->w_AliasOf->S_ContainingNamespace->Name : (byte*) ""), debugger->w_AliasOf->Name) ;
-            snprintf ( wordName, 255, "%s%s%s%s", word ? word->Name : ( byte* ) "", ( ( char* ) debugger->w_AliasOf ? " -> " : "" ),
+            snprintf ( wordName, 299, "%s%s%s%s", word ? word->Name : ( byte* ) "", ( ( char* ) debugger->w_AliasOf ? " -> " : "" ),
                 iw ? aliasName : ( debugger->w_AliasOf ? debugger->w_AliasOf->Name : ( byte* ) "" ), debugger->w_AliasOf ? ( byte* ) " " : (byte*)"" ) ;
             debugger->SubstitutedWord = 0 ;
             SetState ( debugger, DBG_OUTPUT_SUBSTITUTION, true ) ;
@@ -325,7 +325,7 @@ Debugger_ShowChange ( Debugger * debugger, Word * word, Boolean stepFlag, uint64
     depthChange = DataStack_Depth ( ) - debugger->SaveStackDepth ;
     if ( word && ( debugger->WordDsp && ( GetState ( debugger, DBG_SHOW_STACK_CHANGE ) ) || ( change ) || ( debugger->SaveTOS != TOS ) || ( depthChange ) ) )
     {
-        byte * name, pb_change [ 256 ] ;
+        byte * name, pb_change [ 300 ] ;
         char * b = ( char* ) Buffer_Data ( _CSL_->DebugB ), *op ;
         char * c = ( char* ) Buffer_Data ( _CSL_->DebugB2 ) ;
         pb_change [ 0 ] = 0 ;
@@ -337,7 +337,7 @@ Debugger_ShowChange ( Debugger * debugger, Word * word, Boolean stepFlag, uint64
         else op = ( char* ) "set" ;
         snprintf ( ( char* ) c, BUFFER_IX_SIZE, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
         snprintf ( ( char* ) b, BUFFER_IX_SIZE, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
-        strncat ( ( char* ) pb_change, ( char* ) b, 256 ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_O_->Default ) ) ;
+        strncat ( ( char* ) pb_change, ( char* ) b, 299 ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_O_->Default ) ) ;
         name = word->Name ;
         if ( name ) name = String_ConvertToBackSlash ( name ) ;
         char * achange = ( char* ) pb_change ;

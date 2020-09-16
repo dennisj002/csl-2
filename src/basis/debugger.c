@@ -261,7 +261,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
     Word * word, *lastWord = 0, *currentlyRunning = Word_UnAlias ( _Context_->CurrentlyRunningWord ) ;
     byte * addr, *retAddr ;
     dllist * retStackList = List_New ( COMPILER_TEMP ) ;
-    int64 i0, i1, i2, rsDepthPick = 1 ;
+    int64 i0, i1, i2, rsDepthPick = 1, d ;
     if ( _O_->Verbosity > 1 ) CSL_PrintReturnStack ( ) ;
     for ( i0 = 0 ; i0 < 255 ; i0 ++ ) // 255 : sizeof ReturnStack
     {
@@ -278,7 +278,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
             if ( word == currentlyRunning ) break ;
         }
     }
-    int64 d = List_Depth ( retStackList ) ;
+    d = List_Depth ( retStackList ) ;
     if ( d > 1 )
     {
         Stack_Init ( debugger->ReturnStack ) ;
