@@ -12,7 +12,7 @@ cp ../csl.$1.tar.xz  ~/Programs/Programs2/backup/
 mv ../csl.$1.tar.xz  ~/workspace/backup/
 ls -al /home/backup/csl.$1.tar.xz
 ls -al /home/backup/archive/csl.$1.tar.xz
-make _install
+make install
 cd ~/csl/
 csl
 

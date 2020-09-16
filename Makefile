@@ -48,6 +48,7 @@ clean :
 	make oclean
 	touch src/include/defines.h
 	make src/include/prototypes.h
+	rm bin/csl*
 
 src/include/prototypes.h : $(INCLUDES)
 	cp src/include/_proto.h src/include/prototypes.h
@@ -95,7 +96,7 @@ _csl_O2 : cslo
 _csl_O3 : CFLAGS = $(CFLAGS_CORE) -O3
 _csl_O3 : OUT = cslo3
 _csl_O3 : cslo
-	cp bin/cslo3 bin/csl
+	#cp bin/cslo3 bin/csl
 
 _cslo :  src/include/prototypes.h $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
@@ -114,7 +115,7 @@ optimize2 : oclean _csl_O2
 optimize3 : oclean _csl_O3
 
 optimize : 
-	-rm bin/csl*
+	#-rm bin/csl*
 	#make optimize1
 	#make optimize2
 	make optimize3
