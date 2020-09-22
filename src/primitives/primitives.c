@@ -37,7 +37,7 @@ CPrimitive CPrimitives [] = {
     { ",", 0, 0, 0, ( block ) LO_UnQuote, 0, 0, T_LISP_READ_MACRO, "Lisp", "Root" },
     { "unquoteSplicing", 0, 0, 0, ( block ) LO_UnQuoteSplicing, 0, 0, T_LISP_UNQUOTE_SPLICING | T_LISP_READ_MACRO, "Lisp", "Root" },
     { ",@", 0, 0, 0, ( block ) LO_UnQuoteSplicing, 0, 0, T_LISP_UNQUOTE_SPLICING | T_LISP_READ_MACRO, "Lisp", "Root" },
-    { "::", 0, 0, 0, ( block ) _LO_CSL, 0, 0, T_LISP_csl | T_LISP_SPECIAL | T_LISP_IMMEDIATE, "Lisp", "Root" },
+    { "::", 0, 0, 0, ( block ) _LO_CSL, 0, 0, T_LISP_CSL | T_LISP_SPECIAL | T_LISP_IMMEDIATE, "Lisp", "Root" },
     { "lcReset", 0, 0, 0, ( block ) LC_Reset, 0, 0, 0, "Lisp", "Root" },
     { "lcClearDefines", 0, 0, 0, ( block ) LC_ClearDefinesNamespace, 0, 0, 0, "Lisp", "Root" },
 

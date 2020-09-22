@@ -305,7 +305,7 @@ void _Compiler_GetWordStackState(Compiler *compiler, Word *word);
 int64 Compiler_Optimize(Compiler *compiler, Word *word);
 void Compiler_SetStandardPreHere_ForDebugDisassembly(Compiler *compiler);
 void Compiler_SetupArgsToStandardLocations(Compiler *compiler);
-void Compiler_Optimizer_2_Args_And_1_Literal(Compiler *compiler);
+void Compiler_Optimizer_Cmp_With_Arg2Literal(Compiler *compiler);
 void Compiler_Optimizer_2Args_Or_WordArg1_Op(Compiler *compiler);
 void Compiler_Optimizer_0Args(Compiler *compiler);
 void Compiler_Optimizer_1Arg(Compiler *compiler);

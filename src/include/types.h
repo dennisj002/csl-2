@@ -35,15 +35,19 @@ typedef struct
 typedef byte * function, * object, * type, * slot ;
 typedef struct
 {
-    struct
+    union
     {
-        uint64 T_MorphismAttributes ;
-        uint64 T_ObjectAttributes ;
-        uint64 T_LispAttributes ;
-        uint64 T_WAllocationType ;
-        uint32 T_WordAttributes ;
-        uint16 T_NumberOfPrefixedArgs ;
-        uint16 T_Unused ;
+        struct
+        {
+            uint64 T_MorphismAttributes ;
+            uint64 T_ObjectAttributes ;
+            uint64 T_LispAttributes ;
+            uint64 T_WAllocationType ;
+            uint32 T_WordAttributes ;
+            uint16 T_NumberOfPrefixedArgs ;
+            uint16 T_Unused ;
+        } ;
+        //AttributeBitField abf ;
     } ;
     union
     {

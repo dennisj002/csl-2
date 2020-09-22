@@ -122,7 +122,7 @@ _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
     else
     {
         LO_CompileOrInterpretArgs ( largs ) ;
-        if ( lfword && ( ! ( lfword->W_LispAttributes & T_LISP_csl ) ) ) _LO_CompileOrInterpret_One ( lfword, 1 ) ;
+        if ( lfword && ( ! ( lfword->W_LispAttributes & T_LISP_CSL ) ) ) _LO_CompileOrInterpret_One ( lfword, 1 ) ;
     }
     _O_->OVT_LC->LastInterpretedWord = lfword ;
 }

@@ -213,6 +213,159 @@
 #define PSI_NEWLINE ( (uint64) 1 << 15 )
 #define PSI_PROMPT  ( (uint64) 1 << 16 )
 
+#if 0 // not used
+typedef struct 
+{
+    // defines here
+    unsigned int CPRIMITIVE : 1 ;
+    unsigned int CSL_WORD : 1 ;
+    unsigned int CSL_ASM_WORD : 1 ;
+    unsigned int T_LISP_SYMBOL : 1 ;
+    unsigned int NOT_A_KNOWN_OBJECT : 1 ;
+    unsigned int KNOWN_OBJECT : 1 ;
+    unsigned int T_HEAD : 1 ;
+    unsigned int T_TAIL : 1 ;
+    unsigned int RIGHT_BRACKET : 1 ;
+    unsigned int LEFT_BRACKET : 1 ;
+    unsigned int IMMEDIATE : 1 ;
+    unsigned int KEYWORD : 1 ;
+    unsigned int BLOCK : 1 ;
+    unsigned int INLINE : 1 ;
+    unsigned int LEFT_PAREN : 1 ;
+    unsigned int RIGHT_PAREN : 1 ;
+    unsigned int OP_RAX_PLUS_1ARG : 1 ;
+    unsigned int PREFIX : 1 ;
+    unsigned int INFIXABLE : 1 ;
+    unsigned int OBJECT_OPERATOR : 1 ;
+    unsigned int DOT : 1 ;
+    unsigned int COMMENT : 1 ;
+    unsigned int NO_OP_WORD : 1 ;
+    unsigned int SYNTACTIC : 1 ;
+    unsigned int CATEGORY_PLUS_PLUS_MINUS_MINUS : 1 ; // =
+    unsigned int CATEGORY_PP_MM : 1 ;
+    unsigned int CATEGORY_OP_STORE : 1 ;
+    unsigned int CATEGORY_DUP : 1 ;
+    unsigned int CATEGORY_OP_ORDERED : 1 ;
+    unsigned int CATEGORY_OP_LOAD : 1 ;
+    unsigned int CATEGORY_OP_EQUAL : 1 ;
+    unsigned int CATEGORY_LOGIC : 1 ;
+    unsigned int CATEGORY_OP_1_ARG : 1 ;
+    unsigned int VOID_RETURN : 1 ;
+    unsigned int CATEGORY_OP_UNORDERED : 1 ;
+    unsigned int CATEGORY_OP_STACK : 1 ;
+    unsigned int CATEGORY_OP_DIVIDE : 1 ;
+    unsigned int C_PREFIX : 1 ;
+    unsigned int ALIAS : 1 ;
+    unsigned int NO_CODING : 1 ;
+    unsigned int C_PREFIX_RTL_ARGS : 1 ;
+    unsigned int T_TOS : 1 ;
+    unsigned int BLOCK_DELIMITER : 1 ;
+    unsigned int DEBUG_WORD : 1 ;
+    unsigned int BIT_SHIFT : 1 ;
+    unsigned int WORD_CREATE : 1 ;
+    unsigned int INTERPRET_DBG : 1 ;
+    unsigned int INFIX_WORD : 1 ;
+    unsigned int DLSYM_WORD : 1 ;
+    unsigned int RAX_RETURN : 1 ;
+    unsigned int RT_STEPPING_DEBUG : 1 ;
+    unsigned int ADDRESS_OF_OP : 1 ;
+    unsigned int LOGIC_NEGATE : 1 ;
+    unsigned int COMBINATOR : 1 ;
+    unsigned int CATEGORY_OP : 1 ;
+    unsigned int CATEGORY_OP_OPEQUAL : 1 ;
+    unsigned int TEXT_MACRO : 1 ;
+    unsigned int STRING_MACRO : 1 ;
+    unsigned int T_OBJECT : 1 ;
+    unsigned int RECYCLABLE_COPY : 1 ;
+    unsigned int RECYCLABLE_LOCAL : 1 ;
+    unsigned int T_TYPE_VARIABLE : 1 ;
+    unsigned int T_ANY_FIXED_TYPE : 1 ; // =
+    unsigned int T_ANY : 1 ;
+    unsigned int C_INFIX_OP_EQUAL : 1 ;
+    unsigned int STRUCTURE : 1 ; // =
+    unsigned int STRUCT : 1 ;
+    unsigned int RAW_STRING : 1 ;
+    unsigned int T_RAW_STRING : 1 ;
+    unsigned int T_INT32 : 1 ;
+    unsigned int T_INT16 : 1 ;
+    unsigned int T_STRING : 1 ;
+    unsigned int T_INT64 : 1 ; // =
+    unsigned int T_INT : 1 ;
+    unsigned int T_FLOAT : 1 ;
+    unsigned int T_BOOLEAN : 1 ;
+    unsigned int T_BIG_NUM : 1 ;
+    unsigned int T_BYTE : 1 ; // =
+    unsigned int T_CHAR : 1 ;
+    unsigned int T_VOID : 1 ;
+    unsigned int C_TYPE : 1 ;
+    unsigned int T_UNDEFINED : 1 ;
+    unsigned int OBJECT : 1 ;
+    unsigned int OBJECT_FIELD : 1 ;
+    unsigned int DYNAMIC_OBJECT : 1 ;
+    unsigned int DOBJECT : 1 ;
+    unsigned int C_CLASS : 1 ;
+    unsigned int C_TYPEDEF : 1 ;
+    unsigned int T_SIZE_CHECK : 1 ;
+    unsigned int THIS : 1 ;
+    unsigned int QUALIFIED_ID : 1 ; // =
+    unsigned int QID : 1 ;
+    unsigned int CLASS_CLONE : 1 ;
+    unsigned int LITERAL : 1 ;
+    unsigned int REGISTER_VARIABLE : 1 ;
+    unsigned int NAMESPACE_VARIABLE : 1 ;
+    unsigned int PARAMETER_VARIABLE : 1 ;
+    unsigned int STACK_VARIABLE : 1 ;
+    unsigned int LOCAL_VARIABLE : 1 ;
+    unsigned int CONSTANT : 1 ;
+    unsigned int NAMESPACE : 1 ;
+    unsigned int CLASS : 1 ;
+    unsigned int LOCAL_OBJECT : 1 ;
+    unsigned int CLASS_FIELD : 1 ;
+    unsigned int T_POINTER : 1 ;
+    unsigned int WT_PREFIX : 1 ;
+    unsigned int WT_INFIXABLE : 1 ;
+    unsigned int WT_C_PREFIX_RTL_ARGS : 1 ;
+    unsigned int WT_POSTFIX : 1 ;
+    unsigned int WT_QID : 1 ;
+    unsigned int WT_C_SYNTAX : 1 ;
+    unsigned int W_COMMENT : 1 ;
+    unsigned int W_PREPROCESSOR : 1 ;
+    unsigned int T_LAMBDA : 1 ;
+    unsigned int T_CONS : 1 ;
+    unsigned int LIST : 1 ;
+    unsigned int LISP_C_RTL_ARGS : 1 ;
+    unsigned int LIST_OBJECT : 1 ;
+    unsigned int LIST_QUOTATION : 1 ;
+    unsigned int T_LISP_IF : 1 ;
+    unsigned int T_LISP_SET : 1 ;
+    unsigned int LIST_NODE : 1 ;
+    unsigned int T_LISP_SPECIAL : 1 ;
+    unsigned int T_LISP_BEGIN : 1 ;
+    unsigned int T_LISP_TOKEN : 1 ;
+    unsigned int T_LC_LITERAL : 1 ;
+    unsigned int T_LISP_MACRO : 1 ;
+    unsigned int LISP_VOID_RETURN : 1 ;
+    unsigned int T_NIL : 1 ;
+    unsigned int LIST_FUNCTION : 1 ; // =
+    unsigned int LISP_WORD : 1 ;
+    unsigned int T_LISP_COMPILED_WORD : 1 ;
+    unsigned int T_LISP_COMPILE : 1 ;
+    unsigned int T_LISP_LET : 1 ;
+    unsigned int T_LISP_TERMINATING_MACRO : 1 ;
+    unsigned int T_LISP_READ_MACRO : 1 ;
+    unsigned int T_LISP_LOCALS_ARG : 1 ;
+    unsigned int T_LISP_UNQUOTE_SPLICING : 1 ;
+    unsigned int T_LC_DEFINE : 1 ;
+    unsigned int T_LISP_VALUE : 1 ;
+    unsigned int T_LISP_WORD : 1 ;
+    unsigned int T_LC_NEW : 1 ;
+    unsigned int T_LISP_CSL : 1 ;
+    unsigned int T_LISP_COLON : 1 ;
+    unsigned int T_LISP_IMMEDIATE : 1 ;
+    unsigned int T_LISP_CSL_COMPILED : 1 ;
+} AttributeBitField ;
+#endif
+
 // MorphismAttributes, ObjectAttributes & LispAttributes -shared in common 
 #define CPRIMITIVE      ( (uint64) 1 << 0 )
 #define CSL_WORD     ( (uint64) 1 << 1 )
@@ -386,7 +539,7 @@
 #define T_LISP_VALUE ( (uint64) 1 << 38 )
 #define T_LISP_WORD ( (uint64) 1 << 39 )
 #define T_LC_NEW ( (uint64) 1 << 40 )
-#define T_LISP_csl ( (uint64) 1 << 45 )
+#define T_LISP_CSL ( (uint64) 1 << 45 )
 #define T_LISP_COLON ( (uint64) 1 << 46 )
 #define T_LISP_IMMEDIATE ( (uint64) 1 << 48 )
 #define T_LISP_CSL_COMPILED ( (uint64) 1 << 49 )

@@ -233,7 +233,7 @@ using
 "fac5" ffx
 "fac4" ffx
 sp
-pause
+//pause
 #endif
 
 jcc8_On

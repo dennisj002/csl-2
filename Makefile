@@ -84,6 +84,8 @@ cslo : oclean $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
 	strip $(OUT)
 	mv $(OUT) bin
+	-cp bin/$(OUT) bin/csl
+	-sudo cp bin/$(OUT) /usr/local/bin/csl
 
 _csl_O1 : CFLAGS = $(CFLAGS_CORE) -O1
 _csl_O1 : OUT = cslo1
@@ -96,7 +98,6 @@ _csl_O2 : cslo
 _csl_O3 : CFLAGS = $(CFLAGS_CORE) -O3
 _csl_O3 : OUT = cslo3
 _csl_O3 : cslo
-	#cp bin/cslo3 bin/csl
 
 _cslo :  src/include/prototypes.h $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
@@ -207,6 +208,7 @@ _install :
 
 install :
 	make
+	make optimize
 	make _install
 	
 run :
