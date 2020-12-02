@@ -168,7 +168,7 @@ _dllist_Init ( dllist * list )
         list->Head->n_Before = ( dlnode * ) 0 ;
         list->Tail->n_After = ( dlnode* ) 0 ;
         list->Tail->n_Before = ( dlnode * ) list->Head ;
-        list->n_CurrentNode = 0 ;
+        list->l_CurrentNode = 0 ;
     }
 }
 
@@ -222,7 +222,7 @@ dllist_AddNodeToHead ( dllist *list, dlnode * node )
     {
         dlnode_Remove ( node ) ; // if the node is already on a list it will be first removed
         _dllist_AddNodeToHead ( list, node ) ;
-        list->n_CurrentNode = 0 ;
+        list->l_CurrentNode = 0 ;
     }
 }
 
@@ -239,7 +239,7 @@ dllist_AddNodeToTail ( dllist *list, dlnode * node )
     {
         dlnode_Remove ( node ) ;
         _dllist_AddNodeToTail ( list, node ) ;
-        list->n_CurrentNode = node ;
+        list->l_CurrentNode = node ;
     }
 }
 
@@ -348,39 +348,39 @@ dllist_NodePrevious ( dllist * list, dlnode * node )
 dlnode *
 _dllist_Before ( dllist * list )
 {
-    return dlnode_Previous ( list->n_CurrentNode ) ;
+    return dlnode_Previous ( list->l_CurrentNode ) ;
 }
 
 dlnode *
 dllist_SetCurrentNode_Before ( dllist * list )
 {
-    list->n_CurrentNode = _dllist_Before ( list ) ;
-    if ( list->n_CurrentNode == 0 )
+    list->l_CurrentNode = _dllist_Before ( list ) ;
+    if ( list->l_CurrentNode == 0 )
     {
-        list->n_CurrentNode = dllist_Head ( list ) ;
+        list->l_CurrentNode = dllist_Head ( list ) ;
         return 0 ;
     }
-    return list->n_CurrentNode ;
+    return list->l_CurrentNode ;
 }
 // toward the TailNode
 
 dlnode *
-_dllist_After ( dllist * list )
+_dllist_CurrentNodeAfter ( dllist * list )
 {
-    return dlnode_Next ( list->n_CurrentNode ) ;
+    return dlnode_Next ( list->l_CurrentNode ) ;
 }
 // toward the TailNode
 
 dlnode *
 dllist_SetCurrentNode_After ( dllist * list )
 {
-    list->n_CurrentNode = _dllist_After ( list ) ;
-    if ( list->n_CurrentNode == 0 )
+    list->l_CurrentNode = _dllist_CurrentNodeAfter ( list ) ;
+    if ( list->l_CurrentNode == 0 )
     {
-        list->n_CurrentNode = dllist_Tail ( list ) ;
+        list->l_CurrentNode = dllist_Tail ( list ) ;
         return 0 ;
     }
-    return ( dlnode* ) list->n_CurrentNode ;
+    return ( dlnode* ) list->l_CurrentNode ;
 }
 
 void
@@ -796,7 +796,7 @@ List_N_M_Node_PrintWords ( dllist * alist )
     dllist_Map1_FromEnd ( alist, ( MapFunction1 ) Word_N_M_Node_Print, 0 ) ;
 }
 
-// i don't like not have C access to a structure but i want object allocation in init to 
+// i don't like not to have C access to a structure but i want dobject allocation in init to 
 // be robustly tested for csl use
 
 dobject *
@@ -812,26 +812,12 @@ _dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int
         dobj->do_iData[i] = value ;
     }
     va_end ( args ) ;
+    //dobject * dobj = dobject_New_M_Slot ( allocType, typeCode, m_slots, ... )
+
     _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
 
     return dobj ;
 }
-
-#if 0
-
-dobject *
-_dllist_AddToTail_New_M_Slot_Node ( dllist* list, int64 typeCode, int64 allocType, int64 m_slots, ... )
-{
-    int64 i ;
-    va_list args ;
-    va_start ( args, m_slots ) ;
-    dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
-    for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
-    va_end ( args ) ;
-    dllist_AddNodeToTail ( list, ( dlnode* ) dobj ) ;
-    return dobj ;
-}
-#endif
 
 inline
 void

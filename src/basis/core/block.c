@@ -44,7 +44,7 @@ CSL_TurnOffBlockCompiler ( )
     if ( ! GetState ( compiler, LISP_MODE ) ) CSL_LeftBracket ( ) ;
     _CSL_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
     //CSL_SaveDebugInfo ( 0, 0 ) ;
-    _CSL_FinishWordDebugInfo ( 0 ) ;
+    _CSL_FinishWordDebugInfo ( cntx->CurrentWordBeingCompiled ) ;
     CSL_NonCompilingNs_Clear ( compiler ) ;
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
     cntx->LastCompiledWord = cntx->CurrentWordBeingCompiled ;

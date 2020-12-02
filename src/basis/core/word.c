@@ -158,7 +158,7 @@ _Word_Allocate ( uint64 allocType )
     word = ( Word* ) DLList_CheckRecycledForAllocation ( _O_->MemorySpace0->RecycledWordList, size ) ;
     if ( word ) OVT_RecyclingAccounting ( OVT_RA_RECYCLED ) ; //{ _O_->MemorySpace0->RecycledWordCount ++ ; _O_->MemorySpace0->WordsInRecycling -- ; }
     else word = ( Word* ) Mem_Allocate ( size, allocType ) ;
-    ( ( DLNode* ) word )->n_Size = size ;
+    ( ( DLNode* ) word )->n_DLNode.n_Size = size ;
     word->W_WordData = ( WordData * ) ( word + 1 ) ; // nb. "pointer arithmetic"
     return word ;
 }

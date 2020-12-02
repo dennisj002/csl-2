@@ -48,6 +48,7 @@ typedef struct
             uint16 T_Unused ;
         } ;
         //AttributeBitField abf ;
+        //class bitset abt[320] ;
     } ;
     union
     {
@@ -60,54 +61,66 @@ typedef struct
         uint64 T_ChunkSize ; // remember MemChunk is prepended at memory allocation time
     } ;
 } AttributeInfo, TypeInfo, TI ;
+
+/*
 typedef struct
 {
     union
     {
-        AttributeInfo O_Attributes ;
-        type O_type ; // for future dynamic types and dynamic objects 
+        AttributeInfo o_Attributes ;
+        type o_type ; // for future dynamic types and dynamic objects 
     } ;
     union
     {
-        slot * O_slots ; // number of slots should be in T_NumberOfSlots
-        object * O_object ; // size should be in T_Size
+        slot * o_slots ; // number of slots should be in o_Attributes.T_NumberOfSlots
+        object * o_object ; // size should be in o_Attributes.T_Size
     } ;
 } Object, Tuple ;
-#define Tp_NodeAfter O_slots [0] ;
-#define Tp_NodeBefore O_slots [1] ;
-#define Tp_SymbolName O_slots [2] ;
+#define Tp_NodeAfter o_slots [0] ;
+#define Tp_NodeBefore o_slots [1] ;
+#define Tp_SymbolName o_slots [2] ;
 
 typedef object * ( *primop ) ( object * ) ;
 typedef Object * ( *Primop ) ( Object * ) ;
-typedef struct _dlnode
+ */
+
+typedef struct _node
 {
-    struct
+    union
     {
-        struct _dlnode * n_After ;
-        struct _dlnode * n_Before ;
+        struct
+        {
+            struct _node * n_After ;
+            struct _node * n_Before ;
+        } ;
+        struct
+        {
+            struct _node * n_Head ;
+            struct _node * n_Tail ;
+        } ;
     } ;
-} dlnode, node ;
-typedef struct _dllist
+} dlnode, node, _dllist ;
+typedef struct 
 {
-    struct
-    {
-        dlnode * n_Head ;
-        dlnode * n_Tail ;
-    } ;
-    node * n_CurrentNode ;
+    _dllist l_List ;
+    node * l_CurrentNode ;
 } dllist ;
-#define Head n_Head
-#define Tail n_Tail
+#define Head l_List.n_Head
+#define Tail l_List.n_Tail
 enum types
 {
     BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, CARTESIAN_PRODUCT
 } ;
-typedef struct _dobject
+typedef struct 
 {
-    struct
+    union
     {
-        dlnode * do_After ;
-        dlnode * do_Before ;
+        struct
+        {
+            dlnode * do_After ;
+            dlnode * do_Before ;
+        } ;
+        dlnode do_Node ;
     } ;
     struct
     {
@@ -125,14 +138,17 @@ typedef struct _dobject
 } dobject ; // size 4 x 64 bits
 typedef struct
 {
-    struct
+    union
     {
-        dlnode * n_After ;
-        dlnode * n_Before ;
+        struct
+        {
+            dlnode * n_After ;
+            dlnode * n_Before ;
+        } ;
+        dlnode n_Node ;
     } ;
     union
     {
-        node * n_CurrentNode ;
         struct
         {
             int32 n_Type ;
@@ -140,58 +156,16 @@ typedef struct
             Boolean n_Slots ;
             Boolean n_InUseFlag ;
         } ;
-        union
-        {
-            byte * n_unmap ;
-            byte * n_bData ;
-            int64 * n_iData ;
-        } ;
+        byte * n_unmap ;
+        byte * n_bData ;
+        int64 * n_iData ;
+        node * n_CurrentNode ;
     } ;
 } _DLNode, _Node, _ListNode, _DLList ; // size : 3 x 64 bits
 typedef struct
 {
     union
     {
-        struct
-        {
-            struct
-            {
-                dlnode * n_After ;
-                dlnode * n_Before ;
-            } ;
-            union
-            {
-                struct
-                {
-                    int32 n_Type ;
-                    int16 n_Size ;
-                    Boolean n_Slots ;
-                    Boolean n_InUseFlag ;
-                } ;
-                node * n_CurrentNode ;
-                byte * n_unmap ;
-            } ;
-        } ; //_DLNode, _Node, _listNode, _List ;
-        struct
-        {
-            struct
-            {
-                dlnode * do_After ;
-                dlnode * do_Before ;
-            } ;
-            union
-            {
-                struct
-                {
-                    int32 do_Type ;
-                    int16 do_Size ;
-                    uint8 do_Slots ;
-                    Boolean do_InUseFlag ;
-                } ;
-                byte * do_bData ;
-                int64 * do_iData ;
-            } ;
-        } ; //dobject ; // size 4 x 64 bits
         _DLNode n_DLNode ;
         dobject n_dobject ;
     } ;
@@ -252,8 +226,8 @@ typedef struct _Identifier // _Symbol
     struct _Identifier * CSLWord, * BaseObject ;
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer, CaseNode ;
-#define S_Car S_Node.n_After
-#define S_Cdr S_Node.n_Before
+#define S_Car S_Node.n_DLNode.n_After
+#define S_Cdr S_Node.n_DLNode.n_Before
 #define S_After S_Cdr
 #define S_Before S_Car
 #define S_CurrentNode n_CurrentNode
@@ -271,7 +245,7 @@ typedef struct _Identifier // _Symbol
 #define S_NumberOfSlots S_Node.n_Attributes.T_NumberOfSlots
 #define S_Pointer W_Value
 #define S_String W_Value
-#define S_unmap S_Node.n_unmap
+#define S_unmap S_Node.n_DLNode.n_unmap
 #define S_CodeSize CodeSize 
 #define S_MacroLength CodeSize 
 
@@ -287,7 +261,7 @@ typedef struct _Identifier // _Symbol
 #define LProp S_LispAttributes
 #define WProp S_WordAttributes
 #define Data S_pb_Data2
-#define InUseFlag S_Node.n_InUseFlag
+#define InUseFlag S_Node.n_DLNode.n_InUseFlag
 
 #define Lo_CAttribute W_MorphismAttributes
 #define Lo_LAttribute W_LispAttributes
@@ -642,7 +616,7 @@ typedef struct
     {
         struct
         {
-            Word *O_zero, * O_one, *O_two, *O_three, *O_four, *O_five, *O_six, *O_seven ;
+            Word *coiw_zero, * coiw_one, *coiw_two, *coiw_three, *coiw_four, *coiw_five, *coiw_six, *coiw_seven ;
         } ;
         Word * COIW [8] ; // CompileOptimizeInfo Word array
     } ;
@@ -670,7 +644,7 @@ typedef struct
 #define LOC_STACK_1             ( 1 << 5 )
 #define LOC_ACC                 ( 1 << 6 )
 #define LOC_OREG                ( 1 << 7 )
-#define REG_ON_BIT              ( 0x10 ) // decimal 16, beyond the 15 regs
+#define REG_LOCK_BIT              ( 0x10 ) // decimal 16, beyond the 15 regs
     int64 rtrn, NumberOfArgs ;
     uint16 ControlFlags ;
     Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2, *wordArg0_ForOpEqual, *lparen1, *lparen2 ;
@@ -764,7 +738,7 @@ typedef struct Interpreter
     Finder * Finder0 ;
     Lexer * Lexer0 ;
     Compiler * Compiler0 ;
-    byte * Token ; 
+    byte * Token ;
     Word *w_Word, *LastWord ;
     Word *CurrentObjectNamespace, *ThisNamespace ;
     int64 WordType ;

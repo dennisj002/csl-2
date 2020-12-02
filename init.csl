@@ -340,7 +340,7 @@ dscOn
     //stack pause
 ; 
 //' _assertStkChk find wdiss //pause
-#if 0
+#if 1
 : assertStkChk "\n_assertStkChk : " ps _assertStkChk stack pause ; 
 #else
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 

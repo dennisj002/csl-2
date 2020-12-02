@@ -240,18 +240,18 @@ Location_PushNew ( )
 void
 CSL_Do ( )
 {
-    //_Context_->CurrentlyRunningWord->CAttribute |= IMMEDIATE ;
     CSL_LeftBracket ( ) ; // interpret mode
 }
 
 void
 CSL_Does ( )
 {
-    //_CSL_RightBracket ( ) ; // back to compile mode
+    Word * saveWord = _Context_->CurrentWordBeingCompiled ;
     CSL_BeginBlock ( ) ;
     Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0, 0 ) ;
     CSL_EndBlock ( ) ;
     CSL_BlockRun ( ) ;
+    _Context_->CurrentWordBeingCompiled = saveWord ;
 }
 
 void

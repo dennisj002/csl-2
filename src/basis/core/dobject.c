@@ -30,21 +30,21 @@ dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
     return dobj ;
 }
 
-#if 0 // keep this it may be useful later
-
 dobject *
-_dobject_New_M_Slot_Node ( int64 allocType, int64 dobjType, int64 m_slots, ... )
+dobject_New_M_Slot ( int64 allocType, int64 typeCode, int64 m_slots, ... )
 {
-    dobject *dobj ;
+    int64 i, value ;
     va_list args ;
-    int64 i ;
     va_start ( args, m_slots ) ;
-    dobj = dobject_Allocate ( dobjType, m_slots, allocType ) ;
-    for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
+    dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
+    for ( i = 0 ; i < m_slots ; i ++ )
+    {
+        value = va_arg ( args, int64 ) ;
+        dobj->do_iData[i] = value ;
+    }
     va_end ( args ) ;
     return dobj ;
 }
-#endif
 
 void
 _dobject_Print ( dobject * dobj )

@@ -64,11 +64,10 @@ _CS_Case ( uint64 allocType )
 void
 _CS_Match ( uint64 allocType )
 {
-    Interpreter * interp = _Interpreter_ ;
     Word * word ;
     byte * token ;
     token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-    word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
+    word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
     CSL_Parse_KeywordOperand ( word, 1 ) ;
     if ( GetState ( _Context_, C_SYNTAX ) ) CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;
     if ( ! _Compiler_->CurrentMatchList ) _Compiler_->CurrentMatchList = _dllist_New ( allocType ) ;

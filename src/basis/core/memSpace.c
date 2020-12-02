@@ -704,7 +704,7 @@ DLList_CheckRecycledForAllocation ( dllist * list, int64 size )
     {
         dlnode_Remove ( ( dlnode* ) node ) ; // necessary else we destroy the list!
         Mem_Clear ( ( byte* ) node, size ) ;
-        node->n_InUseFlag = N_IN_USE ;
+        node->n_DLNode.n_InUseFlag = N_IN_USE ;
         return ( byte* ) node ;
     }
 

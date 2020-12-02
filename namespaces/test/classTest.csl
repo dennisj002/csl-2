@@ -5,6 +5,7 @@
 "_ClassTest_" /* testing comment ...
 testing comment */ var
 sp 
+scOn
 Int Logic C
 Compiler
 hex
@@ -68,7 +69,6 @@ sp
     DLLNode TailNode ;
 };
 sp
-scOn
 
 : init ( this )
     this.HeadNode.AfterReference this.TailNode.BeforeReference =
@@ -183,4 +183,4 @@ sp
 #endif
 2 + 7 assertStkChk // stack checking
 sp
-
+//pause

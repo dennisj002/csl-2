@@ -591,7 +591,7 @@ dlnode *dllist_Last(dllist *list);
 dlnode *dllist_NodePrevious(dllist *list, dlnode *node);
 dlnode *_dllist_Before(dllist *list);
 dlnode *dllist_SetCurrentNode_Before(dllist *list);
-dlnode *_dllist_After(dllist *list);
+dlnode *_dllist_CurrentNodeAfter(dllist *list);
 dlnode *dllist_SetCurrentNode_After(dllist *list);
 void _dllist_AddNamedValue(dllist *list, byte *name, int64 value, uint64 allocType);
 void _dllist_PushNode(dllist *list, dlnode *node);
@@ -1498,6 +1498,7 @@ OpenVmTil *_OpenVmTil_New(OpenVmTil *ovt, int64 argc, char *argv[ ]);
 /* src/basis/core/dobject.c */
 byte *_object_Allocate(int64 size, int64 allocType);
 dobject *dobject_Allocate(int64 doType, int64 slots, uint64 allocType);
+dobject *dobject_New_M_Slot(int64 allocType, int64 typeCode, int64 m_slots, ...);
 void _dobject_Print(dobject *dobj);
 void _DObject_C_StartupCompiledWords_DefInit(byte *function, int64 arg);
 DObject *_CSL_Do_DynamicObject_ToReg(DObject *dobject0, uint8 reg);

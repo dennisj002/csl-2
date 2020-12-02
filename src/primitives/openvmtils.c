@@ -103,7 +103,7 @@ OpenVmTil_Print_DataSizeofInfo ( int64 flag )
         Printf ( ( byte* ) "dobject size : %d bytes, ", sizeof ( dobject ) ) ;
         Printf ( ( byte* ) "DLNode size : %d bytes, ", sizeof ( DLNode ) ) ;
         Printf ( ( byte* ) "AttributeInfo size : %d bytes, ", sizeof (AttributeInfo ) ) ;
-        Printf ( ( byte* ) "\nObject size : %d bytes, ", sizeof (Object ) ) ;
+        //Printf ( ( byte* ) "\nObject size : %d bytes, ", sizeof (Object ) ) ;
         Printf ( ( byte* ) "Symbol size : %d bytes, ", sizeof (Symbol ) ) ;
         Printf ( ( byte* ) "Word size : %d bytes, ", sizeof (Word ) ) ;
         Printf ( ( byte* ) "ListObject size : %d bytes, ", sizeof ( ListObject ) ) ;

@@ -28,7 +28,7 @@ INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
 	
 
 OBJECTS = $(SOURCES:%.c=%.o) 
-CC = gcc #g++ -fpermissive #gcc #tcc
+CC = gcc-10 #g++ -fpermissive
 OUT = csl-gdb
 
 default : debug
@@ -48,7 +48,7 @@ clean :
 	make oclean
 	touch src/include/defines.h
 	make src/include/prototypes.h
-	rm bin/csl*
+	-rm bin/csl*
 
 src/include/prototypes.h : $(INCLUDES)
 	cp src/include/_proto.h src/include/prototypes.h
@@ -78,6 +78,7 @@ bin/csl-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb
 bin/csl-gdb : src/include/prototypes.h $(OBJECTS) 
 	$(CC) $(CFLAGS) $(OBJECTS) -o bin/csl-gdb $(LIBS)
 	strip -o bin/csl bin/csl-gdb
+	gcc-10 --version
 	
 
 cslo : oclean $(OBJECTS)
@@ -130,7 +131,7 @@ editorClean :
 	rm *.*~ src/basis/*.*~ src/basis/compiler/*.*~ src/primitives/*.*~ src/include/*.*~
 
 realClean : oclean editorClean
-	rm csl csl-gdb
+	-rm csl csl-gdb
 
 udis :
 	wget http://prdownloads.sourceforge.net/udis86/udis86-1.7.2.tar.gz
