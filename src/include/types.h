@@ -831,6 +831,7 @@ typedef struct _LambdaCalculus
     byte * LC_SourceCode ;
     Buffer *OutBuffer, *PrintBuffer ;
     byte * buffer, *outBuffer ;
+    dllist * Lambda_SC_WordList ;
 } LambdaCalculus ;
 typedef struct
 {

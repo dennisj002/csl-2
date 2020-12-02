@@ -340,6 +340,7 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
                 if ( ! word->W_SC_WordList )
                 {
                     word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
+                    if ( GetState ( _LC_, LC_COMPILE_MODE ) ) _LC_->Lambda_SC_WordList = word->W_SC_WordList ;
                     _CSL_->CSL_N_M_Node_WordList = _dllist_New ( WORD_RECYCLING ) ;
                 }
                 else List_Init ( _CSL_->CSL_N_M_Node_WordList ) ;
