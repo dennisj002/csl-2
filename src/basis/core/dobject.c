@@ -123,9 +123,10 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
     {
         word->Definition = ( block ) ( function ? function : ( byte* ) value ) ; //_OptimizeJumps ( ( byte* ) value ) ; // this comes to play (only(?)) with unoptimized code
         word->CodeStart = ( byte* ) word->Definition ;
-        if ( NamedByteArray_CheckAddress ( _O_CodeSpace, word->CodeStart ) ) word->S_CodeSize = Here - word->CodeStart ;
+        if ( NamedByteArray_CheckAddress ( _O_CodeSpace, word->CodeStart ) ) word->S_CodeSize = Here - word->CodeStart ; // 1 : return - 'ret' - ins
         else word->S_CodeSize = 0 ;
         word->W_Value = ( uint64 ) word->Definition ; // rvalue
+        //if ( word->S_CodeSize ) word->S_CodeSize ++ ; // 1 : return - 'ret' - ins
     }
     else
     {

@@ -96,8 +96,8 @@ _Udis_Disassemble ( ud_t *ud, byte* iaddress, int64 number, int64 cflag )
             number -= isize ;
         }
         while ( ( isize && ( number > 0 ) ) ) ;
-        size = address - iaddress ;
+        size = address - iaddress + 1 ; // 1 : include last iaddress 
     }
-    return (( size > 0 ) ? size : 0 ) ;
+    return (( size > 0 ) ? size : 0 ) ; 
 }
 

@@ -19,7 +19,7 @@ _Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 
 {
     int64 size = _Udis_Disassemble ( Debugger_UdisInit ( debugger ), address, ( ( number > ( 3 * K ) ) ? ( 3 * K ) : number ), cflag ) ;
     debugger->LastDisStart = address ;
-    return size ;
+    return size ; //+ 1 ; // ? 1 : return - 'ret' - ins
 }
 
 void
