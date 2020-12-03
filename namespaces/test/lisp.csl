@@ -185,6 +185,7 @@ tick fibc find wdiss //pause
 (fibc 20)
 
 //syntatic experiments ...
+// causes as yet unresolved source code display problems
 
 ( :: : hioo 3 4 + dup p ; : hio 5 6 + dup p ; hio hioo ) 7 _assert 11 _assert s //pause
 ( hioo ) ( hio ) 11 _assert 7 _assert hio hioo 7 _assert 11 _assert 

@@ -192,7 +192,7 @@ DLList_Recycle_WordList ( dllist * list )
 void
 DLList_RecycleInit_WordList ( Word * word )
 {
-    dllist_Map ( word->W_SC_WordList, ( MapFunction0 ) CheckRecycleWord ) ;
+    DLList_Recycle_WordList ( word->W_SC_WordList ) ;
     List_Init ( word->W_SC_WordList ) ;
 }
 

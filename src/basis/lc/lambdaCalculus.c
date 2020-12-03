@@ -205,9 +205,6 @@ _LO_CopyOne ( ListObject * l0, uint64 allocType )
     ListObject * l1 = 0 ;
     if ( l0 )
     {
-        //l1 = ( ListObject * ) _object_Allocate ( sizeof ( ListObject ), allocType ) ; 
-        //if (l0 == (ListObject *) 0x7ffff71321d8 ) _Printf ((byte*) "" ) ;
-        //MemCpy ( l1, l0, sizeof ( ListObject ) ) ;
         l1 = Word_Copy ( l0, allocType ) ;
         // nb. since we are coping the car/cdr are the same as the original so we must clear them else when try to add to the list and remove first it will try to remove from a wrong list so ...
         l1->S_Car = 0 ;
@@ -465,6 +462,7 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
     lc->ParenLevel = 0 ;
     lc->QuoteState = 0 ;
     lc->ItemQuoteState = 0 ;
+
     LC_SaveStackPointer ( lc ) ;
     return lc ;
 }
@@ -500,7 +498,8 @@ _LC_Init ( LambdaCalculus * lc )
         lc->outBuffer = Buffer_Data ( lc->OutBuffer ) ;
         SetState ( _CSL_, DEBUG_SOURCE_CODE_MODE, svsco ) ;
         SetState ( _CSL_, _DEBUG_SHOW_, svds ) ;
-        _LC_ = lc ;
+        DLList_Recycle_WordList ( lc->Lambda_SC_WordList ) ; 
+       _LC_ = lc ;
     }
     return lc ;
 }

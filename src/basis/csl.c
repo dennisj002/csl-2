@@ -328,11 +328,11 @@ CSL_DebugLevel ( )
 void
 CSL_SaveDebugInfo ( Word * word, uint64 allocType )
 {
-    word = word ? word : _Context_->CurrentWordBeingCompiled ? _Context_->CurrentWordBeingCompiled : 0 ; //_Context_->CurrentWordBeingCompiled : _CSL_->LastFinished_Word ;
+    word = word ? word : _Context_->CurrentWordBeingCompiled ? _Context_->CurrentWordBeingCompiled : 0 ; 
     if ( word )
     {
         Compiler * compiler = _Compiler_ ;
-        if ( ! allocType ) allocType = COMPILER_TEMP ; //SESSION ; //T_CSL ; // COMPILER_TEMP ;
+        if ( ! allocType ) allocType = COMPILER_TEMP ; 
         if ( ! GetState ( word, DEBUG_INFO_SAVED ) )
         {
             if ( ! word->NamespaceStack ) // already done earlier
@@ -340,7 +340,8 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
                 if ( ! word->W_SC_WordList )
                 {
                     word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
-                    if ( GetState ( _LC_, LC_COMPILE_MODE ) ) _LC_->Lambda_SC_WordList = word->W_SC_WordList ;
+                    //if ( GetState ( _LC_, LC_COMPILE_MODE ) ) _LC_->Lambda_SC_WordList = word->W_SC_WordList ;
+                    if ( _LC_ ) _LC_->Lambda_SC_WordList = word->W_SC_WordList ;
                     _CSL_->CSL_N_M_Node_WordList = _dllist_New ( WORD_RECYCLING ) ;
                 }
                 else List_Init ( _CSL_->CSL_N_M_Node_WordList ) ;
@@ -373,7 +374,7 @@ CSL_DeleteWordDebugInfo ( Word * word )
 #if 0 // debugging                    
                     SC_WordList_Show ( word->W_SC_WordList, word, 1, 0, ( byte* ) "CSL_DeleteWordDebugInfo" ) ; // debugging
 #endif                    
-                    DLList_Recycle_WordList ( word->W_SC_WordList ) ; // why not ??
+                    DLList_Recycle_WordList ( word->W_SC_WordList ) ; 
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( word->NamespaceStack, 1, 1 ) ; // don't clear ; keep words for source code debugging, etc.
                 }
                 //List_Init ( word->W_SC_WordList ) ;

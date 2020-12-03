@@ -9,8 +9,8 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     LambdaCalculus * lc = _LC_ ;
     ListObject *value0, *value, *l1 ;
     Word * word0 = idNode->Lo_CSLWord, *word ;
-    word = DataObject_New (T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, idNode->W_RL_Index, idNode->W_SC_Index ) ; //word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
-    CSL_WordList_Init (word) ;
+    word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, idNode->W_RL_Index, idNode->W_SC_Index ) ; //word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
+    CSL_WordList_Init ( word ) ;
 
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
@@ -29,17 +29,20 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     word->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     word->State |= LC_DEFINED ;
     // the value was entered into the LISP memory, now we need a temporary carrier for LO_Print
-    l1 = DataObject_New (T_LC_NEW, 0, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes, word->W_LispAttributes,
+    l1 = DataObject_New ( T_LC_NEW, 0, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes, word->W_LispAttributes,
         0, ( int64 ) value, 0, LISP, - 1, - 1 ) ; // all words are symbols
     l1->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     //l1->Lo_Value = ( uint64 ) value ; // used by eval
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
-    if ( GetState ( _LC_, LC_COMPILE_MODE ) )  l1->W_SC_WordList = word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
+    if ( GetState ( _LC_, LC_COMPILE_MODE ) ) l1->W_SC_WordList = word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
     SetState ( lc, LC_COMPILE_MODE, false ) ;
-    _CSL_FinishWordDebugInfo ( word ) ;
-    _Word_Finish ( word ) ; //l1 ) ;
+    //_CSL_FinishWordDebugInfo ( word ) ;
+    //_Word_Finish ( word ) ; //l1 ) ;
+    _CSL_FinishWordDebugInfo ( l1 ) ;
+    _Word_Finish ( l1 ) ;
     return l1 ;
+    //return word ;
 }
 
 ListObject *
@@ -318,6 +321,9 @@ _LO_Semi ( Word * word )
         block blk = ( block ) DataStack_Pop ( ) ;
         Word_InitFinal ( word, ( byte* ) blk ) ;
         word->W_LispAttributes |= T_LISP_CSL_COMPILED ;
+        word->W_SourceCode = _LC_->LC_SourceCode ;
+        word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
+        _LC_->Lambda_SC_WordList = 0 ;
     }
 }
 
@@ -333,19 +339,23 @@ _LO_Colon ( ListObject * lfirst )
     Word * word = Word_New ( lname->Name ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, true ) ;
     CSL_InitSourceCode_WithName ( _CSL_, lname->Name, 1 ) ;
+    cntx->CurrentWordBeingCompiled = word ;
+    _CSL_RecycleInit_CSL_N_M_Node_WordList ( _CSL_->CSL_N_M_Node_WordList, 1 ) ;
+    CSL_WordList_PushWord ( _LO_CopyOne ( lcolon, DICTIONARY )  ) ; 
     CSL_BeginBlock ( ) ;
 
     return word ;
 }
 
 // compile csl code in Lisp/Scheme
+
 ListObject *
 _LO_CSL ( ListObject * lfirst )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     LambdaCalculus * lc = 0 ;
-    ListObject *ldata, *word = 0, *word1 ;
+    ListObject *ldata, *word = 0, *word1 ; //, *lcolon ;
     if ( _LC_ )
     {
         if ( GetState ( _LC_, LC_READ ) )
@@ -359,11 +369,13 @@ _LO_CSL ( ListObject * lfirst )
     _CSL_Namespace_NotUsing ( ( byte * ) "Lisp" ) ; // nb. don't use Lisp words when compiling csl
     SetState ( cntx, LC_CSL, true ) ;
     SetState ( compiler, LISP_MODE, false ) ;
+    _CSL_RecycleInit_CSL_N_M_Node_WordList ( _CSL_->CSL_N_M_Node_WordList, 1 ) ;
+    CSL_WordList_PushWord ( _LO_CopyOne ( lfirst, DICTIONARY )   ) ; 
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
         if ( ldata->W_LispAttributes & ( LIST | LIST_NODE ) )
         {
-            _CSL_Parse_LocalsAndStackVariables (1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
+            _CSL_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "tick" ) || String_Equal ( ldata->Name, ( byte * ) "'" ) )
         {
@@ -373,18 +385,20 @@ _LO_CSL ( ListObject * lfirst )
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "s:" ) )
         {
+            //lcolon = ldata ;
             CSL_DbgSourceCodeOn ( ) ;
-            word = _LO_Colon ( ldata ) ;
+            word =  _LO_Colon ( ldata ) ;
             ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ":" ) )
         {
+            //lcolon = ldata ;
             word = _LO_Colon ( ldata ) ;
             ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "return" ) )
         {
-            ldata = _LO_Next ( ldata ) ; 
+            ldata = _LO_Next ( ldata ) ;
             CSL_DoReturnWord ( ldata ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";s" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
@@ -394,14 +408,16 @@ _LO_CSL ( ListObject * lfirst )
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {
+#if 0            
+            // in case we have more than one ":" on our list ...
             ListObject *ldata1 = _LO_Next ( ldata ) ; // bump ldata to account for name
             word->W_SourceCode = String_New_SourceCode ( _CSL_->SC_Buffer ) ;
             if ( ldata1 && String_Equal ( ldata1->Name, ( byte * ) ":" ) )
             {
                 CSL_InitSourceCode_WithName ( _CSL_, ( byte* ) "(", 1 ) ;
             }
+#endif            
             _LO_Semi ( word ) ;
-            word->W_SourceCode = lc->LC_SourceCode ;
         }
         else //if ( ldata )
         {
@@ -418,7 +434,7 @@ _LO_CSL ( ListObject * lfirst )
         //LC_RestoreStack ( ) ;
     }
     Namespace_DoNamespace_Name ( ( byte * ) "Lisp" ) ;
-    if ( ! CompileMode ) Compiler_Init (compiler, 0) ;
+    if ( ! CompileMode ) Compiler_Init ( compiler, 0 ) ;
     return nil ;
 }
 
