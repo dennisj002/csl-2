@@ -177,7 +177,6 @@ typedef struct
 typedef void ( *MapFunction0 ) ( dlnode * ) ;
 typedef int64( *MapFunction1 ) ( dlnode *, int64 ) ;
 typedef int64( *MapFunction2 ) ( dlnode *, int64, int64 ) ;
-//typedef void ( *MapFunction2 ) ( dlnode *, int64, int64 ) ;
 typedef void ( *MapFunction2_64 ) ( dlnode *, uint64, int64 ) ;
 typedef int64( *MapFunction3 ) ( dlnode *, int64, int64, int64 ) ;
 typedef void ( *MapFunction4 ) ( dlnode *, int64, int64, int64, int64 ) ;
@@ -187,8 +186,6 @@ Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
 typedef struct _Identifier // _Symbol
 {
     DLNode S_Node ;
-    //int64 Slots ; // number of slots in Object
-    //int64 ObjectByteSize ; -> S_Size // number of bytes in Object
     int64 CodeSize ;
     byte * S_Name ;
     uint64 State ;

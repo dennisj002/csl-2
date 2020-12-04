@@ -1,4 +1,4 @@
-                   
+#if 1                   
 5 
 : sp ; //stack pause ; sp
 
@@ -102,6 +102,7 @@ DLLNodeAlloc
 	this . nodes [ 2 ].BeforeReference 2 =
 	this this.size @ dump
 ;
+' tnarr2a find wdiss //pause
 DLLNodeAlloc "testn4" new sp
 DLLNodeAlloc 
 testn4 tnarr2a 
@@ -351,3 +352,4 @@ c_syntaxOff
 
 #endif
 2 + 7 assertStkChk // stack checking
+#endif

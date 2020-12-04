@@ -4,6 +4,7 @@
 void
 _CSL_Colon ( Boolean initSC )
 {
+    //CSL_DeleteWordDebugInfo ( _CSL_->LastFinished_Word ) ;
     CSL_RightBracket ( ) ;
     if ( initSC ) CSL_SourceCode_Init ( ) ;
     CSL_Token ( ) ;

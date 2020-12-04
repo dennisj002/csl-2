@@ -216,10 +216,10 @@
 #define object_Allocate( type, slots, allocType ) (type *) _object_Allocate ( sizeof ( type ) * slots, allocType ) 
 #define _listObject_Allocate( nodeType, slotType, slots, allocType ) (type *) object_Allocate ( sizeof ( nodeType ) + (sizeof ( slotType ) * slots), allocType ) 
 
-#define Get_NBA_Symbol_To_NBA( s )  ( NamedByteArray* ) ( ( ( Symbol* ) s )->S_pb_Data2 ) 
-#define Get_NBA_Node_To_NBA( node )  ( NamedByteArray* ) ( ( ( Symbol* ) node )->S_pb_Data2 ) 
+#define Get_NbaSymbolNode_To_NBA( s )  ( NamedByteArray* ) ( ( ( Symbol* ) s )->S_pb_Data2 ) 
+#define Set_NbaSymbolNode_To_NBA( nba )  nba->NBA_Symbol.S_pb_Data2 = ( byte* ) nba
+//#define Get_NbaLinkNode_To_NBA( node )  ( NamedByteArray* ) ( ( ( Symbol* ) node )->S_pb_Data2 ) 
 #define Get_BA_Symbol_To_BA( s )  ( ByteArray* ) ( ( ( Symbol* ) s )->S_pb_Data2 ) 
-#define Set_NBA_Symbol_To_NBA( nba )  nba->NBA_Symbol.S_pb_Data2 = ( byte* ) nba
 #define Set_BA_Symbol_To_BA( ba )  ba->BA_Symbol.S_pb_Data2 = ( byte* ) ba
 #define MemCheck( block ) { Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; block ; Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; }
 #define MemCpy(dst, src, size) _MemCpy ((byte*)dst, (byte*)src, (int64) size)

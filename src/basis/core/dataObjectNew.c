@@ -153,7 +153,6 @@ _Class_Object_Init ( Word * word, Namespace * ins )
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     word->TypeNamespace = ins ;
-    //if ( ins->W_ObjectAttributes & STRUCT ) word->W_ObjectAttributes |= STRUCT ;
 }
 
 // class object new
@@ -179,12 +178,13 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
 {
     Context * cntx = _Context_ ;
     if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Save_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-    Namespace *sns, * ns = _Namespace_Find ( name, sns = _CSL_Namespace_InNamespaceGet ( ), 0 ) ;
+    Namespace *sns, * ns ;
     int64 size = 0 ;
     byte * token ;
+    sns = _CSL_Namespace_InNamespaceGet ( ) ;
+    ns = _Namespace_Find ( name, sns, 0 ) ;
     if ( ! ns )
     {
-        //sns = _CSL_Namespace_InNamespaceGet ( ) ;
         if ( cloneFlag ) size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         ns = _DObject_New ( name, 0, IMMEDIATE, CLASS | objectType, 0, objectType, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
         Namespace_Do_Namespace ( ns, 0 ) ; // before "size", "this"

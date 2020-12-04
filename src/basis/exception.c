@@ -150,11 +150,11 @@ OVT_PauseInterpret ( Context * cntx, byte key )
 int64
 OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
 {
-    Debugger * debugger = _Debugger_ ;
     int64 rtrn = 0 ;
-    SetState ( _O_, OVT_PAUSE, true ) ;
     if ( _CSL_ && _Context_ )
     {
+        SetState ( _O_, OVT_PAUSE, true ) ;
+        Debugger * debugger = _Debugger_ ;
         if ( _Context_->CurrentlyRunningWord ) _Debugger_->ShowLine = ( byte* ) "" ;
         byte buffer [512], *defaultPrompt =
             ( byte * ) "\n%s\n%s : at %s :: %s'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\\' or <key> (i)interpret, <return> loop%s" ;
@@ -562,7 +562,7 @@ _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
 {
     byte * msg = ovt->ThrowBuffer->Data ;
     byte key, * instr = ".: (p)ause, e(x)it, <key> restart" ;
-    printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, ((ovt->SigSegvs < 2) ? Context_Location ( ) : (byte*)""), ovt->SigSegvs ) ;
+    printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, ( ( ovt->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ), ovt->SigSegvs ) ;
     fflush ( stdout ) ;
     key = Key ( ) ;
     if ( key == 'p' )

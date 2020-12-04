@@ -405,6 +405,12 @@ Namespace_RemoveFromUsingList_WithCheck ( byte * name )
 }
 
 void
+DLList_RemoveWords ( dllist * list )
+{
+    dllist_Map ( list, ( MapFunction0 ) dlnode_Remove ) ;
+}
+
+void
 Dllist_WordList_Clear ( dllist * list, Boolean recycleFlag )
 {
     if ( list )

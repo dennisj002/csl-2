@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.909.600" ) 
+#define VERSION ((byte*) "0.909.702.0" ) // 'rdi' bug remaining
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -297,7 +297,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, - 1 ) ; //totalMemSizeTarget ) ;
 #else    
     ovt->InternalObjectsSize = 75 * K ; //1 * M ; 
-    //ovt->ObjectsSize = 10 * K ; //1 * M ; 
+    ovt->ObjectsSize = 10 * K ; //1 * M ; 
     ovt->BufferSpaceSize = 59 * K ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
     //ovt->StringSpaceSize = 100 * K ;
     ovt->MachineCodeSize = 100 * K ;

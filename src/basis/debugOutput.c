@@ -16,7 +16,7 @@ void
 _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // use a debugger buffer instead ??
 {
     Word * word2 = 0 ;
-    byte * buffer = Buffer_Data_Cleared ( _CSL_->DebugB ) ; // nvw : new view window
+    byte * buffer = Buffer_Data_Cleared ( _CSL_->DebugB ) ;
     uint64 * fp = cpu->CPU_FP ; //? ( uint64* ) ((* cpu->CPU_FP)? ( uint64* ) (* cpu->CPU_FP) : (cpu->CPU_FP)) : 0 ;
     //if ( fp > ( uint64* ) 0x7f000000 )
     {
@@ -41,7 +41,7 @@ _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // u
         }
         else Printf ( ( byte* ) "\n%-018s : index = [r15%s0x%02x]  : <0x%016lx> = 0x%016lx : %16s.%-16s : %s",
             localVarFlag ? "LocalVariable" : "Parameter Variable", localVarFlag ? "+" : "-", Abs ( varOffset * CELL ),
-            fp + varOffset, ( uint64 ) ( fp ? fp [ varOffset ] : 0 ), localsWord->S_ContainingNamespace->Name,
+            fp + varOffset, ( uint64 ) ( fp ? fp [ varOffset ] : 0 ), localsWord->S_ContainingNamespace ? localsWord->S_ContainingNamespace->Name: (byte*)"",
             c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
     }
 }

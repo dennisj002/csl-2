@@ -45,6 +45,7 @@ CSL_Define ( )
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
+    Word * word ;
     SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
     CSL_Colon ( ) ;
     Interpret_ToEndOfLine ( interp ) ;
@@ -54,10 +55,11 @@ CSL_Define ( )
     if ( locals ) CSL_Prefix ( ) ; // if we have local variables make it a prefix word ; maybe : if ( GetState ( _Context_, C_SYNTAX ) ) 
     else
     {
-        Word * word = _CSL_->LastFinished_Word ;
+        word = _CSL_->LastFinished_Word ;
         if ( word ) word->W_ObjectAttributes |= (LITERAL|CONSTANT) ;
     }
     CSL_Inline ( ) ;
+    //CSL_SaveDebugInfo ( _CSL_->LastFinished_Word, 0 ) ; // how would this kind of thing work with an inline word??
     CSL_SourceCode_Init ( ) ; //don't leave the define in sc
 }
 
