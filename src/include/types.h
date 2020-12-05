@@ -251,8 +251,8 @@ typedef struct _Identifier // _Symbol
 #define W_ObjectAttributes S_ObjectAttributes
 #define W_LispAttributes S_LispAttributes
 #define W_TypeAttributes S_WordAttributes
-#define WNumberOfPrefixedArgs S_NumberOfPrefixedArgs 
-#define WAllocType S_WAllocType
+#define W_NumberOfPrefixedArgs S_NumberOfPrefixedArgs 
+#define W_AllocType S_WAllocType
 #define CProp S_MorphismAttributes
 #define CProp2 S_ObjectAttributes
 #define LProp S_LispAttributes

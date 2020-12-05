@@ -34,7 +34,9 @@ Word *
 _CSL_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
-    if (( word0->W_MorphismAttributes & ( KEYWORD | CSL_WORD | T_LISP_SYMBOL ) ) ||  ( word0->W_ObjectAttributes & ( LITERAL ) ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
+    //if (( word0->W_MorphismAttributes & ( KEYWORD | CSL_WORD | T_LISP_SYMBOL ) ) ||  ( word0->W_ObjectAttributes & ( LITERAL ) ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
+    if (( word0->W_MorphismAttributes & ( KEYWORD | CSL_WORD | T_LISP_SYMBOL ) ) ||  
+        ( word0->W_AllocType & ( OBJECT_MEM | INTERNAL_OBJECT_MEM | LISP_TEMP | TEMPORARY | COMPILER_TEMP ) ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
     else word1 = ( Word * ) dllist_Map1_WReturn ( _CSL_->CSL_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
     else wordToBePushed = word0 ;

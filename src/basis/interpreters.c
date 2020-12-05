@@ -126,10 +126,10 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
         }
         d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( "\n_Interpret_PrefixFunction_Until_RParen", 0, 0 ) ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, true ) ;
-        if ( prefixFunction->WNumberOfPrefixedArgs )
+        if ( prefixFunction->W_NumberOfPrefixedArgs )
         {
             Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-            for ( i = 0 ; i < (prefixFunction->WNumberOfPrefixedArgs - 1) ; i ++ ) // -1 : we already did one above
+            for ( i = 0 ; i < (prefixFunction->W_NumberOfPrefixedArgs - 1) ; i ++ ) // -1 : we already did one above
             {
                 Interpreter_InterpretNextToken ( interp ) ;
             }

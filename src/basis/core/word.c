@@ -88,7 +88,7 @@ Word_Copy ( Word * word0, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ) ;
     _Word_Copy ( word, word0 ) ;
-    word->WAllocType = allocType ;
+    word->W_AllocType = allocType ;
     return word ;
 }
 
@@ -171,7 +171,7 @@ _Word_Create ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispT
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     //if ( objectType & ( LITERAL | CONSTANT ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
-    word->WAllocType = allocType ;
+    word->W_AllocType = allocType ;
     word->W_MorphismAttributes = morphismType ;
     word->W_ObjectAttributes = objectType ;
     word->W_LispAttributes = lispType ;

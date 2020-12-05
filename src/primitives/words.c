@@ -330,7 +330,7 @@ CSL_NPrefix ( void )
     {
         word->W_MorphismAttributes |= PREFIX ;
         word->W_TypeAttributes = WT_PREFIX ;
-        word->WNumberOfPrefixedArgs = numberOfPrefixedArgs ;
+        word->W_NumberOfPrefixedArgs = numberOfPrefixedArgs ;
     }
 }
 
