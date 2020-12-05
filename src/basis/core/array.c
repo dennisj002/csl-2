@@ -234,7 +234,7 @@ _NamedByteArray_Init ( NamedByteArray * nba, byte * name, int64 size, int64 atyp
     nba->NBA_MemChunk.Name = name ;
     nba->NBA_AAttribute = atype ;
     dllist_Init ( &nba->NBA_BaList, &nba->NBA_ML_HeadNode, &nba->NBA_ML_TailNode ) ;
-    nba->NBA_DataSize = size ;
+    nba->NBA_DataSize = nba->OriginalSize = size ;
     nba->MemInitial = size ;
     nba->SmallestRemaining = size ;
     nba->LargestRemaining = size ; 

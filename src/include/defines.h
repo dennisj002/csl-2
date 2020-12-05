@@ -508,6 +508,7 @@ typedef struct
 #define WT_C_SYNTAX               ( (uint64) 1 <<  5 )
 #define W_COMMENT                 ( (uint64) 1 <<  6 )
 #define W_PREPROCESSOR            ( (uint64) 1 <<  7 )
+#define WT_INIT                         ( (uint64) 1 << 8)
 
 // LType - lisp types
 #define T_LAMBDA ( (uint64) 1 << 11 )

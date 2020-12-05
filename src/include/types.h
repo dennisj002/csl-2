@@ -455,7 +455,7 @@ typedef struct NamedByteArray
     MemChunk NBA_MemChunk ;
     Symbol NBA_Symbol ;
     ByteArray *ba_CurrentByteArray ;
-    int64 NBA_DataSize, TotalAllocSize ;
+    int64 OriginalSize, NBA_DataSize, TotalAllocSize ;
     int64 MemInitial ;
     int64 MemAllocated ;
     int64 MemRemaining, LargestRemaining, SmallestRemaining ;

@@ -228,10 +228,14 @@ FreeChunkList ( dllist * list )
 void
 FreeNba_BaNode ( NamedByteArray * nba, dlnode * node )
 {
+    ByteArray * ba = Get_BA_Symbol_To_BA ( node ) ; ;
     dlnode_Remove ( node ) ; // remove BA_Symbol from nba->NBA_BaList cf. _NamedByteArray_AddNewByteArray
     MemChunk* mchunk = ( MemChunk* ) ( ( Symbol * ) node )->S_Value ;
-    nba->TotalAllocSize -= mchunk->S_ChunkSize ;
+    int64 size = ba->BA_DataSize ; //mchunk->S_ChunkSize ;
     _Mem_ChunkFree ( mchunk ) ;
+    nba->MemRemaining -= size ;
+    nba->MemAllocated -= size ;
+    nba->TotalAllocSize -= size ;
 }
 
 void
@@ -342,7 +346,8 @@ _OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always 
             ByteArray * ba = Get_BA_Symbol_To_BA ( node ) ;
             if ( ba )
             {
-                if ( ! flag ++ ) // keep one ba initialized
+#if 0                
+                if ( ( ! flag ++ ) && ( ba->MemRemaining < moreThan ) ) // keep one ba initialized
                 {
                     _ByteArray_Init ( ba ) ;
                     nba->ba_CurrentByteArray = ba ;
@@ -355,6 +360,17 @@ _OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always 
                     FreeNba_BaNode ( nba, node ) ;
                     nba->NumberOfByteArrays -- ;
                 }
+#else                
+                FreeNba_BaNode ( nba, node ) ;
+                nba->NumberOfByteArrays -- ;
+                if ( ! nodeNext )
+                {
+                    nba->MemAllocated = 0 ;
+                    nba->MemRemaining = 0 ;
+                    nba->NBA_DataSize = nba->OriginalSize ;
+                    _NamedByteArray_AddNewByteArray ( nba, nba->OriginalSize ) ;
+                }
+#endif                    
             }
         }
         nba->InitFreedRandMarker = rand ( ) ;
@@ -502,14 +518,14 @@ NBA_PrintInfo ( NamedByteArray * nba )
     byte * name = nba->NBA_Symbol.S_Name ;
     if ( _O_->Verbosity > 1 )
     {
-        Printf ( ( byte* ) "\n%-43s InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9 " : ReAllocations = %4d : Largest = %8d : Smallest = %8d : alloctype = %8lu ",
+        Printf ( ( byte* ) "\n%-43s InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9 " : ReAllocations = %4d : Largest = %8d : Smallest = %8d : AllocSize = %8d : alloctype = %8lu ",
             name, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining, nba->ReAllocations, nba->LargestRemaining,
-            nba->SmallestRemaining, ( uint64 ) nba->NBA_AAttribute ) ;
+            nba->NBA_DataSize, nba->SmallestRemaining, ( uint64 ) nba->NBA_AAttribute ) ;
     }
     else
     {
-        Printf ( ( byte* ) "\n%-43s InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9 " : ReAllocations = %4d : Largest = %8d : Smallest = %8d",
-            name, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining, nba->ReAllocations, nba->LargestRemaining, nba->SmallestRemaining ) ;
+        Printf ( ( byte* ) "\n%-43s InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9 " : ReAllocations = %4d : Largest = %8d : Smallest = %8d : AllocSize = %8d",
+            name, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining, nba->ReAllocations, nba->LargestRemaining, nba->SmallestRemaining, nba->NBA_DataSize ) ;
     }
 }
 
@@ -606,7 +622,7 @@ _Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, Boolean showFlag )
                 if ( nextNode )
                 {
                     nextNba = ( NBA* ) Get_NbaSymbolNode_To_NBA ( nextNode ) ;
-                    nextNode = ( dlnode* ) dlnode_Next ( (dlnode *)&(nba->NBA_Symbol)) ;
+                    nextNode = ( dlnode* ) dlnode_Next ( ( dlnode * )&( nba->NBA_Symbol ) ) ;
                     //Printf ( "\nnba = %s : nextNba = %lx : %s", ( (Symbol*) node)->Name, nextNode, ( (Symbol*) nextNode)->Name ) ;
                 }
 #endif                
@@ -748,10 +764,8 @@ _CheckRecycleWord ( Word * w )
 {
     if ( w && ( w->W_ObjectAttributes & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) )
     {
-        //if ( Is_DebugOn ) 
-
-        if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s%s%s", 
-            w->S_ContainingNamespace? w->S_ContainingNamespace->Name : (byte*) "", w->S_ContainingNamespace? (byte*)"." : (byte*)"", w->Name ) ; //, Pause () ;
+        if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s%s%s",
+            w->S_ContainingNamespace ? w->S_ContainingNamespace->Name : ( byte* ) "", w->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", w->Name ) ; //, Pause () ;
     }
 }
 

@@ -140,6 +140,7 @@ _Class_Object_Init ( Word * word, Namespace * ins )
         if ( ( initWord = _Finder_FindWord_InOneNamespace ( _Finder_, ns, ( byte* ) "init" ) ) )
         {
             _Stack_Push ( nsstack, ( int64 ) initWord ) ;
+             initWord->W_TypeAttributes |= WT_INIT ;
         }
         ns = ns->ContainingNamespace ;
     }

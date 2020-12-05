@@ -512,7 +512,6 @@ void Word_Recycle(Word *w);
 void _CheckRecycleWord(Word *w);
 void CheckRecycleNamespaceWord(Node *node);
 void DLList_Recycle_NamespaceList(dllist *list);
-void DLList_RemoveWords(dllist *list);
 /* src/basis/init.c */
 void CSL_RuntimeInit(CSL *csl, int64 cntxDelFlag);
 void OVT_RuntimeInit(void);
@@ -846,6 +845,7 @@ void _Namespace_RemoveFromUsingList(Namespace *ns);
 void Namespace_RemoveFromUsingList(byte *name);
 void Namespace_MoveToFirstOnUsingList(byte *name);
 void Namespace_RemoveFromUsingList_WithCheck(byte *name);
+void DLList_RemoveWords(dllist *list);
 void Dllist_WordList_Clear(dllist *list, Boolean recycleFlag);
 void _Namespace_Clear(Namespace *ns, Boolean recycleFlag);
 void Namespace_Clear(byte *name);

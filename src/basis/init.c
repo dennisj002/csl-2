@@ -30,7 +30,6 @@ void
 OVT_RuntimeInit ( )
 {
     OVT_FreeTempMem ( ) ;
-    //OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace", 1 ) ; // 1 : re-init
     OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
 }
 
@@ -46,9 +45,8 @@ _CSL_Init_SessionCore ( CSL * csl, Boolean cntxDelFlag, Boolean promptFlag )
     Interpreter_Init ( cntx->Interpreter0 ) ;
     if ( _LC_ ) LC_Init_Runtime ( ) ;
     CSL_RuntimeInit ( csl, cntxDelFlag ) ;
-    OVT_RuntimeInit ( ) ;
-    OVT_StartupMessage ( promptFlag && ( csl->InitSessionCoreTimes < 2 ) ) ;
-    csl->InitSessionCoreTimes ++ ;
+    if ( csl->InitSessionCoreTimes ++ ) OVT_RuntimeInit ( ) ;
+    OVT_StartupMessage ( promptFlag && ( csl->InitSessionCoreTimes < 3 ) ) ;
     _OVT_Ok ( promptFlag ) ;
 }
 

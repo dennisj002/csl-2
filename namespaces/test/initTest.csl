@@ -109,6 +109,7 @@ shellOff
 Interpreter
 nl "_TestDone_ =" ps _TestDone_ @ p nl
 //stack pause
+//mem pause
 { _TestDone_ @ not } { pause } if2 
 //stack pause
 2 + 7 assertStkChk // stack checking

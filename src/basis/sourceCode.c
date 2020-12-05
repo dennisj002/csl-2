@@ -385,6 +385,7 @@ CSL_WordList_PushWord ( Word * word )
             if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE | NAMESPACE | OBJECT_FIELD | LOCAL_OBJECT ) ) ) 
                 inUseFlag |= SCN_IN_USE_FOR_SOURCE_CODE ;
         }
+        //if ( ! (word->W_TypeAttributes &WT_INIT ))
         CSL_WordList_Push ( word, inUseFlag ) ;
     }
 }
