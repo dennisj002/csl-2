@@ -242,6 +242,7 @@ _NamedByteArray_Init ( NamedByteArray * nba, byte * name, int64 size, int64 atyp
     Set_NbaSymbolNode_To_NBA ( nba ) ;
     nba->NBA_Symbol.S_unmap = nba->NBA_MemChunk.S_unmap ;
     nba->NumberOfByteArrays = 0 ;
+    nba->Allocations = 1 ;
     _NamedByteArray_AddNewByteArray ( nba, size ) ;
 }
 

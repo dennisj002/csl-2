@@ -330,6 +330,7 @@ scOn
     //addr @ size @ <dbg> dump
     addr @ size @ dump
 ; prefix
+//vb (3) logOn
 cta "caba" new
 c_syntaxOn
  
@@ -351,6 +352,7 @@ ctcta ( y cta a )
 ctcta ( 1 caba ) ; //pause
 c_syntaxOff
 ' ctcta find wdiss
+//vb (1) logOff
 #endif
 2 + 7 assertStkChk // stack checking
 #endif

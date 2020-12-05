@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.910.010" ) 
+#define VERSION ((byte*) "0.910.110" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -122,106 +122,6 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
     }
     _O_ = 0 ;
 }
-#define USE_OpenVmTil_CalculateMemSpaceSizes 0
-#define _CSL_SIZE (82 * K) // data stack included here
-#if USE_OpenVmTil_CalculateMemSpaceSizes
-// _OpenVmTil_CalculateMemSpaceSizes is convoluted and needs rework
-
-void
-_OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int64 totalMemSizeTarget )
-{
-    int64 minimalCoreMemorySize, minStaticMemSize, coreMemTargetSize, exceptionsHandled, verbosity, objectsSize, tempObjectsSize,
-        sessionObjectsSize, dataStackSize, historySize, lispTempSize, compilerTempObjectsSize, contextSize, bufferSpaceSize, stringSpaceSize,
-        openVmTilSize, cslSize, codeSize, dictionarySize ; //, sessionCodeSize ;
-
-    if ( restartCondition < RESTART )
-    {
-        verbosity = ovt->Verbosity ;
-        // preserve values across partial restarts
-        sessionObjectsSize = ovt->SessionObjectsSize ;
-        dictionarySize = ovt->DictionarySize ;
-        lispTempSize = ovt->LispTempSize ;
-        codeSize = ovt->MachineCodeSize ;
-        objectsSize = ovt->ObjectsSize ;
-        tempObjectsSize = ovt->TempObjectsSize ;
-        compilerTempObjectsSize = ovt->CompilerTempObjectsSize ;
-        dataStackSize = ovt->DataStackSize ;
-        historySize = ovt->HistorySize ;
-        contextSize = ovt->ContextSize ;
-        bufferSpaceSize = ovt->BufferSpaceSize ;
-        openVmTilSize = ovt->OpenVmTilSize ;
-        cslSize = ovt->CSLSize ;
-        stringSpaceSize = ovt->StringSpaceSize ;
-        exceptionsHandled = ovt->SignalExceptionsHandled ;
-    }
-    else if ( totalMemSizeTarget > 0 )
-    {
-        verbosity = 0 ;
-
-        // volatile mem sizes
-        tempObjectsSize = 10 * K ; //TEMP_OBJECTS_SIZE ;
-        sessionObjectsSize = 50 * K ; //SESSION_OBJECTS_SIZE ;
-        lispTempSize = 10 * K ; //LISP_TEMP_SIZE ;
-        compilerTempObjectsSize = 10 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
-        historySize = 1 * K ; //HISTORY_SIZE ;
-        contextSize = 5 * FULL_CONTEXT_SIZE ; //CONTEXT_SIZE ;
-        bufferSpaceSize = 35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ; //2153 ; //K ; //BUFFER_SPACE_SIZE ;
-        stringSpaceSize = 10 * K ; //BUFFER_SPACE_SIZE ;
-
-        // static mem sizes
-        dataStackSize = 2 * K ; // STACK_SIZE
-        openVmTilSize = 2 * K ; //OPENVMTIL_SIZE ;
-        cslSize = _CSL_SIZE ; //( dataStackSize * 4 ) + ( 12.5 * K ) ; // csl_SIZE
-        exceptionsHandled = 0 ;
-    }
-    else // 0 or -1 get default
-    {
-        verbosity = 0 ;
-
-        tempObjectsSize = 1 * MB ; //TEMP_OBJECTS_SIZE ;
-        sessionObjectsSize = 1 * MB ; // SESSION_OBJECTS_SIZE ;
-        lispTempSize = 1 * MB ; // LISP_TEMP_SIZE ;
-        compilerTempObjectsSize = 1 * MB ; //COMPILER_TEMP_OBJECTS_SIZE ;
-        contextSize = 5 * K ; // CONTEXT_SIZE ;
-        bufferSpaceSize = 35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
-        stringSpaceSize = 1 * MB ; //BUFFER_SPACE_SIZE ;
-        historySize = 1 * MB ; //HISTORY_SIZE ;
-
-        dataStackSize = 8 * KB ; //STACK_SIZE ;
-        openVmTilSize = 15 * KB ; //OPENVMTIL_SIZE ;
-        cslSize = _CSL_SIZE ; //( dataStackSize * sizeof (int64 ) ) + ( 5 * KB ) ; //csl_SIZE ;
-
-        exceptionsHandled = 0 ;
-    }
-    minStaticMemSize = tempObjectsSize + sessionObjectsSize + dataStackSize + historySize + lispTempSize + compilerTempObjectsSize +
-        contextSize + bufferSpaceSize + openVmTilSize + cslSize, stringSpaceSize ;
-
-    minimalCoreMemorySize = 150 * K, coreMemTargetSize = totalMemSizeTarget - minStaticMemSize ;
-    coreMemTargetSize = ( coreMemTargetSize > minimalCoreMemorySize ) ? coreMemTargetSize : minimalCoreMemorySize ;
-    // core memory
-    objectsSize = 1 * M ; //( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ; // we can easily allocate more object and dictionary space but not code space
-    dictionarySize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ;
-    codeSize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ;
-    codeSize = ( codeSize < ( 500 * K ) ) ? 500 * K : codeSize ;
-
-    ovt->SignalExceptionsHandled = exceptionsHandled ;
-    ovt->Verbosity = verbosity ;
-    ovt->MachineCodeSize = codeSize ;
-    ovt->DictionarySize = dictionarySize ;
-    ovt->ObjectsSize = objectsSize ;
-    ovt->TempObjectsSize = tempObjectsSize ;
-    ovt->SessionObjectsSize = sessionObjectsSize ;
-    ovt->DataStackSize = dataStackSize ;
-    ovt->HistorySize = historySize ;
-    ovt->LispTempSize = lispTempSize ;
-    ovt->ContextSize = contextSize ;
-    ovt->CompilerTempObjectsSize = compilerTempObjectsSize ;
-    ovt->BufferSpaceSize = bufferSpaceSize ;
-    ovt->CSLSize = cslSize ;
-    ovt->StringSpaceSize = stringSpaceSize ;
-    ovt->OpenVmTilSize = openVmTilSize ;
-}
-#endif
 
 void
 OVT_PrintStartupOptions ( OpenVmTil * ovt )
@@ -298,20 +198,19 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 #else    
     ovt->InternalObjectsSize = 75 * K ; //1 * M ; 
     ovt->ObjectsSize = 100 * K ; //1 * M ; 
-    ovt->LispSize = 100 * K ; //1 * M ; 
-    ovt->LispTempSize = 100 * K ; //1 * M ; 
+    ovt->LispSize = 1 * M ; 
+    ovt->LispTempSize = 1 * M ; //1 * M ; 
     ovt->BufferSpaceSize = 59 * K ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
-    //ovt->StringSpaceSize = 100 * K ;
     ovt->MachineCodeSize = 100 * K ;
     ovt->DictionarySize = 1 * M ; //100 * K ;
     ovt->CSLSize = ( 80 * K ) ;
     ovt->OpenVmTilSize = ( 6 * K ) ;
     ovt->DataStackSize = 8 * KB ;
     ovt->TempObjectsSize = 200 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
-    ovt->CompilerTempObjectsSize = 400 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
+    ovt->CompilerTempObjectsSize = 1 * M ; //COMPILER_TEMP_OBJECTS_SIZE ;
     ovt->WordRecylingSize = 1 * K * ( sizeof (Word) + sizeof (WordData) ) ; //50 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
     ovt->SessionObjectsSize = 50 * K ; 
-    ovt->StringSpaceSize = 20 * K ;
+    ovt->StringSpaceSize = 100 * K ;
 #endif    
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can

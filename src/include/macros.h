@@ -221,7 +221,7 @@
 //#define Get_NbaLinkNode_To_NBA( node )  ( NamedByteArray* ) ( ( ( Symbol* ) node )->S_pb_Data2 ) 
 #define Get_BA_Symbol_To_BA( s )  ( ByteArray* ) ( ( ( Symbol* ) s )->S_pb_Data2 ) 
 #define Set_BA_Symbol_To_BA( ba )  ba->BA_Symbol.S_pb_Data2 = ( byte* ) ba
-#define MemCheck( block ) { Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; block ; Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; }
+#define MemCheck( block ) { OVT_CalculateAndShow_TotalNbaAccountedMemAllocated ( 1 ) ; block ; OVT_CalculateAndShow_TotalNbaAccountedMemAllocated ( 1 ) ; }
 #define MemCpy(dst, src, size) _MemCpy ((byte*)dst, (byte*)src, (int64) size)
 
 #define _Debugger_ _CSL_->Debugger0

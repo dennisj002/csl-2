@@ -459,7 +459,7 @@ typedef struct NamedByteArray
     int64 MemInitial ;
     int64 MemAllocated ;
     int64 MemRemaining, LargestRemaining, SmallestRemaining ;
-    int64 NumberOfByteArrays, ReAllocations, InitFreedRandMarker ;
+    int64 NumberOfByteArrays, Allocations, InitFreedRandMarker ;
     dllist NBA_BaList ;
     dlnode NBA_ML_HeadNode ;
     dlnode NBA_ML_TailNode ;
