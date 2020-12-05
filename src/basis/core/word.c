@@ -160,6 +160,7 @@ _Word_Allocate ( uint64 allocType )
     else word = ( Word* ) Mem_Allocate ( size, allocType ) ;
     ( ( DLNode* ) word )->n_DLNode.n_Size = size ;
     word->W_WordData = ( WordData * ) ( word + 1 ) ; // nb. "pointer arithmetic"
+    //if ( word == (Word *)0x7ffff62ba7cc ) Printf ("\ngot it") ;
     return word ;
 }
 

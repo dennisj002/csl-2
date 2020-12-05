@@ -30,7 +30,6 @@ void
 OVT_RuntimeInit ( )
 {
     OVT_FreeTempMem ( ) ;
-    OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
 }
 
 void

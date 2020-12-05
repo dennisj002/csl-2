@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.910.110" ) 
+#define VERSION ((byte*) "0.910.200" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -70,7 +70,6 @@ OVT_RecycleAllWordsDebugInfo ( )
     Tree_Map_Namespaces ( _CSL_->Namespaces->W_List, ( MapSymbolFunction ) CSL_DeleteWordDebugInfo ) ;
     _OVT_MemListFree_WordRecyclingSpace () ;
     OVT_FreeTempMem ( ) ;
-    //_CSL_->CSL_N_M_Node_WordList = 0 ;
     _CSL_->CSL_N_M_Node_WordList = _dllist_New ( T_CSL ) ;
 }
 
@@ -79,7 +78,6 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
 {
     MemorySpace_New ( ) ; // nb : memory must be after we set Size values and before lists; list are allocated from memory
     _HistorySpace_New ( ovt, resetHistory ) ;
-    //ovt->psi_PrintStateInfo = PrintStateInfo_New ( ) ; // variable init needed by any allocation which call _Printf
     ovt->VersionString = VERSION ;
     // ? where do we want the init file ?
     if ( _File_Exists ( ( byte* ) "./init.csl" ) )
@@ -151,36 +149,10 @@ OVT_GetStartupOptions ( OpenVmTil * ovt )
 OpenVmTil *
 _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 {
-    //char errorFilename [256] ;
     int64 restartCondition, exceptionsHandled, startedTimes = 0 ; //, startIncludeTries
     if ( ! ovt ) restartCondition = INITIAL_START ;
     else restartCondition = FULL_RESTART ;
-#if 0
-    startIncludeTries = ovt ? ovt->StartIncludeTries ++ : 0 ;
-    if ( startIncludeTries < 2 )
-    {
-        if ( ovt && ovt->OVT_Context && ovt->OVT_Context->ReadLiner0 && ovt->OVT_Context->ReadLiner0->Filename )
-            strcpy ( errorFilename, ( char* ) ovt->OVT_Context->ReadLiner0->Filename ) ;
-        else strcpy ( errorFilename, "Debug Context" ) ;
-    }
-    else errorFilename [ 0 ] = 0 ;
-    //restartCondition = ( ovt && ( restartCondition || ( startIncludeTries < 2 ) ) ) ? ovt->RestartCondition : RESTART ;
-    int64 ium = ovt ? ovt->OVT_InitialUnAccountedMemory : 0, ovtv = ovt ? ovt->Verbosity : 0 ;
-    if ( ovt && ( restartCondition < INITIAL_START ) && ( ovt->Restarts < 2 ) ) OpenVmTil_Delete ( ovt ) ;
-    else if ( ovt )
-    {
-        printf ( ( byte* ) "\nUnable to reliably delete memory from previous system - rebooting into a new system. 'mem' for more detail on memory.\n" ) ;
-        fflush ( stdout ) ;
-        if ( ovt->Restarts < 2 ) OpenVmTil_Pause ( ) ; // we may crash here
-    }
-    d0 ( if ( ovtv > 1 )
-    {
-        printf ( ( byte* ) "\nTotal Mem Remaining = %9lld : <=: mmap_TotalMemAllocated - mmap_TotalMemFreed - ovt->OVT_InitialUnAccountedMemory", mmap_TotalMemAllocated - mmap_TotalMemFreed - ium ) ;
-            fflush ( stdout ) ;
-    } )
-#else
     if ( ovt ) startedTimes = ovt->StartedTimes, OpenVmTil_Delete ( ovt ) ;
-#endif        
     _O_ = ovt = _OpenVmTil_Allocate ( ) ;
 
     OVT_SetRestartCondition ( ovt, restartCondition ) ;
@@ -190,32 +162,25 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     //ovt->SavedTerminalAttributes = savedTerminalAttributes ;
 
     OVT_GetStartupOptions ( ovt ) ;
-#if USE_OpenVmTil_CalculateMemSpaceSizes 
-    int64 MIN_TotalMemSizeTarget = ( 300 * K ) ;
-    if ( ovt->TotalMemSizeTarget < MIN_TotalMemSizeTarget ) ovt->TotalMemSizeTarget = MIN_TotalMemSizeTarget ;
-    int64 totalMemSizeTarget = ( ovt->TotalMemSizeTarget < 5 * M ) ? ovt->TotalMemSizeTarget : - 1 ; // 0 or -1 : gets default values     
-    _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, - 1 ) ; //totalMemSizeTarget ) ;
-#else    
-    ovt->InternalObjectsSize = 75 * K ; //1 * M ; 
-    ovt->ObjectsSize = 100 * K ; //1 * M ; 
-    ovt->LispSize = 1 * M ; 
-    ovt->LispTempSize = 1 * M ; //1 * M ; 
-    ovt->BufferSpaceSize = 59 * K ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
-    ovt->MachineCodeSize = 100 * K ;
+    int64 allocSize = 200 * K ;
+    ovt->InternalObjectsSize = allocSize ; 
+    ovt->ObjectsSize = 2 * allocSize ; //1 * M ; 
+    ovt->LispSize = allocSize ; 
+    ovt->LispTempSize = 2 * allocSize ; 
+    ovt->CompilerTempObjectsSize = 2 * allocSize ;
+    ovt->BufferSpaceSize = allocSize ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
+    ovt->MachineCodeSize = allocSize ;
+    ovt->StringSpaceSize = allocSize ;
     ovt->DictionarySize = 1 * M ; //100 * K ;
     ovt->CSLSize = ( 80 * K ) ;
     ovt->OpenVmTilSize = ( 6 * K ) ;
     ovt->DataStackSize = 8 * KB ;
     ovt->TempObjectsSize = 200 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
-    ovt->CompilerTempObjectsSize = 1 * M ; //COMPILER_TEMP_OBJECTS_SIZE ;
     ovt->WordRecylingSize = 1 * K * ( sizeof (Word) + sizeof (WordData) ) ; //50 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
     ovt->SessionObjectsSize = 50 * K ; 
-    ovt->StringSpaceSize = 100 * K ;
-#endif    
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can
     Linux_SetupSignals ( &ovt->JmpBuf0, 1 ) ;
-    //if ( startIncludeTries ) ovt->ErrorFilename = String_New ( ( byte* ) errorFilename, STRING_MEM ) ;
     return ovt ;
 }
 

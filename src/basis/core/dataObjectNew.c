@@ -284,8 +284,6 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
     word = _DObject_New ( name, uliteral, ( IMMEDIATE | lexer->L_MorphismAttributes ), 
         ( LITERAL | CONSTANT | lexer->L_ObjectAttributes ), 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, 
         ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
-    //if ( lexer->L_ObjectAttributes & ( T_STRING | T_RAW_STRING ) )
-        //word->S_Value = (int64) word->Name ;
     return word ;
 }
 

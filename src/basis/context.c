@@ -201,7 +201,8 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
 
             cntx->System0->IncludeFileStackNumber -- ;
             if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\n%s included\n", filename ) ;
-            OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
+            //OVT_MemListFree_Objects ( ) ;
+            OVT_FreeTempMem ( ) ;
         }
         else
         {

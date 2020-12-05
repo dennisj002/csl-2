@@ -482,6 +482,7 @@ void OVT_MemList_DeleteNBAMemory(byte *name, Boolean reinitFlag);
 void OVT_MemList_FreeNBAMemory(byte *name, uint64 moreThan, int64 always);
 void OVT_MemListFree_ContextMemory(void);
 void OVT_MemListFree_TempObjects(void);
+void OVT_MemListFree_Objects(void);
 void OVT_MemListFree_LispSpace(void);
 void _OVT_MemListFree_WordRecyclingSpace(void);
 void _OVT_MemListFree_CompilerTempObjectSpace(void);

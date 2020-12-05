@@ -34,7 +34,7 @@ Word *
 _CSL_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
-    if ( word0->W_MorphismAttributes & ( KEYWORD | CSL_WORD | T_LISP_SYMBOL ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
+    if (( word0->W_MorphismAttributes & ( KEYWORD | CSL_WORD | T_LISP_SYMBOL ) ) ||  ( word0->W_ObjectAttributes & ( LITERAL ) ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
     else word1 = ( Word * ) dllist_Map1_WReturn ( _CSL_->CSL_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
     else wordToBePushed = word0 ;
@@ -48,7 +48,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
     if ( word0 )
     {
         if ( ( word0->W_MorphismAttributes & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
-        if ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) // don't we want to copy in non-compile mode too ??
+        if ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | ARRAY_MODE ) ) ) // don't we want to copy in non-compile mode too ??
         {
             wordp = _CSL_CopyDuplicates ( word0 ) ;
         }

@@ -338,7 +338,7 @@ void
 ctcta ( y cta a )
 {
     a.ar [0][y + 1][0] = 'M' ; // a.ar [0][y + 1][0] = 77 ; 
-    a.ar [y ][y + 1][ 0] = a.ar [0][y + 1][0] ; 
+    a.ar [y ][y + 1][ 0] = a.ar [0][y + 1][ 0 ] ; 
     a.ar [y ][y + 1][1] = a.ar [y ][y + 1][0] ; 
     a.ar [y + 1][y + 1][ 0 ] = a.ar [y ][y + 1][1] ; 
     hp ( a.ar [y ][y + 1][1] ) ; //pause () ;
