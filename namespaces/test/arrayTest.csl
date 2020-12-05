@@ -86,6 +86,7 @@ tna
 testnarr2.nodes[1].AfterReference @ 1 _assert
 testnarr2.nodes[1].BeforeReference @ 2 _assert
 sp
+//vb (3 ) logOn
 DLLNodeAlloc 
 : tnarr2 ( this ) 
         "tnarr2" ps nl
@@ -126,7 +127,7 @@ testn5 hp
 testn5 tnarr2
 sp
 : tnax1 ( this ) // "tnax1 pushed" ps nl
-        this nl hp nl
+         this nl hp nl
 	this.nodes[3].AfterReference 1 =
 	this.nodes[4].BeforeReference 2 =
 	this.nodes[3] hp 
@@ -136,6 +137,7 @@ sp
 ;
 ' tnax1 find wdiss sp
 DLLNodeAlloc "testnx" new 
+//vb (1 ) logOff rdi pause
 sp
 testnx tnax1
 sp
@@ -349,7 +351,6 @@ ctcta ( y cta a )
 ctcta ( 1 caba ) ; //pause
 c_syntaxOff
 ' ctcta find wdiss
-
 #endif
 2 + 7 assertStkChk // stack checking
 #endif

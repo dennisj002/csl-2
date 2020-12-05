@@ -477,5 +477,5 @@ namespaceTreeWithWords
 Interpreter
 sp
 2 + 7 assertStkChk // stack checking
-//rdi 
+rdi 
 mem    

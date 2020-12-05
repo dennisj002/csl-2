@@ -374,7 +374,7 @@ CSL_DeleteWordDebugInfo ( Word * word )
 #if 0 // debugging                    
                     SC_WordList_Show ( word->W_SC_WordList, word, 1, 0, ( byte* ) "CSL_DeleteWordDebugInfo" ) ; // debugging
 #endif                    
-                    DLList_Recycle_WordList ( word->W_SC_WordList ) ; 
+                    if ( ! String_Equal (word->Name, "init" ) ) DLList_Recycle_WordList ( word->W_SC_WordList ) ; // 'init' : a temp fix??
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( word->NamespaceStack, 1, 1 ) ; // don't clear ; keep words for source code debugging, etc.
                 }
                 //List_Init ( word->W_SC_WordList ) ;

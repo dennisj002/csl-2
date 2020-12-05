@@ -591,7 +591,7 @@ _Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, Boolean showFlag )
     if ( ovt )
     {
         dlnode * node, * nextNode ;
-        NamedByteArray * nba, * nextNba ;
+        NamedByteArray * nba ; //, * nextNba ;
         ovt->TotalNbaAccountedMemRemaining = 0 ;
         ovt->TotalNbaAccountedMemAllocated = 0 ;
         //NamedByteArray *osNba = _OVT_Find_NBA ( "ObjectSpace" ) ;
@@ -602,12 +602,14 @@ _Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, Boolean showFlag )
 
                 nextNode = dlnode_Next ( node ) ;
                 nba = ( NBA* ) Get_NbaSymbolNode_To_NBA ( node ) ;
+#if 0 // debug                
                 if ( nextNode )
                 {
                     nextNba = ( NBA* ) Get_NbaSymbolNode_To_NBA ( nextNode ) ;
                     nextNode = ( dlnode* ) dlnode_Next ( (dlnode *)&(nba->NBA_Symbol)) ;
                     //Printf ( "\nnba = %s : nextNba = %lx : %s", ( (Symbol*) node)->Name, nextNode, ( (Symbol*) nextNode)->Name ) ;
                 }
+#endif                
                 NBA_AccountRemainingAndShow ( nba, showFlag ) ;
                 ovt->TotalNbaAccountedMemAllocated += nba->TotalAllocSize ;
                 ovt->TotalNbaAccountedMemRemaining += nba->MemRemaining ;
@@ -748,8 +750,8 @@ _CheckRecycleWord ( Word * w )
     {
         //if ( Is_DebugOn ) 
 
-        if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
-        Word_Recycle ( w ) ;
+        if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s%s%s", 
+            w->S_ContainingNamespace? w->S_ContainingNamespace->Name : (byte*) "", w->S_ContainingNamespace? (byte*)"." : (byte*)"", w->Name ) ; //, Pause () ;
     }
 }
 
