@@ -229,9 +229,9 @@ void
 FreeNba_BaNode ( NamedByteArray * nba, dlnode * node )
 {
     ByteArray * ba = Get_BA_Symbol_To_BA ( node ) ; ;
-    dlnode_Remove ( node ) ; // remove BA_Symbol from nba->NBA_BaList cf. _NamedByteArray_AddNewByteArray
     MemChunk* mchunk = ( MemChunk* ) ( ( Symbol * ) node )->S_Value ;
     int64 size = ba->BA_DataSize ; //mchunk->S_ChunkSize ;
+    dlnode_Remove ( node ) ; // remove BA_Symbol from nba->NBA_BaList cf. _NamedByteArray_AddNewByteArray
     _Mem_ChunkFree ( mchunk ) ;
     nba->MemRemaining -= size ;
     nba->MemAllocated -= size ;
@@ -346,21 +346,6 @@ _OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always 
             ByteArray * ba = Get_BA_Symbol_To_BA ( node ) ;
             if ( ba )
             {
-#if 0                
-                if ( ( ! flag ++ ) && ( ba->MemRemaining < moreThan ) ) // keep one ba initialized
-                {
-                    _ByteArray_Init ( ba ) ;
-                    nba->ba_CurrentByteArray = ba ;
-                    size = ba->BA_DataSize ;
-                    nba->MemAllocated = size ;
-                    nba->MemRemaining = size ;
-                }
-                else
-                {
-                    FreeNba_BaNode ( nba, node ) ;
-                    nba->NumberOfByteArrays -- ;
-                }
-#else                
                 FreeNba_BaNode ( nba, node ) ;
                 nba->NumberOfByteArrays -- ;
                 if ( ! nodeNext )
@@ -370,7 +355,6 @@ _OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always 
                     nba->NBA_DataSize = nba->OriginalSize ;
                     _NamedByteArray_AddNewByteArray ( nba, nba->OriginalSize ) ;
                 }
-#endif                    
             }
         }
         nba->InitFreedRandMarker = rand ( ) ;
