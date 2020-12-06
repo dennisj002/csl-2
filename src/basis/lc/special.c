@@ -38,7 +38,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     if ( GetState ( _LC_, LC_COMPILE_MODE ) ) l1->W_SC_WordList = word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
     SetState ( lc, LC_COMPILE_MODE, false ) ;
     //_CSL_FinishWordDebugInfo ( word ) ;
-    //_Word_Finish ( word ) ; //l1 ) ;
+    //_Word_Finish ( word ) ; 
     _CSL_FinishWordDebugInfo ( l1 ) ;
     _Word_Finish ( l1 ) ;
     return l1 ;
