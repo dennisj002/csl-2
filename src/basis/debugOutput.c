@@ -127,7 +127,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         {
             if ( iw ) snprintf ( aliasName, 255, "%s.%s", 
                 (debugger->w_AliasOf->S_ContainingNamespace ? debugger->w_AliasOf->S_ContainingNamespace->Name : (byte*) ""), debugger->w_AliasOf->Name) ;
-            snprintf ( wordName, 299, "%s%s%s%s", word ? word->Name : ( byte* ) "", ( ( char* ) debugger->w_AliasOf ? " -> " : "" ),
+            snprintf ( wordName, 299, "%s%s%s%s", word ? (char*) word->Name : "", ( ( char* ) debugger->w_AliasOf ? " -> " : "" ),
                 iw ? aliasName : ( debugger->w_AliasOf ? debugger->w_AliasOf->Name : ( byte* ) "" ), debugger->w_AliasOf ? ( byte* ) " " : (byte*)"" ) ;
             debugger->SubstitutedWord = 0 ;
             SetState ( debugger, DBG_OUTPUT_SUBSTITUTION, true ) ;

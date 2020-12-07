@@ -36,6 +36,7 @@ Word_Object_Run ( Word * word )
             CSL_Do_Variable ( word, rvalueFlag, isForwardDotted, isReverseDotted ) ;
         else if ( word->W_ObjectAttributes & ( C_TYPE | C_CLASS ) ) Namespace_Do_C_Type ( word, isForwardDotted ) ;
         if ( word->W_ObjectAttributes & ( NAMESPACE | CLASS | CLASS_CLONE ) ) Namespace_Do_Namespace ( word, isForwardDotted ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
+        //else if ( word->W_ObjectAttributes & ( MEMORY_SPACE ) ) MemorySpace_Do_MemorySpace ( (MemorySpace *) word->S_Value ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
         Context_DoDotted_Post ( cntx ) ;
     }
 }
@@ -427,7 +428,7 @@ void
 CSL_Do_AccumulatedAddress ( Word * word, byte * accumulatedAddress, int64 offset, Boolean rvalueFlag )
 {
     Namespace * ns ;
-    byte size = ( ( ns = TypeNamespace_Get ( word ) ) ? ( int64 ) _Namespace_VariableValueGet ( ns, "size" ) : CELL ) ;
+    byte size = ( ( ns = TypeNamespace_Get ( word ) ) ? ( int64 ) _Namespace_VariableValueGet ( ns, (byte*) "size" ) : CELL ) ;
     Do_AccumulatedAddress ( accumulatedAddress, offset, rvalueFlag, size ) ;
 }
 

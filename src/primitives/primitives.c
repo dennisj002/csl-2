@@ -153,6 +153,9 @@ CPrimitive CPrimitives [] = {
     { "_findUsing", 0, 0, 0, CSL_Postfix_Find_Using, 0, 0, 0, "Namespace", "Root" },
     { "_findAny", 0, 0, 0, CSL_Postfix_Find_Any, 0, 0, 0, "Namespace", "Root" },
 
+    { "memspace", 0, 0, 0, CSL_MemorySpace_New, 0, 0, 0, "MemorySpace", "Root" },
+    { "msDelete", 0, 0, 0, CSL_MemorySpace_Delete, 0, 0, 0, "MemorySpace", "Root" },
+
     { "};", 0, 0, 0, CSL_ClassStructureEnd, 0, 0, 0, "Class", "Root" },
     { "+:{", 0, 0, 0, CSL_CloneStructureBegin, 0, 0, 0, "Class", "Root" },
     { ":{", 0, 0, 0, CSL_ClassTypedef, 0, 0, 0, "Class", "Root" },
@@ -424,7 +427,7 @@ CPrimitive CPrimitives [] = {
     { "dataStackSize", 0, 0, 0, OpenVmTil_DataStackSize, 0, 0, 0, "OpenVmTil", "Root" },
     { "historySize", 0, 0, 0, OpenVmTil_HistorySize, 0, 0, 0, "OpenVmTil", "Root" },
     { "addToHistory", 0, 0, 0, OpenVmTil_AddStringToHistory, 0, 0, 0, "OpenVmTil", "Root" },
-    { "historyReset", 0, 0, 0, HistorySpace_Reset, 0, 0, 0, "OpenVmTil", "Root" },
+    //{ "historyReset", 0, 0, 0, HistorySpace_Reset, 0, 0, 0, "OpenVmTil", "Root" },
     { "addToHistoryOn", 0, 0, 0, OpenVmTil_AddStringToHistoryOn, 0, 0, 0, "OpenVmTil", "Root" },
     { "addToHistoryOff", 0, 0, 0, OpenVmTil_AddStringToHistoryOff, 0, 0, 0, "OpenVmTil", "Root" },
     //{ "showAllocated", 0, 0, 0, OVT_Mem_ShowAllocated, 0, 0, 0, "OpenVmTil", "Root" },

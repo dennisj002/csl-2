@@ -61,7 +61,6 @@ typedef struct
         uint64 T_ChunkSize ; // remember MemChunk is prepended at memory allocation time
     } ;
 } AttributeInfo, TypeInfo, TI ;
-
 /*
 typedef struct
 {
@@ -100,7 +99,7 @@ typedef struct _node
         } ;
     } ;
 } dlnode, node, _dllist ;
-typedef struct 
+typedef struct
 {
     _dllist l_List ;
     node * l_CurrentNode ;
@@ -111,7 +110,7 @@ enum types
 {
     BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, CARTESIAN_PRODUCT
 } ;
-typedef struct 
+typedef struct
 {
     union
     {
@@ -897,23 +896,18 @@ typedef struct
     NamedByteArray * LispTempSpace ;
     // quasi long term
     NamedByteArray * BufferSpace ;
-    NamedByteArray * CSLInternalSpace ;
     // long term memory
     NamedByteArray * CodeSpace ;
     NamedByteArray * ObjectSpace ;
-    NamedByteArray * InternalObjectSpace ;
     NamedByteArray * LispSpace ;
     NamedByteArray * DictionarySpace ;
-    NamedByteArray * HistorySpace ;
-    NamedByteArray * OpenVmTilSpace ;
     NamedByteArray * StringSpace ;
-    dllist NBAs ;
-    dlnode NBAsHeadNode ;
-    dlnode NBAsTailNode ;
-    dllist * BufferList ;
-    dllist * RecycledWordList ;
-    dllist * RecycledOptInfoList ;
+
+    dllist *NBAs ;
+    //dlnode NBAsHeadNode ;
+    //dlnode NBAsTailNode ;
     int64 RecycledWordCount, WordsInRecycling ;
+    Namespace * Namespaces, * InNamespace, *SavedCslNamespaces ;
 } MemorySpace ;
 typedef struct
 {
@@ -937,19 +931,14 @@ typedef struct
         IntColors ics_IntColors ;
     } ;
 } Colors ;
-typedef struct
-{
-    NamedByteArray * HistorySpaceNBA ;
-    dlnode _StringList_HeadNode, _StringList_TailNode ;
-    dllist _StringList, * StringList ;
-} HistorySpace ;
+
 typedef struct
 {
     uint64 State ;
     CSL * OVT_CSL ;
     Context * OVT_Context ;
     Interpreter * OVT_Interpreter ;
-    HistorySpace OVT_HistorySpace ;
+    dllist * HistorySpace_StringList ;
     LambdaCalculus * OVT_LC ;
     ByteArray * CodeByteArray ; // a variable
 
@@ -965,11 +954,22 @@ typedef struct
     byte * SigLocation ;
     Colors *Current, Default, Alert, Debug, Notice, User ;
 
-    dllist PermanentMemList ;
-    dlnode PML_HeadNode, PML_TailNode ;
-    MemorySpace * MemorySpace0 ;
+    //dlnode PML_HeadNode, PML_TailNode ;
     int64 PermanentMemListRemainingAccounted, TotalNbaAccountedMemRemaining, TotalNbaAccountedMemAllocated, TotalMemSizeTarget ;
-    int64 Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, RunTimeAllocation, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
+    int64 Mmap_RemainingMemoryAllocated, OVT_InitialStaticMemory, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
+
+    MemorySpace * MemorySpace0 ;
+    dllist * PermanentMemChunkList ;
+    dllist * MemorySpaceList ;
+    dllist * NBAs ;
+    dllist * BufferList ;
+    dllist * RecycledWordList ;
+    dllist * RecycledOptInfoList ;
+    // long term memory
+    NamedByteArray * HistorySpace ;
+    NamedByteArray * InternalObjectSpace ;
+    NamedByteArray * OpenVmTilSpace ;
+    NamedByteArray * CSLInternalSpace ;
 
     // variables accessible from csl
     int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, ReAllocations, Dbi ;

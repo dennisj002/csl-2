@@ -159,7 +159,7 @@ _CSL_GetSystemState_String1 ( byte *buf )
     return buf ;
 }
 
-byte *
+const char *
 Convert_RestartCondtion ( int64 restartCondition )
 {
     switch ( restartCondition )

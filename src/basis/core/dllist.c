@@ -303,7 +303,8 @@ _dllist_First ( dllist * list )
 {
     dlnode * head = _dllist_Head ( list ), * headNext ;
     if ( head && ( headNext = _dlnode_Next ( head ) ) )
-        if ( ! Is_TheTailNode ( headNext ) ) return headNext ;
+        //if ( ! Is_TheTailNode ( headNext ) ) return headNext ;
+        if ( headNext->n_After ) return headNext ;
     return 0 ;
 }
 
@@ -312,7 +313,8 @@ _dllist_Last ( dllist * list )
 {
     dlnode *tail = _dllist_Tail ( list ), * tailPrevious ;
     if ( tail && ( tailPrevious = _dlnode_Previous ( tail ) ) )
-        if ( ! Is_TheHeadNode ( tailPrevious ) ) return tailPrevious ;
+        //if ( ! Is_TheHeadNode ( tailPrevious ) ) return tailPrevious ;
+        if ( tailPrevious->n_Before ) return tailPrevious ;
     return 0 ;
 }
 

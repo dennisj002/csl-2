@@ -65,7 +65,6 @@ CSL_Namespace_New ( )
 {
     Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) DataStack_Pop ( ), _CSL_Namespace_InNamespaceGet ( ), 1 ) ;
     Namespace_Do_Namespace ( ns, 0 ) ;
-
 }
 
 void

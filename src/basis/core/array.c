@@ -217,20 +217,21 @@ _NamedByteArray_AddNewByteArray ( NamedByteArray *nba, int64 size )
 NamedByteArray *
 _NamedByteArray_Allocate ( int64 allocType )
 {
-    return ( NamedByteArray* ) _Mem_ChunkAllocate ( sizeof ( NamedByteArray ), allocType ) ;
+    NamedByteArray * nba = ( NamedByteArray* ) _Mem_ChunkAllocate ( sizeof ( NamedByteArray ), allocType ) ;
+    return nba ;
 }
 
 NamedByteArray *
 NamedByteArray_Allocate ( )
 {
-    return _NamedByteArray_Allocate ( OPENVMTIL ) ; // allocate the nba structure OPENVMTIL but nba->NBA_AAttribute has it's own different type
+    NamedByteArray * nba = _NamedByteArray_Allocate ( OPENVMTIL ) ; // allocate the nba structure OPENVMTIL but nba->NBA_AAttribute has it's own different type
+    return nba ;
 }
 
 void
 _NamedByteArray_Init ( NamedByteArray * nba, byte * name, int64 size, int64 atype )
 {
     _Symbol_NameInit ( ( Symbol* ) & nba->NBA_Symbol, name ) ;
-    //nba->NBA_Symbol.Name = name ;
     nba->NBA_MemChunk.Name = name ;
     nba->NBA_AAttribute = atype ;
     dllist_Init ( &nba->NBA_BaList, &nba->NBA_ML_HeadNode, &nba->NBA_ML_TailNode ) ;
@@ -249,12 +250,23 @@ _NamedByteArray_Init ( NamedByteArray * nba, byte * name, int64 size, int64 atyp
 NamedByteArray *
 NamedByteArray_New ( byte * name, int64 size, int64 atype )
 {
+    NamedByteArray * nba ;
     //if ( String_Equal ( "HistorySpace", name ) ) _Printf ( ( byte* ) "\nNamedByteArray_New : name = %s", name ) ;
-    NamedByteArray * nba = NamedByteArray_Allocate ( ) ; // else the nba would be deleted with MemList_FreeExactType ( nba->NBA_AAttribute ) ;
+    if (atype == STATIC) nba = (NamedByteArray * ) Mem_Allocate ( sizeof ( OpenVmTil ), STATIC ) ; 
+    else nba = NamedByteArray_Allocate ( ) ; //NamedByteArray_Allocate ( ) ; // else the nba would be deleted with MemList_FreeExactType ( nba->NBA_AAttribute ) ;
     _NamedByteArray_Init ( nba, name, size, atype ) ;
     return nba ;
 }
-
+#if 0
+NamedByteArray *
+NamedByteArray_History_New ( byte * name, int64 size )
+{
+    //if ( String_Equal ( "HistorySpace", name ) ) _Printf ( ( byte* ) "\nNamedByteArray_New : name = %s", name ) ;
+    NamedByteArray * nba = _NamedByteArray_Allocate ( STATIC ) ;
+    _NamedByteArray_Init ( nba, name, size, STATIC ) ;
+    return nba ;
+}
+#endif
 // returns true if address is in this nba memory space
 
 int64

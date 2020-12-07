@@ -1054,7 +1054,7 @@ typedef struct
     CSL * OVT_CSL ;
     Context * OVT_Context ;
     Interpreter * OVT_Interpreter ;
-    HistorySpace OVT_HistorySpace ;
+    HistorySpace HistorySpace_StringList ;
     LambdaCalculus * OVT_LC ;
     ByteArray * CodeByteArray ; // a variable
 

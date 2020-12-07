@@ -192,7 +192,7 @@ ReadTable_A ( ReadLiner * rl ) // 'A' - back in history - UP arrow - ESC[A towar
 {
     if ( rl->EscapeModeFlag == 2 )
     {
-        dlnode * node = dllist_SetCurrentNode_Before ( _O_->OVT_HistorySpace.StringList ) ;
+        dlnode * node = dllist_SetCurrentNode_Before ( _O_->HistorySpace_StringList ) ;
         if ( node )
         {
             rl->HistoryNode = ( HistoryStringNode* ) node ;
@@ -208,7 +208,7 @@ ReadTable_B ( ReadLiner * rl )// 'B' - forward, toward end of history - DOWN arr
 {
     if ( rl->EscapeModeFlag == 2 )
     {
-        dlnode * node = dllist_SetCurrentNode_After ( _O_->OVT_HistorySpace.StringList ) ;
+        dlnode * node = dllist_SetCurrentNode_After ( _O_->HistorySpace_StringList ) ;
         if ( node )
         {
             rl->HistoryNode = ( HistoryStringNode* ) node ;

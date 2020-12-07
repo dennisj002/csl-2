@@ -1022,8 +1022,8 @@ Buffer_Init ( Buffer * b, int64 flag )
 void
 Buffer_Add ( Buffer * b, int64 flag )
 {
-    if ( flag & N_PERMANENT ) dllist_AddNodeToTail ( _O_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
-    else dllist_AddNodeToHead ( _O_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
+    if ( flag & N_PERMANENT ) dllist_AddNodeToTail ( _O_->BufferList, ( dlnode* ) b ) ;
+    else dllist_AddNodeToHead ( _O_->BufferList, ( dlnode* ) b ) ;
 }
 
 Buffer *
@@ -1044,7 +1044,7 @@ _Buffer_New ( int64 size, int64 flag )
     d0 ( Buffer_PrintBuffers ( ) ) ;
     if ( _O_ && _O_->MemorySpace0 )
     {
-        for ( node = dllist_First ( ( dllist* ) _O_->MemorySpace0->BufferList ) ; node ; node = nextNode )
+        for ( node = dllist_First ( ( dllist* ) _O_->BufferList ) ; node ; node = nextNode )
         {
             nextNode = dlnode_Next ( node ) ;
             b = ( Buffer* ) node ;
@@ -1081,7 +1081,7 @@ Buffers_SetAsUnused ( int64 force )
     int64 total = 0, setFree = 0 ;
     if ( _O_ && _O_->MemorySpace0 )
     {
-        for ( node = dllist_First ( ( dllist* ) _O_->MemorySpace0->BufferList ) ; node ; node = nextNode )
+        for ( node = dllist_First ( ( dllist* ) _O_->BufferList ) ; node ; node = nextNode )
         {
             nextNode = dlnode_Next ( node ) ;
             b = ( Buffer* ) node ;
@@ -1100,7 +1100,7 @@ Buffer_PrintBuffers ( )
     int64 total = 0, free = 0, locked = 0, unlocked = 0, permanent = 0 ;
     if ( _O_ && _O_->MemorySpace0 )
     {
-        for ( node = dllist_First ( ( dllist* ) _O_->MemorySpace0->BufferList ) ; node ; node = nextNode )
+        for ( node = dllist_First ( ( dllist* ) _O_->BufferList ) ; node ; node = nextNode )
         {
             b = ( Buffer* ) node ;
             d0 ( Printf ( "\nBuffer_PrintBuffers : buffer = 0x%08x : nextNode = 0x%08x : flag = 0x%08x : size = %d : length = %d : data = %s\n", b, dlnode_Next ( node ), b->InUseFlag, b->B_Size, strlen ( b->B_Data ), b->B_Data ) ) ;

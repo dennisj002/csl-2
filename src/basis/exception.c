@@ -529,7 +529,7 @@ CSL_FullRestart ( )
 }
 
 void
-Error ( byte * msg, uint64 state )
+_Error ( byte * msg, uint64 state )
 {
     AlertColors ;
     if ( ( state ) & PAUSE )

@@ -55,7 +55,7 @@ _Lexer_ParseBinary ( Lexer * lexer, int64 offset )
         else
         {
             SetState ( lexer, KNOWN_OBJECT, false ) ;
-            Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, "\n_Lexer_ParseBinary : non binary digits with number base 2" ) ;
+            Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, (byte * )"\n_Lexer_ParseBinary : non binary digits with number base 2" ) ;
         }
     }
     SetState ( lexer, KNOWN_OBJECT, true ) ;

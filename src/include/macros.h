@@ -303,5 +303,6 @@
 #define OVT_RA_ADDED 1
 #define OVT_RA_RECYCLED 2
 
-//#define _dllist_PushNew_M_Slot_Node ( list, allocType, typeCode, m_slots, ... )   _dllist_PushNode ( list, ( dlnode* ) dobject_New_M_Slot ( allocType, typeCode, m_slots, ... ) ) 
+#define Error( msg, state ) _Error ( (byte * ) msg, (uint64) state )
+
 

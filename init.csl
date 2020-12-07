@@ -436,6 +436,8 @@ dbgOff
 
 #if Is_DebugOn 
 
+"testCsl" memspace
+    
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
 : TODO ( str ) _TODO ( str @ ) pause ;;
@@ -454,6 +456,7 @@ demo
 //rtw
 
 stringMacrosOff
+"testCsl" msDelete
 
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your extra init code maybe here if you like
 : mct "namespaces/compiler/machineCode.csl" include ;

@@ -480,37 +480,6 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
     return 0 ;
 }
 
-#if 1
-
-Namespace *
-_Namespace_New ( byte * name, Namespace * containingNs )
-{
-    Namespace * ns = _DObject_New ( name, 0, IMMEDIATE, NAMESPACE, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
-    ns->S_SymbolList =_dllist_New ( DICTIONARY ) ;
-    return ns ;
-}
-#else
-
-Namespace *
-_Namespace_New ( byte * name, Namespace * containingNs )
-{
-    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, containingNs, 0, 0, - 1 ) ;
-    return ns ;
-}
-#endif
-
-Namespace *
-Namespace_New ( byte * name, Namespace * containingNs )
-{
-    Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
-    if ( ! ns )
-    {
-        ns = _Namespace_New ( name, containingNs ) ;
-        //_Namespace_Symbol_Print ( ns, 2, 0 ) ;
-    }
-    return ns ;
-}
-
 // a namespaces internal finder, a wrapper for Symbol_Find - prefer Symbol_Find directly
 
 Namespace *
@@ -532,6 +501,26 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 }
 
 Namespace *
+_Namespace_New ( byte * name, Namespace * containingNs )
+{
+    Namespace * ns = _DObject_New ( name, 0, IMMEDIATE, NAMESPACE, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
+    ns->S_SymbolList =_dllist_New ( DICTIONARY ) ;
+    return ns ;
+}
+
+Namespace *
+Namespace_New ( byte * name, Namespace * containingNs )
+{
+    Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
+    if ( ! ns )
+    {
+        ns = _Namespace_New ( name, containingNs ) ;
+        //_Namespace_Symbol_Print ( ns, 2, 0 ) ;
+    }
+    return ns ;
+}
+
+Namespace *
 _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
     Context * cntx = _Context_ ;
@@ -543,8 +532,6 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
     //ns = _Namespace_Find ( name, _CSL_->Namespaces, 0 ) ;
     //if ( ! ns )
     {
-        //ns = Namespace_New ( name, _CSL_->Namespaces ) ;
-        //ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, _CSL_->Namespaces, 0, 0, - 1 ) ;
         ns = _Namespace_New ( name, _CSL_->Namespaces ) ;
         if ( CompileMode ) Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
         else compiler->NonCompilingNs = ns ;

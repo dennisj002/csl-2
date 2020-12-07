@@ -105,22 +105,22 @@ OpenVmTil_Print_DataSizeofInfo ( int64 flag )
         Printf ( ( byte* ) "AttributeInfo size : %d bytes, ", sizeof (AttributeInfo ) ) ;
         //Printf ( ( byte* ) "\nObject size : %d bytes, ", sizeof (Object ) ) ;
         Printf ( ( byte* ) "Symbol size : %d bytes, ", sizeof (Symbol ) ) ;
-        Printf ( ( byte* ) "Word size : %d bytes, ", sizeof (Word ) ) ;
+        Printf ( ( byte* ) "\nWord size : %d bytes, ", sizeof (Word ) ) ;
         Printf ( ( byte* ) "ListObject size : %d bytes, ", sizeof ( ListObject ) ) ;
         Printf ( ( byte* ) "WordData size : %d bytes, ", sizeof (WordData ) ) ;
-        Printf ( ( byte* ) "\nContext size : %d bytes, ", sizeof (Context ) ) ;
+        Printf ( ( byte* ) "Context size : %d bytes, ", sizeof (Context ) ) ;
         Printf ( ( byte* ) "System size : %d bytes, ", sizeof (System ) ) ;
-        Printf ( ( byte* ) "Debugger size : %d bytes, ", sizeof (Debugger ) ) ;
+        Printf ( ( byte* ) "\nDebugger size : %d bytes, ", sizeof (Debugger ) ) ;
         Printf ( ( byte* ) "MemorySpace size : %d bytes, ", sizeof (MemorySpace ) ) ;
-        Printf ( ( byte* ) "\nReadLiner size : %d bytes, ", sizeof (ReadLiner ) ) ;
+        Printf ( ( byte* ) "ReadLiner size : %d bytes, ", sizeof (ReadLiner ) ) ;
         Printf ( ( byte* ) "Lexer size : %d bytes, ", sizeof (Lexer ) ) ;
         Printf ( ( byte* ) "Interpreter size : %d bytes, ", sizeof (Interpreter ) ) ;
-        Printf ( ( byte* ) "Finder size : %d bytes, ", sizeof (Finder ) ) ;
+        Printf ( ( byte* ) "\nFinder size : %d bytes, ", sizeof (Finder ) ) ;
         Printf ( ( byte* ) "Compiler size : %d bytes, ", sizeof (Compiler ) ) ;
-        Printf ( ( byte* ) "\nByteArray size : %d bytes, ", sizeof (ByteArray ) ) ;
+        Printf ( ( byte* ) "ByteArray size : %d bytes, ", sizeof (ByteArray ) ) ;
         Printf ( ( byte* ) "NamedByteArray size : %d bytes, ", sizeof (NamedByteArray ) ) ;
         Printf ( ( byte* ) "MemChunk size : %d bytes", sizeof ( MemChunk ) ) ;
-        Printf ( ( byte* ) "CSL size : %d bytes, ", sizeof (CSL ) ) ;
+        Printf ( ( byte* ) "\nCSL size : %d bytes, ", sizeof (CSL ) ) ;
         Printf ( ( byte* ) "OpenVimTil size : %d bytes", sizeof (OpenVmTil ) ) ;
     }
 }

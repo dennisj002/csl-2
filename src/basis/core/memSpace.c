@@ -3,7 +3,8 @@
 
 const int64 MEM_FREE = 0 ;
 const int64 MEM_ALLOC = 1 ;
-int64 mmap_TotalMemAllocated = 0, mmap_TotalMemFreed = 0 ;
+int64 mmap_TotalMemAllocated = 0, mmap_TotalMemFreed = 0, StaticAllocation = 0 ;
+dllist HistoryMemChunkList ; dlnode hml_Head, hml_Tail ;
 
 byte*
 _mmap_AllocMem ( int64 size )
@@ -92,8 +93,89 @@ _Mem_ChunkAllocate ( int64 size, uint64 allocType )
     mchunk->S_ChunkSize = size ; // S_ChunkSize is the total size of the chunk including any prepended accounting structure in that total
     mchunk->S_WAllocType = allocType ;
     _MemChunk_Account ( ( MemChunk* ) mchunk, MEM_ALLOC ) ;
-    dllist_AddNodeToHead ( &_O_->PermanentMemList, ( dlnode* ) mchunk ) ;
+    if (allocType == HISTORY ) dllist_AddNodeToHead ( &HistoryMemChunkList, ( dlnode* ) mchunk ) ;
+    else dllist_AddNodeToHead ( _O_->PermanentMemChunkList, ( dlnode* ) mchunk ) ;
     return ( byte* ) mchunk ;
+}
+
+void
+_MemorySpace_Do_MemorySpace ( OpenVmTil * ovt, MemorySpace * ms )
+{
+    ovt->MemorySpace0 = ms ;
+    if ( ovt->OVT_CSL && ovt->OVT_CSL->Context0 )
+    {
+        NBA * cnba = ovt->OVT_CSL->Context0->ContextNba ;
+        ovt->MemorySpace0->ContextSpace = cnba ;
+    }
+}
+
+MemorySpace *
+MemorySpace_Find ( byte * name )
+{
+    MemorySpace * ms = ( MemorySpace* ) _DLList_FindName_InOneNamespaceList ( _O_->MemorySpaceList, name ) ;
+    return ms ;
+}
+
+MemorySpace *
+MemorySpace_StaticMem_Allocate ( )
+{
+    MemorySpace *ms = ( MemorySpace* ) Mem_Allocate ( sizeof ( MemorySpace ), STATIC ) ; //mmap_AllocMem ( sizeof ( MemorySpace ) ) ;
+    ms->NBAs = _dllist_New ( STATIC ) ;
+    //_O_->OVT_InitialStaticMemory += ( sizeof (dllist ) + ( 2 * sizeof (dlnode ) ) ) + sizeof ( MemorySpace ) ;
+    return ms ;
+}
+
+MemorySpace *
+MemorySpace_New ( OpenVmTil * ovt, byte * name )
+{
+    MemorySpace * ms = MemorySpace_Find ( name ) ;
+    if ( ! ms )
+    {
+        ms = MemorySpace_StaticMem_Allocate ( ) ;
+        MemorySpace_Init ( ms ) ;
+        ( ( Symbol* ) ms )->S_Name = name ;
+        dllist_AddNodeToHead ( ovt->MemorySpaceList, ( dlnode* ) ms ) ;
+        _MemorySpace_Do_MemorySpace ( ovt, ms ) ;
+    }
+    return ms ;
+}
+
+// not so useful now maybe future developments will change things
+
+MemorySpace *
+MemorySpace_Delete ( byte * name )
+{
+    NamedByteArray *nba ;
+    dlnode * node, *nodeNext ;
+    MemorySpace * ms = MemorySpace_Find ( name ) ;
+    if ( ms && ( node = dllist_First ( ( dllist* ) ms->NBAs ) ) )
+    {
+        MemorySpace * defaultMs = MemorySpace_Find ( "DefaultMemorySpace" ) ;
+        defaultMs->WordsInRecycling = ms->WordsInRecycling ;
+        defaultMs->RecycledWordCount = ms->RecycledWordCount ;
+        for ( ; node ; node = nodeNext )
+        {
+            nodeNext = dlnode_Next ( node ) ;
+            nba = Get_NbaSymbolNode_To_NBA ( node ) ;
+            _OVT_MemList_FreeNBAMemory ( nba, 0, 1 ) ;
+        }
+        dlnode_Remove ( ( dlnode * ) ms ) ;
+        _MemorySpace_Do_MemorySpace ( _O_, defaultMs ) ;
+
+    }
+}
+
+void
+CSL_MemorySpace_Delete ( )
+{
+    MemorySpace_Delete ( ( byte* ) DataStack_Pop ( ) ) ;
+}
+
+void
+CSL_MemorySpace_New ( )
+{
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
+    MemorySpace * ms = MemorySpace_New ( _O_, name ) ;
 }
 
 ByteArray *
@@ -163,33 +245,39 @@ _ByteArray_AppendSpace ( ByteArray * ba, int64 size ) // size in bytes
 byte *
 Mem_Allocate ( int64 size, uint64 allocType )
 {
-    MemorySpace * ms = _O_->MemorySpace0 ;
-    switch ( allocType )
+    if ( allocType == STATIC )
     {
-        case OPENVMTIL: return _Allocate ( size, ms->OpenVmTilSpace ) ;
-        case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
-        case INTERNAL_OBJECT_MEM: return _Allocate ( size, ms->InternalObjectSpace ) ;
-        case LISP: return _Allocate ( size, ms->LispSpace ) ;
-        case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
-        case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
-        case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
-        case CODE: return _Allocate ( size, ms->CodeSpace ) ;
-        case BUFFER: return _Allocate ( size, ms->BufferSpace ) ;
-        case HISTORY: return _Allocate ( size, ms->HistorySpace ) ;
-        case LISP_TEMP: return _Allocate ( size, ms->LispTempSpace ) ;
-        case CONTEXT: return _Allocate ( size, ms->ContextSpace ) ;
-        case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
-        case WORD_RECYCLING: return _Allocate ( size, ms->WordRecylingSpace ) ;
-        case T_CSL: case DATA_STACK: return _Allocate ( size, ms->CSLInternalSpace ) ;
-        case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
-        case RUNTIME: // not used??
-        {
-            _O_->RunTimeAllocation += size ;
-            return mmap_AllocMem ( size ) ;
-        }
-        default: CSL_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
+        StaticAllocation += size ;
+        return mmap_AllocMem ( size ) ;
     }
-    return 0 ;
+    else
+    {
+        OpenVmTil * ovt = _O_ ;
+        MemorySpace * ms = ovt->MemorySpace0 ;
+        switch ( allocType )
+        {
+            case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
+            case LISP: return _Allocate ( size, ms->LispSpace ) ;
+            case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
+            case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
+            case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
+            case CODE: return _Allocate ( size, ms->CodeSpace ) ;
+            case BUFFER: return _Allocate ( size, ms->BufferSpace ) ;
+            case LISP_TEMP: return _Allocate ( size, ms->LispTempSpace ) ;
+            case CONTEXT: return _Allocate ( size, ms->ContextSpace ) ;
+            case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
+            case WORD_RECYCLING: return _Allocate ( size, ms->WordRecylingSpace ) ;
+            case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
+
+            case HISTORY: return _Allocate ( size, ovt->HistorySpace ) ;
+            case T_CSL: case DATA_STACK: return _Allocate ( size, ovt->CSLInternalSpace ) ;
+            case INTERNAL_OBJECT_MEM: return _Allocate ( size, ovt->InternalObjectSpace ) ;
+            case OPENVMTIL: return _Allocate ( size, ovt->OpenVmTilSpace ) ;
+
+            default: CSL_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
+        }
+        return 0 ;
+    }
 }
 
 void
@@ -263,7 +351,16 @@ NamedByteArray *
 MemorySpace_NBA_New ( MemorySpace * memSpace, byte * name, int64 size, int64 allocType )
 {
     NamedByteArray *nba = NamedByteArray_New ( name, size, allocType ) ;
-    dllist_AddNodeToHead ( &memSpace->NBAs, ( dlnode* ) & nba->NBA_Symbol ) ;
+    dllist_AddNodeToHead ( memSpace->NBAs, ( dlnode* ) & nba->NBA_Symbol ) ;
+    return nba ;
+}
+
+NamedByteArray *
+MemorySpace_NBA_OvtNew ( byte * name, int64 size, int64 allocType )
+{
+    OpenVmTil * ovt = _O_ ;
+    NamedByteArray *nba = NamedByteArray_New ( name, size, allocType ) ;
+    dllist_AddNodeToHead ( ovt->NBAs, ( dlnode* ) & nba->NBA_Symbol ) ;
     return nba ;
 }
 
@@ -274,56 +371,45 @@ OVT_FreeTempMem ( )
     OVT_MemListFree_TempObjects ( ) ;
     OVT_MemListFree_Objects ( ) ;
     OVT_MemListFree_LispTemp ( ) ;
-    //_OVT_MemListFree_WordRecyclingSpace ( ) ;
 }
 
 void
 MemorySpace_Init ( MemorySpace * ms )
 {
     OpenVmTil * ovt = _O_ ;
+    MemorySpace * oldMs = ovt->MemorySpace0 ;
 
-    ms->OpenVmTilSpace = MemorySpace_NBA_New ( ms, ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
-    ms->CSLInternalSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CSLInternalSpace", ovt->CSLSize, T_CSL ) ;
-    ms->InternalObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "InternalObjectSpace", ovt->InternalObjectsSize, INTERNAL_OBJECT_MEM ) ;
+    //ms->LispSpace = oldMs->LispSpace ? oldMs->LispSpace : MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
+    ms->DictionarySpace = oldMs->DictionarySpace ? oldMs->DictionarySpace : MemorySpace_NBA_New ( ms, ( byte* ) "DictionarySpace", ovt->DictionarySize, DICTIONARY ) ;
+    ms->CodeSpace = oldMs->CodeSpace ? oldMs->CodeSpace : MemorySpace_NBA_New ( ms, ( byte* ) "CodeSpace", ovt->MachineCodeSize, CODE ) ;
+
+    ms->LispSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
     ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectsSize, OBJECT_MEM ) ;
     ms->TempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "TempObjectSpace", ovt->TempObjectsSize, TEMPORARY ) ;
-    ms->LispSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
     ms->LispTempSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispTempSpace", ovt->LispTempSize, LISP_TEMP ) ;
     ms->CompilerTempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CompilerTempObjectSpace", ovt->CompilerTempObjectsSize, COMPILER_TEMP ) ;
     ms->WordRecylingSpace = MemorySpace_NBA_New ( ms, ( byte* ) "WordRecylingSpace", ovt->WordRecylingSize, WORD_RECYCLING ) ;
-    ms->CodeSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CodeSpace", ovt->MachineCodeSize, CODE ) ;
     ms->SessionObjectsSpace = MemorySpace_NBA_New ( ms, ( byte* ) "SessionObjectsSpace", ovt->SessionObjectsSize, SESSION ) ;
-    ms->DictionarySpace = MemorySpace_NBA_New ( ms, ( byte* ) "DictionarySpace", ovt->DictionarySize, DICTIONARY ) ;
-    ms->BufferSpace = MemorySpace_NBA_New ( ms, ( byte* ) "BufferSpace", ovt->BufferSpaceSize, BUFFER ) ;
-    ms->HistorySpace = MemorySpace_NBA_New ( ms, ( byte* ) "HistorySpace", HISTORY_SIZE, HISTORY ) ;
     ms->StringSpace = MemorySpace_NBA_New ( ms, ( byte* ) "StringSpace", ovt->StringSpaceSize, STRING_MEMORY ) ;
+    ms->BufferSpace = MemorySpace_NBA_New ( ms, ( byte* ) "BufferSpace", ovt->BufferSpaceSize, BUFFER ) ;
 
-    ms->BufferList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
-    ms->RecycledWordList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
-    ms->RecycledOptInfoList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
+    if ( ovt->OVT_CSL && ovt->OVT_CSL->Context0 )
+    {
+        NBA * cnba = ovt->OVT_CSL->Context0->ContextNba ;
+        ms->ContextSpace = cnba ;
+    }
+
 
     _O_CodeByteArray = ms->CodeSpace->ba_CurrentByteArray ; //init CompilerSpace ptr
 
     if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nSystem Memory has been initialized.  " ) ;
 }
 
-MemorySpace *
-MemorySpace_New ( )
-{
-    MemorySpace *memSpace = ( MemorySpace* ) mmap_AllocMem ( sizeof ( MemorySpace ) ) ;
-    _O_->MemorySpace0 = memSpace ;
-    _O_->OVT_InitialUnAccountedMemory += sizeof ( MemorySpace ) ; // needed here because '_O_' was not initialized yet for MemChunk accounting
-    dllist_Init ( &memSpace->NBAs, &memSpace->NBAsHeadNode, &memSpace->NBAsTailNode ) ; //= _dllist_New ( OPENVMTIL ) ;
-    MemorySpace_Init ( memSpace ) ; // can't be initialized until after it is hooked into it's System
-
-    return memSpace ;
-}
-
 NamedByteArray *
 _OVT_Find_NBA ( byte * name )
 {
     // needs a Word_Find that can be called before everything is initialized
-    Symbol * s = DLList_FindName_InOneNamespaceList ( &_O_->MemorySpace0->NBAs, ( byte * ) name ) ;
+    Symbol * s = DLList_FindName_InOneNamespaceList ( _O_->MemorySpace0->NBAs, ( byte * ) name ) ;
     if ( s ) return Get_NbaSymbolNode_To_NBA ( s ) ;
     else return 0 ;
 }
@@ -468,7 +554,7 @@ _OVT_MemListFree_CSLInternal ( )
 void
 _NBAsMemList_FreeTypes ( int64 allocType, int64 exactFlag )
 {
-    dllist_Map2 ( &_O_->MemorySpace0->NBAs, ( MapFunction2 ) NBA_FreeChunkType, allocType, exactFlag ) ;
+    dllist_Map2 ( _O_->MemorySpace0->NBAs, ( MapFunction2 ) NBA_FreeChunkType, allocType, exactFlag ) ;
 }
 
 void
@@ -525,23 +611,26 @@ NBA_PrintInfo ( NamedByteArray * nba )
 void
 NBA_AccountRemainingAndShow ( NamedByteArray * nba, Boolean flag )
 {
-    byte * name = nba->NBA_Symbol.S_Name ;
-    int64 largest = 0, smallest = 0 ;
-    nba->MemRemaining = 0 ;
-    dlnode * node, *nodeNext ;
-    for ( node = dllist_First ( ( dllist* ) & nba->NBA_BaList ) ; node ; node = nodeNext )
+    if ( nba )
     {
-        nodeNext = dlnode_Next ( node ) ;
-        ByteArray * ba = Get_BA_Symbol_To_BA ( node ) ;
-        nba->MemRemaining += ba->MemRemaining ;
-        if ( ! largest ) largest = ba->MemRemaining ;
-        else if ( ba->MemRemaining > largest ) largest = ba->MemRemaining ;
-        if ( ! smallest ) smallest = ba->MemRemaining ;
-        else if ( ba->MemRemaining < smallest ) smallest = ba->MemRemaining ;
+        byte * name = nba->NBA_Symbol.S_Name ;
+        int64 largest = 0, smallest = 0 ;
+        nba->MemRemaining = 0 ;
+        dlnode * node, *nodeNext ;
+        for ( node = dllist_First ( ( dllist* ) & nba->NBA_BaList ) ; node ; node = nodeNext )
+        {
+            nodeNext = dlnode_Next ( node ) ;
+            ByteArray * ba = Get_BA_Symbol_To_BA ( node ) ;
+            nba->MemRemaining += ba->MemRemaining ;
+            if ( ! largest ) largest = ba->MemRemaining ;
+            else if ( ba->MemRemaining > largest ) largest = ba->MemRemaining ;
+            if ( ! smallest ) smallest = ba->MemRemaining ;
+            else if ( ba->MemRemaining < smallest ) smallest = ba->MemRemaining ;
+        }
+        nba->LargestRemaining = largest ;
+        nba->SmallestRemaining = smallest ;
+        if ( flag ) NBA_PrintInfo ( nba ) ;
     }
-    nba->LargestRemaining = largest ;
-    nba->SmallestRemaining = smallest ;
-    if ( flag ) NBA_PrintInfo ( nba ) ;
 }
 
 void
@@ -550,7 +639,7 @@ OVT_ShowNBAs ( OpenVmTil * ovt, int64 flag )
     if ( ovt )
     {
         dlnode * node, *nodeNext ;
-        if ( ovt->MemorySpace0 && ( node = dllist_First ( ( dllist* ) & ovt->MemorySpace0->NBAs ) ) )
+        if ( ovt->MemorySpace0 && ( node = dllist_First ( ( dllist* ) ovt->MemorySpace0->NBAs ) ) )
         {
             for ( ; node ; node = nodeNext )
             {
@@ -574,7 +663,7 @@ _OVT_ShowPermanentMemList ( OpenVmTil * ovt )
         int64 diff ;
         dlnode * node, *nodeNext ;
         if ( ovt->Verbosity > 2 ) printf ( "\nMemChunk List :: " ) ;
-        for ( size = 0, node = dllist_First ( ( dllist* ) & ovt->PermanentMemList ) ; node ; node = nodeNext )
+        for ( size = 0, node = dllist_First ( ( dllist* ) & ovt->PermanentMemChunkList ) ; node ; node = nodeNext )
         {
             nodeNext = dlnode_Next ( node ) ;
             if ( ovt->Verbosity > 2 ) MemChunk_Show ( ( MemChunk * ) node ) ;
@@ -598,20 +687,40 @@ _OVT_CalculateAndShow_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, Boolean s
 {
     if ( ovt )
     {
-        dlnode * node, * nextNode ;
-        NamedByteArray * nba ; //, * nextNba ;
+        dlnode * node, * nextNode, *msNode, *nextMsNode ;
+        NamedByteArray * nba ;
+        MemorySpace * ms ;
+        Boolean flag = 0 ;
         ovt->TotalNbaAccountedMemRemaining = 0 ;
         ovt->TotalNbaAccountedMemAllocated = 0 ;
         if ( ovt && ovt->MemorySpace0 )
         {
-            for ( node = dllist_First ( ( dllist* ) & ovt->MemorySpace0->NBAs ) ; node ; node = nextNode )// nb. NBAs is the NBA Symbol list
+            for ( msNode = dllist_First ( ( dllist* ) ovt->MemorySpaceList ) ; msNode ; msNode = nextMsNode )
             {
-
-                nextNode = dlnode_Next ( node ) ;
-                nba = ( NBA* ) Get_NbaSymbolNode_To_NBA ( node ) ;
-                NBA_AccountRemainingAndShow ( nba, showFlag ) ;
-                ovt->TotalNbaAccountedMemAllocated += nba->TotalAllocSize ;
-                ovt->TotalNbaAccountedMemRemaining += nba->MemRemaining ;
+                ms = ( MemorySpace * ) msNode ;
+                nextMsNode = dlnode_Next ( msNode ) ;
+                for ( node = dllist_First ( ( dllist* ) ms->NBAs ) ; node ; node = nextNode )// nb. NBAs is the NBA Symbol list
+                {
+                    nextNode = dlnode_Next ( node ) ;
+                    nba = ( NBA* ) Get_NbaSymbolNode_To_NBA ( node ) ;
+                    NBA_AccountRemainingAndShow ( nba, showFlag ) ;
+                    ovt->TotalNbaAccountedMemAllocated += nba->TotalAllocSize ;
+                    ovt->TotalNbaAccountedMemRemaining += nba->MemRemaining ;
+                }
+                if ( ! flag ++ )
+                {
+                    for ( node = dllist_First ( ( dllist* ) & ovt->NBAs ) ; node ; node = nextNode )// nb. NBAs is the NBA Symbol list
+                    {
+                        nextNode = dlnode_Next ( node ) ;
+                        nba = ( NBA* ) Get_NbaSymbolNode_To_NBA ( node ) ;
+                        if ( nba ) // ?? should not need this
+                        {
+                            NBA_AccountRemainingAndShow ( nba, showFlag ) ;
+                            ovt->TotalNbaAccountedMemAllocated += nba->TotalAllocSize ;
+                            ovt->TotalNbaAccountedMemRemaining += nba->MemRemaining ;
+                        }
+                    }
+                }
             }
         }
     }
@@ -637,13 +746,12 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
 {
     Boolean vf = ( ovt->Verbosity > 1 ) ;
     if ( ! vf ) Printf ( ( byte* ) c_gu ( "\nIncrease the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
-    int64 leak = ( mmap_TotalMemAllocated - mmap_TotalMemFreed ) - ( ovt->TotalMemAllocated - ovt->TotalMemFreed ) - ovt->OVT_InitialUnAccountedMemory ;
-    OVT_CalculateAndShow_TotalNbaAccountedMemAllocated ( ovt, 1 ) ; //leak || vf ) ;
+    int64 leak = ( mmap_TotalMemAllocated - mmap_TotalMemFreed ) - ( ovt->TotalMemAllocated - ovt->TotalMemFreed ) - StaticAllocation ; //- ovt->OVT_InitialStaticMemory ; //- ovt->RunTimeAllocation ;
+    OVT_CalculateAndShow_TotalNbaAccountedMemAllocated ( ovt, 1 ) ; 
     _OVT_ShowPermanentMemList ( ovt ) ;
     int64 memDiff2 = ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted ;
     byte * memDiff2s = ( byte* ) "\nCurrent Unaccounted Diff (leak?)                  = %9d : <=: ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted" ;
-    byte * leaks = ( byte* ) "\nleak?                                             = %9d : <=  (mmap_TotalMemAllocated - mmap_TotalMemFreed) - (ovt->TotalMemAllocated - ovt->TotalMemFreed) "
-        "\n                                                                    - ovt->OVT_InitialUnAccountedMemory" ;
+    byte * leaks = ( byte* ) "\nleak?                                             = %9d : <=  (mmap_TotalMemAllocated - mmap_TotalMemFreed) - (ovt->TotalMemAllocated - ovt->TotalMemFreed) - StaticAllocation" ;
     if ( memDiff2 ) Printf ( ( byte* ) c_ad ( memDiff2s ), memDiff2 ) ;
     else if ( vf ) Printf ( ( byte* ) c_ud ( memDiff2s ), memDiff2 ) ;
     if ( leak ) Printf ( ( byte* ) c_ad ( leaks ), leak ) ;
@@ -662,10 +770,11 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
         Printf ( ( byte* ) "\nTotal Mem Allocated                               = %9d : <=: ovt->TotalMemAllocated", ovt->TotalMemAllocated ) ; //+ ovt->UnaccountedMem ) ) ;
         Printf ( ( byte* ) "\nTotal Mem Freed                                   = %9d : <=: ovt->TotalMemFreed", ovt->TotalMemFreed ) ; //+ ovt->UnaccountedMem ) ) ;
         Printf ( ( byte* ) "\nTotal Mem Remaining                               = %9d : <=: ovt->TotalMemAllocated - ovt->TotalMemFreed", ovt->TotalMemAllocated - ovt->TotalMemFreed ) ; //+ ovt->UnaccountedMem ) ) ;
-        Printf ( ( byte* ) "\nOVT_InitialUnAccountedMemory                      = %9d : <=: ovt->OVT_InitialUnAccountedMemory", ovt->OVT_InitialUnAccountedMemory ) ; //+ ovt->UnaccountedMem ) ) ;
+        Printf ( ( byte* ) "\nOVT_InitialUnAccountedMemory                      = %9d : <=: ovt->OVT_InitialUnAccountedMemory", ovt->OVT_InitialStaticMemory ) ; //+ ovt->UnaccountedMem ) ) ;
         Printf ( ( byte* ) "\nTotalMemSizeTarget                                = %9d : <=: ovt->TotalMemSizeTarget", ovt->TotalMemSizeTarget ) ;
     }
     Printf ( ( byte* ) "\nReAllocations                                     = %9d", _O_->ReAllocations ) ;
+    Printf ( ( byte* ) "\nStaticAllocation                                  = %9d", StaticAllocation ) ;
     Printf ( ( byte* ) "\nTotal Memory Allocated                            = %9d"
         "\nTotal Memory leaks                                = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
@@ -729,7 +838,7 @@ OVT_RecyclingAccounting ( int64 flag )
 void
 OVT_Recycle ( dlnode * anode )
 {
-    if ( anode ) dllist_AddNodeToTail ( _O_->MemorySpace0->RecycledWordList, anode ) ;
+    if ( anode ) dllist_AddNodeToTail ( _O_->RecycledWordList, anode ) ;
     //_O_->MemorySpace0->WordsInRecycling ++ ;
     OVT_RecyclingAccounting ( OVT_RA_ADDED ) ;
 }

@@ -10,10 +10,22 @@ DLList_FindName_InOneNamespaceList ( dllist * list, byte * name )
 }
 
 Symbol *
+_DLList_FindName_InOneNamespaceList ( dllist * list, byte * name )
+{
+    Symbol * s = ( Symbol* ) Tree_Map_OneNamespace ( ( Word* ) dllist_First ( list ), ( MapFunction_1 ) _Symbol_CompareName, ( int64 ) name ) ;
+    return s ;
+}
+
+Symbol *
 DLList_FindName_InOneNamespace ( Namespace * ns, byte * name )
 {
+#if 0    
     Symbol * s = ( Symbol* ) Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) ns->W_List ),
         ( MapFunction_1 ) _Symbol_CompareName, ( int64 ) name ) ;
+    if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace_TwoArgs ( _CSL_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
+    return s ;
+#endif    
+    Symbol * s = DLList_FindName_InOneNamespaceList ( ( dllist* ) ns->W_List, name ) ;
     if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace_TwoArgs ( _CSL_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
     return s ;
 }

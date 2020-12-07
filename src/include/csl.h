@@ -60,7 +60,8 @@ extern MachineCodePrimitive MachineCodePrimitives [];
 extern int64 mmap_TotalMemAllocated, mmap_TotalMemFreed ;
 extern uint64 BlockCallAddress ;
 extern block CurrentDefinition ;
-//extern uint64 *_Dsp_ ; 
+extern dllist HistoryMemChunkList ; 
+extern dlnode hml_Head, hml_Tail ;
 
 typedef int ( *mpf2andOutFunc) (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t) ;
 

@@ -6,7 +6,7 @@ Interpret_DoParenthesizedValue ( )
 {
     Compiler * compiler = _Compiler_ ;
     int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
-    _Interpret_Until_Token ( _Interpreter_, ")", 0 ) ;
+    _Interpret_Until_Token ( _Interpreter_, (byte * ) ")", 0 ) ;
     SetState ( compiler, COMPILE_MODE, svcm ) ;
 }
 
@@ -138,7 +138,7 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                         }
                         continue ;
                     }
-                    else _SyntaxError ( "Syntax Error : incorrect \"else\" (with no \"if\"?) : ", 1 ) ;
+                    else _SyntaxError ( (byte * )"Syntax Error : incorrect \"else\" (with no \"if\"?) : ", 1 ) ;
                 }
                 // ... drop thru to default:
             }
