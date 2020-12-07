@@ -456,6 +456,7 @@ demo
 //rtw
 
 stringMacrosOff
+mem pause
 "testCsl" msDelete
 
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your extra init code maybe here if you like

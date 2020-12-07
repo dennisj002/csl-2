@@ -221,7 +221,7 @@ _Stack_Init ( Stack * stack, int64 slots )
 void
 Stack_Delete ( Stack * stack )
 {
-    Mem_FreeItem ( _O_->PermanentMemChunkList, ( byte* ) stack ) ;
+    Mem_FreeItem ( _O_->OvtMemChunkList, ( byte* ) stack ) ;
 }
 #endif
 

@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.910.630" ) 
+#define VERSION ((byte*) "0.910.660" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -24,6 +24,103 @@ openvmtil ( int64 argc, char * argv [ ] )
 {
     LinuxInit ( ) ;
     OpenVmTil_Run ( argc, argv ) ;
+}
+
+OpenVmTil *
+_OpenVmTil_Allocate ( )
+{
+    if ( ! StaticMemChunkList )
+    {
+        StaticMemChunkList = _dllist_New ( STATIC ) ;
+        HistorySpace_MemChunkStringList = _dllist_New ( STATIC ) ;
+        OvtMemChunkList = _dllist_New ( STATIC ) ;
+    }
+    OpenVmTil * ovt = _O_ = ( OpenVmTil* ) Mem_ChunkAllocate ( sizeof ( OpenVmTil ), OPENVMTIL ) ; //Mem_Allocate ( sizeof ( OpenVmTil ), STATIC ) ; 
+    ovt->OpenVmTilSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
+    ovt->NBAs = _dllist_New ( OPENVMTIL ) ;
+    ovt->MemorySpaceList = _dllist_New ( OPENVMTIL ) ;
+    return ovt ;
+}
+
+void
+_OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
+{
+    ovt->MemorySpace0 = MemorySpace_New ( ovt, "DefaultMemorySpace" ) ;
+    ovt->CSLInternalSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "CSLInternalSpace", ovt->CSLSize, T_CSL ) ;
+    ovt->InternalObjectSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "InternalObjectSpace", ovt->InternalObjectsSize, INTERNAL_OBJECT_MEM ) ;
+    ovt->BufferList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
+    ovt->RecycledWordList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
+    ovt->RecycledOptInfoList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
+    ovt->VersionString = VERSION ;
+    // ? where do we want the init file ?
+    if ( _File_Exists ( ( byte* ) "./init.csl" ) )
+    {
+        ovt->InitString = ( byte* ) "\"./init.csl\" _include" ; // could allow override with a startup parameter
+        SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, true ) ;
+    }
+    else
+    {
+        ovt->InitString = ( byte* ) "\"/usr/local/lib/csl/init.csl\" _include" ; // could allow override with a startup parameter
+        SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, false ) ;
+    }
+    if ( ovt->Verbosity > 1 )
+    {
+        Printf ( ( byte* ) "\nRestart : All memory freed, allocated and initialized as at startup. "
+            "termios, verbosity and memory category allocation sizes preserved. verbosity = %d.", ovt->Verbosity ) ;
+        OpenVmTil_Print_DataSizeofInfo ( 0 ) ;
+    }
+    ovt->ThrowBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
+    _OpenVmTil_ColorsInit ( ovt ) ;
+}
+
+OpenVmTil *
+OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
+{
+    int64 restartCondition, startedTimes = 0, allocSize ; 
+    if ( ! ovt ) restartCondition = INITIAL_START ;
+    else restartCondition = FULL_RESTART ;
+
+    if ( ovt ) startedTimes = ovt->StartedTimes ;
+    OpenVmTil_Delete ( ovt ) ;
+    ovt = _OpenVmTil_Allocate ( ) ;
+
+    OVT_SetRestartCondition ( ovt, restartCondition ) ;
+    ovt->Argc = argc ;
+    ovt->Argv = argv ;
+    ovt->StartedTimes = startedTimes ;
+    OVT_GetStartupOptions ( ovt ) ;
+    
+    allocSize = 200 * K ;
+    ovt->InternalObjectsSize = allocSize ;
+    ovt->ObjectsSize = 2 * allocSize ; //1 * M ; 
+    ovt->LispSize = allocSize ;
+    ovt->LispTempSize = allocSize ;
+    ovt->CompilerTempObjectsSize = 2 * allocSize ;
+    ovt->BufferSpaceSize = allocSize ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
+    ovt->MachineCodeSize = allocSize ;
+    ovt->StringSpaceSize = allocSize ;
+    ovt->DictionarySize = 1 * M ; //100 * K ;
+    ovt->CSLSize = ( 80 * K ) ;
+    ovt->OpenVmTilSize = ( 6 * K ) ;
+    ovt->DataStackSize = 8 * KB ;
+    ovt->TempObjectsSize = 200 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
+    ovt->WordRecylingSize = 1 * K * ( sizeof (Word ) + sizeof (WordData ) ) ; //50 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
+    ovt->SessionObjectsSize = 50 * K ;
+    
+    _OpenVmTil_Init ( ovt, 0 ) ; 
+    Linux_SetupSignals ( &ovt->JmpBuf0, 1 ) ;
+    return ovt ;
+}
+
+void
+OpenVmTil_Delete ( OpenVmTil * ovt )
+{
+    if ( ovt )
+    {
+        if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated, non-static memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
+        FreeChunkList ( OvtMemChunkList ) ;
+    }
+    _O_ = 0 ;
 }
 
 void
@@ -52,124 +149,11 @@ OpenVmTil_Run ( int64 argc, char * argv [ ] )
     }
 }
 
-OpenVmTil *
-_OpenVmTil_Allocate ( )
-{
-    OpenVmTil * ovt = ( OpenVmTil* ) Mem_Allocate ( sizeof ( OpenVmTil ), STATIC ) ; // ( mmap_AllocMem ( sizeof ( OpenVmTil ) ) ; //_Mem_Allocate ( 0, sizeof ( OpenVmTil ), 0, ( RETURN_CHUNK_HEADER ) ) ; // don't add this to mem alloc system ; ummap it when done
-    ovt->PermanentMemChunkList = _dllist_New ( STATIC ) ;
-    ovt->MemorySpaceList = _dllist_New ( STATIC ) ;
-    ovt->NBAs = _dllist_New ( STATIC ) ;
-    return ovt ;
-}
-
-void
-_OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
-{
-    ovt->MemorySpace0 = MemorySpace_StaticMem_Allocate ( ) ; // nb : memory must be after we set Size values and before lists; list are allocated from memory
-    ovt->OpenVmTilSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
-    ovt->CSLInternalSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "CSLInternalSpace", ovt->CSLSize, T_CSL ) ;
-    ovt->InternalObjectSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "InternalObjectSpace", ovt->InternalObjectsSize, INTERNAL_OBJECT_MEM ) ;
-    if ( ! ovt->HistorySpace ) History_Init ( ) ;
-    ovt->BufferList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
-    ovt->RecycledWordList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
-    ovt->RecycledOptInfoList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
-    MemorySpace_New ( ovt, "DefaultMemorySpace" ) ;
-    ovt->VersionString = VERSION ;
-    // ? where do we want the init file ?
-    if ( _File_Exists ( ( byte* ) "./init.csl" ) )
-    {
-        ovt->InitString = ( byte* ) "\"./init.csl\" _include" ; // could allow override with a startup parameter
-        SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, true ) ;
-    }
-    else
-    {
-        ovt->InitString = ( byte* ) "\"/usr/local/lib/csl/init.csl\" _include" ; // could allow override with a startup parameter
-        SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, false ) ;
-    }
-    if ( ovt->Verbosity > 1 )
-    {
-        Printf ( ( byte* ) "\nRestart : All memory freed, allocated and initialized as at startup. "
-            "termios, verbosity and memory category allocation sizes preserved. verbosity = %d.", ovt->Verbosity ) ;
-        OpenVmTil_Print_DataSizeofInfo ( 0 ) ;
-    }
-    ovt->ThrowBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
-    _OpenVmTil_ColorsInit ( ovt ) ;
-}
-
-OpenVmTil *
-OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
-{
-    int64 restartCondition, startedTimes = 0 ; //, startIncludeTries
-    NBA * historySpace = ( ovt ? ovt->HistorySpace : 0 ) ;
-    dllist * hsStringList = 0 ;
-    dlnode * hsCurrentNode = 0 ;
-    ByteArray * hscba = 0 ;
-    if ( historySpace )
-    {
-        hsStringList = ovt->HistorySpace_StringList ;
-        hsCurrentNode = hsStringList->l_CurrentNode ;
-        hscba = historySpace->ba_CurrentByteArray ;
-    }
-    if ( ! ovt ) restartCondition = INITIAL_START ;
-    else restartCondition = FULL_RESTART ;
-
-    if ( ovt ) startedTimes = ovt->StartedTimes ;
-    OpenVmTil_Delete ( ovt ) ;
-    _O_ = ovt = _OpenVmTil_Allocate ( ) ;
-
-    OVT_SetRestartCondition ( ovt, restartCondition ) ;
-    ovt->Argc = argc ;
-    ovt->Argv = argv ;
-    ovt->StartedTimes = startedTimes ;
-
-    OVT_GetStartupOptions ( ovt ) ;
-    int64 allocSize = 200 * K ;
-    ovt->InternalObjectsSize = allocSize ;
-    ovt->ObjectsSize = 2 * allocSize ; //1 * M ; 
-    ovt->LispSize = allocSize ;
-    ovt->LispTempSize = allocSize ;
-    ovt->CompilerTempObjectsSize = 2 * allocSize ;
-    ovt->BufferSpaceSize = allocSize ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
-    ovt->MachineCodeSize = allocSize ;
-    ovt->StringSpaceSize = allocSize ;
-    ovt->DictionarySize = 1 * M ; //100 * K ;
-    ovt->CSLSize = ( 80 * K ) ;
-    ovt->OpenVmTilSize = ( 6 * K ) ;
-    ovt->DataStackSize = 8 * KB ;
-    ovt->TempObjectsSize = 200 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
-    ovt->WordRecylingSize = 1 * K * ( sizeof (Word ) + sizeof (WordData ) ) ; //50 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
-    ovt->SessionObjectsSize = 50 * K ;
-    if ( historySpace )
-    {
-        ovt->HistorySpace = historySpace ;
-        ovt->HistorySpace->ba_CurrentByteArray = hscba ;
-        if ( hsStringList )
-        {
-            hsStringList->l_CurrentNode = hsCurrentNode ;
-            ovt->HistorySpace_StringList = hsStringList ;
-        }
-    }
-    _OpenVmTil_Init ( ovt, 0 ) ; //exceptionsHandled > 1 ) ; // try to keep history if we can
-    Linux_SetupSignals ( &ovt->JmpBuf0, 1 ) ;
-    return ovt ;
-}
-
 void
 Ovt_RunInit ( OpenVmTil * ovt )
 {
     ovt->StartedTimes ++ ;
     OVT_SetRestartCondition ( ovt, CSL_RUN_INIT ) ;
-}
-
-void
-OpenVmTil_Delete ( OpenVmTil * ovt )
-{
-    if ( ovt )
-    {
-        FreeChunkList ( ovt->PermanentMemChunkList ) ;
-        if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated, non-static memory has just been freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
-    }
-    _O_ = 0 ;
 }
 
 void

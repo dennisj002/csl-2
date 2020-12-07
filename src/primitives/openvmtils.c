@@ -52,12 +52,6 @@ Ovt_AutoVarOn ( )
 }
 
 void
-OpenVmTil_HistorySize ( )
-{
-    DataStack_Push ( ( int64 ) & _O_->HistorySize ) ;
-}
-
-void
 OpenVmTil_DataStackSize ( )
 {
     DataStack_Push ( ( int64 ) & _O_->DataStackSize ) ;

@@ -57,11 +57,11 @@ const void *const __dso_handle __attribute__ ((__visibility__ ("hidden")))
 extern OpenVmTil * _O_;
 extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
-extern int64 mmap_TotalMemAllocated, mmap_TotalMemFreed ;
+extern int64 mmap_TotalMemAllocated, mmap_TotalMemFreed, HistoryAllocation, StaticAllocation ;
+extern int64 TotalMemAllocated, TotalMemFreed, Mmap_RemainingMemoryAllocated ;
 extern uint64 BlockCallAddress ;
 extern block CurrentDefinition ;
-extern dllist HistoryMemChunkList ; 
-extern dlnode hml_Head, hml_Tail ;
+extern dllist *StaticMemChunkList, *HistorySpace_MemChunkStringList, *OvtMemChunkList ; 
 
 typedef int ( *mpf2andOutFunc) (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t) ;
 

@@ -257,16 +257,6 @@ NamedByteArray_New ( byte * name, int64 size, int64 atype )
     _NamedByteArray_Init ( nba, name, size, atype ) ;
     return nba ;
 }
-#if 0
-NamedByteArray *
-NamedByteArray_History_New ( byte * name, int64 size )
-{
-    //if ( String_Equal ( "HistorySpace", name ) ) _Printf ( ( byte* ) "\nNamedByteArray_New : name = %s", name ) ;
-    NamedByteArray * nba = _NamedByteArray_Allocate ( STATIC ) ;
-    _NamedByteArray_Init ( nba, name, size, STATIC ) ;
-    return nba ;
-}
-#endif
 // returns true if address is in this nba memory space
 
 int64

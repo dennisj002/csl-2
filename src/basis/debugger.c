@@ -668,7 +668,7 @@ Debugger_Copy ( Debugger * debugger0, uint64 type )
 void
 Debugger_Delete ( Debugger * debugger )
 {
-    Mem_FreeItem ( _O_->PermanentMemChunkList, ( byte* ) debugger ) ;
+    Mem_FreeItem ( OvtMemChunkList, ( byte* ) debugger ) ;
 }
 
 Debugger *
