@@ -3,8 +3,10 @@
 
 const int64 MEM_FREE = 0 ;
 const int64 MEM_ALLOC = 1 ;
+// static memory
 int64 mmap_TotalMemAllocated = 0, mmap_TotalMemFreed = 0, StaticAllocation = 0 ;
-dllist HistoryMemChunkList ; dlnode hml_Head, hml_Tail ;
+dllist HistoryMemChunkList ;
+dlnode hml_Head, hml_Tail ;
 
 byte*
 _mmap_AllocMem ( int64 size )
@@ -84,7 +86,7 @@ _Mem_ChunkFree ( MemChunk * mchunk )
     mmap_FreeMem ( mchunk->S_unmap, mchunk->S_ChunkSize ) ;
 }
 
-byte *
+MemChunk *
 _Mem_ChunkAllocate ( int64 size, uint64 allocType )
 {
     // a MemChunk is already a part of the size being part of the ByteArray and NamedByteArray : cf. types.h
@@ -92,8 +94,15 @@ _Mem_ChunkAllocate ( int64 size, uint64 allocType )
     mchunk->S_unmap = ( byte* ) mchunk ;
     mchunk->S_ChunkSize = size ; // S_ChunkSize is the total size of the chunk including any prepended accounting structure in that total
     mchunk->S_WAllocType = allocType ;
+    return mchunk ;
+}
+
+byte *
+Mem_ChunkAllocate ( int64 size, uint64 allocType )
+{
+    MemChunk * mchunk = ( MemChunk * ) _Mem_ChunkAllocate ( size, allocType ) ;
     _MemChunk_Account ( ( MemChunk* ) mchunk, MEM_ALLOC ) ;
-    if (allocType == HISTORY ) dllist_AddNodeToHead ( &HistoryMemChunkList, ( dlnode* ) mchunk ) ;
+    if ( allocType == HISTORY ) dllist_AddNodeToHead ( &HistoryMemChunkList, ( dlnode* ) mchunk ) ;
     else dllist_AddNodeToHead ( _O_->PermanentMemChunkList, ( dlnode* ) mchunk ) ;
     return ( byte* ) mchunk ;
 }
@@ -255,18 +264,18 @@ Mem_Allocate ( int64 size, uint64 allocType )
         MemorySpace * ms = ovt->MemorySpace0 ;
         switch ( allocType )
         {
-            case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
-            case LISP: return _Allocate ( size, ms->LispSpace ) ;
-            case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
             case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
-            case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
             case CODE: return _Allocate ( size, ms->CodeSpace ) ;
-            case BUFFER: return _Allocate ( size, ms->BufferSpace ) ;
-            case LISP_TEMP: return _Allocate ( size, ms->LispTempSpace ) ;
+            case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
+            case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
             case CONTEXT: return _Allocate ( size, ms->ContextSpace ) ;
+            case BUFFER: return _Allocate ( size, ms->BufferSpace ) ;
+            case LISP: return _Allocate ( size, ms->LispSpace ) ;
+            case LISP_TEMP: return _Allocate ( size, ms->LispTempSpace ) ;
+            case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
+            case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
             case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
             case WORD_RECYCLING: return _Allocate ( size, ms->WordRecylingSpace ) ;
-            case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
 
             case HISTORY: return _Allocate ( size, ovt->HistorySpace ) ;
             case T_CSL: case DATA_STACK: return _Allocate ( size, ovt->CSLInternalSpace ) ;
@@ -277,6 +286,35 @@ Mem_Allocate ( int64 size, uint64 allocType )
         }
         return 0 ;
     }
+}
+
+void
+MemorySpace_Init ( MemorySpace * ms )
+{
+    OpenVmTil * ovt = _O_ ;
+    MemorySpace * oldMs = ovt->MemorySpace0 ;
+
+    ms->DictionarySpace = oldMs->DictionarySpace ? oldMs->DictionarySpace : MemorySpace_NBA_New ( ms, ( byte* ) "DictionarySpace", ovt->DictionarySize, DICTIONARY ) ;
+    ms->CodeSpace = oldMs->CodeSpace ? oldMs->CodeSpace : MemorySpace_NBA_New ( ms, ( byte* ) "CodeSpace", ovt->MachineCodeSize, CODE ) ;
+
+    ms->LispSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
+    ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectsSize, OBJECT_MEM ) ;
+    ms->StringSpace = MemorySpace_NBA_New ( ms, ( byte* ) "StringSpace", ovt->StringSpaceSize, STRING_MEMORY ) ;
+    ms->BufferSpace = MemorySpace_NBA_New ( ms, ( byte* ) "BufferSpace", ovt->BufferSpaceSize, BUFFER ) ;
+
+    ms->TempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "TempObjectSpace", ovt->TempObjectsSize, TEMPORARY ) ;
+    ms->LispTempSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispTempSpace", ovt->LispTempSize, LISP_TEMP ) ;
+    ms->CompilerTempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CompilerTempObjectSpace", ovt->CompilerTempObjectsSize, COMPILER_TEMP ) ;
+    ms->WordRecylingSpace = MemorySpace_NBA_New ( ms, ( byte* ) "WordRecylingSpace", ovt->WordRecylingSize, WORD_RECYCLING ) ;
+    ms->SessionObjectsSpace = MemorySpace_NBA_New ( ms, ( byte* ) "SessionObjectsSpace", ovt->SessionObjectsSize, SESSION ) ;
+
+    if ( ovt->OVT_CSL && ovt->OVT_CSL->Context0 )
+    {
+        NBA * cnba = ovt->OVT_CSL->Context0->ContextNba ;
+        ms->ContextSpace = cnba ;
+    }
+    _O_CodeByteArray = ms->CodeSpace->ba_CurrentByteArray ; //init CompilerSpace ptr
+    if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nSystem Memory has been initialized.  " ) ;
 }
 
 void
@@ -370,37 +408,6 @@ OVT_FreeTempMem ( )
     OVT_MemListFree_TempObjects ( ) ;
     OVT_MemListFree_Objects ( ) ;
     OVT_MemListFree_LispTemp ( ) ;
-}
-
-void
-MemorySpace_Init ( MemorySpace * ms )
-{
-    OpenVmTil * ovt = _O_ ;
-    MemorySpace * oldMs = ovt->MemorySpace0 ;
-
-    ms->DictionarySpace = oldMs->DictionarySpace ? oldMs->DictionarySpace : MemorySpace_NBA_New ( ms, ( byte* ) "DictionarySpace", ovt->DictionarySize, DICTIONARY ) ;
-    ms->CodeSpace = oldMs->CodeSpace ? oldMs->CodeSpace : MemorySpace_NBA_New ( ms, ( byte* ) "CodeSpace", ovt->MachineCodeSize, CODE ) ;
-
-    ms->LispSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
-    ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectsSize, OBJECT_MEM ) ;
-    ms->TempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "TempObjectSpace", ovt->TempObjectsSize, TEMPORARY ) ;
-    ms->LispTempSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispTempSpace", ovt->LispTempSize, LISP_TEMP ) ;
-    ms->CompilerTempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CompilerTempObjectSpace", ovt->CompilerTempObjectsSize, COMPILER_TEMP ) ;
-    ms->WordRecylingSpace = MemorySpace_NBA_New ( ms, ( byte* ) "WordRecylingSpace", ovt->WordRecylingSize, WORD_RECYCLING ) ;
-    ms->SessionObjectsSpace = MemorySpace_NBA_New ( ms, ( byte* ) "SessionObjectsSpace", ovt->SessionObjectsSize, SESSION ) ;
-    ms->StringSpace = MemorySpace_NBA_New ( ms, ( byte* ) "StringSpace", ovt->StringSpaceSize, STRING_MEMORY ) ;
-    ms->BufferSpace = MemorySpace_NBA_New ( ms, ( byte* ) "BufferSpace", ovt->BufferSpaceSize, BUFFER ) ;
-
-    if ( ovt->OVT_CSL && ovt->OVT_CSL->Context0 )
-    {
-        NBA * cnba = ovt->OVT_CSL->Context0->ContextNba ;
-        ms->ContextSpace = cnba ;
-    }
-
-
-    _O_CodeByteArray = ms->CodeSpace->ba_CurrentByteArray ; //init CompilerSpace ptr
-
-    if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nSystem Memory has been initialized.  " ) ;
 }
 
 NamedByteArray *
@@ -746,7 +753,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     Boolean vf = ( ovt->Verbosity > 1 ) ;
     if ( ! vf ) Printf ( ( byte* ) c_gu ( "\nIncrease the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
     int64 leak = ( mmap_TotalMemAllocated - mmap_TotalMemFreed ) - ( ovt->TotalMemAllocated - ovt->TotalMemFreed ) - StaticAllocation ; //- ovt->OVT_InitialStaticMemory ; //- ovt->RunTimeAllocation ;
-    OVT_CalculateAndShow_TotalNbaAccountedMemAllocated ( ovt, 1 ) ; 
+    OVT_CalculateAndShow_TotalNbaAccountedMemAllocated ( ovt, 1 ) ;
     _OVT_ShowPermanentMemList ( ovt ) ;
     int64 memDiff2 = ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted ;
     byte * memDiff2s = ( byte* ) "\nCurrent Unaccounted Diff (leak?)                  = %9d : <=: ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted" ;
