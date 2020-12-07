@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.910.400" ) 
+#define VERSION ((byte*) "0.910.410" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -148,9 +148,6 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
             hsStringList->l_CurrentNode = hsCurrentNode ;
             ovt->HistorySpace_StringList = hsStringList ;
         }
-        // ?? : why not ... 
-        //_dlnode_Init ( (dlnode*) &historySpace->NBA_Symbol ) ;
-        //_dllist_AddNodeToHead ( ovt->NBAs, ( dlnode* ) & historySpace->NBA_Symbol ) ;
     }
     _OpenVmTil_Init ( ovt, 0 ) ; //exceptionsHandled > 1 ) ; // try to keep history if we can
     Linux_SetupSignals ( &ovt->JmpBuf0, 1 ) ;
@@ -160,7 +157,6 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 void
 Ovt_RunInit ( OpenVmTil * ovt )
 {
-    //ovt->SignalExceptionsHandled = 0 ;
     ovt->StartedTimes ++ ;
     OVT_SetRestartCondition ( ovt, CSL_RUN_INIT ) ;
 }
@@ -170,10 +166,8 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
 {
     if ( ovt )
     {
-        if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
         FreeChunkList ( ovt->PermanentMemChunkList ) ;
-        //mmap_FreeMem ( ( byte* ) ovt->MemorySpace0, sizeof ( MemorySpace ) ) ;
-        //mmap_FreeMem ( ( byte* ) ovt, sizeof ( OpenVmTil ) ) ;
+        if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated, non-static memory has just been freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
     }
     _O_ = 0 ;
 }

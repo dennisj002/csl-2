@@ -121,7 +121,6 @@ MemorySpace_StaticMem_Allocate ( )
 {
     MemorySpace *ms = ( MemorySpace* ) Mem_Allocate ( sizeof ( MemorySpace ), STATIC ) ; //mmap_AllocMem ( sizeof ( MemorySpace ) ) ;
     ms->NBAs = _dllist_New ( STATIC ) ;
-    //_O_->OVT_InitialStaticMemory += ( sizeof (dllist ) + ( 2 * sizeof (dlnode ) ) ) + sizeof ( MemorySpace ) ;
     return ms ;
 }
 
@@ -379,7 +378,6 @@ MemorySpace_Init ( MemorySpace * ms )
     OpenVmTil * ovt = _O_ ;
     MemorySpace * oldMs = ovt->MemorySpace0 ;
 
-    //ms->LispSpace = oldMs->LispSpace ? oldMs->LispSpace : MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
     ms->DictionarySpace = oldMs->DictionarySpace ? oldMs->DictionarySpace : MemorySpace_NBA_New ( ms, ( byte* ) "DictionarySpace", ovt->DictionarySize, DICTIONARY ) ;
     ms->CodeSpace = oldMs->CodeSpace ? oldMs->CodeSpace : MemorySpace_NBA_New ( ms, ( byte* ) "CodeSpace", ovt->MachineCodeSize, CODE ) ;
 
@@ -674,7 +672,8 @@ _OVT_ShowPermanentMemList ( OpenVmTil * ovt )
         {
             printf ( "\nTotal Size = %9ld : ovt->Mmap_RemainingMemoryAllocated = %9ld :: diff = %6ld", size, ovt->Mmap_RemainingMemoryAllocated, diff ) ;
         }
-        printf ( "\nMmap_RemainingMemoryAllocated                     = %9ld : <=: ovt->Mmap_RemainingMemoryAllocated", ovt->Mmap_RemainingMemoryAllocated ) ;
+        printf ( ( byte* ) "\nTotal Non-Static Memory Allocated                 = %9ld", ovt->TotalNbaAccountedMemAllocated ) ;
+        //printf ( "\nMmap_RemainingMemoryAllocated                     = %9ld : <=: ovt->Mmap_RemainingMemoryAllocated", ovt->Mmap_RemainingMemoryAllocated ) ;
         fflush ( stdout ) ;
     }
     ovt->PermanentMemListRemainingAccounted = size ;
@@ -773,10 +772,9 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
         Printf ( ( byte* ) "\nOVT_InitialUnAccountedMemory                      = %9d : <=: ovt->OVT_InitialUnAccountedMemory", ovt->OVT_InitialStaticMemory ) ; //+ ovt->UnaccountedMem ) ) ;
         Printf ( ( byte* ) "\nTotalMemSizeTarget                                = %9d : <=: ovt->TotalMemSizeTarget", ovt->TotalMemSizeTarget ) ;
     }
-    Printf ( ( byte* ) "\nReAllocations                                     = %9d", _O_->ReAllocations ) ;
     Printf ( ( byte* ) "\nStaticAllocation                                  = %9d", StaticAllocation ) ;
-    Printf ( ( byte* ) "\nTotal Memory Allocated                            = %9d"
-        "\nTotal Memory leaks                                = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
+    Printf ( ( byte* ) "\nTotal Memory leaks                                = %9d", leak ) ;
+    Printf ( ( byte* ) "\nReAllocations                                     = %9d", _O_->ReAllocations ) ;
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
     Printf ( ( byte* ) "\nRecycledWordCount :: %5d x %3d bytes : Recycled = %9d", _O_->MemorySpace0->RecycledWordCount,
         wordSize, _O_->MemorySpace0->RecycledWordCount * wordSize ) ;
@@ -839,7 +837,6 @@ void
 OVT_Recycle ( dlnode * anode )
 {
     if ( anode ) dllist_AddNodeToTail ( _O_->RecycledWordList, anode ) ;
-    //_O_->MemorySpace0->WordsInRecycling ++ ;
     OVT_RecyclingAccounting ( OVT_RA_ADDED ) ;
 }
 
