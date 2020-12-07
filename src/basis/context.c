@@ -253,7 +253,7 @@ CSL_Set_QidInNamespace ( Namespace * ns )
 }
 
 void
-Context_DoDotted_Pre ( Context * cntx, Word * word )
+Context_GetState ( Context * cntx, Word * word )
 {
     int64 isForwardDotted, isReverseDotted ;
     isReverseDotted = Lexer_IsTokenReverseDotted ( cntx->Lexer0 ) ;
@@ -266,22 +266,29 @@ Context_DoDotted_Pre ( Context * cntx, Word * word )
     }
     SetState ( cntx, IS_FORWARD_DOTTED, isForwardDotted ) ;
     SetState ( cntx, IS_REVERSE_DOTTED, isReverseDotted ) ;
+    if ( GetState ( _Compiler_, LC_ARG_PARSING ) )
+    {
+        if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) SetState ( cntx, IS_RVALUE, false ) ;
+        else SetState ( cntx, IS_RVALUE, true ) ;
+    }
+    else SetState ( cntx, IS_RVALUE, ( ! Is_LValue ( cntx, word ) ) ) ;
 }
 
 void
-Context_DoDotted_Post ( Context * cntx )
+Context_ClearState ( Context * cntx )
 {
     if ( ! GetState ( cntx, IS_FORWARD_DOTTED ) )
     {
         SetState ( cntx, ADDRESS_OF_MODE, false ) ;
         if ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) ) cntx->BaseObject = 0 ; // nb! very important !! 
-        if ( GetState ( cntx, IS_REVERSE_DOTTED ) ) 
+        if ( GetState ( cntx, IS_REVERSE_DOTTED ) )
         {
-            Context_ClearQualifyingNamespace () ;
-            Context_ClearQidInNamespace () ;
-            SetState ( _Context_, (IS_REVERSE_DOTTED|IS_FORWARD_DOTTED), false ) ;
+            Context_ClearQualifyingNamespace ( ) ;
+            Context_ClearQidInNamespace ( ) ;
+            //SetState ( _Context_, (IS_REVERSE_DOTTED|IS_FORWARD_DOTTED|IS_RVALUE), false ) ;
         }
     }
+    SetState ( _Context_, ( IS_REVERSE_DOTTED | IS_FORWARD_DOTTED | IS_RVALUE ), false ) ;
 }
 
 

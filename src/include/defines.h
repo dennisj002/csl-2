@@ -810,6 +810,7 @@ typedef struct
 #define LC_CSL ( (uint64) 1 << 30 )
 #define IS_FORWARD_DOTTED ( (uint64) 1 << 31 )
 #define IS_REVERSE_DOTTED ( (uint64) 1 << 32 )
+#define IS_RVALUE ( (uint64) 1 << 33 )
 
 #define NON_INLINABLE ( (uint64) 1 << 0 )
 #define DONE true

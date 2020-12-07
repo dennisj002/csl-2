@@ -101,7 +101,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         {
             Set_CompileMode ( true ) ;
 #if 1            
-            Word_Object_Run ( word ) ;
+            Word_ObjectRun ( word ) ;
 #else            
             Interpreter_DoWord_Default ( _Interpreter_, word, tsrli, scwi ) ;
 #endif            
@@ -109,7 +109,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         }
         l0 = DataObject_New (T_LC_NEW, word, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes,
             ( T_LISP_SYMBOL | word->W_LispAttributes ), 0, word->Lo_Value, 0, allocType, tsrli, scwi ) ;
-        if ( word->W_ObjectAttributes & NAMESPACE_TYPE ) Namespace_Do_Namespace ( word, 0 ) ;
+        if ( word->W_ObjectAttributes & NAMESPACE_TYPE ) Namespace_Do_Namespace ( word ) ;
     }
     return l0 ;
 }

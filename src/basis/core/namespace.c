@@ -49,12 +49,12 @@ _Namespace_AddToNamespacesTail ( Namespace * ns )
 }
 
 void
-Namespace_Do_Namespace ( Namespace * ns, Boolean isForwardDotted )
+Namespace_Do_Namespace ( Namespace * ns )
 {
     Context * cntx = _Context_ ;
-    //if ( isForwardDotted ) Compiler_Save_Qid_BackgroundNamespace ( cntx->Compiler0 ) ;
+    //if ( GetState ( cntx, IS_FORWARD_DOTTED ) ) Compiler_Save_Qid_BackgroundNamespace ( cntx->Compiler0 ) ;
     if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX | LISP_MODE ) ) _Namespace_Do_Namespace ( ns ) ;
-    else if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
+    else if ( ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
     {
         _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_Do_Namespace, ( int64 ) ns ) ;
     }
@@ -159,7 +159,7 @@ _Namespace_Do_Namespace ( Namespace * ns )
 void
 Namespace_DoNamespace_Name ( byte * name )
 {
-    Namespace_Do_Namespace ( Namespace_Find ( name ), 0 ) ;
+    Namespace_Do_Namespace ( Namespace_Find ( name ) ) ;
 }
 
 Boolean

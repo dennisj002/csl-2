@@ -188,7 +188,7 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     {
         if ( cloneFlag ) size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         ns = _DObject_New ( name, 0, IMMEDIATE, CLASS | objectType, 0, objectType, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
-        Namespace_Do_Namespace ( ns, 0 ) ; // before "size", "this"
+        Namespace_Do_Namespace ( ns ) ; // before "size", "this"
         Word *ws = _CSL_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CSL_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
@@ -207,7 +207,7 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     {
         Printf ( ( byte* ) "\nNamespace Error? : \'%s\' already exists! : \n  %s : size = %d : this namespace is %s.%s : size = %d : at %s\n",
             ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectByteSize, ns->S_ContainingNamespace->Name, ns->Name, ns->ObjectByteSize, Context_Location ( ) ) ;
-        Namespace_Do_Namespace ( ns, 0 ) ;
+        Namespace_Do_Namespace ( ns ) ;
     }
     CSL_WordList_Init ( 0 ) ;
     Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
