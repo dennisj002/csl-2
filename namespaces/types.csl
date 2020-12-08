@@ -1074,7 +1074,7 @@ typedef struct
     dlnode PML_HeadNode, PML_TailNode ;
     MemorySpace * MemorySpace0 ;
     int64 PermanentMemListRemainingAccounted, TotalNbaAccountedMemRemaining, TotalNbaAccountedMemAllocated, TotalMemSizeTarget ;
-    int64 Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, RunTimeAllocation, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
+    int64 _OS_->Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, RunTimeAllocation, _OS_->TotalMemFreed, _OS_->TotalMemAllocated, NumberOfByteArrays ;
 
     // variables accessible from csl
     int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, AllocationRequestLacks, Dbi ;

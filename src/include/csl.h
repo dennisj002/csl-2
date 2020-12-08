@@ -55,13 +55,12 @@ const void *const __dso_handle __attribute__ ((__visibility__ ("hidden")))
 #include "macros.h"
 
 extern OpenVmTil * _O_;
+extern OVT_Static * _OS_ ;
 extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
-extern int64 mmap_TotalMemAllocated, mmap_TotalMemFreed, HistoryAllocation, StaticAllocation ;
-extern int64 TotalMemAllocated, TotalMemFreed, Mmap_RemainingMemoryAllocated ;
-extern uint64 BlockCallAddress ;
-extern block CurrentDefinition ;
-extern dllist *StaticMemChunkList, *HistorySpace_MemChunkStringList, *OvtMemChunkList ; 
+extern OS_List OS_StaticMemList ; 
+extern int64 OS_StaticMemAllocated ;
+extern struct termios SavedTerminalAttributes ;
 
 typedef int ( *mpf2andOutFunc) (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t) ;
 

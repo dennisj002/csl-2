@@ -603,13 +603,15 @@ typedef struct
 #define COMPILER_TEMP_OBJECT_MEMORY ( (uint64) 1 << 18 )
 #define COMPILER_TEMP COMPILER_TEMP_OBJECT_MEMORY 
 #define LARGEST_MEMORY_TYPE COMPILER_TEMP_OBJECT_MEMORY
-#define STATIC ( (uint64) 1 << 19 )
+#define OVT_STATIC ( (uint64) 1 << 19 )
 #define STRING_MEMORY ( (uint64) 1 << 20 )
 #define STRING_MEM STRING_MEMORY
-#define WORD_COPY_MEM ( (uint64) 1 << 20 )
 #define SESSION_CODE ( (uint64) 1 << 21 )
 #define INTERNAL_OBJECT_MEM ( (uint64) 1 << 22 )
 #define WORD_RECYCLING ( (uint64) 1 << 23 )
+#define WORD_COPY_MEM ( (uint64) 1 << 24 )
+#define _STATIC_ ( (uint64) 1 << 25 )
+#define OS_STATIC ( (uint64) 1 << 26 )
 
 //#define ALL      ( INTERNAL | EXTERNAL | csl | TEMPORARY | DATA_STACK | SESSION )
 

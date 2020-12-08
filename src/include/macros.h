@@ -304,5 +304,7 @@
 #define OVT_RA_RECYCLED 2
 
 #define Error( msg, state ) _Error ( (byte * ) msg, (uint64) state )
+#define MEM_FREE            0 
+#define MEM_ALLOC           1 
 
 

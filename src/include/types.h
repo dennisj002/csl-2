@@ -22,6 +22,7 @@ typedef int64( *cFunction_1_Arg ) ( int64 ) ;
 typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;
 typedef VoidFunction block ; // code block
 typedef byte AsciiCharSet [ 256 ] ;
+
 typedef struct
 {
     int64 StackSize ;
@@ -110,6 +111,21 @@ enum types
 {
     BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, CARTESIAN_PRODUCT
 } ;
+
+typedef struct
+{
+    dllist osl_List ;
+    dlnode n_Head ;
+    dlnode n_Tail ;
+} OS_List;
+
+typedef struct
+{
+    dlnode osc_Node ;
+    int64 osc_Size ;
+    byte osc_b_Chunk [0] ;
+} OS_Chunk, OS_Node ;
+
 typedef struct
 {
     union
@@ -931,7 +947,6 @@ typedef struct
         IntColors ics_IntColors ;
     } ;
 } Colors ;
-
 typedef struct
 {
     MemChunk OVT_MemChunk ;
@@ -1040,4 +1055,11 @@ typedef struct typeStatusInfo
     Boolean TypeErrorStatus, OpWord_ReturnsACodedValue_Flag ;
     byte OpWordReturnSignatureLetterCode ;
 } TypeStatusInfo, TSI ;
+
+typedef struct
+{
+    int64 mmap_TotalMemAllocated, mmap_TotalMemFreed, HistoryAllocation, StaticAllocation ;
+    int64 TotalMemAllocated, TotalMemFreed, Mmap_RemainingMemoryAllocated ;
+    dllist *StaticMemChunkList, *HistorySpace_MemChunkStringList, *OvtMemChunkList ;
+} OVT_Static, OS ;
 

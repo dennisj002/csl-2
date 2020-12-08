@@ -171,7 +171,6 @@ _dllist_Init ( dllist * list )
         list->l_CurrentNode = 0 ;
     }
 }
-
 void
 dllist_Init ( dllist * list, dlnode * ahead, dlnode * atail )
 {
@@ -179,6 +178,15 @@ dllist_Init ( dllist * list, dlnode * ahead, dlnode * atail )
     list->Tail = atail ;
     _dllist_Init ( list ) ;
 }
+
+void 
+OS_List_Init ( OS_List * osl )
+{
+    osl->osl_List.l_List.n_Head = &osl->n_Head ;
+    osl->osl_List.l_List.n_Tail = &osl->n_Tail ;
+    dllist_Init ( (dllist*)&osl->osl_List, &osl->n_Head, &osl->n_Tail ) ;
+}
+
 
 dllist *
 _dllist_New ( uint64 allocType )

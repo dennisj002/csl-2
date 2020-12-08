@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.910.660" ) 
+#define VERSION ((byte*) "0.910.700" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -12,29 +12,25 @@
 // til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas,
 
 OpenVmTil * _O_ ;
+OVT_Static * _OS_ ;
 
 int
 main ( int argc, char * argv [ ] )
 {
+    LinuxInit ( ) ;
+    OS_Static_Init ( ) ;
     openvmtil ( argc, argv ) ;
 }
 
 void
 openvmtil ( int64 argc, char * argv [ ] )
 {
-    LinuxInit ( ) ;
     OpenVmTil_Run ( argc, argv ) ;
 }
 
 OpenVmTil *
 _OpenVmTil_Allocate ( )
 {
-    if ( ! StaticMemChunkList )
-    {
-        StaticMemChunkList = _dllist_New ( STATIC ) ;
-        HistorySpace_MemChunkStringList = _dllist_New ( STATIC ) ;
-        OvtMemChunkList = _dllist_New ( STATIC ) ;
-    }
     OpenVmTil * ovt = _O_ = ( OpenVmTil* ) Mem_ChunkAllocate ( sizeof ( OpenVmTil ), OPENVMTIL ) ; //Mem_Allocate ( sizeof ( OpenVmTil ), STATIC ) ; 
     ovt->OpenVmTilSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
     ovt->NBAs = _dllist_New ( OPENVMTIL ) ;
@@ -76,11 +72,15 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
 OpenVmTil *
 OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 {
-    int64 restartCondition, startedTimes = 0, allocSize ; 
+    int64 restartCondition, startedTimes = 0, allocSize ;
     if ( ! ovt ) restartCondition = INITIAL_START ;
-    else restartCondition = FULL_RESTART ;
+    else
+    {
+        restartCondition = FULL_RESTART ;
+        startedTimes = ovt->StartedTimes ;
+    }
 
-    if ( ovt ) startedTimes = ovt->StartedTimes ;
+    OS_Static_New ( ) ;
     OpenVmTil_Delete ( ovt ) ;
     ovt = _OpenVmTil_Allocate ( ) ;
 
@@ -89,7 +89,7 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     ovt->Argv = argv ;
     ovt->StartedTimes = startedTimes ;
     OVT_GetStartupOptions ( ovt ) ;
-    
+
     allocSize = 200 * K ;
     ovt->InternalObjectsSize = allocSize ;
     ovt->ObjectsSize = 2 * allocSize ; //1 * M ; 
@@ -106,8 +106,8 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     ovt->TempObjectsSize = 200 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
     ovt->WordRecylingSize = 1 * K * ( sizeof (Word ) + sizeof (WordData ) ) ; //50 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
     ovt->SessionObjectsSize = 50 * K ;
-    
-    _OpenVmTil_Init ( ovt, 0 ) ; 
+
+    _OpenVmTil_Init ( ovt, 0 ) ;
     Linux_SetupSignals ( &ovt->JmpBuf0, 1 ) ;
     return ovt ;
 }
@@ -118,7 +118,7 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
     if ( ovt )
     {
         if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated, non-static memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
-        FreeChunkList ( OvtMemChunkList ) ;
+        FreeChunkList ( _OS_->OvtMemChunkList ) ;
     }
     _O_ = 0 ;
 }

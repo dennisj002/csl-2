@@ -192,7 +192,7 @@ ReadTable_A ( ReadLiner * rl ) // 'A' - back in history - UP arrow - ESC[A towar
 {
     if ( rl->EscapeModeFlag == 2 )
     {
-        dlnode * node = dllist_SetCurrentNode_Before ( HistorySpace_MemChunkStringList ) ;
+        dlnode * node = dllist_SetCurrentNode_Before ( _OS_->HistorySpace_MemChunkStringList ) ;
         if ( node )
         {
             rl->HistoryNode = ( HistoryStringNode* ) node ;
@@ -208,7 +208,7 @@ ReadTable_B ( ReadLiner * rl )// 'B' - forward, toward end of history - DOWN arr
 {
     if ( rl->EscapeModeFlag == 2 )
     {
-        dlnode * node = dllist_SetCurrentNode_After ( HistorySpace_MemChunkStringList ) ;
+        dlnode * node = dllist_SetCurrentNode_After ( _OS_->HistorySpace_MemChunkStringList ) ;
         if ( node )
         {
             rl->HistoryNode = ( HistoryStringNode* ) node ;

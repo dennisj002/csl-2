@@ -2,7 +2,7 @@
 #include "../include/csl.h"
 
 #if LINUX
-static struct termios SavedTerminalAttributes ;
+struct termios SavedTerminalAttributes ;
 
 void
 _DisplaySignal ( int64 signal )

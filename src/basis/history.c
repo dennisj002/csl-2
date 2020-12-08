@@ -14,7 +14,7 @@ HistorySymbolList_Find ( byte * hstring )
 {
     HistoryStringNode * hsn = 0 ;
     dlnode * node, * nextNode ;
-    for ( node = dllist_First ( ( dllist* ) HistorySpace_MemChunkStringList ) ; node ; node = nextNode )
+    for ( node = dllist_First ( ( dllist* ) _OS_->HistorySpace_MemChunkStringList ) ; node ; node = nextNode )
     {
         nextNode = dlnode_Next ( node ) ;
         hsn = ( HistoryStringNode* ) node ;
@@ -55,9 +55,9 @@ _OpenVmTil_AddStringToHistoryList ( byte * istring )
         hsn = HistorySymbolList_Find ( nstring ) ;
         if ( ! hsn ) hsn = HistoryStringNode_New ( nstring ) ;
         else dlnode_Remove ( ( dlnode* ) hsn ) ; // make it last with dllist_AddNodeToTail
-        dllist_AddNodeToTail ( HistorySpace_MemChunkStringList, ( dlnode* ) hsn ) ; //
-        d0 ( int64 ll = List_Length ( HistorySpace_MemChunkStringList ) ) ;
-        dllist_SetCurrentNode_After ( HistorySpace_MemChunkStringList ) ; // ! properly set Object.dln_Node
+        dllist_AddNodeToTail ( _OS_->HistorySpace_MemChunkStringList, ( dlnode* ) hsn ) ; //
+        d0 ( int64 ll = List_Length ( _OS_->HistorySpace_MemChunkStringList ) ) ;
+        dllist_SetCurrentNode_After ( _OS_->HistorySpace_MemChunkStringList ) ; // ! properly set Object.dln_Node
     }
 }
 
@@ -83,13 +83,13 @@ OpenVmTil_AddStringToHistoryOff ( )
 void
 History_Init ( )
 {
-    HistorySpace_MemChunkStringList = _dllist_New ( STATIC ) ;
+    _OS_->HistorySpace_MemChunkStringList = _dllist_New ( OVT_STATIC ) ;
 }
 
 void
 History_Delete ( )
 {
-    FreeChunkList ( HistorySpace_MemChunkStringList ) ;
-    _dllist_Init ( HistorySpace_MemChunkStringList ) ;
-    HistoryAllocation = 0 ;
+    FreeChunkList ( _OS_->HistorySpace_MemChunkStringList ) ;
+    _dllist_Init ( _OS_->HistorySpace_MemChunkStringList ) ;
+    _OS_->HistoryAllocation = 0 ;
 }
