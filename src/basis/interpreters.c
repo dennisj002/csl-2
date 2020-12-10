@@ -24,7 +24,12 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
         List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
         if ( String_Equal ( token, "#" ) || ( newlineBreakFlag && String_Equal ( token, "?" ) ) ) break ;
         else if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 )
-            || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) ) break ;
+            || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) ) 
+        {
+            //if ( String_Equal ( token, ";" ) )  return token ; //{ Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ; return 0 ; }
+            //else 
+            break ;
+        }
         else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;

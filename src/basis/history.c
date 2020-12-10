@@ -80,11 +80,14 @@ OpenVmTil_AddStringToHistoryOff ( )
     SetState ( _Context_->ReadLiner0, ADD_TO_HISTORY, false ) ;
 }
 
+#if 0
 void
 History_Init ( )
 {
-    _OS_->HistorySpace_MemChunkStringList = _dllist_New ( OVT_STATIC ) ;
+//    _OS_->HistorySpace_MemChunkStringList = _dllist_New ( OVT_STATIC ) ;
+    _OS_->HistorySpace_MemChunkStringList = _dllist_New ( HISTORY ) ;
 }
+#endif
 
 void
 History_Delete ( )

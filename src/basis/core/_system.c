@@ -2,10 +2,37 @@
 #include "../../include/csl.h"
 
 void
+TimerInit ( struct timespec * timer )
+{
+    clock_gettime ( CLOCK_REALTIME, timer ) ;
+    //clock_gettime ( CLOCK_MONOTONIC, &system->Timers [ i ] ) ;
+}
+
+void
 _System_TimerInit ( System * system, int64 i )
 {
     clock_gettime ( CLOCK_REALTIME, &system->Timers [ i ] ) ;
     //clock_gettime ( CLOCK_MONOTONIC, &system->Timers [ i ] ) ;
+}
+
+void
+Time ( struct timespec * timer, char * format, byte * toString )
+{
+    __time_t seconds, seconds2 ;
+    int64 nseconds, nseconds2 ;
+    seconds = timer->tv_sec ;
+    nseconds = timer->tv_nsec ;
+    TimerInit ( timer ) ;
+    seconds2 = timer->tv_sec ;
+    nseconds2 = timer->tv_nsec ;
+    //clock_settime ( CLOCK_MONOTONIC, &system->Timers [ timer ] ) ;
+    //clock_settime ( CLOCK_REALTIME, &system->Timers [ timer ] ) ;
+    if ( nseconds > nseconds2 )
+    {
+        seconds2 -- ;
+        nseconds2 += 1000000000 ;
+    }
+    sprintf ( ( char* ) toString, format, seconds2 - seconds, nseconds2 - nseconds ) ;
 }
 
 void
@@ -29,7 +56,7 @@ _System_Time ( System * system, uint64 timer, char * format, byte * toString )
         }
         sprintf ( ( char* ) toString, format, seconds2 - seconds, nseconds2 - nseconds ) ;
     }
-    else Throw (  ( byte* ) "_System_Time : ", ( byte* ) "Error: timer index must be less than 8\n", QUIT ) ;
+    else Throw ( ( byte* ) "_System_Time : ", ( byte* ) "Error: timer index must be less than 8\n", QUIT ) ;
 }
 
 void
@@ -38,6 +65,15 @@ System_Time ( System * system, uint64 timer, char * string, int64 tflag )
     byte buffer [ 64 ] ;
     _System_Time ( system, timer, ( char* ) "%ld.%09ld", buffer ) ;
     if ( tflag && ( _O_->Verbosity ) ) Printf ( ( byte* ) "%s [ %d ] : elapsed time = %s seconds", string, timer, buffer ) ;
+}
+
+void
+OVT_Time ( char * string, int64 tflag )
+{
+    byte buffer [ 64 ] ;
+    //_System_Time ( system, timer, ( char* ) "%ld.%09ld", buffer ) ;
+    Time ( &_O_->Timer,  ( char* ) "%ld.%09ld", buffer ) ;
+    if ( tflag && ( _O_->Verbosity ) ) Printf ( ( byte* ) "%s : elapsed time = %s seconds", string, buffer ) ;
 }
 
 void
@@ -62,6 +98,7 @@ System_Copy ( System * system0, uint64 type )
 }
 
 // BigNumWidth is a parameter to mpfr_printf; it works like printf and sets minimum number of characters to print
+
 void
 _System_Init ( System * system )
 {

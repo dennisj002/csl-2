@@ -244,16 +244,31 @@ CSL_Do ( )
     CSL_LeftBracket ( ) ; // interpret mode
 }
 
+#if 1 // original : working but not ";" 
 void
 CSL_Does ( )
 {
     Word * saveWord = _Context_->CurrentWordBeingCompiled ;
     CSL_BeginBlock ( ) ;
-    Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0, 0 ) ;
+    Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) "<;", ( byte* ) "}", ( byte* ) ",", 0, 0 ) ; // ";" doesn't work right ??
     CSL_EndBlock ( ) ;
     CSL_BlockRun ( ) ;
     _Context_->CurrentWordBeingCompiled = saveWord ;
 }
+
+#else
+void
+CSL_Does ( )
+{
+    Word * saveWord = _Context_->CurrentWordBeingCompiled ;
+    CSL_BeginBlock ( ) ;
+    CSL_EndBlock ( ) ;
+    CSL_BlockRun ( ) ;
+    Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0, 0 ) ; // ";" doesn't work right ??
+    _Context_->CurrentWordBeingCompiled = saveWord ;
+    //CSL_EndBlock ( ) ;
+}
+#endif
 
 void
 Word_Namespace ( )

@@ -117,7 +117,7 @@ Mem_ChunkAllocate ( int64 size, uint64 allocType )
 {
     MemChunk * mchunk = ( MemChunk * ) _Mem_ChunkAllocate ( size, allocType ) ;
     _MemChunk_Account ( ( MemChunk* ) mchunk, MEM_ALLOC ) ;
-    if ( allocType == OVT_STATIC ) dllist_AddNodeToHead ( _OS_->StaticMemChunkList, ( dlnode* ) mchunk ) ;
+    //if ( allocType == OVT_STATIC ) dllist_AddNodeToHead ( _OS_->StaticMemChunkList, ( dlnode* ) mchunk ) ;
     if ( allocType == HISTORY ) dllist_AddNodeToHead ( _OS_->HistorySpace_MemChunkStringList, ( dlnode* ) mchunk ) ;
     else dllist_AddNodeToHead ( _OS_->OvtMemChunkList, ( dlnode* ) mchunk ) ;
     return ( byte* ) mchunk ;
@@ -212,11 +212,11 @@ Mem_Allocate ( int64 size, uint64 allocType )
         case T_CSL: case DATA_STACK: return _Allocate ( size, ovt->CSLInternalSpace ) ;
         case INTERNAL_OBJECT_MEM: return _Allocate ( size, ovt->InternalObjectSpace ) ;
         case OPENVMTIL: return _Allocate ( size, ovt->OpenVmTilSpace ) ;
-        case _STATIC_: case OS_STATIC: case OVT_STATIC: case HISTORY:
+        //case _STATIC_: case OS_STATIC: case OVT_STATIC: case HISTORY:
+        case _STATIC_: case OS_STATIC: case HISTORY:
         {
             if ( allocType == _STATIC_ ) return _Mmap ( size ) ;
-            else if ( allocType & OS_STATIC ) return OS_Static_AllocMem ( size ) ; //_OS_->StaticAllocation += size ;
-            else if ( allocType & OVT_STATIC ) _OS_->StaticAllocation += size ;
+            else if ( allocType & (OS_STATIC) ) _OS_->StaticAllocation += size ;
             else if ( allocType & HISTORY ) _OS_->HistoryAllocation += size ;
             return mmap_AllocMem ( size ) ;
         }
@@ -832,12 +832,12 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
 {
     Boolean vf = ( ovt->Verbosity > 1 ) ;
     if ( ! vf ) Printf ( ( byte* ) c_gu ( "\nIncrease the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
-    int64 leak = ( _OS_->mmap_TotalMemAllocated - _OS_->mmap_TotalMemFreed ) - ( _OS_->TotalMemAllocated - _OS_->TotalMemFreed ) - _OS_->StaticAllocation - _OS_->HistoryAllocation ; //- ovt->OVT_InitialStaticMemory ; //- ovt->RunTimeAllocation ;
+    int64 leak = ( _OS_->mmap_TotalMemAllocated - _OS_->mmap_TotalMemFreed ) - ( _OS_->TotalMemAllocated - _OS_->TotalMemFreed ) - _OS_->HistoryAllocation -_OS_->StaticAllocation ; 
     OVT_CalculateAndShow_TotalNbaAccountedMemAllocated ( ovt, 1 ) ;
     _OVT_ShowPermanentMemList ( ovt ) ;
     int64 memDiff2 = _OS_->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted ;
     byte * memDiff2s = ( byte* ) "\nCurrent Unaccounted Diff (leak?)                  = %9d : <=: ovt->_OS_->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted" ;
-    byte * leaks = ( byte* ) "\nleak?                                             = %9d : <=  (_OS_->mmap_TotalMemAllocated - _OS_->mmap_TotalMemFreed) - (ovt->_OS_->TotalMemAllocated - ovt->_OS_->TotalMemFreed) - _OS_->StaticAllocation" ;
+    byte * leaks = ( byte* ) "\nleak?                                             = %9d : <=  ( _OS_->mmap_TotalMemAllocated - _OS_->mmap_TotalMemFreed ) - ( _OS_->TotalMemAllocated - _OS_->TotalMemFreed ) - _OS_->HistoryAllocation -_OS_->StaticAllocation" ;
     if ( memDiff2 ) Printf ( ( byte* ) c_ad ( memDiff2s ), memDiff2 ) ;
     else if ( vf ) Printf ( ( byte* ) c_ud ( memDiff2s ), memDiff2 ) ;
     if ( leak ) Printf ( ( byte* ) c_ad ( leaks ), leak ) ;
@@ -857,7 +857,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
         Printf ( ( byte* ) "\nTotal Mem Freed                                   = %9d : <=: ovt->_OS_->TotalMemFreed", _OS_->TotalMemFreed ) ; //+ ovt->UnaccountedMem ) ) ;
         Printf ( ( byte* ) "\nTotal Mem Remaining                               = %9d : <=: ovt->_OS_->TotalMemAllocated - ovt->_OS_->TotalMemFreed", _OS_->TotalMemAllocated - _OS_->TotalMemFreed ) ; //+ ovt->UnaccountedMem ) ) ;
         //Printf ( ( byte* ) "\nOVT_InitialUnAccountedMemory                      = %9d : <=: ovt->OVT_InitialUnAccountedMemory", ovt->OVT_InitialStaticMemory ) ; //+ ovt->UnaccountedMem ) ) ;
-        Printf ( ( byte* ) "\nTotalMemSizeTarget                                = %9d : <=: ovt->TotalMemSizeTarget", ovt->TotalMemSizeTarget ) ;
+        //Printf ( ( byte* ) "\nTotalMemSizeTarget                                = %9d : <=: ovt->TotalMemSizeTarget", ovt->TotalMemSizeTarget ) ;
     }
     Printf ( ( byte* ) "\nStaticAllocation                                  = %9d", _OS_->StaticAllocation ) ;
     Printf ( ( byte* ) "\nHistoryAllocation                                 = %9d", _OS_->HistoryAllocation ) ;

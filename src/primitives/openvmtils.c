@@ -138,7 +138,9 @@ OVT_StartupMessage ( Boolean promptFlag )
         //if ( CSL->InitSessionCoreTimes > 1 ) CSL_NewLine () ;
         if ( promptFlag && ( _O_->Restarts < 2 ) )
         {
-            System_Time ( _CSL_->Context0->System0, 0, ( char* ) "\nStartup", 1 ) ;
+            System_Time ( _CSL_->Context0->System0, 0, ( char* ) "\nSystem Startup", 1 ) ;
+            OVT_Time ( ( char* ) "\nOVT Startup", 1 ) ;
+
             _CSL_Version ( promptFlag ) ;
         }
         if ( _O_->Verbosity > 1 )

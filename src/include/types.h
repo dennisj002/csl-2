@@ -994,7 +994,7 @@ typedef struct
     int64 CSLSize, BufferSpaceSize, StringSpaceSize, Thrown ;
     Buffer *ThrowBuffer ;
     sigjmp_buf JmpBuf0 ;
-    //block GetChar//FunctionTable [8] ;
+    struct timespec Timer ;
 } OpenVmTil ;
 
 // note : this puts these namespaces on the search list such that last, in the above list, will be searched first

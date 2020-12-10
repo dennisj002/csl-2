@@ -333,6 +333,7 @@ LO_Repl ( )
     LC_ReadInitFile ( ( byte* ) "./namespaces/compiler/lcinit.csl" ) ;
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
     SetState ( compiler, LISP_MODE, false ) ;
+    Printf ( ( byte* ) "\nleaving csl lisp : returning to csl interpreter" ) ;
 }
 
 //===================================================================================================================

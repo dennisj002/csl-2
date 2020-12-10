@@ -252,8 +252,9 @@ NamedByteArray_New ( byte * name, int64 size, int64 atype )
 {
     NamedByteArray * nba ;
     //if ( String_Equal ( "HistorySpace", name ) ) _Printf ( ( byte* ) "\nNamedByteArray_New : name = %s", name ) ;
-    if (atype == OVT_STATIC) nba = (NamedByteArray * ) Mem_Allocate ( sizeof ( OpenVmTil ), OVT_STATIC ) ; 
-    else nba = NamedByteArray_Allocate ( ) ; //NamedByteArray_Allocate ( ) ; // else the nba would be deleted with MemList_FreeExactType ( nba->NBA_AAttribute ) ;
+    //if (atype == OVT_STATIC) nba = (NamedByteArray * ) Mem_Allocate ( sizeof ( OpenVmTil ), OVT_STATIC ) ; 
+    //else 
+    nba = NamedByteArray_Allocate ( ) ; //NamedByteArray_Allocate ( ) ; // else the nba would be deleted with MemList_FreeExactType ( nba->NBA_AAttribute ) ;
     _NamedByteArray_Init ( nba, name, size, atype ) ;
     return nba ;
 }

@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.910.700" ) 
+#define VERSION ((byte*) "0.910.720" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -83,6 +83,7 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     OS_Static_New ( ) ;
     OpenVmTil_Delete ( ovt ) ;
     ovt = _OpenVmTil_Allocate ( ) ;
+    TimerInit ( &ovt->Timer ) ;
 
     OVT_SetRestartCondition ( ovt, restartCondition ) ;
     ovt->Argc = argc ;

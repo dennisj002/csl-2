@@ -289,9 +289,12 @@ void CSL_AdjustLabels(byte *srcAddress);
 int64 CSL_CheckForGotoPoints(int64 key);
 int64 CSL_RemoveGotoPoints(int64 key);
 /* src/basis/core/_system.c */
+void TimerInit(struct timespec *timer);
 void _System_TimerInit(System *system, int64 i);
+void Time(struct timespec *timer, char *format, byte *toString);
 void _System_Time(System *system, uint64 timer, char *format, byte *toString);
 void System_Time(System *system, uint64 timer, char *string, int64 tflag);
+void OVT_Time(char *string, int64 tflag);
 void System_InitTime(System *system);
 void _System_Copy(System *system, System *system0);
 System *System_Copy(System *system0, uint64 type);
@@ -473,7 +476,6 @@ byte *OS_Static_AllocMem(int64 size);
 void OS_Static_FreeMem(byte *mem);
 void OVT_Free_OS_Static_Mem(void);
 void OS_Static_Init(void);
-void OVT_OS_Static_Mem_Init(void);
 OVT_Static *_OS_Static_New(void);
 OVT_Static *OS_Static_New(void);
 byte *Mem_Allocate(int64 size, uint64 allocType);
@@ -897,7 +899,6 @@ void _OpenVmTil_AddStringToHistoryList(byte *istring);
 void OpenVmTil_AddStringToHistory(void);
 void OpenVmTil_AddStringToHistoryOn(void);
 void OpenVmTil_AddStringToHistoryOff(void);
-void History_Init(void);
 void History_Delete(void);
 /* src/basis/core/readline.c */
 void _ReadLine_NullDelimitInputBuffer(ReadLiner *rl);

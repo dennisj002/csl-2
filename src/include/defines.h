@@ -603,7 +603,7 @@ typedef struct
 #define COMPILER_TEMP_OBJECT_MEMORY ( (uint64) 1 << 18 )
 #define COMPILER_TEMP COMPILER_TEMP_OBJECT_MEMORY 
 #define LARGEST_MEMORY_TYPE COMPILER_TEMP_OBJECT_MEMORY
-#define OVT_STATIC ( (uint64) 1 << 19 )
+//#define OVT_STATIC ( (uint64) 1 << 19 )
 #define STRING_MEMORY ( (uint64) 1 << 20 )
 #define STRING_MEM STRING_MEMORY
 #define SESSION_CODE ( (uint64) 1 << 21 )

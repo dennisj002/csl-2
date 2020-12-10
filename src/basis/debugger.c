@@ -409,14 +409,12 @@ Debugger_Continue ( Debugger * debugger )
         while ( debugger->DebugAddress )
         {
             if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_Step ( debugger ) ;
-            else goto doneOrStopContinue ;
+            else return ; //goto doneOrStopContinue ;
         }
         SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_STEPPING | DBG_AUTO_MODE | DBG_CONTINUE_MODE | DBG_RUNTIME_BREAKPOINT ) ;
         SetState ( debugger->w_Word, STEPPED, true ) ;
     }
     else _Debugger_Eval ( debugger, 1 ) ;
-doneOrStopContinue:
-    ;
 }
 
 // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
