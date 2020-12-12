@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.911.100" ) 
+#define VERSION ((byte*) "0.911.110" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -27,9 +27,10 @@ openvmtil ( int64 argc, char * argv [ ] )
 }
 
 OpenVmTil *
-_OpenVmTil_Allocate ( )
+_OpenVmTil_Allocate ( OpenVmTil * ovt )
 {
-    OpenVmTil * ovt = _O_ = ( OpenVmTil* ) Mem_ChunkAllocate ( sizeof ( OpenVmTil ), OPENVMTIL ) ; //Mem_Allocate ( sizeof ( OpenVmTil ), STATIC ) ; 
+    OpenVmTil_Delete ( ovt ) ; // first delete a previous ovt - it could have been corrupted by a software error
+    ovt = _O_ = ( OpenVmTil* ) Mem_ChunkAllocate ( sizeof ( OpenVmTil ), OPENVMTIL ) ; //Mem_Allocate ( sizeof ( OpenVmTil ), STATIC ) ; 
     ovt->OpenVmTilSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
     ovt->NBAs = _dllist_New ( OPENVMTIL ) ;
     ovt->MemorySpaceList = _dllist_New ( OPENVMTIL ) ;
@@ -40,7 +41,7 @@ void
 OpenVmTil_Delete ( OpenVmTil * ovt )
 {
     if ( ! _OS_ ) OVT_Static_New ( ) ;
-    else 
+    if ( ovt ) 
     {
         if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated, non-static memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
         FreeChunkList ( _OS_->OvtMemChunkList ) ;
@@ -90,8 +91,7 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
         startedTimes = ovt->StartedTimes ;
     }
 
-    OpenVmTil_Delete ( ovt ) ;
-    ovt = _OpenVmTil_Allocate ( ) ;
+    ovt = _OpenVmTil_Allocate ( ovt ) ;
     TimerInit ( &ovt->Timer ) ;
 
     OVT_SetRestartCondition ( ovt, restartCondition ) ;

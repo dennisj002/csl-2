@@ -1506,7 +1506,7 @@ void _MemCpy(byte *dst, byte *src, int64 size);
 /* src/basis/openVmTil.c */
 int main(int argc, char *argv[ ]);
 void openvmtil(int64 argc, char *argv[ ]);
-OpenVmTil *_OpenVmTil_Allocate(void);
+OpenVmTil *_OpenVmTil_Allocate(OpenVmTil *ovt);
 void OpenVmTil_Delete(OpenVmTil *ovt);
 void _OpenVmTil_Init(OpenVmTil *ovt, int64 resetHistory);
 OpenVmTil *OpenVmTil_New(OpenVmTil *ovt, int64 argc, char *argv[ ]);
