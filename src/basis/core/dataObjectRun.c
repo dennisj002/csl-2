@@ -253,7 +253,7 @@ _Compile_C_TypeDeclaration ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     byte * token ;
-    while ( token = Interpret_C_Until_Token4 ( cntx->Interpreter0,
+    while ( token = Interpret_C_Until_NotIncluding_Token4 ( cntx->Interpreter0,
         ( byte* ) ",", ( byte* ) ";", ( byte* ) "{", ( GetState ( cntx, C_SYNTAX ) ? ( byte* ) "}" : ( byte* ) "=" ), 0, 0 ) )
     {
         if ( String_Equal ( token, ";" ) )

@@ -146,7 +146,7 @@ CSL_Word_New ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = Word_New ( name ) ;
-    CSL_WordList_Init (word) ; //nb! so we need to use source code debug before creating a new word
+    CSL_WordList_Init ( word ) ; //nb! so we need to use source code debug before creating a new word
     DataStack_Push ( ( int64 ) word ) ;
 }
 
@@ -158,7 +158,7 @@ CSL_Word ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    DataObject_New (CSL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
+    DataObject_New ( CSL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
 }
 
 void
@@ -166,16 +166,16 @@ CSL_Alias ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _CSL_Alias (word, name , 0) ;
+    _CSL_Alias ( word, name, 0 ) ;
 }
 
 void
 CSL_FindAlias ( )
 {
-    byte * wname  = ( byte* ) DataStack_Pop ( ) ;
+    byte * wname = ( byte* ) DataStack_Pop ( ) ;
     Word * word = Finder_Word_FindUsing ( _Finder_, wname, 0 ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _CSL_Alias ( word, name , 0) ;
+    _CSL_Alias ( word, name, 0 ) ;
 }
 #if 0
 
@@ -212,9 +212,10 @@ Location_New ( )
     Location * loc = ( Location * ) Mem_Allocate ( sizeof ( Location ), ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
     loc->Filename = lexer->Filename ;
     loc->LineNumber = lexer->LineNumber ;
-    loc->CursorPosition = _Context_->Lexer0->CurrentReadIndex ; 
+    loc->CursorPosition = _Context_->Lexer0->CurrentReadIndex ;
     return loc ;
 }
+
 void
 _Location_Printf ( Location * loc )
 {
@@ -238,36 +239,70 @@ Location_PushNew ( )
 // related to forth does>
 // do> does> <do
 
+#if 0
+
 void
 CSL_Do ( )
 {
     CSL_LeftBracket ( ) ; // interpret mode
+    byte * token = Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    _CSL_RightBracket ( ) ;
 }
 
-#if 1 // original : working but not ";" 
 void
 CSL_Does ( )
 {
     Word * saveWord = _Context_->CurrentWordBeingCompiled ;
+    _CSL_RightBracket ( ) ;
+    Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    _Context_->CurrentWordBeingCompiled = saveWord ;
+}
+
+#elif 1  
+
+void
+CSL_Do ( )
+{
+    CSL_LeftBracket ( ) ; // interpret mode
+    byte * token = Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    _CSL_RightBracket ( ) ;
+}
+
+void
+CSL_Does ( )
+{
+    Word * saveWord = _Context_->CurrentWordBeingCompiled ;
+    _CSL_RightBracket ( ) ;
     CSL_BeginBlock ( ) ;
-    Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) "<;", ( byte* ) "}", ( byte* ) ",", 0, 0 ) ; // ";" doesn't work right ??
+    byte * token = Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
     CSL_EndBlock ( ) ;
     CSL_BlockRun ( ) ;
+    if ( String_Equal ( token, ";" ) ) { DataStack_Push ((int64)_Compiler_->Current_Word_Create) ; Word_DefinitionEqual ( ) ; } // for use with 'create - 'wordNew like ans forth ??
     _Context_->CurrentWordBeingCompiled = saveWord ;
 }
 
 #else
+
+void
+CSL_Do ( )
+{
+    CSL_LeftBracket ( ) ; // interpret mode
+    byte * token = Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    _CSL_RightBracket ( ) ;
+}
+
 void
 CSL_Does ( )
 {
     Word * saveWord = _Context_->CurrentWordBeingCompiled ;
+    _CSL_RightBracket ( ) ;
     CSL_BeginBlock ( ) ;
+    Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
     CSL_EndBlock ( ) ;
     CSL_BlockRun ( ) ;
-    Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0, 0 ) ; // ";" doesn't work right ??
     _Context_->CurrentWordBeingCompiled = saveWord ;
-    //CSL_EndBlock ( ) ;
 }
+
 #endif
 
 void
@@ -361,6 +396,7 @@ CSL_C_Prefix ( void )
 }
 
 #if 0
+
 void
 CSL_C_Return ( void )
 {

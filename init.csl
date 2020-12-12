@@ -309,8 +309,9 @@ dscOn
 : _assert1dbg ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
 //: _assert1 ( n m str ) { n @ m @ != } { <dbg> nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { <dbg> str @ ps " : ok\n" ps nl } ifElse ;
 : _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ; debugWord
-: ctloc do> locationPush does> locationPrint <do ; immediate // compile time location
+: ctloc do> locationPush does> locationPrint <does ; immediate // compile time location
 //: ctloc do> locationPush does> locationPrint ; immediate // compile time location
+//: ctloc locationPush locationPrint ; immediate // compile time location
 : _assert0 ( n m ) { n @ m @ != } { nl location nl hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
 : _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ; 
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
@@ -483,10 +484,10 @@ jcc8_Off
 pwi fac5    
 cOff
 #endif    
-2 + 7 assertStkChk // stack checking 
-//: tdd do> "\ntdd" ps does> 3 4 + d: p ;
-#if 0 // testing does> without <do/<; -- just ";" is preferred
-: tdd do> "\ntdd" ps does> 3 4 + p <; ; tdd
-//: tdd2 do> "\ntdd2" ps does> 3 4 + p d: ; tdd
+#if 0 
+: tdd do> "\ntdd" ps does> 3 4 + p <does ;
+: tdd1 do> "\n\ntdd1" ps <do does> 3 4 + p ; tdd1
+: tdd2 do> "\ntdd2" ps does> 3 4 + p ; tdd2
 #endif    
-
+2 + 7 assertStkChk // stack checking 
+// s

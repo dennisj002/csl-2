@@ -117,8 +117,10 @@ using
     this.Twelve 12 =
     this.Accum this.Sum @ = 
 
-#if 1 // do> does> testing // not working after 906.450 ??
+#if 0 // do> does> testing // not working after 906.450 ??
     this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" do> locationPush does> locationPrint <do assert //pause
+#elif 1        
+    this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" do> locationPush <do does> locationPrint <does assert //pause
 #else
     this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" assert 
 #endif

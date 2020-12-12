@@ -54,13 +54,12 @@ const void *const __dso_handle __attribute__ ((__visibility__ ("hidden")))
 #include "types.h"
 #include "macros.h"
 
-extern OpenVmTil * _O_;
+extern OVT_StaticMemSystem *_OSMS_ ;
 extern OVT_Static * _OS_ ;
+extern struct termios SavedTerminalAttributes ;
+extern OpenVmTil * _O_;
 extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
-extern OS_List OS_StaticMemList ; 
-extern int64 OS_StaticMemAllocated ;
-extern struct termios SavedTerminalAttributes ;
 
 typedef int ( *mpf2andOutFunc) (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t) ;
 

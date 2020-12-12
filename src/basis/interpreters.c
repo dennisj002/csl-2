@@ -8,7 +8,7 @@ Interpret_String ( byte *str )
 }
 
 byte *
-Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte* end4, byte * delimiters, Boolean newlineBreakFlag )
+Interpret_C_Until_NotIncluding_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte* end4, byte * delimiters, Boolean newlineBreakFlag )
 {
     byte * token ;
     int64 inChar ;
@@ -53,17 +53,24 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
 }
 
 void
-_Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
+_Interpret_Until_Including_Token ( Interpreter * interp, byte * end, byte * delimiters )
 {
     byte * token ;
     while ( token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) )
     {
         Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-        if ( String_Equal ( ( char* ) token, end ) ) 
-        {
-            
-            break ;
-        }
+        if ( String_Equal ( ( char* ) token, end ) ) break ;
+    }
+}
+
+byte *
+_Interpret_Until_NotIncluding_Token ( Interpreter * interp, byte * end, byte * delimiters )
+{
+    byte * token ;
+    while ( token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) )
+    {
+        if ( String_Equal ( ( char* ) token, end ) ) return token ;
+        Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
     }
 }
 

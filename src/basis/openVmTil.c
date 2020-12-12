@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.910.720" ) 
+#define VERSION ((byte*) "0.911.000" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -12,13 +12,11 @@
 // til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas,
 
 OpenVmTil * _O_ ;
-OVT_Static * _OS_ ;
 
 int
 main ( int argc, char * argv [ ] )
 {
     LinuxInit ( ) ;
-    OS_Static_Init ( ) ;
     openvmtil ( argc, argv ) ;
 }
 
@@ -36,6 +34,18 @@ _OpenVmTil_Allocate ( )
     ovt->NBAs = _dllist_New ( OPENVMTIL ) ;
     ovt->MemorySpaceList = _dllist_New ( OPENVMTIL ) ;
     return ovt ;
+}
+
+void
+OpenVmTil_Delete ( OpenVmTil * ovt )
+{
+    if ( ! _OS_ ) OVT_Static_New ( ) ;
+    else 
+    {
+        if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated, non-static memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
+        FreeChunkList ( _OS_->OvtMemChunkList ) ;
+    }
+    _O_ = 0 ;
 }
 
 void
@@ -80,7 +90,6 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
         startedTimes = ovt->StartedTimes ;
     }
 
-    OS_Static_New ( ) ;
     OpenVmTil_Delete ( ovt ) ;
     ovt = _OpenVmTil_Allocate ( ) ;
     TimerInit ( &ovt->Timer ) ;
@@ -111,17 +120,6 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     _OpenVmTil_Init ( ovt, 0 ) ;
     Linux_SetupSignals ( &ovt->JmpBuf0, 1 ) ;
     return ovt ;
-}
-
-void
-OpenVmTil_Delete ( OpenVmTil * ovt )
-{
-    if ( ovt )
-    {
-        if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated, non-static memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
-        FreeChunkList ( _OS_->OvtMemChunkList ) ;
-    }
-    _O_ = 0 ;
 }
 
 void

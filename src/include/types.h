@@ -121,6 +121,11 @@ typedef struct
 
 typedef struct
 {
+    OS_List OVT_StaticMemList ;
+    int64 OVT_Static_MemAllocated ;
+} OVT_StaticMemSystem ;
+typedef struct
+{
     dlnode osc_Node ;
     int64 osc_Size ;
     byte osc_b_Chunk [0] ;
@@ -1058,8 +1063,8 @@ typedef struct typeStatusInfo
 
 typedef struct
 {
-    int64 mmap_TotalMemAllocated, mmap_TotalMemFreed, HistoryAllocation, StaticAllocation ;
+    int64 mmap_TotalMemAllocated, mmap_TotalMemFreed, HistoryAllocation ; //, StaticAllocation ;
     int64 TotalMemAllocated, TotalMemFreed, Mmap_RemainingMemoryAllocated ;
-    dllist *StaticMemChunkList, *HistorySpace_MemChunkStringList, *OvtMemChunkList ;
-} OVT_Static, OS ;
+    dllist *HistorySpace_MemChunkStringList, *OvtMemChunkList ; //, *StaticMemChunkList ;
+} OVT_Static ;
 

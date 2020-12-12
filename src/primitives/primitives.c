@@ -6,6 +6,7 @@ CPrimitive CPrimitives [] = {
     { "do>", 0, 0, 0, CSL_Do, IMMEDIATE, 0, 0, "Experimental", "Root" },
     { "does>", 0, 0, 0, CSL_Does, IMMEDIATE, 0, 0, "Experimental", "Root" },
     { "<do", 0, 0, 0, CSL_NoOp, IMMEDIATE, 0, 0, "Experimental", "Root" },
+    { "<does", 0, 0, 0, CSL_NoOp, IMMEDIATE, 0, 0, "Experimental", "Root" },
 
     { "(", 0, 0, 0, ( block ) LC_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD | LEFT_PAREN, 0, 0, "Lisp", "Root" },
     { "_(", 0, 0, 0, ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },

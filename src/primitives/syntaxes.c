@@ -93,7 +93,7 @@ CSL_C_Semi ( )
 void
 CSL_C_Comma ( void )
 {
-    
+    //noop
 }
 
 void

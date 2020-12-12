@@ -6,7 +6,7 @@ Interpret_DoParenthesizedValue ( )
 {
     Compiler * compiler = _Compiler_ ;
     int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
-    _Interpret_Until_Token ( _Interpreter_, (byte * ) ")", 0 ) ;
+    _Interpret_Until_Including_Token ( _Interpreter_, (byte * ) ")", 0 ) ;
     SetState ( compiler, COMPILE_MODE, svcm ) ;
 }
 
@@ -387,12 +387,12 @@ CSL_C_ConditionalExpression ( )
         }
         byte * compiledAtAddress = Compile_UninitializedJumpEqualZero ( ) ;
         Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
-        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
+        byte * token = Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
         if ( String_Equal ( token, ":" ) )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CSL_Else ( ) ;
-            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " ", 0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+            Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " ", 0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
             CSL_EndIf ( ) ;
         }
         else SyntaxError ( 1 ) ;
