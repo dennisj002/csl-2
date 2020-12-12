@@ -30,6 +30,7 @@ _CSL_ReStart ( CSL * csl, int64 restartCondition )
     switch ( restartCondition )
     {
         case 0:
+        case COMPLETE_INITIAL_START :
         case INITIAL_START:
         case FULL_RESTART:
         case RESTART:

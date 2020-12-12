@@ -355,6 +355,7 @@ CPrimitive CPrimitives [] = {
     { "ri", 0, 0, 0, CSL_RestartInit, 0, 0, 0, "System", "Root" },
     { "fullRestart", 0, 0, 0, CSL_FullRestart, 0, 0, 0, "System", "Root" },
     { "fr", 0, 0, 0, CSL_FullRestart, 0, 0, 0, "System", "Root" },
+    { "frc", 0, 0, 0, CSL_FullRestartComplete, 0, 0, 0, "System", "Root" },
     { "warmInit", 0, 0, 0, CSL_WarmInit, 0, 0, 0, "System", "Root" },
     { "ok", 0, 0, 0, OVT_Ok, 0, 0, 0, "System", "Root" },
     { "console", 0, 0, 0, Console, 0, 0, 0, "System", "Root" },

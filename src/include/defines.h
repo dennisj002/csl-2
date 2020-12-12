@@ -550,6 +550,7 @@ typedef struct
 #define NEW_RUN_COMPOSITE 0
 #define EXIT ( (uint64) 1 << 30 )
 #define PAUSE ( (uint64) 1 << 11)
+#define COMPLETE_INITIAL_START ( (uint64) 1 << 12)
 #define INITIAL_START ( (uint64) 1 << 10)
 #define FULL_RESTART ( (uint64) 1 << 9 )
 #define RESTART ( (uint64) 1 << 8 )

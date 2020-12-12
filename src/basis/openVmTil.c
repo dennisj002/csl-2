@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.911.110" ) 
+#define VERSION ((byte*) "0.911.130" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -38,15 +38,21 @@ _OpenVmTil_Allocate ( OpenVmTil * ovt )
 }
 
 void
-OpenVmTil_Delete ( OpenVmTil * ovt )
+_OpenVmTil_Delete ( OpenVmTil * ovt )
 {
-    if ( ! _OS_ ) OVT_Static_New ( ) ;
-    if ( ovt ) 
+    if ( ovt )
     {
         if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated, non-static memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
         FreeChunkList ( _OS_->OvtMemChunkList ) ;
     }
     _O_ = 0 ;
+}
+
+void
+OpenVmTil_Delete ( OpenVmTil * ovt )
+{
+    if ( ! _OS_ ) OVT_Static_New ( ) ;
+    _OpenVmTil_Delete ( ovt ) ;
 }
 
 void
@@ -129,6 +135,7 @@ OpenVmTil_Run ( int64 argc, char * argv [ ] )
     int64 restartCondition = INITIAL_START, restarts = 0, sigSegvs = 0 ;
     while ( 1 )
     {
+        if ( restartCondition == COMPLETE_INITIAL_START ) OVT_FullRestartCompleteDelete ( ) ;
         if ( _O_ )
         {
             sigSegvs = _O_->SigSegvs ;

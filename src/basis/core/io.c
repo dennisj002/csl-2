@@ -133,25 +133,12 @@ CSL_DoPrompt ( )
 void
 _Printf ( byte *format, ... )
 {
-    //if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
-    //if ( _O_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
-    {
-        va_list args ;
+    va_list args ;
 
-        va_start ( args, ( char* ) format ) ;
-        vprintf ( ( char* ) format, args ) ;
-        va_end ( args ) ;
-        fflush ( stdout ) ;
-
-        if ( _CSL_ && _CSL_->LogFlag && _CSL_->LogFILE )
-        {
-            va_start ( args, ( char* ) format ) ;
-            vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
-            va_end ( args ) ;
-            fflush ( _CSL_->LogFILE ) ;
-        }
-    }
-    //ReadLiner_SetLastChar ( 0 ) ; //
+    va_start ( args, ( char* ) format ) ;
+    vprintf ( ( char* ) format, args ) ;
+    va_end ( args ) ;
+    fflush ( stdout ) ;
 }
 
 void

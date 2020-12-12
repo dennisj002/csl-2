@@ -529,6 +529,13 @@ CSL_FullRestart ( )
 }
 
 void
+CSL_FullRestartComplete ( )
+{
+    _O_->Signal = 0 ;
+    _OpenVmTil_LongJmp_WithMsg ( COMPLETE_INITIAL_START, ( byte* ) "Complete Initial Re-Start : ..." ) ;
+}
+
+void
 _Error ( byte * msg, uint64 state )
 {
     AlertColors ;

@@ -56,8 +56,8 @@ const void *const __dso_handle __attribute__ ((__visibility__ ("hidden")))
 
 extern OVT_StaticMemSystem *_OSMS_ ;
 extern OVT_Static * _OS_ ;
-extern struct termios SavedTerminalAttributes ;
 extern OpenVmTil * _O_;
+extern struct termios SavedTerminalAttributes ;
 extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
 

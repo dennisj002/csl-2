@@ -185,14 +185,14 @@ all.tar.xz :
 
 xz : 
 	-rm ~/csl/core
-	-rm -rf /home/backup/csl/
-	-cp -r ~/csl/ /home/backup/csl/
+	-rm -rf ~/backup/csl/
+	-cp -r ~/csl/ ~/backup/csl/
 	make tar.xz
 
 all.xz : 
 	-rm ~/csl/core
-	-rm -rf /home/backup/csl/
-	-cp -r ~/csl/ /home/backup/csl/
+	-rm -rf ~/backup/csl/
+	-cp -r ~/csl/ ~/backup/csl/
 	make all.tar.xz
 
 _all : realClean install
