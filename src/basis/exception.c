@@ -532,6 +532,7 @@ void
 CSL_FullRestartComplete ( )
 {
     _O_->Signal = 0 ;
+    Printf ( "\nHistory will be deleted with this FullRestartComplete... ") ;
     _OpenVmTil_LongJmp_WithMsg ( COMPLETE_INITIAL_START, ( byte* ) "Complete Initial Re-Start : ..." ) ;
 }
 

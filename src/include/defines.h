@@ -801,6 +801,7 @@ typedef struct
 
 // Context flags
 #define C_SYNTAX ( (uint64) 1 << 20 )
+#define CONTEXT_PREPROCESSOR_MODE ( (uint64) 1 << 21 )
 #define PREFIX_MODE ( (uint64) 1 << 22 )
 #define C_LHS ( (uint64) 1 << 23 )
 #define C_RHS ( (uint64) 1 << 24 )

@@ -194,7 +194,7 @@ interpret2
 using sp
 #if 1
 int
-fac4 ( n  | facc ) 
+fac40 ( n  | facc ) 
 { 
     int facc = 1 ;
 #if 1
@@ -205,8 +205,8 @@ fac4 ( n  | facc )
     return facc ;
 } 
 c_syntaxOff
-pwi fac4 //pause
-7 fac4 dup p 5040 _assert sp
+pwi fac40 //pause
+7 fac40 dup p 5040 _assert sp
 #endif // <- l. 187
 
 i2halt

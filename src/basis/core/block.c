@@ -74,6 +74,7 @@ _CSL_BeginBlock0 ( )
     {
         OVT_CheckCodeSpaceForRoom ( ) ;
         _Context_->CurrentWordBeingCompiled = compiler->Current_Word_Create ;
+        CSL_RecycleInit_CSL_N_M_Node_WordList ( ) ;
         CSL_TurnOnBlockCompiler ( ) ;
     }
     compiler->LHS_Word = 0 ;

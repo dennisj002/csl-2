@@ -839,8 +839,8 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
         Printf ( ( byte* ) "\nTotal Mem Allocated                               = %9d : <=: _OS_->TotalMemAllocated", _OS_->TotalMemAllocated ) ; //+ ovt->UnaccountedMem ) ) ;
         Printf ( ( byte* ) "\nTotal Mem Freed                                   = %9d : <=: _OS_->TotalMemFreed", _OS_->TotalMemFreed ) ; //+ ovt->UnaccountedMem ) ) ;
         Printf ( ( byte* ) "\nTotal Mem Remaining                               = %9d : <=: _OS_->TotalMemAllocated - _OS_->TotalMemFreed", _OS_->TotalMemAllocated - _OS_->TotalMemFreed ) ; //+ ovt->UnaccountedMem ) ) ;
+        Printf ( ( byte* ) "\nOVT_MmapAllocated                                 = %9d", _OSMS_->OVT_MmapAllocated ) ;
     }
-    Printf ( ( byte* ) "\nOVT_MmapAllocated                                 = %9d", _OSMS_->OVT_MmapAllocated ) ;
     Printf ( ( byte* ) "\nHistoryAllocation                                 = %9d", _OS_->HistoryAllocation ) ;
     Printf ( ( byte* ) "\nTotal Memory leaks                                = %9d", leak ) ;
 

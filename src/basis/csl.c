@@ -341,7 +341,6 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
                 if ( ! word->W_SC_WordList )
                 {
                     word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
-                    //if ( GetState ( _LC_, LC_COMPILE_MODE ) ) _LC_->Lambda_SC_WordList = word->W_SC_WordList ;
                     if ( _LC_ ) _LC_->Lambda_SC_WordList = word->W_SC_WordList ;
                     _CSL_->CSL_N_M_Node_WordList = _dllist_New ( WORD_RECYCLING ) ;
                 }
@@ -377,7 +376,10 @@ CSL_DeleteWordDebugInfo ( Word * word )
 #endif                    
                     //if ( ! String_Equal (word->Name, "init" ) ) 
                     if ( ! (word->W_TypeAttributes &WT_INIT ))
+                    {
                         DLList_Recycle_WordList ( word->W_SC_WordList ) ; // 'init' : a temp fix??
+                        word->W_SC_WordList = 0 ;
+                    }
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( word->NamespaceStack, 1, 1 ) ; // don't clear ; keep words for source code debugging, etc.
                 }
                 //List_Init ( word->W_SC_WordList ) ;

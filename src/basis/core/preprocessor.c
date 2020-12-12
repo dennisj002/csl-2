@@ -127,7 +127,9 @@ _GetCondStatus ( )
     Boolean status, svcm = GetState ( cntx->Compiler0, COMPILE_MODE ), svcs = GetState ( cntx, C_SYNTAX ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, false ) ;
     SetState ( cntx, C_SYNTAX, false ) ;
+    SetState ( cntx, CONTEXT_PREPROCESSOR_MODE, true ) ;
     Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
+    SetState ( cntx, CONTEXT_PREPROCESSOR_MODE, false ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, svcm ) ;
     SetState ( cntx, C_SYNTAX, svcs ) ;
     status = DataStack_Pop ( ) ;

@@ -97,6 +97,18 @@ faccs ( 7 ) dup p 5040 _assert
 sp
 
 int
+fac40 ( n  | facc ) 
+{ 
+    int facc = 1 ;
+#if 1
+    while ( n > 1 ) facc = n -- * facc ;
+#else
+    while ( n > 1 ) facc *= n -- ;
+#endif
+    return facc ;
+} 
+
+int
 fac5 ( REG n  | REG facc ) 
 { 
     facc = 1 ;
@@ -231,7 +243,7 @@ using
 "factorial" ffx
 "faccs" ffx
 "fac5" ffx
-"fac4" ffx
+"fac40" ffx
 sp
 //pause
 #endif

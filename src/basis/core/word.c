@@ -148,6 +148,7 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
             ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "" ), word->Name, word, Context_Location ( ) ) ;
         //Pause () ;
     }
+    //if ( word == (Word*) 0x7ffff61f2184 ) Printf ( "\ngot it!") ;
 }
 
 Word *
