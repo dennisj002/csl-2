@@ -525,24 +525,6 @@ CPrimitive CPrimitives [] = {
     { "clone", 0, 0, 0, CSL_DObject_Clone, 0, 0, 0, "DObject", "Root" },
     { "new", 0, 0, 0, CSL_DObject_New, 0, 0, 0, "DObject", "Root" },
 
-    // this section can be implemented by lower level calls - internally
-    { "word", 0, 0, 0, CSL_Word, 0, 0, 0, "Reserved", "Compiler" },
-    { ":", 0, 0, 0, CSL_Colon, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
-    { "semi", 0, 0, 0, CSL_SemiColon, KEYWORD, 0, 0, "Reserved", "Compiler" },
-    { ";", 0, 0, 0, CSL_SemiColon, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "Reserved", "Compiler" },
-    { "}", 0, 0, 0, ( block ) CSL_EndBlock, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "Reserved", "Compiler" }, // moved to init.csl and renamed below
-    { "{", 0, 0, 0, ( block ) CSL_BeginBlock, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "Reserved", "Compiler" }, // moved to init.csl and renamed below
-    { "end", 0, 0, 0, CSL_EndBlock, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "Reserved", "Compiler" },
-    { "immediate", 0, 0, 0, CSL_Immediate, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
-    //{ "stackVariable", 0, 0, 0, CSL_StackVariable, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
-    { "syntactic", 0, 0, 0, CSL_Syntactic, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
-
-    { "dlsym:", 0, 0, 0, CSL_Dlsym, 0, 0, 0, "Reserved", "Compiler" },
-    { "keyword", 0, 0, 0, CSL_Keyword, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
-    { "swap", 0, 0, 0, CSL_Swap, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
-    { "|}", 0, 0, 0, _CSL_RightBracket, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
-    { "{|", 0, 0, 0, CSL_LeftBracket, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
-
     { "c_syntaxOn", 0, 0, 0, CSL_C_Syntax_On, IMMEDIATE, 0, 0, "Compiler", "Root" }, // put this here so Compiler will be in Root namespace and Compiler will close to the top
     { "c_syntaxOff", 0, 0, 0, CSL_C_Syntax_Off, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "postfixOn", 0, 0, 0, CSL_PostfixModeOn, IMMEDIATE | KEYWORD, 0, 0, "Compiler", "Root" },
@@ -595,6 +577,24 @@ CPrimitive CPrimitives [] = {
     { "sourceCodeOn", 0, 0, 0, CSL_Lexer_SourceCodeOn, 0, 0, 0, "Compiler", "Root" },
     //{ ")", 0, 0, 0, CSL_NoOp, IMMEDIATE | KEYWORD, NO_OP_WORD|RIGHT_PAREN, 0, "Compiler", "Root" },
     { ")", 0, 0, 0, CSL_C_Comma, IMMEDIATE | KEYWORD | RIGHT_PAREN, 0, 0, "Compiler", "Root" },
+
+    // this section can be implemented by lower level calls - internally
+    { "word", 0, 0, 0, CSL_Word, 0, 0, 0, "Reserved", "Compiler" },
+    { ":", 0, 0, 0, CSL_Colon, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
+    { "semi", 0, 0, 0, CSL_SemiColon, KEYWORD, 0, 0, "Reserved", "Compiler" },
+    { ";", 0, 0, 0, CSL_SemiColon, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "Reserved", "Compiler" },
+    { "}", 0, 0, 0, ( block ) CSL_EndBlock, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "Reserved", "Compiler" }, // moved to init.csl and renamed below
+    { "{", 0, 0, 0, ( block ) CSL_BeginBlock, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "Reserved", "Compiler" }, // moved to init.csl and renamed below
+    { "end", 0, 0, 0, CSL_EndBlock, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "Reserved", "Compiler" },
+    { "immediate", 0, 0, 0, CSL_Immediate, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
+    //{ "stackVariable", 0, 0, 0, CSL_StackVariable, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
+    { "syntactic", 0, 0, 0, CSL_Syntactic, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
+
+    { "dlsym:", 0, 0, 0, CSL_Dlsym, 0, 0, 0, "Reserved", "Compiler" },
+    { "keyword", 0, 0, 0, CSL_Keyword, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
+    { "swap", 0, 0, 0, CSL_Swap, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
+    { "|}", 0, 0, 0, _CSL_RightBracket, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
+    { "{|", 0, 0, 0, CSL_LeftBracket, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
 
     { "compileByte", 0, 0, 0, Compile_Int8, 0, 0, 0, "Compiling", "Compiler" },
     { "compileInt16", 0, 0, 0, Compile_Int16, 0, 0, 0, "Compiling", "Compiler" },
