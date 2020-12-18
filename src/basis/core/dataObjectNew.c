@@ -97,12 +97,12 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttribute
         }
         case PARAMETER_VARIABLE: case LOCAL_VARIABLE: case (PARAMETER_VARIABLE | REGISTER_VARIABLE ): case (LOCAL_VARIABLE | REGISTER_VARIABLE ):
         {
-            word = _Compiler_LocalWord ( _Compiler_, name, morphismAttributes, objectAttributes, lispAttributes, DICTIONARY ) ;
+            word = _Compiler_LocalWord_New ( _Compiler_, name, morphismAttributes, objectAttributes, lispAttributes, DICTIONARY ) ;
             break ;
         }
         default: case (T_LISP_SYMBOL | PARAMETER_VARIABLE ): case (T_LISP_SYMBOL | LOCAL_VARIABLE ): // REGISTER_VARIABLE combinations with others in this case
         {
-            word = Compiler_LocalWord ( _Compiler_, name, type, objectAttributes, lispAttributes, DICTIONARY ) ;
+            word = Compiler_LocalWord_New ( _Compiler_, name, type, objectAttributes, lispAttributes, DICTIONARY ) ;
             break ;
         }
     }
@@ -236,7 +236,7 @@ _CSL_Variable_New ( byte * name, int64 value )
     Word * word ;
     if ( CompileMode )
     {
-        word = Compiler_LocalWord ( _Compiler_, name, 0, LOCAL_VARIABLE, 0, DICTIONARY ) ;
+        word = Compiler_LocalWord_New ( _Compiler_, name, 0, LOCAL_VARIABLE, 0, DICTIONARY ) ;
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
     else word = _DObject_New ( name, value, ( IMMEDIATE ), NAMESPACE_VARIABLE, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
@@ -256,7 +256,7 @@ _CSL_Label ( byte * lname )
         sprintf ( ( char* ) bufferData, "%s%d", lname, rand ( ) ) ;
         lname = bufferData ;
     }
-    Word * word = _DObject_New ( lname, ( int64 ) gotoInfo, IMMEDIATE, CONSTANT, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, DICTIONARY ) ;
+    Word * word = _DObject_New ( lname, ( int64 ) gotoInfo, IMMEDIATE, CONSTANT, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, COMPILER_TEMP ) ; //DICTIONARY ) ;
 
     return word->Name ;
 }
@@ -282,8 +282,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
         name = lexer->OriginalToken ;
     }
     word = _DObject_New ( name, uliteral, ( IMMEDIATE | lexer->L_MorphismAttributes ), 
-        ( LITERAL | CONSTANT | lexer->L_ObjectAttributes ), 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, 
-        ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
+        ( LITERAL | CONSTANT | lexer->L_ObjectAttributes ), 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, COMPILER_TEMP ) ; //( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ; // literals are compiled directly into machine code
     return word ;
 }
 

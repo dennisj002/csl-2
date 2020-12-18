@@ -19,7 +19,7 @@ CompileCall ( )
 }
 
 void
-CompileACSLWord ( )
+Compile_A_CSLWord ( )
 {
     _Word_Compile ( ( Word* ) DataStack_Pop ( ) ) ;
 }

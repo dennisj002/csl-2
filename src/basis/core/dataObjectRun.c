@@ -5,14 +5,6 @@
 
 // we run all new objects thru here ; good for debugging and understanding 
 
-Boolean
-Word_ObjectRun_Finish ( Word * word )
-{
-    Context * cntx = _Context_ ;
-    if ( word->W_ObjectAttributes & ( NAMESPACE | CLASS | CLASS_CLONE ) ) Namespace_Do_Namespace ( word ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
-    Context_ClearState ( cntx ) ;
-}
-
 void
 Word_ObjectRun ( Word * word )
 {
@@ -35,8 +27,9 @@ Word_ObjectRun ( Word * word )
         else if ( word->W_ObjectAttributes & ( STRUCTURE ) ) CSL_Do_Object ( word ) ;
         else if ( word->W_ObjectAttributes & ( THIS | OBJECT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) CSL_Do_Variable ( word ) ;
         else if ( word->W_ObjectAttributes & ( C_TYPE | C_CLASS ) ) CSL_Do_C_Type ( word ) ;
+        if ( word->W_ObjectAttributes & ( NAMESPACE | CLASS | CLASS_CLONE ) ) Namespace_Do_Namespace ( word ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
 
-        Word_ObjectRun_Finish ( word ) ;
+        Context_ClearState ( cntx ) ;
     }
 }
 

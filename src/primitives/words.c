@@ -53,12 +53,20 @@ Word_Definition ( )
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     DataStack_Push ( ( int64 ) word->Definition ) ;
 }
-
+ 
 void
 Word_Value ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     DataStack_Push ( ( int64 ) word->W_Value ) ;
+}
+
+void
+Word_ValueEqual ( )
+{
+    int64 value = DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    word->W_Value = value ;
 }
 
 void

@@ -59,7 +59,8 @@ Compile_Peek ( Compiler * compiler, Boolean stackReg ) // @
     {
         Word * one = CSL_WordList ( 1 ) ;
         //if ( one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
-        if ( ( ! ( one->W_ObjectAttributes & OBJECT ) ) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
+        //if ( ( ! ( one->W_ObjectAttributes & OBJECT ) ) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
+        if ( one && ( ! ( one->W_ObjectAttributes & OBJECT ) ) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
         {
             SetHere ( one->StackPushRegisterCode, 1 ) ;
             Compile_Move_Rm_To_Reg ( ACC, ACC, 0, 0 ) ;

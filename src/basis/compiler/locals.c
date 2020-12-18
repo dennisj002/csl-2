@@ -123,7 +123,7 @@ Compiler_LocalWord_UpdateCompiler ( Compiler * compiler, Word * word, int64 obje
 }
 
 Word *
-_Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismType, int64 objectType, int64 lispType, int64 allocType )
+_Compiler_LocalWord_New ( Compiler * compiler, byte * name, int64 morphismType, int64 objectType, int64 lispType, int64 allocType )
 {
     Word *word = _DObject_New ( name, 0, ( morphismType | IMMEDIATE ), objectType, lispType, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
     Compiler_LocalWord_UpdateCompiler ( compiler, word, objectType ) ;
@@ -140,10 +140,10 @@ Compiler_LocalsNamespace_New ( Compiler * compiler )
 }
 
 Word *
-Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismAttributes, int64 objectAttributes, int64 lispAttributes, int64 allocType )
+Compiler_LocalWord_New ( Compiler * compiler, byte * name, int64 morphismAttributes, int64 objectAttributes, int64 lispAttributes, int64 allocType )
 {
     if ( ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) ) compiler->LocalsNamespace = Compiler_LocalsNamespace_New ( compiler ) ;
-    Word * word = _Compiler_LocalWord ( compiler, name, morphismAttributes, objectAttributes, lispAttributes, allocType ) ;
+    Word * word = _Compiler_LocalWord_New ( compiler, name, morphismAttributes, objectAttributes, lispAttributes, allocType ) ;
     //if (compiler->LocalsNamespace) Namespace_DoAddWord ( compiler->LocalsNamespace, word ) ;
     return word ;
 }

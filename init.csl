@@ -484,10 +484,13 @@ jcc8_Off
 pwi fac5    
 cOff
 #endif    
-#if 0 
-: tdd do> "\ntdd" ps does> 3 4 + p <does ;
-: tdd1 do> "\n\ntdd1" ps <do does> 3 4 + p ; tdd1
-: tdd2 do> "\ntdd2" ps does> 3 4 + p ; tdd2
+#if 0
+: one 1 ;
+'does> 'begin find alias
+'<does 'semi find alias
+: constant token wordNew dup 2 pick value= does> value _peek <does ;
+1 d: constant prime
+d: prime p
 #endif    
 2 + 7 assertStkChk // stack checking 
 // s

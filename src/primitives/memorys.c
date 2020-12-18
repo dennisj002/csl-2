@@ -119,7 +119,6 @@ CSL_Poke ( ) // =
     Word * lvalueWord = TWS ( - 1 ), *rvalueWord = TWS ( 0 ) ;
     int64 lvalueSize = Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ;
     //if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
-    _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) ;
     {
         if ( CompileMode ) Compile_Poke ( _Context_->Compiler0, lvalueSize ) ;
         else

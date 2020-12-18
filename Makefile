@@ -209,7 +209,7 @@ _install :
 	ls -l /usr/local/bin/csl*
 
 install :
-	make
+#	make
 	make optimize
 	make _install
 	
