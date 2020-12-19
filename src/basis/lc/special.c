@@ -341,7 +341,7 @@ _LO_Colon ( ListObject * lfirst )
     CSL_InitSourceCode_WithName ( _CSL_, lname->Name, 1 ) ;
     cntx->CurrentWordBeingCompiled = word ;
     _CSL_RecycleInit_CSL_N_M_Node_WordList ( _CSL_->CSL_N_M_Node_WordList, 1 ) ;
-    CSL_WordList_PushWord ( _LO_CopyOne ( lcolon, DICTIONARY )  ) ; 
+    CSL_WordList_PushWord ( _LO_CopyOne ( lcolon, DICTIONARY ) ) ;
     CSL_BeginBlock ( ) ;
 
     return word ;
@@ -370,7 +370,7 @@ _LO_CSL ( ListObject * lfirst )
     SetState ( cntx, LC_CSL, true ) ;
     SetState ( compiler, LISP_MODE, false ) ;
     _CSL_RecycleInit_CSL_N_M_Node_WordList ( _CSL_->CSL_N_M_Node_WordList, 1 ) ;
-    CSL_WordList_PushWord ( _LO_CopyOne ( lfirst, DICTIONARY )   ) ; 
+    CSL_WordList_PushWord ( _LO_CopyOne ( lfirst, DICTIONARY ) ) ;
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
         if ( ldata->W_LispAttributes & ( LIST | LIST_NODE ) )
@@ -387,7 +387,7 @@ _LO_CSL ( ListObject * lfirst )
         {
             //lcolon = ldata ;
             CSL_DbgSourceCodeOn ( ) ;
-            word =  _LO_Colon ( ldata ) ;
+            word = _LO_Colon ( ldata ) ;
             ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ":" ) )
@@ -434,7 +434,11 @@ _LO_CSL ( ListObject * lfirst )
         //LC_RestoreStack ( ) ;
     }
     Namespace_DoNamespace_Name ( ( byte * ) "Lisp" ) ;
-    if ( ! CompileMode ) Compiler_Init ( compiler, 0 ) ;
+    if ( ! CompileMode )
+    {
+        Compiler_Init ( compiler, 0 ) ;
+        CSL_AfterWordReset ( ) ;
+    }
     return nil ;
 }
 

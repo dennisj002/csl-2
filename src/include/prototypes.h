@@ -211,7 +211,6 @@ void CSL_If_ConditionalExpression(void);
 void CSL_Else(void);
 void CSL_EndIf(void);
 /* src/basis/core/dataObjectRun.c */
-Boolean Word_ObjectRun_Finish(Word *word);
 void Word_ObjectRun(Word *word);
 void _DataObject_Run(Word *word0);
 void DataObject_Run(void);
@@ -427,6 +426,7 @@ void _CSL_NamespacesInit(CSL *csl);
 void _CSL_DataStack_Init(CSL *csl);
 void CSL_DataStack_Init(void);
 void CSL_Setup_For_DObject_ValueDefinition_Init(void);
+void CSL_AfterWordReset(void);
 void _CSL_Init(CSL *csl, Namespace *nss);
 void CSL_ResetMemory(CSL *csl);
 CSL *_CSL_New(CSL *csl);

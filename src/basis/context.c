@@ -202,7 +202,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             cntx->System0->IncludeFileStackNumber -- ;
             if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\n%s included\n", filename ) ;
             //OVT_MemListFree_Objects ( ) ;
-            //OVT_FreeTempMem ( ) ;
+            //OVT_FreeTempMem ( ) ;// no because it would delete eg. literals in the debug word list!! -> crash
         }
         else
         {

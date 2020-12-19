@@ -97,10 +97,11 @@ _Word_Finish ( Word * word )
 {
     DObject_Finish ( word ) ;
     //_CSL_FinishWordDebugInfo ( word ) ;
-    CSL_Finish_WordSourceCode (_CSL_, word , 0) ;
+    CSL_Finish_WordSourceCode ( _CSL_, word, 0 ) ;
     CSL_TypeStackReset ( ) ;
     _CSL_->LastFinished_Word = word ;
     Compiler_Init ( _Compiler_, 0 ) ;
+    CSL_AfterWordReset ( ) ;
 }
 
 void
@@ -170,7 +171,7 @@ _Word_Create ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispT
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
-    //if ( objectType & ( LITERAL | CONSTANT ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
+        //if ( objectType & ( LITERAL | CONSTANT ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
     word->W_AllocType = allocType ;
     word->W_MorphismAttributes = morphismType ;
@@ -245,7 +246,7 @@ byte *
 _Word_SourceCodeLocation_pbyte ( Word * word )
 {
     byte * b = Buffer_Data ( _CSL_->ScratchB2 ) ;
-    if ( word ) sprintf ( ( char* ) b, "%s.%s : %s %ld.%ld", word->ContainingNamespace->Name, word->Name, word->W_WordData->Filename, 
+    if ( word ) sprintf ( ( char* ) b, "%s.%s : %s %ld.%ld", word->ContainingNamespace->Name, word->Name, word->W_WordData->Filename,
         word->W_WordData->LineNumber, word->W_TokenStart_LineIndex ) ;
     return String_New ( b, TEMPORARY ) ;
 }

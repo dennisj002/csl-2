@@ -136,6 +136,13 @@ CSL_Setup_For_DObject_ValueDefinition_Init ( )
 }
 
 void
+CSL_AfterWordReset ( )
+{
+    CSL_TypeStackReset ( ) ;
+    SetState ( _CSL_, RT_DEBUG_ON, false ) ;
+}
+
+void
 _CSL_Init ( CSL * csl, Namespace * nss )
 {
     uint64 allocType = T_CSL ;

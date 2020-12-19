@@ -35,7 +35,7 @@ _CSL_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
     //if (( word0->W_MorphismAttributes & ( KEYWORD | CSL_WORD | T_LISP_SYMBOL ) ) ||  ( word0->W_ObjectAttributes & ( LITERAL ) ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
-    if (( word0->W_MorphismAttributes & ( KEYWORD | CSL_WORD | T_LISP_SYMBOL ) ) ||  
+    if ( ( word0->W_MorphismAttributes & ( KEYWORD | CSL_WORD | T_LISP_SYMBOL ) ) ||
         ( word0->W_AllocType & ( OBJECT_MEM | INTERNAL_OBJECT_MEM | LISP_TEMP | TEMPORARY | COMPILER_TEMP ) ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
     else word1 = ( Word * ) dllist_Map1_WReturn ( _CSL_->CSL_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
@@ -54,9 +54,9 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
             wordp = _CSL_CopyDuplicates ( word0 ) ;
         }
         else wordp = word0 ;
-        if ( ( word0->W_MorphismAttributes & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( 
+        if ( ( word0->W_MorphismAttributes & ( DEBUG_WORD | INTERPRET_DBG ) ) || (
             word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) || GetState ( _Context_, CONTEXT_PREPROCESSOR_MODE ) ) return word0 ;
-            //word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
+        //word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
         Lexer_Set_ScIndex_RlIndex ( _Lexer_, wordp, tsrli, scwi ) ;
         CSL_WordList_PushWord ( wordp ) ;
     }
@@ -224,10 +224,11 @@ Compiler_BlockLevel ( Compiler * compiler )
     int64 depth = _Stack_Depth ( compiler->BlockStack ) ;
     return depth ;
 }
+
 void
 Compiler_FreeLocalsNamespaces ( Compiler * compiler )
 {
-    if ( compiler->NumberOfVariables ) Namespace_RemoveAndReInitNamespacesStack_ClearFlag (compiler->LocalsCompilingNamespacesStack, 1 , 0) ;
+    if ( compiler->NumberOfVariables ) Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, 1, 0 ) ;
     if ( compiler->LocalsNamespace ) _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 1, 0 ) ;
 }
 
@@ -268,12 +269,11 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     _dllist_Init ( compiler->CurrentMatchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
-    CSL_TypeStackReset ( ) ;
-    SetState ( _CSL_, RT_DEBUG_ON, false ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     //SetBuffersUnused ( 0 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
     if ( compiler->NonCompilingNs != compiler->LocalsNamespace ) CSL_NonCompilingNs_Clear ( compiler ) ; // for special syntax : we have a namespace but not while compiling
+    //CSL_AfterWordReset ( ) ;
 }
 
 Compiler *
