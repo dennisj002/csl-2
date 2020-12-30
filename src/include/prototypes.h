@@ -243,7 +243,7 @@ void Compiler_SetAs_InNamespace_Qid_BackgroundNamespace(Compiler *compiler);
 /* src/basis/core/block.c */
 void _Block_Eval(block blck);
 void Block_Eval(block blck);
-void Dbg_Block_Eval(Word *word, block blck);
+void Word_DbgBlock_Eval(Word *word, block blck);
 void CSL_TurnOffBlockCompiler(void);
 void CSL_TurnOnBlockCompiler(void);
 BlockInfo *_CSL_BeginBlock0(void);
@@ -1030,7 +1030,8 @@ void CSL_Set_QidInNamespace(Namespace *ns);
 void Context_GetState(Context *cntx, Word *word);
 void Context_ClearState(Context *cntx);
 /* src/basis/core/word.c */
-void Word_PreRun_Init(Word *word);
+void Context_PreWordRun_Init(Context *cntx, Word *word);
+void Context_PostWordRun_Init(Context *cntx, Word *word);
 void Word_Morphism_Run(Word *word);
 void Word_Eval(Word *word);
 void _Word_Interpret(Word *word);

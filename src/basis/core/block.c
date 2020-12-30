@@ -15,24 +15,6 @@ Block_Eval ( block blck )
     }
 }
 
-void
-Dbg_Block_Eval ( Word * word, block blck )
-{
-    if ( blck )
-    {
-        Word_PreRun_Init ( word ) ;
-        _DEBUG_SETUP ( word, 0, ( byte* ) blck, 1, 0 ) ;
-        if ( ! GetState ( _Debugger_->w_Word, STEPPED ) )
-        {
-            _Block_Eval ( blck ) ;
-            _DEBUG_SHOW ( word, 1, 0 ) ;
-        }
-        SetState ( _Debugger_->w_Word, STEPPED, false ) ;
-        _Context_->LastRanWord = word ;
-        _Context_->CurrentlyRunningWord = 0 ;
-    }
-}
-
 // a 'block' is merely a notation borrowed from C
 // for a pointer to an anonymous subroutine 'call'
 

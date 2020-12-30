@@ -381,7 +381,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
             block b = ( block ) DataStack_Pop ( ) ;
             Set_CompileMode ( svcm ) ;
             Set_CompilerSpace ( scs ) ;
-            Dbg_Block_Eval (word, b) ;
+            Word_DbgBlock_Eval (word, b) ;
         }
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;
         SetState ( compiler, LC_ARG_PARSING, false ) ;

@@ -311,9 +311,11 @@ ab.ar [0][0][0] @ dup p 254 _assert
     a.ar [y @][y @][y @ 1 +] dup nl hp a.ar [0][0][0] @ =
     TODO ( "array out of bounds checking with variables?!" )
     a.ar 32 dump
+    a.ar [1][2][2] 7 =
+    a.ar [1][2][2] @ 7 _assert 
 ;
 ct "ac" new 
-'tct find wdiss
+'tct find d: wdiss
 ct
 2 ac tct 
 sp

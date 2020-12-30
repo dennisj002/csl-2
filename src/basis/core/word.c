@@ -1,26 +1,36 @@
 #include "../../include/csl.h"
 
-void
-Word_PreRun_Init ( Word * word )
+inline void
+Context_PreWordRun_Init ( Context * cntx, Word * word )
 {
     if ( word )
     {
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        if ( ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) ) Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
-        _Context_->CurrentlyRunningWord = word ;
+        if ( ( GetState ( cntx->Compiler0, ( COMPILE_MODE | ASM_MODE ) ) ) ) Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+        cntx->CurrentlyRunningWord = word ;
     }
 }
+
+#if 0
+inline void
+Context_PostWordRun_Init ( Context * cntx, Word * word )
+{
+    cntx->LastRanWord = word ;
+    cntx->CurrentlyRunningWord = 0 ;
+}
+#else
+#define Context_PostWordRun_Init( cntx, word )  cntx->LastRanWord = word ;  cntx->CurrentlyRunningWord = 0 ;
+#endif
 
 void
 Word_Morphism_Run ( Word * word )
 {
     if ( word )
     {
-        Word_PreRun_Init ( word ) ;
+        Context_PreWordRun_Init ( _Context_, word ) ;
         Block_Eval ( word->Definition ) ;
-        _Context_->LastRanWord = word ;
-        _Context_->CurrentlyRunningWord = 0 ;
+        Context_PostWordRun_Init ( _Context_, word ) ;
     }
 }
 
@@ -48,6 +58,23 @@ Word_Eval ( Word * word )
             SetState ( word, STEPPED, false ) ;
         }
         else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+    }
+}
+
+void
+Word_DbgBlock_Eval ( Word * word, block blck )
+{
+    if ( blck )
+    {
+        Context_PreWordRun_Init ( _Context_, word ) ;
+        _DEBUG_SETUP ( word, 0, ( byte* ) blck, 1, 0 ) ;
+        if ( ! GetState ( _Debugger_->w_Word, STEPPED ) )
+        {
+            _Block_Eval ( blck ) ;
+            _DEBUG_SHOW ( word, 1, 0 ) ;
+        }
+        SetState ( _Debugger_->w_Word, STEPPED, false ) ;
+        Context_PostWordRun_Init ( _Context_, word ) ;
     }
 }
 

@@ -74,7 +74,7 @@ CSL_BlockRun ( )
     }
     else
     {
-        Dbg_Block_Eval ( 0, doBlock ) ;
+        Word_DbgBlock_Eval ( 0, doBlock ) ;
         //Set_DataStackPointer_FromDspReg ( ) ;
     }
 }
@@ -98,7 +98,7 @@ CSL_LoopCombinator ( )
     }
     else
     {
-        while ( 1 ) Dbg_Block_Eval ( 0, loopBlock ) ;
+        while ( 1 ) Word_DbgBlock_Eval ( 0, loopBlock ) ;
     }
 }
 
@@ -128,9 +128,9 @@ CSL_WhileCombinator ( )
     {
         while ( 1 )
         {
-            Dbg_Block_Eval ( 0, testBlock ) ;
+            Word_DbgBlock_Eval ( 0, testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
-            Dbg_Block_Eval ( 0, trueBlock ) ;
+            Word_DbgBlock_Eval ( 0, trueBlock ) ;
         }
     }
     return 1 ;
@@ -157,8 +157,8 @@ CSL_DoWhileCombinator ( )
     {
         do
         {
-            Dbg_Block_Eval ( 0, doBlock ) ;
-            Dbg_Block_Eval ( 0, testBlock ) ;
+            Word_DbgBlock_Eval ( 0, doBlock ) ;
+            Word_DbgBlock_Eval ( 0, testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
         }
         while ( 1 ) ;
@@ -186,7 +186,7 @@ CSL_If1Combinator ( )
     }
     else
     {
-        if ( DataStack_Pop ( ) ) Dbg_Block_Eval ( 0, doBlock ) ;
+        if ( DataStack_Pop ( ) ) Word_DbgBlock_Eval ( 0, doBlock ) ;
     }
 }
 
@@ -209,11 +209,11 @@ CSL_If2Combinator ( )
     else
     {
         //int64 * svDsp = _Dsp_ ;
-        Dbg_Block_Eval ( 0, testBlock ) ;
+        Word_DbgBlock_Eval ( 0, testBlock ) ;
         if ( tvalue = DataStack_Pop ( ) )
         {
             //_Dsp_ = svDsp ;
-            Dbg_Block_Eval ( 0, doBlock ) ;
+            Word_DbgBlock_Eval ( 0, doBlock ) ;
         }
     }
 }
@@ -242,8 +242,8 @@ CSL_TrueFalseCombinator2 ( )
     }
     else
     {
-        if ( testCondition ) Dbg_Block_Eval ( 0, trueBlock ) ;
-        else Dbg_Block_Eval ( 0, falseBlock ) ;
+        if ( testCondition ) Word_DbgBlock_Eval ( 0, trueBlock ) ;
+        else Word_DbgBlock_Eval ( 0, falseBlock ) ;
     }
 }
 
@@ -270,16 +270,16 @@ CSL_TrueFalseCombinator3 ( )
     else
     {
         //int64 * svDsp = _Dsp_ ;
-        Dbg_Block_Eval ( 0, testBlock ) ;
+        Word_DbgBlock_Eval ( 0, testBlock ) ;
         if ( DataStack_Pop ( ) )
         {
             //_Dsp_ = svDsp ;
-            Dbg_Block_Eval ( 0, trueBlock ) ;
+            Word_DbgBlock_Eval ( 0, trueBlock ) ;
         }
         else
         {
             //_Dsp_ = svDsp ;
-            Dbg_Block_Eval ( 0, falseBlock ) ;
+            Word_DbgBlock_Eval ( 0, falseBlock ) ;
         }
     }
 }
@@ -325,11 +325,11 @@ CSL_DoWhileDoCombinator ( )
         //int64 * svDsp = _Dsp_ ;
         do
         {
-            Dbg_Block_Eval ( 0, doBlock1 ) ;
-            Dbg_Block_Eval ( 0, testBlock ) ;
+            Word_DbgBlock_Eval ( 0, doBlock1 ) ;
+            Word_DbgBlock_Eval ( 0, testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
             //_Dsp_ = svDsp ;
-            Dbg_Block_Eval ( 0, doBlock2 ) ;
+            Word_DbgBlock_Eval ( 0, doBlock2 ) ;
         }
         while ( 1 ) ;
     }
@@ -367,13 +367,13 @@ CSL_ForCombinator ( )
     }
     else
     {
-        Dbg_Block_Eval ( 0, doPreBlock ) ;
+        Word_DbgBlock_Eval ( 0, doPreBlock ) ;
         do
         {
-            Dbg_Block_Eval ( 0, testBlock ) ;
+            Word_DbgBlock_Eval ( 0, testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
-            Dbg_Block_Eval ( 0, doBlock ) ;
-            Dbg_Block_Eval ( 0, doPostBlock ) ;
+            Word_DbgBlock_Eval ( 0, doBlock ) ;
+            Word_DbgBlock_Eval ( 0, doPostBlock ) ;
         }
         while ( 1 ) ;
     }
