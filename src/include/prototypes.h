@@ -243,7 +243,6 @@ void Compiler_SetAs_InNamespace_Qid_BackgroundNamespace(Compiler *compiler);
 /* src/basis/core/block.c */
 void _Block_Eval(block blck);
 void Block_Eval(block blck);
-void Word_DbgBlock_Eval(Word *word, block blck);
 void CSL_TurnOffBlockCompiler(void);
 void CSL_TurnOnBlockCompiler(void);
 BlockInfo *_CSL_BeginBlock0(void);
@@ -1031,9 +1030,9 @@ void Context_GetState(Context *cntx, Word *word);
 void Context_ClearState(Context *cntx);
 /* src/basis/core/word.c */
 void Context_PreWordRun_Init(Context *cntx, Word *word);
-void Context_PostWordRun_Init(Context *cntx, Word *word);
 void Word_Morphism_Run(Word *word);
 void Word_Eval(Word *word);
+void Word_DbgBlock_Eval(Word *word, block blck);
 void _Word_Interpret(Word *word);
 void _Word_Compile(Word *word);
 Namespace *_Word_Namespace(Word *word);
@@ -1558,7 +1557,7 @@ void CSL_Endif_ConditionalInterpret(void);
 /* src/basis/lists.c */
 void _Interpret_ListNode(dlnode *node);
 void List_Interpret(dllist *list);
-void List_InterpretLists(dllist *list);
+void List_InterpretLists(dllist *olist);
 void List_CheckInterpretLists_OnVariable(dllist *list, byte *token);
 void List_PrintNames(dllist *list, int64 count, int64 flag);
 void List_Show_N_Word_Names(dllist *list, uint64 n, int64 showBeforeAfterFlag, int64 dbgFlag);

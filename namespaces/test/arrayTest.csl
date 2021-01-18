@@ -315,7 +315,7 @@ ab.ar [0][0][0] @ dup p 254 _assert
     a.ar [1][2][2] @ 7 _assert 
 ;
 ct "ac" new 
-'tct find d: wdiss
+'tct find wdiss
 ct
 2 ac tct 
 sp

@@ -133,10 +133,18 @@ CSL_DoPrompt ( )
 void
 _Printf ( byte *format, ... )
 {
+    //Boolean doLog = _CSL_ && _CSL_->LogFlag && _CSL_->LogFILE ;
     va_list args ;
 
     va_start ( args, ( char* ) format ) ;
     vprintf ( ( char* ) format, args ) ;
+#if 0    
+    if ( doLog )
+    {
+        vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
+        fflush ( _CSL_->LogFILE ) ;
+    }
+#endif    
     va_end ( args ) ;
     fflush ( stdout ) ;
 }
@@ -144,6 +152,8 @@ _Printf ( byte *format, ... )
 void
 Printf ( byte *format, ... )
 {
+    //Boolean doLog = _CSL_ && _CSL_->LogFlag && _CSL_->LogFILE ;
+
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
     if ( _O_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
     {
@@ -151,9 +161,16 @@ Printf ( byte *format, ... )
 
         va_start ( args, ( char* ) format ) ;
         vprintf ( ( char* ) format, args ) ;
+#if 0        
+        if ( doLog )
+        {
+            vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
+            fflush ( _CSL_->LogFILE ) ;
+        }
+#endif        
         va_end ( args ) ;
         fflush ( stdout ) ;
-
+#if 1
         if ( _CSL_ && _CSL_->LogFlag && _CSL_->LogFILE )
         {
             va_start ( args, ( char* ) format ) ;
@@ -161,6 +178,7 @@ Printf ( byte *format, ... )
             va_end ( args ) ;
             fflush ( _CSL_->LogFILE ) ;
         }
+#endif        
     }
     //ReadLiner_SetLastChar ( 0 ) ; //
 }

@@ -18,7 +18,7 @@ List_Interpret ( dllist * list )
 // list : a list of lists of postfix operations needing to be interpreted
 
 void
-List_InterpretLists ( dllist * list )
+List_InterpretLists ( dllist * olist )
 {
     Compiler * compiler = _Compiler_ ;
     if ( ! ( GetState ( compiler, INFIX_LIST_INTERPRET ) ) ) // prevent recursive call here
@@ -27,16 +27,16 @@ List_InterpretLists ( dllist * list )
         SetState ( compiler, C_INFIX_EQUAL, false ) ;
         SetState ( compiler, INFIX_LIST_INTERPRET, true ) ;
         dlnode * node, *nextNode ;
-        for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+        for ( node = dllist_First ( ( dllist* ) olist ) ; node ; node = nextNode )
         {
             // get nextNode before map function (mf) in case mf changes list by a Remove of current node
             // problem could arise if mf removes Next node
             nextNode = dlnode_Next ( node ) ;
-            dllist * list = ( dllist * ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
-            List_Interpret ( list ) ;
+            dllist * ilist = ( dllist * ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
+            List_Interpret ( ilist ) ;
             dlnode_Remove ( node ) ;
         }
-        List_Init ( list ) ;
+        List_Init ( olist ) ;
         SetState ( compiler, INFIX_LIST_INTERPRET, false ) ;
         SetState ( compiler, C_INFIX_EQUAL, svs ) ;
     }

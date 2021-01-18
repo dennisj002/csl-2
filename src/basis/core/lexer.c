@@ -33,7 +33,7 @@ Lexer_Do_MakeItAutoVar ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
         _Namespace_ActivateAsPrimary ( compiler->LocalsNamespace ) ;
         word = DataObject_New ( LOCAL_VARIABLE, 0, token, 0, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
         token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
-        if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
+        if ( ! String_EqualSingleCharString ( token2, '=' ) ) return lexer->TokenWord = 0 ; // don't interpret this word
     }
     else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
     word->W_ObjectAttributes |= ( T_RAW_STRING ) ;

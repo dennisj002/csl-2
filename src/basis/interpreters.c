@@ -22,22 +22,23 @@ Interpret_C_Until_NotIncluding_Token4 ( Interpreter * interp, byte * end1, byte 
         }
         token = _Lexer_ReadToken ( lexer, delimiters ) ;
         List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
-        if ( String_Equal ( token, "#" ) || ( newlineBreakFlag && String_Equal ( token, "?" ) ) ) break ;
-        else if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 )
+        //if ( String_Equal ( token, "#" ) || ( newlineBreakFlag && String_StartEqualChar ( token, '?' ) ) ) break ;
+        //else 
+        if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 )
             || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) ) 
         {
             //if ( String_Equal ( token, ";" ) )  return token ; //{ Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ; return 0 ; }
             //else 
             break ;
         }
-        else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
+        else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && String_EqualSingleCharString ( token, ')' ) )
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
             
             token = 0 ;
             break ;
         }
-        else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) )
+        else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_EqualSingleCharString ( token, ';' ) ) )
         {
             CSL_ArrayModeOff ( ) ;
             
@@ -85,10 +86,10 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
         token = _Lexer_ReadToken ( lexer, delimiters ) ;
         if ( String_Equal ( token, end ) )
         {
-            if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( String_Equal ( token, ";" ) ) ) CSL_PushToken_OnTokenList ( token ) ;
+            if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( String_EqualSingleCharString ( token, ';' ) ) ) CSL_PushToken_OnTokenList ( token ) ;
             break ;
         }
-        if ( String_Equal ( token, ";" ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
+        if ( String_EqualSingleCharString ( token, ';' ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
         {
             CSL_PushToken_OnTokenList ( token ) ;
             CSL_ArrayModeOff ( ) ;
@@ -125,7 +126,7 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
         while ( 1 )
         {
             token = Lexer_ReadToken ( interp->Lexer0 ) ; // skip the opening left paren
-            if ( token && ( ! String_Equal ( token, "(" ) ) )
+            if ( token && ( ! String_EqualSingleCharString ( token, '(' ) ) )
             {
                 if ( word = Finder_Word_FindUsing (interp->Finder0, token, 1) )
                 {

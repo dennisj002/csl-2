@@ -12,7 +12,7 @@ _CSL_Colon ( Boolean initSC )
     CSL_BeginBlock ( ) ;
 
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-    if ( ( String_Equal ( token, "(" ) ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) )
+    if ( ( String_EqualSingleCharString ( token, '(' ) ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;
         CSL_LocalsAndStackVariablesBegin ( ) ;
@@ -285,7 +285,7 @@ CSL_Does ( )
     byte * token = Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
     CSL_EndBlock ( ) ;
     CSL_BlockRun ( ) ;
-    if ( String_Equal ( token, ";" ) ) { DataStack_Push ((int64)_Compiler_->Current_Word_Create) ; Word_DefinitionEqual ( ) ; } // for use with 'create - 'wordNew like ans forth ??
+    if ( String_EqualSingleCharString ( token, ';' ) ) { DataStack_Push ((int64)_Compiler_->Current_Word_Create) ; Word_DefinitionEqual ( ) ; } // for use with 'create - 'wordNew like ans forth ??
     _Context_->CurrentWordBeingCompiled = saveWord ;
 }
 

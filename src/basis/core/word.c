@@ -249,7 +249,7 @@ Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
         Context * cntx = _Context_ ;
         if ( Is_DebugModeOn ) NoticeColors ;
         byte * name = String_ConvertToBackSlash ( word->Name ) ;
-        if ( String_Equal ( "]", name ) && cntx->BaseObject )
+        if ( String_EqualSingleCharString ( name, ']') && cntx->BaseObject )
         {
             Printf ( ( byte* ) "\n\'%s\' = array end :: base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx => address = 0x%lx",
                 name, cntx->BaseObject->Name, cntx->BaseObject->W_Value, offset, totalOffset, ( ( byte* ) cntx->BaseObject->W_PtrToValue ) + totalOffset ) ;
