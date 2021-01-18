@@ -29,7 +29,7 @@ _LO_Read ( LambdaCalculus * lc )
         qidFlag = GetState ( cntx, CONTEXT_PARSING_QID ) ;
         if ( token )
         {
-            if ( String_EqualSingleCharString ( token, ')' ) )
+            if ( _String_EqualSingleCharString ( token, ')' ) )
             {
                 lc->ParenLevel -- ;
                 break ;
@@ -148,7 +148,7 @@ LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli,
     //if ( Is_DebugOn ) _Printf ( ( byte * ) "\n_LO_Read : \'%s\' scwi = %d", token, scwi ) ;
     if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CSL_ParenthesisComment ( ) ;
     else if ( String_Equal ( ( char * ) token, ( byte * ) "//" ) ) CSL_CommentToEndOfLine ( ) ;
-    else if ( String_EqualSingleCharString ( token, '(' ) ) l0 = _LO_Read_Do_LParen ( lc ) ;
+    else if ( _String_EqualSingleCharString ( token, '(' ) ) l0 = _LO_Read_Do_LParen ( lc ) ;
     else l0 = _LO_Read_DoToken ( lc, token, qidFlag, tsrli, scwi ) ;
     return l0 ;
 }

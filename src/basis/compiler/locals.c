@@ -337,8 +337,8 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
         else token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
         if ( token )
         {
-            if ( String_EqualSingleCharString ( token, '(' ) ) continue ;
-            if ( String_EqualSingleCharString ( token, '|' ) )
+            if ( _String_EqualSingleCharString ( token, '(' ) ) continue ;
+            if ( _String_EqualSingleCharString ( token, '|' ) )
             {
                 svff = 0 ; // set stack variable flag to off -- no more stack variables ; begin local variables
                 continue ; // don't add a node to our temporary list for this token
@@ -356,14 +356,14 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
                 strncpy ( ( char* ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString, ( char* ) token, 8 ) ;
                 continue ; // don't add a node to our temporary list for this token
             }
-            if ( String_EqualSingleCharString ( token, ')' ) ) break ;
+            if ( _String_EqualSingleCharString ( token, ')' ) ) break ;
             if ( String_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
             {
                 if ( GetState ( _CSL_, OPTIMIZE_ON ) ) regFlag = true ;
                 continue ;
             }
-            if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( String_EqualSingleCharString ( token, '{' ) ) || 
-                ( String_EqualSingleCharString ( token, ';' ) ) )
+            if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( _String_EqualSingleCharString ( token, '{' ) ) || 
+                ( _String_EqualSingleCharString ( token, ';' ) ) )
             {
                 //_Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
                 CSL_Exception ( SYNTAX_ERROR, "\nLocal variables syntax error : no closing parenthesis ')' found", 1 ) ;

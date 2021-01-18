@@ -249,16 +249,16 @@ _Compile_C_TypeDeclaration ( )
     while ( token = Interpret_C_Until_NotIncluding_Token4 ( cntx->Interpreter0,
         ( byte* ) ",", ( byte* ) ";", ( byte* ) "{", ( GetState ( cntx, C_SYNTAX ) ? ( byte* ) "}" : ( byte* ) "=" ), 0, 0 ) )
     {
-        if ( String_EqualSingleCharString ( token, ';' ) )
+        if ( _String_EqualSingleCharString ( token, ';' ) )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             Interpreter_InterpretAToken ( cntx->Interpreter0, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
             break ;
         }
-        else if ( String_EqualSingleCharString ( token, ',' ) || ( ( ! GetState ( cntx, C_SYNTAX ) ) && String_EqualSingleCharString ( token, '=' ) ) ) Lexer_ReadToken ( _Lexer_ ) ;
+        else if ( _String_EqualSingleCharString ( token, ',' ) || ( ( ! GetState ( cntx, C_SYNTAX ) ) && _String_EqualSingleCharString ( token, '=' ) ) ) Lexer_ReadToken ( _Lexer_ ) ;
         else
         {
-            if ( String_EqualSingleCharString ( token, ')' ) && GetState ( compiler, DOING_A_PREFIX_WORD ) ) CSL_PushToken_OnTokenList ( token ) ;
+            if ( _String_EqualSingleCharString ( token, ')' ) && GetState ( compiler, DOING_A_PREFIX_WORD ) ) CSL_PushToken_OnTokenList ( token ) ;
             if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Save_C_BackgroundNamespace ( compiler ) ;
 
             break ;

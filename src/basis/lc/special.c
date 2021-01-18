@@ -390,7 +390,7 @@ _LO_CSL ( ListObject * lfirst )
             word = _LO_Colon ( ldata ) ;
             ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
         }
-        else if ( String_EqualSingleCharString ( ldata->Name, ':' ) )
+        else if ( _String_EqualSingleCharString ( ldata->Name, ':' ) )
         {
             //lcolon = ldata ;
             word = _LO_Colon ( ldata ) ;
@@ -406,7 +406,7 @@ _LO_CSL ( ListObject * lfirst )
             CSL_DbgSourceCodeOff ( ) ;
             _LO_Semi ( word ) ;
         }
-        else if ( String_EqualSingleCharString ( ldata->Name, ';' ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
+        else if ( _String_EqualSingleCharString ( ldata->Name, ';' ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {
 #if 0            
             // in case we have more than one ":" on our list ...

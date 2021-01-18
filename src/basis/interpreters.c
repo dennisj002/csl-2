@@ -31,14 +31,14 @@ Interpret_C_Until_NotIncluding_Token4 ( Interpreter * interp, byte * end1, byte 
             //else 
             break ;
         }
-        else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && String_EqualSingleCharString ( token, ')' ) )
+        else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && _String_EqualSingleCharString ( token, ')' ) )
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
             
             token = 0 ;
             break ;
         }
-        else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_EqualSingleCharString ( token, ';' ) ) )
+        else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || _String_EqualSingleCharString ( token, ';' ) ) )
         {
             CSL_ArrayModeOff ( ) ;
             
@@ -86,10 +86,10 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
         token = _Lexer_ReadToken ( lexer, delimiters ) ;
         if ( String_Equal ( token, end ) )
         {
-            if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( String_EqualSingleCharString ( token, ';' ) ) ) CSL_PushToken_OnTokenList ( token ) ;
+            if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( _String_EqualSingleCharString ( token, ';' ) ) ) CSL_PushToken_OnTokenList ( token ) ;
             break ;
         }
-        if ( String_EqualSingleCharString ( token, ';' ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
+        if ( _String_EqualSingleCharString ( token, ';' ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
         {
             CSL_PushToken_OnTokenList ( token ) ;
             CSL_ArrayModeOff ( ) ;
@@ -126,7 +126,7 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
         while ( 1 )
         {
             token = Lexer_ReadToken ( interp->Lexer0 ) ; // skip the opening left paren
-            if ( token && ( ! String_EqualSingleCharString ( token, '(' ) ) )
+            if ( token && ( ! _String_EqualSingleCharString ( token, '(' ) ) )
             {
                 if ( word = Finder_Word_FindUsing (interp->Finder0, token, 1) )
                 {

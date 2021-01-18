@@ -216,7 +216,7 @@ _CSL_C_Infix_EqualOp ( block op )
     {
         if ( ( lhsWord->W_ObjectAttributes & ( OBJECT | OBJECT_FIELD | THIS | QID ) || GetState ( lhsWord, QID ) ) )
         {
-            if ( ( ! String_EqualSingleCharString ( word0a->Name, ']' ) ) &&
+            if ( ( ! _String_EqualSingleCharString ( word0a->Name, ']' ) ) &&
                 ( ! ( word0a->W_ObjectAttributes & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) )
                 Compile_TosRmToTOS ( ) ;
             wordr = _CSL_->PokeWord ;
@@ -240,7 +240,7 @@ _CSL_C_Infix_EqualOp ( block op )
         rword = wordr ;
         svName = rword->Name ;
         rword->Name = ( byte* ) "=" ;
-        if ( ! String_EqualSingleCharString ( word0->Name, '=' ) )
+        if ( ! _String_EqualSingleCharString ( word0->Name, '=' ) )
         {
             SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
             _Debugger_->SubstitutedWord = rword ;
@@ -388,7 +388,7 @@ CSL_C_ConditionalExpression ( )
         byte * compiledAtAddress = Compile_UninitializedJumpEqualZero ( ) ;
         Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
         byte * token = Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
-        if ( String_EqualSingleCharString ( token, ':' ) )
+        if ( _String_EqualSingleCharString ( token, ':' ) )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CSL_Else ( ) ;

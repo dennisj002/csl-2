@@ -145,7 +145,7 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, Boolean saveQns )
         // the InNamespace takes precedence with this one exception but is this the best logic ??               
         if ( finder->QualifyingNamespace )
         {
-            if ( String_EqualSingleCharString ( name, '.' ) ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
+            if ( _String_EqualSingleCharString ( name, '.' ) ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
             else
             {
                 rword = _Finder_FindWord_InOneNamespace ( _Finder_, Word_UnAlias ( finder->QualifyingNamespace ), name ) ;
