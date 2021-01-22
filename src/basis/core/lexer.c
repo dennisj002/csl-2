@@ -145,8 +145,8 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
 byte
 Lexer_NextNonDelimiterChar ( Lexer * lexer )
 {
-
-    return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ) - 1, lexer->DelimiterCharSet ) ;
+    //return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ) - 1, lexer->DelimiterCharSet ) ;
+    return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ), lexer->DelimiterCharSet ) ;
 }
 //----------------------------------------------------------------------------------------|
 //              get from/ add to head  |              | get from head      add to tail    |      
@@ -254,8 +254,10 @@ Boolean
 Lexer_IsNextWordLeftParen ( Lexer * lexer )
 {
     // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses (in PREFIX_MODE)
+#if 0   
     byte chr = ReadLine_LastChar ( _ReadLiner_ ) ;
     if ( ! _CharSet_IsDelimiter ( lexer->DelimiterCharSet, chr ) ) return false ; // we need to start from a delimiter
+#endif    
     byte c = Lexer_NextNonDelimiterChar ( lexer ) ;
     if ( ( c == '(' ) ) return true ;
 

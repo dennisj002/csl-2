@@ -105,8 +105,12 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
         Context * cntx = _Context_ ;
         if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) word = Interpreter_DoInfixWord ( interp, word ) ;
             // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
-        else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) )
+        else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) ) 
+        {
+            // with Lexer_IsWordPrefixing any postfix word that is not a keyword or a c_rtl arg word can now be used as a prefix function with parentheses (in PREFIX_MODE)
+            // nb! : for this to work you must turn prefix mode on - 'prefixOn'
             word = _Interpreter_DoPrefixWord ( cntx, interp, word ) ; 
+        }
         else if ( word->W_TypeAttributes == WT_C_PREFIX_RTL_ARGS ) word = Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else return 0 ;
     }

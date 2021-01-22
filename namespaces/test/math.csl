@@ -59,7 +59,7 @@ sp ' moe find wdiss sp
 infixOff
 sp
 c_syntaxOn
-void cmoe ( n m ) { n <<= m ; p (n) ; return n ; }  cmoe ( 2 6 ) ; sp ; _assert0 ( 128 ) ; cmoe ( 1 16 ) ; _assert ( 65536 ) ; ps ("\nshould show 128 65536\n") sp
+void cmoe ( n m ) { n <<= m ; p (n) ; return n ; }  cmoe ( 2 6 ) ; d: sp ; _assert0( 128 ) ; cmoe ( 1 16 ) ; _assert ( 65536 ) ; ps ("\nshould show 128 65536\n") sp
 void cmoe ( n m ) { n >>= m ; n p ; return n ; } cmoe ( 128 6 ) ; _assert (2) ; cmoe ( 65536 16 ) ; _assert (1) ; "\nshould show 2 1\n" ps sp
 c_syntaxOff
 
