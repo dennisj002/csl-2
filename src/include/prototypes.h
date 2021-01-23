@@ -353,7 +353,7 @@ void _CSL_ArrayBegin(Boolean lispMode, Word **pl1, int64 *i);
 void CSL_ArrayBegin(void);
 int64 _CSL_ArrayEnd(Word *word, Word *arrayBaseObject, int64 objSize, Boolean *variableFlag);
 void CSL_ArrayEnd(void);
-void CSL_ArrayModeOff(void);
+void CSL_ArrayModeOff_OptimizeOn(void);
 /* src/basis/core/io.c */
 int64 GetTerminalWidth(void);
 char kbhit(void);

@@ -16,28 +16,20 @@ Interpret_C_Until_NotIncluding_Token4 ( Interpreter * interp, byte * end1, byte 
         }
         token = _Lexer_ReadToken ( lexer, delimiters ) ;
         List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
-        //if ( String_Equal ( token, "#" ) || ( newlineBreakFlag && String_StartEqualChar ( token, '?' ) ) ) break ;
-        //else 
-        if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 )
-            || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) ) 
-        {
-            //if ( String_Equal ( token, ";" ) )  return token ; //{ Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ; return 0 ; }
-            //else 
-            break ;
-        }
+        if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) ) break ;
         else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && _String_EqualSingleCharString ( token, ')' ) )
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
-            
             token = 0 ;
             break ;
         }
+#if 1        
         else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || _String_EqualSingleCharString ( token, ';' ) ) )
         {
-            CSL_ArrayModeOff ( ) ;
-            
+            CSL_ArrayModeOff_OptimizeOn ( ) ;
             break ;
         }
+#endif        
         else Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
         inChar = ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) ;
         if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
@@ -64,7 +56,7 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
         if ( _String_EqualSingleCharString ( token, ';' ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
         {
             CSL_PushToken_OnTokenList ( token ) ;
-            CSL_ArrayModeOff ( ) ;
+            CSL_ArrayModeOff_OptimizeOn ( ) ;
             break ;
         }
         else Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
@@ -72,7 +64,6 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
         if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
     }
     while ( token ) ;
-    //if ( token ) _CSL_PushToken_OnTokenList ( token ) ;
     return token ;
 }
 
@@ -83,7 +74,7 @@ Interpret_DoPrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixF
     if ( prefixFunction )
     {
         byte * token ;
-        int64 i, flag = 0 ; //svs_c_rhs ;
+        int64 i, flag = 0 ; 
         Compiler * compiler = interp->Compiler0 ;
         while ( 1 )
         {
@@ -118,7 +109,6 @@ Interpret_DoPrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixF
         if ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) word = Interpreter_DoWord_Default ( interp, prefixFunction, prefixFunction->W_RL_Index, prefixFunction->W_SC_Index ) ;
         SetState ( compiler, ( PREFIX_ARG_PARSING | DOING_A_PREFIX_WORD ), false ) ;
         SetState ( _Debugger_, DBG_INFIX_PREFIX, false ) ;
-        //if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
     }
     return word ;
 }

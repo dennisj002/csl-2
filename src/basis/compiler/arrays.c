@@ -137,7 +137,7 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
     if ( tokenWord ) word = tokenWord ;
     else
     {
-        word = Finder_Word_FindUsing (cntx->Finder0, token, 0) ;
+        word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
         if ( word )
         {
             word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
@@ -257,7 +257,7 @@ _CSL_ArrayEnd ( Word * word, Word * arrayBaseObject, int64 objSize, Boolean *var
     Word * baseObject = cntx->BaseObject ;
     Compiler *compiler = cntx->Compiler0 ;
     int64 arrayIndex, increment ;
-    
+
     int64 dimNumber = compiler->ArrayEnds ; // dimNumber is used as an array index so it is also zero base indexed
     int64 dimSize = CalculateArrayDimensionSize ( arrayBaseObject, dimNumber ) ; // dimNumber is used as an array index so it is also zero base indexed
     compiler->ArrayEnds ++ ; // after, because arrayBaseObject->ArrayDimensions is a zero based array
@@ -280,20 +280,14 @@ _CSL_ArrayEnd ( Word * word, Word * arrayBaseObject, int64 objSize, Boolean *var
     CSL_TypeStack_Pop ( ) ; // pop the index ; we want the object field type 
     if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) )
     {
-        SetState ( compiler, ARRAY_MODE, false ) ;
+        CSL_ArrayModeOff_OptimizeOn ( ) ;
         return 1 ; // breaks the calling function
     }
     return 0 ;
 }
 
 void
-CSL_ArrayEnd ( void )
-{
-    //noop
-}
-
-void
-CSL_ArrayModeOff ( void )
+CSL_ArrayModeOff_OptimizeOn ( void )
 {
     if ( GetState ( _Compiler_, ARRAY_MODE ) )
     {
@@ -301,4 +295,11 @@ CSL_ArrayModeOff ( void )
         CSL_OptimizeOn ( ) ;
     }
 }
+
+void
+CSL_ArrayEnd ( void )
+{
+    CSL_ArrayModeOff_OptimizeOn ( ) ;
+}
+
 

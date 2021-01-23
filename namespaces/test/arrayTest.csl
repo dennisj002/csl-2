@@ -1,4 +1,3 @@
-#if 1                   
 5 
 : sp ; //stack pause ; sp
 
@@ -239,7 +238,6 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
 //0 2 1 a6 a7 // as not a prefix function
 a7(0,2,1,a6) // as a prefix function : lexer test, note dense lexeme packing is possible here
 "a6 : " ps location a6 a6.size @ dump //pause
-#if 1 // Ar9 is 16 mb in size so only for testing
 "Ar9" class :{ byte ar [256][256][256] ; };
 sp
 //verbosity 2 =
@@ -291,10 +289,9 @@ jcc8_Off
 ;
 jcc8_On
 ' a9 find wdiss s //pause
-Ar9 "arr9" new arr9 a9 sp //pause
+Ar9 "arr9" new arr9 a9 sp //pause // Ar9 is 16 mb in size so only for testing
 adump ( 0 123 234 arr9 ) 
-sp //pause
-#endif
+sp pause
 "ct" class :{ byte ar [3][3][3] ; };
 ct "ab" new
 ab.ar [0][0][0] hp
@@ -357,4 +354,3 @@ c_syntaxOff
 //verbosity 1 = logOff pause
 #endif
 2 + 7 assertStkChk // stack checking
-#endif

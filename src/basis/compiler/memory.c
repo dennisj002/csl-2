@@ -101,7 +101,7 @@ Compile_Store ( Compiler * compiler, int lvalueSize ) // !
         //DBI_OFF ;
     }
 #if ARRAY_MODE_CHECK   
-    CSL_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff_OptimizeOn ( ) ;
 #endif    
 }
 
@@ -119,7 +119,7 @@ Compile_Poke ( Compiler * compiler, int lvalueSize ) // =
         Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }
 #if ARRAY_MODE_CHECK   
-    CSL_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff_OptimizeOn ( ) ;
 #endif    
 }
 
@@ -136,7 +136,7 @@ Compile_AtEqual ( Boolean stackReg ) // !
     Compile_Move_Reg_To_Rm ( OREG, ACC, 0, 0 ) ;
     Compile_SUBI ( REG, stackReg, 0, CELL_SIZE * 2, BYTE ) ;
 #if ARRAY_MODE_CHECK    
-    CSL_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff_OptimizeOn ( ) ;
 #endif    
 }
 
@@ -178,7 +178,7 @@ Compile_Store ( Compiler * compiler, 0 ) // !
         //DBI_OFF ;
     }
 #if ARRAY_MODE_CHECK   
-    CSL_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff_OptimizeOn ( ) ;
 #endif    
 }
 
@@ -220,7 +220,7 @@ Compile_Poke ( Compiler * compiler, 0 ) // =
         Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }
 #if ARRAY_MODE_CHECK  
-    CSL_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff_OptimizeOn ( ) ;
 #endif    
 }
 #endif
