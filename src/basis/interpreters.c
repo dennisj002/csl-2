@@ -1,12 +1,6 @@
 
 #include "../include/csl.h"
 
-void
-Interpret_String ( byte *str )
-{
-    _CSL_ContextNew_InterpretString ( _CSL_, str ) ;
-}
-
 byte *
 Interpret_C_Until_NotIncluding_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte* end4, byte * delimiters, Boolean newlineBreakFlag )
 {
@@ -53,28 +47,6 @@ Interpret_C_Until_NotIncluding_Token4 ( Interpreter * interp, byte * end1, byte 
     return token ;
 }
 
-void
-_Interpret_Until_Including_Token ( Interpreter * interp, byte * end, byte * delimiters )
-{
-    byte * token ;
-    while ( token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) )
-    {
-        Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-        if ( String_Equal ( ( char* ) token, end ) ) break ;
-    }
-}
-
-byte *
-_Interpret_Until_NotIncluding_Token ( Interpreter * interp, byte * end, byte * delimiters )
-{
-    byte * token ;
-    while ( token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) )
-    {
-        if ( String_Equal ( ( char* ) token, end ) ) return token ;
-        Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-    }
-}
-
 byte *
 Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
 {
@@ -93,7 +65,6 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
         {
             CSL_PushToken_OnTokenList ( token ) ;
             CSL_ArrayModeOff ( ) ;
-            
             break ;
         }
         else Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
@@ -105,23 +76,14 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
     return token ;
 }
 
-void
-Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
-{
-    int64 svscwi = _CSL_->SC_Index ;
-    Interpret_Until_Token ( interp, end, delimiters ) ;
-    SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
-    if ( prefixFunction ) Interpreter_DoWord_Default ( interp, prefixFunction, - 1, svscwi ) ;
-}
-
 Word *
-Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFunction )
+Interpret_DoPrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFunction )
 {
     Word * word = 0 ;
     if ( prefixFunction )
     {
         byte * token ;
-        int64 i, svs_c_rhs, flag = 0 ;
+        int64 i, flag = 0 ; //svs_c_rhs ;
         Compiler * compiler = interp->Compiler0 ;
         while ( 1 )
         {
@@ -156,9 +118,40 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
         if ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) word = Interpreter_DoWord_Default ( interp, prefixFunction, prefixFunction->W_RL_Index, prefixFunction->W_SC_Index ) ;
         SetState ( compiler, ( PREFIX_ARG_PARSING | DOING_A_PREFIX_WORD ), false ) ;
         SetState ( _Debugger_, DBG_INFIX_PREFIX, false ) ;
-        if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
+        //if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
     }
     return word ;
+}
+
+void
+_Interpret_Until_Including_Token ( Interpreter * interp, byte * end, byte * delimiters )
+{
+    byte * token ;
+    while ( token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) )
+    {
+        Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+        if ( String_Equal ( ( char* ) token, end ) ) break ;
+    }
+}
+
+byte *
+_Interpret_Until_NotIncluding_Token ( Interpreter * interp, byte * end, byte * delimiters )
+{
+    byte * token ;
+    while ( token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) )
+    {
+        if ( String_Equal ( ( char* ) token, end ) ) return token ;
+        Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+    }
+}
+
+void
+Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
+{
+    int64 svscwi = _CSL_->SC_Index ;
+    Interpret_Until_Token ( interp, end, delimiters ) ;
+    SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
+    if ( prefixFunction ) Interpreter_DoWord_Default ( interp, prefixFunction, - 1, svscwi ) ;
 }
 
 void
@@ -186,6 +179,12 @@ Interpret_UntilFlaggedWithInit ( Interpreter * interp, int64 doneFlags )
 {
     Interpreter_Init ( interp ) ;
     Interpret_UntilFlagged ( interp, doneFlags ) ;
+}
+
+void
+Interpret_String ( byte *str )
+{
+    _CSL_ContextNew_InterpretString ( _CSL_, str ) ;
 }
 
 void

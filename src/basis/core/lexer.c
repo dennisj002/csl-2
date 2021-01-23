@@ -270,7 +270,8 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
     if ( word->Name[0] == '(' ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
     else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ) )
-        && ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) )
+        //&& ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) )
+        &&  ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) )
     {
         return Lexer_IsNextWordLeftParen ( lexer ) ;
     }
