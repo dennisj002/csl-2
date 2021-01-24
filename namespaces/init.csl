@@ -299,6 +299,7 @@ System
 : ddps ( s ) debugColors s @ ps defaultColors ;
 //#if Is_DebugOn
 dscOn 
+
 //verbosity 2 =
 : debugTest3 ( n ) n @ 1 2 + + p <dbg> stack ;
 //: debugTest3 1 2 + p <dbg> stack ;
@@ -306,12 +307,10 @@ dscOn
 : debugTest2 1 2 + p debugTest3 ;
 : debugTest1 1 2 + p debugTest2 ;
 : debugTest 1 2 + p debugTest1 ;
+
 : _assert1dbg ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
-//: _assert1 ( n m str ) { n @ m @ != } { <dbg> nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { <dbg> str @ ps " : ok\n" ps nl } ifElse ;
 : _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ; debugWord
 : ctloc do> locationPush does> locationPrint <does ; immediate // compile time location
-//: ctloc do> locationPush does> locationPrint ; immediate // compile time location
-//: ctloc locationPush locationPrint ; immediate // compile time location
 : _assert0 ( n m ) { n @ m @ != } { nl location nl hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
 : _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ; 
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
@@ -347,7 +346,7 @@ dscOn
 #else
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
 #endif
-
+sp
 Root
 User 
 : pause nl _pause ;
@@ -370,7 +369,6 @@ Compiler
 
 Root C
 "allot" ' allocateMem find alias
-
 : include1 _dup debugColors "\n'include'" ps ps " :: at :" ps location nl defaultColors sp include  ;
 Debug
 #if ( DebugFlag @ )
@@ -458,7 +456,7 @@ demo
 //rtw
 
 stringMacrosOff
-mem pause
+mem //pause
 "testCsl" msDelete
 
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your extra init code maybe here if you like

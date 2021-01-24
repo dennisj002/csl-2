@@ -86,7 +86,6 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
     if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
     {
         Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ; // preserve state across init ??
-        //Lexer_Init ( lexer, delimiters, lexer->State & (~LEXER_FORWARD_DOTTED), CONTEXT ) ; // preserve state across init ??
         lexer->State |= state ;
         lexer->SC_Index = _CSL_->SC_Index ;
         while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
@@ -116,24 +115,34 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
 void
 Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
 {
+    Context * cntx = _Context_ ;
     lexer->TokenBuffer = _CSL_->TokenBuffer ;
     Mem_Clear ( lexer->TokenBuffer, BUFFER_IX_SIZE ) ;
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
     lexer->SC_Index = _CSL_->SC_Index ;
-    if ( delimiters ) Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
+    if ( delimiters )
+    {
+        Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
+        //cntx->SpecialDelimiterCharSet = 0 ;
+    }
     else
     {
-        //if ( ! _Context_->DefaultDelimiterCharSet ) // ?? 
-
-        Context_SetDefaultTokenDelimiters ( _Context_, ( byte* ) " \n\r\t", CONTEXT ) ;
-        lexer->DelimiterCharSet = _Context_->DefaultDelimiterCharSet ;
-        lexer->TokenDelimiters = _Context_->DefaultTokenDelimiters ;
+        if ( cntx->SpecialDelimiterCharSet )
+        {
+            lexer->DelimiterCharSet = cntx->SpecialDelimiterCharSet ;
+            lexer->TokenDelimiters = cntx->SpecialTokenDelimiters ;
+            lexer->DelimiterOrDotCharSet = cntx->SpecialDelimiterOrDotCharSet ;
+        }
+        else
+        {
+            lexer->DelimiterCharSet = cntx->DefaultDelimiterCharSet ;
+            lexer->TokenDelimiters = cntx->DefaultTokenDelimiters ;
+            lexer->DelimiterOrDotCharSet = cntx->DefaultDelimiterOrDotCharSet ;
+        }
     }
     lexer->State = state & ( ~ LEXER_RETURN_NULL_TOKEN ) ;
     SetState ( lexer, KNOWN_OBJECT | LEXER_DONE | END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE | LEXER_ALLOW_DOT, false ) ;
-    lexer->TokenDelimitersAndDot = ( byte* ) " .\n\r\t" ;
-    lexer->DelimiterOrDotCharSet = CharSet_New ( lexer->TokenDelimitersAndDot, allocType ) ;
     lexer->TokenStart_ReadLineIndex = - 1 ;
     lexer->Filename = lexer->ReadLiner0->Filename ;
     lexer->LineNumber = lexer->ReadLiner0->LineNumber ;
@@ -143,10 +152,10 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
 }
 
 byte
-Lexer_NextNonDelimiterChar ( Lexer * lexer )
+Lexer_NextPrintChar ( Lexer * lexer )
 {
     //return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ) - 1, lexer->DelimiterCharSet ) ;
-    return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ), lexer->DelimiterCharSet ) ;
+    return _String_NextPrintChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ), lexer->DelimiterCharSet ) ;
 }
 //----------------------------------------------------------------------------------------|
 //              get from/ add to head  |              | get from head      add to tail    |      
@@ -258,7 +267,7 @@ Lexer_IsNextWordLeftParen ( Lexer * lexer )
     byte chr = ReadLine_LastChar ( _ReadLiner_ ) ;
     if ( ! _CharSet_IsDelimiter ( lexer->DelimiterCharSet, chr ) ) return false ; // we need to start from a delimiter
 #endif    
-    byte c = Lexer_NextNonDelimiterChar ( lexer ) ;
+    byte c = Lexer_NextPrintChar ( lexer ) ;
     if ( ( c == '(' ) ) return true ;
 
     else return false ;
@@ -270,8 +279,9 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
     if ( word->Name[0] == '(' ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
     else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ) )
-        //&& ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) )
-        &&  ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) )
+        //&& ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) 
+        //&& IS_MORPHISM_TYPE( word ) 
+        && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) )
     {
         return Lexer_IsNextWordLeftParen ( lexer ) ;
     }
@@ -290,9 +300,14 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
 }
 
 void
+_Lexer_DoChar ( Lexer * lexer, byte c )
+{
+    _CSL_->LexerCharacterFunctionTable [ _CSL_->LexerCharacterTypeTable [ c ].CharInfo ] ( lexer ) ;
+}
+
+void
 Lexer_DoChar ( Lexer * lexer, byte c )
 {
-
     lexer->TokenInputByte = c ;
     _Lexer_DoChar ( lexer, c ) ;
     lexer->CurrentReadIndex = lexer->ReadLiner0->ReadIndex ;
@@ -379,9 +394,11 @@ Lexer_LastChar ( Lexer * lexer )
 void
 Lexer_SetTokenDelimiters ( Lexer * lexer, byte * delimiters, uint64 allocType )
 {
-    if ( lexer->DelimiterCharSet ) CharSet_Init ( lexer->DelimiterCharSet, 128, delimiters ) ;
-    else lexer->DelimiterCharSet = CharSet_New ( delimiters, allocType ) ;
     lexer->TokenDelimiters = delimiters ;
+    //if ( lexer->DelimiterCharSet ) CharSet_Init ( lexer->DelimiterCharSet, 128, delimiters ) ;
+    //else 
+    lexer->DelimiterCharSet = CharSet_New ( delimiters, allocType ) ;
+    lexer->DelimiterOrDotCharSet = CharSet_NewDelimitersWithDot ( delimiters, allocType ) ;
 }
 
 Lexer *
@@ -467,7 +484,6 @@ Lexer_DoDelimiter ( Lexer * lexer )
 Boolean
 Lexer_IsCurrentInputCharADelimiter ( Lexer * lexer )
 {
-
     return ( Boolean ) _Lexer_IsCharDelimiter ( lexer, lexer->TokenInputByte ) ;
 }
 
@@ -778,6 +794,7 @@ GreaterThan ( Lexer * lexer ) // '>':
 
 // package the dot to be lexed as a token
 #if 0
+
 void
 Dot ( Lexer * lexer ) //  '.':
 {
@@ -807,6 +824,7 @@ Dot ( Lexer * lexer ) //  '.':
 }
 
 #else
+
 void
 Dot ( Lexer * lexer ) //  '.':
 {
@@ -837,17 +855,16 @@ Dot ( Lexer * lexer ) //  '.':
 void
 Comma ( Lexer * lexer )
 {
-    if ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) || GetState ( _Compiler_, TDSCI_PARSING ) ) //&& lexer->TokenWriteIndex )
+    if ( GetState ( _Context_, ASM_SYNTAX | C_SYNTAX | INFIX_MODE ) || GetState ( _Compiler_, TDSCI_PARSING ) ) //&& lexer->TokenWriteIndex )
     {
         if ( lexer->TokenWriteIndex )
         {
             Lexer_MakeItTheNextToken ( lexer ) ;
             return ;
         }
-        else //if ( Lexer_IsCurrentInputCharADelimiter ( lexer ) ) 
+        else
         {
-            CSL_C_Comma ( ) ; // ??  
-            //return ;
+            CSL_C_Comma ( ) ;
         }
     }
     else if ( ! GetState ( _Context_->Compiler0, LC_ARG_PARSING ) )
@@ -922,12 +939,6 @@ void
 Lexer_SetInputFunction ( Lexer * lexer, byte ( *lipf ) ( ReadLiner * ) )
 {
     lexer->NextChar = lipf ;
-}
-
-void
-_Lexer_DoChar ( Lexer * lexer, byte c )
-{
-    _CSL_->LexerCharacterFunctionTable [ _CSL_->LexerCharacterTypeTable [ c ].CharInfo ] ( lexer ) ;
 }
 
 Boolean

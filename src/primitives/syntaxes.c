@@ -33,15 +33,25 @@ CSL_C_Syntax_Off ( )
 {
     Context * cntx = _Context_ ;
     SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, false ) ;
-    //Namespace_SetAsNotUsing ( "C" ) ;
     CSL_SetInNamespaceFromBackground ( ) ; // before below Namespace_SetAsNotUsing_MoveToTail in case one of them is the background namespace
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "PrefixCombinators" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Infix" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "C_Syntax" ) ;
-    //Namespace_DoNamespace ( "Bits" ) ; // TODO : must be a better way
-    //if ( cntx->Compiler0->C_BackgroundNamespace ) _CSL_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
-    Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " \n\r\t", CONTEXT ) ;
-    //Ovt_AutoVarOff ( ) ;
+    Context_SetSpecialTokenDelimiters ( cntx, 0, CONTEXT ) ;
+}
+
+void
+CSL_C_Syntax_On ( )
+{
+    Context * cntx = _Context_ ;
+    Compiler_Save_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+    SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, true ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "C" ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "PrefixCombinators" ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "Infix" ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "C_Syntax" ) ;
+    Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+    Context_SetSpecialTokenDelimiters ( cntx, ( byte* ) " ,\n\r\t", CONTEXT ) ;
 }
 
 // switch to the default forth, postfix mode
@@ -53,23 +63,6 @@ CSL_PostfixModeOn ( )
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Lisp" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "LispTemp" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "LispDefines" ) ;
-}
-
-void
-CSL_C_Syntax_On ( )
-{
-    Context * cntx = _Context_ ;
-    //if ( ! GetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE ) )
-    {
-        Compiler_Save_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-        SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, true ) ;
-        Namespace_DoNamespace_Name ( ( byte* ) "C" ) ;
-        Namespace_DoNamespace_Name ( ( byte* ) "PrefixCombinators" ) ;
-        Namespace_DoNamespace_Name ( ( byte* ) "Infix" ) ;
-        Namespace_DoNamespace_Name ( ( byte* ) "C_Syntax" ) ;
-        Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-        Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " ,\n\r\t", CONTEXT ) ;
-    }
 }
 
 void
@@ -86,7 +79,7 @@ CSL_C_Semi ( )
     {
         CSL_InitSourceCode ( _CSL_ ) ;
     }
-    
+
     Context_ClearQidInNamespace ( ) ;
 }
 

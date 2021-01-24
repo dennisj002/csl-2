@@ -244,12 +244,14 @@ void
 CSL_AsmModeOn ( )
 {
     SetState ( _Context_->Compiler0, ASM_MODE, true ) ;
+    SetState ( _Context_, ASM_SYNTAX, true ) ;
 }
 
 void
 CSL_AsmModeOff ( )
 {
     SetState ( _Context_->Compiler0, ASM_MODE, false ) ;
+    SetState ( _Context_, ASM_SYNTAX, false ) ;
 }
 
 void

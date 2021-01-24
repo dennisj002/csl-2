@@ -893,8 +893,7 @@ typedef struct
     System * System0 ;
     Stack * ContextDataStack ;
     byte * Location, * CurrentToken ;
-    byte * DefaultTokenDelimiters ;
-    byte * DefaultDelimiterCharSet ;
+    byte * DefaultDelimiterCharSet, * DefaultTokenDelimiters, * TokenDelimitersAndDot, * DelimiterOrDotCharSet ;
     Word * CurrentlyRunningWord, *LastRanWord, *CurrentTokenWord, *TokenDebugSetupWord, *CurrentEvalWord, *LastEvalWord, *NlsWord ;
     Word * SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord, * LastCompiledWord, *CurrentWordBeingCompiled ;
     block CurrentlyRunningWordDefinition ;

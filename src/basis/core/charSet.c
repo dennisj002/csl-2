@@ -1,7 +1,7 @@
 
 #include "../../include/csl.h"
 
-byte CharTable []= { // from maru
+byte CharTable [128]= { // from maru
   /*  00 nul */	0,
   /*  01 soh */	0,
   /*  02 stx */	0,
@@ -126,7 +126,7 @@ byte CharTable []= { // from maru
   /*  79  y  */	CHAR_PRINT | CHAR_LETTER | CHAR_ALPHA,
   /*  7a  z  */	CHAR_PRINT | CHAR_LETTER | CHAR_ALPHA,
   /*  7b  {  */	CHAR_PRINT,
-  /*  7c  | */	CHAR_PRINT | CHAR_LETTER,
+  /*  7c  | */         CHAR_PRINT | CHAR_LETTER,
   /*  7d  }  */	CHAR_PRINT,
   /*  7e  ~  */	CHAR_PRINT | CHAR_LETTER,
   /*  7f del */	0,
@@ -160,7 +160,7 @@ CharSet_Init ( CharSet *cset, int64 size, byte * initString )
 {
     int64 i ;
     memset ( cset, 0, size ) ;
-    //if ( size >= sizeof (CharTable) ) MemCpy ( cset, &CharTable, sizeof( CharTable) ) ;
+    memcpy ( cset, (char*) CharTable, sizeof ( CharSet ) ) ; //size ) ;
     for ( i = 0 ; initString [i] ; i ++ ) cset [ initString [ i ] ] |= CHAR_DELIMITER ;
     cset [0] |= CHAR_DELIMITER ; // default 0 is always a delimiter
     return cset ;
@@ -185,6 +185,17 @@ CharSet *
 CharSet_New ( byte * initString, uint64 allocType )
 {
     return _CharSet_New ( initString, 128, allocType ) ;
+}
+
+byte * 
+CharSet_NewDelimitersWithDot ( byte * delimiters0, uint64 allocType )
+{
+    char delimiters [64] ;
+    delimiters[0] = 0 ;
+    strcpy ( delimiters, "." ) ;
+    strcat ( delimiters, delimiters0 ) ;
+    byte * charSet = CharSet_New ( delimiters, allocType ) ;
+    return charSet ;
 }
 
 

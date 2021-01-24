@@ -172,7 +172,7 @@ Parse_Identifier_Fields ( int64 t_type )
     while ( 1 )
     {
         Parse_Identifier_Or_Array_Field ( t_type ) ;
-        if ( ( tdsci->TdsciToken ) && ( tdsci->TdsciToken[0] == ',' ) ) token = TDSCI_ReadToken ( ) ;
+        if ( ( tdsci->TdsciToken ) && ( tdsci->TdsciToken[0] != ';' ) ) token = TDSCI_ReadToken ( ) ;
         else break ;
     }
 }
@@ -224,7 +224,11 @@ Parse_StructUnionDef ( ) // 'struct' or 'union'
     }
     while ( tdsci->TdsciToken && ( tdsci->TdsciToken [0] != '}' ) ) ;
 
-    if ( tdsci->TdsciToken[1] != ';' ) token = TDSCI_ReadToken ( ) ;
+    if ( tdsci->TdsciToken[1] != ';' ) 
+    {
+        token = TDSCI_ReadToken ( ) ;
+        //Parse_Identifier ( POST_STRUCTURE_ID ) ;
+    }
 }
 
 // SEMI :: ';'

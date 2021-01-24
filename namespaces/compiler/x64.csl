@@ -111,19 +111,21 @@ dscOn
 //postifx verbosity 3 =
 #endif    
 //scOn
-int abs ( n ) 
-{
-    if ( n < 0 ) n = 0 - n ;
-    return n ; 
-}
 //: abs( n | rtn ) { n > 0 } { rtn n = } { rtn 0 n - = } ifElse return rtn ; 
 'fa 'findAlias find alias
 '_Compile_Int8 'compileByte fa
 '_Compile_Int16 'compileInt16 fa
 '_Compile_Int32 'compileInt32 fa
 '_Compile_Int64 'compileInt64 fa
-
+//logOn
 c_syntaxOn
+
+int64 
+abs ( int64 n ) 
+{
+    if ( n < 0 ) n = 0 - n ;
+    return n ; 
+}
 
 uint8
 Calculate_Rex ( uint8 reg, uint8 rm, uint8 rex_w_flag, uint8 rex_b_flag )
@@ -214,10 +216,10 @@ CalculateModRmByte ( uint8 mod, uint8 reg, uint8 rm, uint8 sib, int64 disp )
         //if ( ( mod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
     {
         // cf. InstructionSet-A-M-253666.pdf Table 2-2
-        //CSL_Exception ( MACHINE_CODE_ERROR, 0, 1 ) ;
         ps ( "\n\nCalculateModRmByte : MACHINE_CODE_ERROR\n" ) ;
         ps ( "\n cf. InstructionSet-A-M-253666.pdf Table 2-2\n\n" ) ;
         pause ;
+        //CSL_Exception ( MACHINE_CODE_ERROR, 0, 1 ) ;
         quit ;
     }
     if ( sib )
@@ -251,7 +253,7 @@ _Compile_Write_Instruction_X64 ( uint8 rex, uint8 opCode0, uint8 opCode1, uint8 
     dis ( _here, nbytes ) ; nl ; //pause () ; nl ; nl ; 
 #endif
 } prefix
-
+pwi _Compile_Write_Instruction_X64 //pause
 #if 0
 uint8
 RegParameterOrder ( uint8 n )
@@ -297,7 +299,7 @@ Compile_CalculateWrite_Instruction_X64 ( uint8 opCode0, uint8 opCode1, uint8 mod
     uint8 modRm = CalculateModRmByte ( mod, reg, rm, sib, disp ) ;
     _Compile_Write_Instruction_X64 ( rex, opCode0, opCode1, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
-
+pwi Compile_CalculateWrite_Instruction_X64 //pause
 // intel syntax : opcode dst, src
 // mov reg to mem or mem to reg
 // note the order of the operands match intel syntax with dst always before src
@@ -380,6 +382,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
     Compile_CalculateWrite_Instruction_X64 ( opCode0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
     //DBI_OFF ;
 } prefix
+pwi Compile_Move //pause
 
 void
 Compile_Move_WithSib ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 scale, uint8 index, uint8 base )
@@ -630,6 +633,7 @@ _Compile_X_Group1_Immediate ( uint8 code, uint8 mod, uint8 rm, int64 disp, uint6
     // 0x80 is the base opCode for this group of instructions but 0x80 is an alias for 0x82
     // we always sign extend so opCodes 0x80 and 0x82 are not being used
     // 1000 00sw 
+    //<dbg>
     int64 opCode = 0x80 ;
     if ( ( ( iSize > 4 ) || ( imm >= 0x100000000 ) ) ) //&& disp )
     {
@@ -716,12 +720,12 @@ _Compile_TESTreg_Toreg ( dstReg, srcReg )
 
 } prefix
 
-void _Compile_Move_DataStackN_ToReg ( uint8 reg, uint8 n ) 
+void _Compile_Move_DataStackN_ToReg ( reg, n ) 
 { 
 //  Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSize, uint8 sib, int64 disp, uint8 dispSize, int64 imm, uint8 immSize )
     Compile_Move ( REG, MEM, reg, DSP, 8, 0, n * CELL, 0, 0, 0 ) ; 
 } prefix 
-
+pwi _Compile_Move_DataStackN_ToReg
 
 c_syntaxOff
 infixOn
@@ -738,19 +742,18 @@ sp
 '_Compile_Stack_PopToReg find wdiss //pause
 sp
 C X64
-#if x64_dbg
 Combinators
 
 sp
-dbiOn
 asm: iax
-    _Compile_Stack_PopToReg ( R8D )       //4d8b06                  mov r8, [r14]       
-    _Compile_CallThruReg ( R8D )             //4983ee08                sub r14, 0x8
-                                             //49ffd0                  call r8  
-                                             //c3                      ret      
+    //dbiOn
+    _Compile_Stack_PopToReg ( R8D )      //4d8b06                  mov r8, [r14]       
+    _Compile_CallThruReg ( R8D )             //4983ee08              sub r14, 0x8
+                                                                //49ffd0                   call r8  
+                                                                //c3                          ret      
 ;asm
 
-' iax find wdiss sp 
+' iax find wdiss sp //pause
 
 : _Compile_Test_Imm (  mod, rm, disp, imm )
     _Compile_Test ( mod @, rm @, IMM_B, disp @, imm @ )
@@ -787,12 +790,12 @@ asm: stest
 ;asm
 sp
 ' stest find wdiss //pause
+//logOff
 sp
 "\nthis is some purposefully funky code for testing\n" ps
 
-s stest sp 
+s stest s 
 nl "x64 test" ps "ok" ' dup find xt@ iax ' ps find xt@ iax "ok" "error" assert1s sp //pause
-#endif
 sp
 Stack
 asm: ndup
@@ -856,15 +859,16 @@ c_syntaxOff
 sp
 C_Syntax Asm 
 asm: testAsm
-    MOVrr RDX RAX 
-    MOVrr RAX RBX 
-    MOVrr RBX RAX 
-    MOVrr RAX RDX 
+    MOVrr RDX, RAX 
+    MOVrr RAX, RBX 
+    MOVrr RBX, RAX 
+    MOVrr RAX, RDX 
 ;asm
 pwi testAsm 
 testAsm
 sp 
 cOff
+//pause
 2 + 7 assertStkChk // stack checking
 //logOff
 //stack pause

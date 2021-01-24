@@ -49,7 +49,7 @@ C libc
 void
 interpret2 ( | atoken aword ) 
 {
-    testc1 ( ) ; xhi01 ; xhi1( ) ; xhi2 ( 8 ) ; xhi2a ( "xhi2a =", 8 ) ; 
+    testc1 () ; xhi01 ; xhi1( ) ; xhi2 ( 8 ) ; xhi2a ( "xhi2a =", 8 ) ; 
     nl( ) ; tab ( ) ; ps ( "interpret2 :> " ) ; nl ( ) ;
     while ( 1 )
     {   

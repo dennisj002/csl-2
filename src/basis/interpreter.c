@@ -15,7 +15,6 @@ Interpreter_New ( uint64 type )
 
     interp->Lexer0 = Lexer_New ( type ) ;
     interp->ReadLiner0 = interp->Lexer0->ReadLiner0 ;
-    //interp->Lexer0->OurInterpreter = interp ;
     interp->Finder0 = Finder_New ( type ) ;
     interp->Compiler0 = Compiler_New ( type ) ;
     Interpreter_Init ( interp ) ;

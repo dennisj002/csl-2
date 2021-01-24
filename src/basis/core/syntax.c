@@ -392,7 +392,8 @@ CSL_C_ConditionalExpression ( )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CSL_Else ( ) ;
-            Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " ", 0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+            //Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+            Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0,  0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
             CSL_EndIf ( ) ;
         }
         else SyntaxError ( 1 ) ;

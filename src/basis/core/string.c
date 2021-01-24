@@ -634,17 +634,6 @@ String_New_SourceCode ( byte * string )
 
 #if 0
 byte
-_String_NextNonDelimiterChar ( byte * str0, byte * cset )
-{
-    byte * str = str0 ;
-    if ( str )
-    {
-        for ( ; *str ; str ++ ) if ( ! _CharSet_IsDelimiter ( cset, *str ) ) break ;
-    }
-    return str ? *str : 0 ;
-}
-#else
-byte
 _String_NextNonDelimiterChar ( byte * str, byte * cset )
 {
     if ( ! str ) return 0 ;
@@ -658,6 +647,19 @@ _String_NextNonDelimiterChar ( byte * str, byte * cset )
     return *str ;
 }
 #endif
+byte
+_String_NextPrintChar ( byte * str, byte * cset )
+{
+    if ( ! str ) return 0 ;
+    else
+    {
+        for ( ; *str ; str ++ ) 
+        {
+            if ( CharTable_IsCharType ( *str, CHAR_PRINT ) ) break ;
+        }
+    }
+    return *str ;
+}
 
 int64
 _CSL_StrTok ( byte * inBuffer )

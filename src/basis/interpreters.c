@@ -23,13 +23,11 @@ Interpret_C_Until_NotIncluding_Token4 ( Interpreter * interp, byte * end1, byte 
             token = 0 ;
             break ;
         }
-#if 1        
         else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || _String_EqualSingleCharString ( token, ';' ) ) )
         {
             CSL_ArrayModeOff_OptimizeOn ( ) ;
             break ;
         }
-#endif        
         else Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
         inChar = ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) ;
         if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
@@ -53,7 +51,8 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
             if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( _String_EqualSingleCharString ( token, ';' ) ) ) CSL_PushToken_OnTokenList ( token ) ;
             break ;
         }
-        if ( _String_EqualSingleCharString ( token, ';' ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
+            //else if ( _String_EqualSingleCharString ( token, ',' ) ) continue ;
+        else if ( _String_EqualSingleCharString ( token, ';' ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
         {
             CSL_PushToken_OnTokenList ( token ) ;
             CSL_ArrayModeOff_OptimizeOn ( ) ;
@@ -74,14 +73,14 @@ Interpret_DoPrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixF
     if ( prefixFunction )
     {
         byte * token ;
-        int64 i, flag = 0 ; 
+        int64 i, flag = 0 ;
         Compiler * compiler = interp->Compiler0 ;
         while ( 1 )
         {
             token = Lexer_ReadToken ( interp->Lexer0 ) ; // skip the opening left paren
             if ( token && ( ! _String_EqualSingleCharString ( token, '(' ) ) )
             {
-                if ( word = Finder_Word_FindUsing (interp->Finder0, token, 1) )
+                if ( word = Finder_Word_FindUsing ( interp->Finder0, token, 1 ) )
                 {
                     if ( word->W_MorphismAttributes & DEBUG_WORD ) continue ;
                     else flag = 1 ;
@@ -95,9 +94,17 @@ Interpret_DoPrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixF
         if ( prefixFunction->W_NumberOfPrefixedArgs )
         {
             Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-            for ( i = 0 ; i < (prefixFunction->W_NumberOfPrefixedArgs - 1) ; i ++ ) // -1 : we already did one above
+            for ( i = 0 ; i < ( prefixFunction->W_NumberOfPrefixedArgs - 1 ) ; i ++ ) // -1 : we already did one above
             {
-                Interpreter_InterpretNextToken ( interp ) ;
+                //Interpreter_InterpretNextToken ( interp ) ;
+                byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
+                if ( _String_EqualSingleCharString ( token, ',' ) && GetState ( _Context_, ASM_SYNTAX ) )
+                {
+                    i -- ; // don't count it 
+                    //continue ;
+                }
+                Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+                //Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
             }
         }
         else
@@ -124,6 +131,7 @@ _Interpret_Until_Including_Token ( Interpreter * interp, byte * end, byte * deli
     }
 }
 
+#if 0
 byte *
 _Interpret_Until_NotIncluding_Token ( Interpreter * interp, byte * end, byte * delimiters )
 {
@@ -143,6 +151,7 @@ Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFuncti
     SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
     if ( prefixFunction ) Interpreter_DoWord_Default ( interp, prefixFunction, - 1, svscwi ) ;
 }
+#endif
 
 void
 Interpret_UntilFlagged ( Interpreter * interp, int64 doneFlags )

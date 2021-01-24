@@ -85,6 +85,8 @@ CPrimitive CPrimitives [] = {
     { "wordNameStructPrint", 0, 0, 0, CSL_Word_Name_ClassStructure_PrintData, 0, 0, 0, "C", "Root" },
     { "wordStructPrint", 0, 0, 0, CSL_Word_ClassStructure_PrintData, 0, 0, 0, "C", "Root" },
 
+    { ",", 0, 0, 0, CSL_C_Comma, IMMEDIATE | NO_OP_WORD | RIGHT_PAREN | KEYWORD, 0, 0, "Asm", "Root" },
+    
     { "{", 0, 0, 0, CSL_Begin_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
     { "}", 0, 0, 0, CSL_End_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
     { ";", 0, 0, 0, CSL_C_Semi, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "C_Syntax", "C" },

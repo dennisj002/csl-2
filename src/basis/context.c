@@ -49,10 +49,28 @@ _Context_Allocate ( )
 }
 
 void
+Context_SetSpecialTokenDelimiters ( Context * cntx, byte * specialDelimiters, uint64 allocType )
+{
+    if ( specialDelimiters )
+    {
+        cntx->SpecialDelimiterCharSet = CharSet_New ( specialDelimiters, allocType ) ;
+        cntx->SpecialTokenDelimiters = specialDelimiters ;
+        cntx->SpecialDelimiterOrDotCharSet = CharSet_NewDelimitersWithDot ( specialDelimiters, allocType ) ;
+    }
+    else
+    {
+        cntx->SpecialDelimiterCharSet = 0 ;
+        cntx->SpecialTokenDelimiters = 0 ;
+        cntx->SpecialDelimiterOrDotCharSet = 0 ;
+    }
+}
+
+void
 Context_SetDefaultTokenDelimiters ( Context * cntx, byte * delimiters, uint64 allocType )
 {
     cntx->DefaultDelimiterCharSet = CharSet_New ( delimiters, allocType ) ;
     cntx->DefaultTokenDelimiters = delimiters ;
+    cntx->DefaultDelimiterOrDotCharSet = CharSet_NewDelimitersWithDot ( delimiters, CONTEXT ) ;
 }
 
 Context *
@@ -62,10 +80,10 @@ _Context_Init ( Context * cntx0, Context * cntx )
     else cntx->System0 = System_New ( CONTEXT ) ;
     List_Init ( _CSL_->CSL_N_M_Node_WordList ) ;
     Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " \n\r\t", CONTEXT ) ;
+    Context_SetSpecialTokenDelimiters ( cntx, 0, CONTEXT ) ;
     cntx->Interpreter0 = Interpreter_New ( CONTEXT ) ;
     cntx->Lexer0 = cntx->Interpreter0->Lexer0 ;
     cntx->ReadLiner0 = cntx->Interpreter0->ReadLiner0 ;
-    //cntx->Lexer0->OurInterpreter = cntx->Interpreter0 ;
     cntx->Finder0 = cntx->Interpreter0->Finder0 ;
     cntx->Compiler0 = cntx->Interpreter0->Compiler0 ;
     cntx->PreprocessorStackList = _dllist_New ( CONTEXT ) ;

@@ -214,7 +214,7 @@
 #define PSI_PROMPT  ( (uint64) 1 << 16 )
 
 #if 0 // not used
-typedef struct 
+typedef struct
 {
     // defines here
     unsigned int CPRIMITIVE : 1 ;
@@ -814,6 +814,7 @@ typedef struct
 #define IS_FORWARD_DOTTED ( (uint64) 1 << 31 )
 #define IS_REVERSE_DOTTED ( (uint64) 1 << 32 )
 #define IS_RVALUE ( (uint64) 1 << 33 )
+#define ASM_SYNTAX ( (uint64) 1 << 34 )
 
 #define NON_INLINABLE ( (uint64) 1 << 0 )
 #define DONE true
@@ -886,6 +887,7 @@ typedef struct
 #define CHAR_PRINT      ( (uint64) 1 << 6 )
 
 #define _CharSet_IsDelimiter( cset, ch ) cset [ ch ]
+#define _CharSet_IsPrint( ch ) CharTable_IsCharType ( ch, CHAR_PRINT )
 
 // OpenVmTil State defines
 #define OVT_IN_USEFUL_DIRECTORY     ( (uint64) 1 << 0 )
