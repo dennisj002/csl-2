@@ -291,7 +291,7 @@ jcc8_On
 ' a9 find wdiss s //pause
 Ar9 "arr9" new arr9 a9 sp //pause // Ar9 is 16 mb in size so only for testing
 adump ( 0 123 234 arr9 ) 
-sp pause
+sp //pause
 "ct" class :{ byte ar [3][3][3] ; };
 ct "ab" new
 ab.ar [0][0][0] hp

@@ -372,7 +372,9 @@ wtdInclude
 cOn
 C.Experimental 
 'wtdInclude find Word size dump
-'wtdInclude find 'C.Experimental.Word find wordStructPrint 
+'wtdInclude find 'C.Experimental.Word find wordStructPrint  
+printf ( "\nWord.size= %d", Word.size) ;
+stateAll
 'C.Experimental notUsing 
 //pause
 #endif
@@ -431,7 +433,7 @@ stateAll
 "\nWord size = " ps Word size @ p
 "\nWordData size = " ps WordData size @ p
 "\nDLNode size = " ps DLNode size @ p
-"\ndobject size = " ps dobject size @ p
+"\ndobject size = " ps C.Experimental dobject size @ p
 "\nAttributeInfo size = " ps AttributeInfo size @ p
 pwi Word
 'C.Experimental notUsing 

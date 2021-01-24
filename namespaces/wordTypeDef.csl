@@ -5,34 +5,40 @@ C.Experimental
 type Pointer ; Pointer.size = 8 ;
 type block ; block.size = 8 ;
 type Location ; Location.size = 8 ;
-typedef struct _dlnode
+typedef struct _node
 {
-    struct
-    { 
-        // test comment
-        struct _dlnode * n_After ; // test comment
-        struct _dlnode * n_Before ;
-    }  ;
-} dlnode, node ;
-typedef struct _dllist
-{
-    struct
+    union
     {
-        dlnode * n_After ;
-        dlnode * n_Before ;
+        struct
+        {
+            struct _node * n_After ;
+            struct _node * n_Before ;
+        } ;
+        struct
+        {
+            struct _node * n_Head ;
+            struct _node * n_Tail ;
+        } ;
     } ;
-    node * n_CurrentNode ;
-} dllist ; //, list ;
+} dlnode, node, _dllist ;
 typedef struct
 {
-    struct
+    _dllist l_List ;
+    node * l_CurrentNode ;
+} dllist ;
+typedef struct
+{
+    union
     {
-        dlnode * n_After ;
-        dlnode * n_Before ;
+        struct
+        {
+            dlnode * n_After ;
+            dlnode * n_Before ;
+        } ;
+        dlnode n_Node ;
     } ;
     union
     {
-        node * n_CurrentNode ;
         struct
         {
             int32 n_Type ;
@@ -41,34 +47,49 @@ typedef struct
             Boolean n_InUseFlag ;
         } ;
         byte * n_unmap ;
+        byte * n_bData ;
+        int64 * n_iData ;
+        node * n_CurrentNode ;
     } ;
 } _DLNode, _Node, _ListNode, _DLList ; // size : 3 x 64 bits
 typedef struct
 {
-    struct
+    union
     {
-        uint64 T_MorphismAttributes ;
-        uint64 T_ObjectAttributes ;
-        uint64 T_LispAttributes ;
-        uint64 T_WAllocationType ;
-        uint32 T_WordAttributes ;
-        uint16 T_NumberOfPrefixedArgs ;
-        uint16 T_Unused ;
+        struct
+        {
+            uint64 T_MorphismAttributes ;
+            uint64 T_ObjectAttributes ;
+            uint64 T_LispAttributes ;
+            uint64 T_WAllocationType ;
+            uint32 T_WordAttributes ;
+            uint16 T_NumberOfPrefixedArgs ;
+            uint16 T_Unused ;
+        } ;
+        //AttributeBitField abf ;
+        //class bitset abt[320] ;
     } ;
     union
     {
         uint64 T_NumberOfSlots ;
         uint64 T_NumberOfBytes ;
+    } ;
+    union
+    {
         uint64 T_Size ;
         uint64 T_ChunkSize ; // remember MemChunk is prepended at memory allocation time
     } ;
 } AttributeInfo, TypeInfo, TI ;
-typedef struct _dobject
+typedef struct
 {
-    struct
+    union
     {
-        dlnode * do_After ;
-        dlnode * do_Before ;
+        struct
+        {
+            dlnode * do_After ;
+            dlnode * do_Before ;
+        } ;
+        dlnode do_Node ;
     } ;
     struct
     {
@@ -79,60 +100,20 @@ typedef struct _dobject
     } ;
     union
     {
+        byte * do_unmap ;
         byte * do_bData ;
         int64 * do_iData ;
     } ;
-} dobject ; // size : 4 cells (8 bytes each) 
+} dobject ; // size 4 x 64 bits
 typedef struct
 {
     union
     {
-        struct
-        {
-            struct
-            {
-                dlnode * n_After ;
-                dlnode * n_Before ;
-            } ;
-            union
-            {
-                struct
-                {
-                    int32 n_Type ;
-                    int16 n_Size ;
-                    Boolean n_Slots ;
-                    Boolean n_InUseFlag ;
-                } ;
-                node * n_CurrentNode ;
-                byte * n_unmap ;
-            } ;
-        } ; //_DLNode, _Node, _listNode, _List ;
-        struct
-        {
-            struct
-            {
-                dlnode * do_After ;
-                dlnode * do_Before ;
-            } ;
-            union
-            {
-                struct
-                {
-                    int32 do_Type ;
-                    int16 do_Size ;
-                    Boolean do_Slots ;
-                    Boolean do_InUseFlag ;
-                } ;
-                byte * do_bData ;
-                int64 * do_iData ;
-            } ;
-        } ; //dobject ; // size 4 x 64 bits
         _DLNode n_DLNode ;
         dobject n_dobject ;
     } ;
     AttributeInfo n_Attributes ;
 } DLNode, Node, ListNode, DLList, List ;
-
 typedef struct _WordData
 {
     uint64 RunType ;
@@ -141,20 +122,20 @@ typedef struct _WordData
     byte * Coding ; // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
     byte * Filename ; // ?? should be made a part of a accumulated string table ??
     int64 LineNumber ;
-    int64 CursorPosition ;
+    int64 TokenStart_LineIndex ;
     int64 NumberOfNonRegisterArgs ;
     int64 NumberOfNonRegisterLocals ;
     int64 NumberOfVariables ;
 
     byte * ObjectCode ; // used by objects/class words
     byte * StackPushRegisterCode ; // used by the optInfo
-    Word * AliasOf, * OriginalWord ;
+    Word * AliasOf, *OriginalWord ;
     int64 Offset ; // used by ClassField
     struct
     {
         uint8 RegToUse ;
         uint8 Opt_Rm ;
-        uint8 Opt_Reg ; 
+        uint8 Opt_Reg ;
         uint8 SrcReg ;
         uint8 DstReg ;
         uint8 RegFlags ; // future uses available here !!
@@ -162,7 +143,7 @@ typedef struct _WordData
         uint8 OpInsnCode ;
     } ;
     byte TypeSignature [16] ;
-    Namespace * TypeObjectsNamespaces [16] ; // 16 : increase if need more than 15 objects as args
+    //Namespace * TypeObjectsNamespaces [16] ; // 16 : increase if need more than 15 objects as args
     union
     {
         dllist * LocalNamespaces ;
@@ -171,13 +152,13 @@ typedef struct _WordData
     union
     {
         int64 * WD_ArrayDimensions ;
-        byte * WD_SourceCode ; // arrays don't have source code
+        byte *WD_SourceCode ; // arrays don't have source code
     } ;
     int64 WD_ArrayNumberOfDimensions ;
     Stack * WD_NamespaceStack ; // arrays don't have runtime debug code
     union
     {
-        ListObject * LambdaBody ; // forwawrd reference
+        ListObject * LambdaBody ;
         int64 AccumulatedOffset ; // used by Do_Object 
     } ;
     union
@@ -186,16 +167,14 @@ typedef struct _WordData
         int64 Index ; // used by Variable and LocalWord
         //byte * LogicTestCode ;
     } ;
-    dllist *SourceCodeWordList ;
-    byte *SourceCoding ; //
+    dllist * SourceCodeWordList ;
+    byte * SourceCoding ; //
     int64 SourceCodeMemSpaceRandMarker ;
 } WordData ; // try to put all compiler related data here so in the future we can maybe delete WordData at runtime
 
-typedef struct _Identifier
+typedef struct _Identifier // _Symbol
 {
     DLNode S_Node ;
-    int64 Slots ; // number of slots in Object
-    //int64 ObjectByteSize ; -> S_Size // number of bytes in Object
     int64 CodeSize ;
     byte * S_Name ;
     uint64 State ;
@@ -208,7 +187,7 @@ typedef struct _Identifier
     dllist * S_SymbolList ;
     uint64 S_DObjectValue ; // nb! DynamicObject value can not be a union with S_SymbolList
     uint64 * S_PtrToValue ; // because we copy words with Compiler_PushCheckAndCopyDuplicates and we want the original value
-    union 
+    union // leave this here so we can add a ListObject to a namespace
     {
         struct _Identifier * S_ContainingNamespace ;
         struct _Identifier * S_ContainingList ;
@@ -229,10 +208,10 @@ typedef struct _Identifier
     block Definition ;
     dllist * DebugWordList ;
     int64 StartCharRlIndex ;
-    int64 SC_WordIndex, SC_FileIndex_Start, SC_FileIndex_End ;
+    int64 SC_WordIndex ; //, SC_FileIndex_Start, SC_FileIndex_End ;
     struct _Identifier * CSLWord, * BaseObject ;
     struct _WordData * W_WordData ;
-} Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
+} Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer, CaseNode ;
 c_syntaxOff
 'C.Experimental notUsing
 Root Experimental User

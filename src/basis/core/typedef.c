@@ -591,7 +591,6 @@ Boolean
 Parser_Check_Do_Debug_Token ( byte * token )
 {
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-
     return Parser_Check_Do_CommentWord ( word ) ;
 }
 
@@ -600,7 +599,6 @@ TDSCI_ReadToken ( )
 {
     Context * cntx = _Context_ ;
     TDSCI * tdsci = TDSCI_GetTop ( ) ;
-#if 1   
     //if ( Is_DebugOn )
     {
         do
@@ -617,7 +615,6 @@ TDSCI_ReadToken ( )
         tdsci->Token_EndIndex = cntx->Lexer0->TokenEnd_FileIndex ;
     }
     //else tdsci->TdsciToken = Lexer_ReadToken ( cntx->Lexer0 ) ;
-#endif    
     return tdsci->TdsciToken ;
 }
 
