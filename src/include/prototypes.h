@@ -1294,8 +1294,6 @@ byte *Interpret_C_Until_NotIncluding_Token4(Interpreter *interp, byte *end1, byt
 byte *Interpret_Until_Token(Interpreter *interp, byte *end, byte *delimiters);
 Word *Interpret_DoPrefixFunction_OrUntil_RParen(Interpreter *interp, Word *prefixFunction);
 void _Interpret_Until_Including_Token(Interpreter *interp, byte *end, byte *delimiters);
-byte *_Interpret_Until_NotIncluding_Token(Interpreter *interp, byte *end, byte *delimiters);
-void Interpret_PrefixFunction_Until_Token(Interpreter *interp, Word *prefixFunction, byte *end, byte *delimiters);
 void Interpret_UntilFlagged(Interpreter *interp, int64 doneFlags);
 void Interpret_ToEndOfLine(Interpreter *interp);
 void Interpret_UntilFlaggedWithInit(Interpreter *interp, int64 doneFlags);

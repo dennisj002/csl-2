@@ -448,7 +448,7 @@ Word_GetOriginalWord ( Word * word )
 Word *
 Word_UnAlias ( Word * word )
 {
-    if ( word ) while ( word->W_AliasOf ) word = word->W_AliasOf ;
+    if ( word ) while ( word->W_AliasOf && (word != word->W_AliasOf)) word = word->W_AliasOf ;
     return word ;
 }
 

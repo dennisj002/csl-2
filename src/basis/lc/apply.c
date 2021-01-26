@@ -291,16 +291,13 @@ void
 _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
 {
     Context * cntx = _Context_ ;
+    Lexer * lexer = cntx->Lexer0 ;
     ListObject *l1 = * pl1 ;
     Word * word = l1 ;
     word = l1->Lo_CSLWord ;
     byte * here = Here ;
-#if 1    
     word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
     Word_Eval ( word ) ;
-#else    
-    Interpreter_DoWord_Default ( _Interpreter_, word, l1->W_RL_Index, l1->W_SC_Index ) ;
-#endif    
     Word *baseObject = _Context_->BaseObject ;
     if ( ( word->Name [0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
     {
@@ -316,9 +313,11 @@ void
 _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
 {
     Context * cntx = _Context_ ;
+    Lexer * lexer = cntx->Lexer0 ;
     ListObject *l1 = * pl1, * l2 ;
     Word * word = l1 ;
 
+    lexer->TokenStart_ReadLineIndex = l1->W_RL_Index ; // nb : needed eg. to correctly check is forward dotted to set a QualifyingNamespace ; it is reset at ReadToken
     Set_CompileMode ( true ) ;
     if ( l1->W_LispAttributes & ( LIST | LIST_NODE ) )
     {

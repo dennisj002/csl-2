@@ -1,5 +1,12 @@
-// see readme.txt for a text description
-// TODO : types, database, garbage collection : integration
+5
+c_syntaxOn
+C 'Experimental namespace
+C C.Experimental
+type Pointer ; Pointer.size = 8 ;
+type block ; block.size = 8 ;
+type Location ; Location.size = 8 ;
+type NamedByteArray ; NamedByteArray.size = 8 ;
+#if 0
 typedef char int8 ;
 typedef unsigned char uint8 ;
 typedef uint8 byte ;
@@ -22,6 +29,7 @@ typedef int64( *cFunction_1_Arg ) ( int64 ) ;
 typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;
 typedef VoidFunction block ; // code block
 //typedef byte AsciiCharSet [ 256 ] ;
+#endif
 
 typedef struct
 {
@@ -30,7 +38,7 @@ typedef struct
     uint64 *StackMin ;
     uint64 *StackMax ;
     uint64 *InitialTosPointer ;
-    uint64 StackData [0] ;
+    d: uint64 StackData [0] ;
 } Stack ;
 
 typedef byte * function, * object, * type, * slot ;
@@ -107,11 +115,12 @@ typedef struct
 } dllist ;
 #define Head l_List.n_Head
 #define Tail l_List.n_Tail
+#if 0
 enum types
 {
     BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, CARTESIAN_PRODUCT
 } ;
-
+#endif
 typedef struct
 {
     dllist osl_List ;
@@ -194,6 +203,7 @@ typedef struct
 
 #define n_Car n_After 
 #define n_Cdr n_Before
+#if 0
 typedef void ( *MapFunction0 ) ( dlnode * ) ;
 typedef int64( *MapFunction1 ) ( dlnode *, int64 ) ;
 typedef int64( *MapFunction2 ) ( dlnode *, int64, int64 ) ;
@@ -201,8 +211,8 @@ typedef void ( *MapFunction2_64 ) ( dlnode *, uint64, int64 ) ;
 typedef int64( *MapFunction3 ) ( dlnode *, int64, int64, int64 ) ;
 typedef void ( *MapFunction4 ) ( dlnode *, int64, int64, int64, int64 ) ;
 typedef void ( *MapFunction5 ) ( dlnode *, int64, int64, int64, int64, int64 ) ;
-typedef
-Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
+typedef Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
+#endif
 typedef struct _Identifier // _Symbol
 {
     DLNode S_Node ;
@@ -243,6 +253,7 @@ typedef struct _Identifier // _Symbol
     struct _Identifier * CSLWord, * BaseObject ;
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer, CaseNode ;
+#if 0
 #define S_Car S_Node.n_DLNode.n_After
 #define S_Cdr S_Node.n_DLNode.n_Before
 #define S_After S_Cdr
@@ -323,13 +334,13 @@ typedef int64( *MapFunction_Word_PtrInt ) ( ListObject *, Word *, int64 * ) ;
 typedef int64( *MapFunction ) ( Symbol * ) ;
 typedef int64( *MapFunction_1 ) ( Symbol *, int64 ) ;
 typedef int64( *MapFunction_Word ) ( Symbol *, Word * ) ;
-typedef
-int64( *MapFunction_2 ) ( Symbol *, int64, int64 ) ;
+typedef int64( *MapFunction_2 ) ( Symbol *, int64, int64 ) ;
 typedef void ( *MapSymbolFunction ) ( Symbol * ) ;
 typedef void ( *VMapNodeFunction ) ( dlnode * ) ;
 typedef void ( *MapSymbolFunction2 ) ( Symbol *, int64, int64 ) ;
 typedef Word* ( *MapNodeFunction ) ( dlnode * node ) ;
 typedef void ( *VMapSymbol2 ) ( Symbol * symbol, int64, int64 ) ;
+#endif
 typedef struct location
 {
     byte * Filename ;
@@ -400,7 +411,7 @@ typedef struct _WordData
     byte * SourceCoding ; //
     int64 SourceCodeMemSpaceRandMarker ;
 } WordData ; // try to put all compiler related data here so in the future we can maybe delete WordData at runtime
-
+#if 0
 // to keep using existing code without rewriting ...
 #define CodeStart W_WordData->CodeStart // set at Word allocation 
 #define Coding W_WordData->Coding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
@@ -449,13 +460,13 @@ typedef struct _WordData
 #define W_TypeSignatureString W_WordData->TypeSignature
 #define W_TypeObjectsNamespaces W_WordData->TypeObjectsNamespaces
 #define NamespaceStack W_WordData->WD_NamespaceStack
+#endif
 typedef struct
 {
     Symbol P_Symbol ;
     slot P_Attributes ;
 } Attribute ;
 
-struct NamedByteArray ;
 typedef struct
 {
     MemChunk BA_MemChunk ;
@@ -467,9 +478,11 @@ typedef struct
     byte * bp_Last ;
     byte * BA_Data ;
 } ByteArray ;
+#if 0
 #define BA_AllocSize BA_MemChunk.S_Size
 #define BA_CAttribute BA_MemChunk.S_MorphismAttributes
 #define BA_AAttribute BA_MemChunk.S_WAllocType
+#endif
 typedef struct NamedByteArray
 {
     MemChunk NBA_MemChunk ;
@@ -484,12 +497,14 @@ typedef struct NamedByteArray
     dlnode NBA_ML_HeadNode ;
     dlnode NBA_ML_TailNode ;
 } NamedByteArray, NBA ;
+#if 0
 #define NBA_AAttribute NBA_Symbol.S_WAllocType
 #define NBA_Chunk_Size NBA_Symbol.S_ChunkSize
 #define NBA_Name NBA_Symbol.S_Name
 #define CN_CaseBlock S_Value 
 #define CN_CaseBytePtrValue S_pb_Data2
 #define CN_CaseUint64Value S_Value2
+#endif
 typedef struct
 {
     Symbol GI_Symbol ;
@@ -551,9 +566,8 @@ typedef struct TCI
     Namespace * OriginalContainingNamespace, * MarkNamespace ;
 } TabCompletionInfo, TCI ;
 
-struct ReadLiner ;
-typedef
-byte( *ReadLiner_KeyFunction ) (struct ReadLiner *) ;
+//struct ReadLiner ;
+//typedef byte ( *ReadLiner_KeyFunction ) (struct ReadLiner *) ;
 typedef struct ReadLiner
 {
     uint64 State, svState ;
@@ -578,7 +592,7 @@ typedef struct
     Namespace * QualifyingNamespace ;
 } Finder ;
 
-struct Interpreter ;
+//struct Interpreter ;
 typedef struct SourceCodeInfo
 {
     int64 SciIndex, SciQuoteMode, SciFileIndexScStart, SciFileIndexScEnd ;
@@ -637,6 +651,7 @@ typedef struct
         } ;
         Word * COIW [8] ; // CompileOptimizeInfo Word array
     } ;
+#if 0    
 #if NEW_CPU_PIPELINE_STATE    
     CpuPipelineState CPState ;
 #endif   
@@ -662,6 +677,7 @@ typedef struct
 #define LOC_ACC                 ( 1 << 6 )
 #define LOC_OREG                ( 1 << 7 )
 #define REG_LOCK_BIT              ( 0x10 ) // decimal 16, beyond the 15 regs
+#endif    
     int64 rtrn, NumberOfArgs ;
     uint16 ControlFlags ;
     Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2, *wordArg0_ForOpEqual, *lparen1, *lparen2 ;
@@ -669,6 +685,7 @@ typedef struct
     Boolean rvalue, wordArg1_rvalue, wordArg2_rvalue, wordArg1_literal, wordArg2_literal ;
     Boolean wordOp, wordArg1_Op, wordArg2_Op ;
     // CompileOptimizeInfo State values
+#if 0    
 #define ACC_1L                   ( (uint64) 1 << 1 )              
 #define ACC_1R                   ( (uint64) 1 << 2 )              
 #define ACC_2L                   ( (uint64) 1 << 3 )              
@@ -691,8 +708,9 @@ typedef struct
 #define ARG2_L                   ( 1 << 2 )
 #define ARG2_R                   ( 1 << 3 )
 #define OP_RESULT                ( 1 << 4 )
+#endif    
 } CompileOptimizeInfo, COI ;
-typedef struct TypeDefStructCompileInfo
+typedef struct //_TypeDefStructCompileInfo
 {
     int64 State, Tdsci_Offset, Tdsci_StructureUnion_Size, Tdsci_Field_Size ;
     int64 LineNumber, Token_EndIndex, Token_StartIndex ;
@@ -700,6 +718,7 @@ typedef struct TypeDefStructCompileInfo
     Word * Tdsci_Field_Object ;
     byte *DataPtr, * TdsciToken ;
 } TypeDefStructCompileInfo, TDSCI ;
+d: #if 0
 //TypeDefStructCompileInfo State flags
 #define TDSCI_CLONE_FLAG                    ( (uint64) 1 << 0 ) 
 #define TDSCI_STRUCT                        ( (uint64) 1 << 1 ) 
@@ -708,6 +727,7 @@ typedef struct TypeDefStructCompileInfo
 #define TDSCI_PRINT                         ( (uint64) 1 << 4 ) 
 #define TDSCI_POINTER                       ( (uint64) 1 << 5 ) 
 #define TDSCI_UNION_PRINTED                 ( (uint64) 1 << 6 ) 
+#endif
 typedef struct
 {
     uint64 State ;

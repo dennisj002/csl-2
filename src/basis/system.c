@@ -170,7 +170,7 @@ Convert_RestartCondtion ( int64 restartCondition )
         case ( ( uint64 ) 1 << 7 ): return "RESET_ALL" ;
         case ( ( uint64 ) 1 << 6 ): return "ABORT" ;
         case ( ( uint64 ) 1 << 5 ): return "QUIT" ;
-        case ( ( uint64 ) 1 << 4 ): return "csl_RUN_INIT" ;
+        case ( ( uint64 ) 1 << 4 ): return "CSL_RUN_INIT" ;
         case ( ( uint64 ) 1 << 3 ): return "STOP" ;
         case ( ( uint64 ) 1 << 2 ): return "BREAK" ;
         case ( ( uint64 ) 1 << 1 ): return "CONTINUE" ;

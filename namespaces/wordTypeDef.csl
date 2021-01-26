@@ -5,6 +5,7 @@ C.Experimental
 type Pointer ; Pointer.size = 8 ;
 type block ; block.size = 8 ;
 type Location ; Location.size = 8 ;
+type int64 ; int64.size = 8 ;
 typedef struct _node
 {
     union

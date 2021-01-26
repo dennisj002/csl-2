@@ -26,17 +26,13 @@ CSL_CommentToEndOfLine ( )
 void
 CSL_ParenthesisComment ( )
 {
+    //byte * token ;
     Lexer * lexer = _Lexer_ ;
     _CSL_UnAppendTokenFromSourceCode ( _CSL_, lexer->OriginalToken ) ;
     int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( lexer ) ;
-    while ( 1 )
-    {
-        int64 inChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
-        if ( (!inChar) || ( inChar == - 1 ) || ( inChar == eof ) ) break ;
-        char * token = ( char* ) Lexer_ReadToken ( lexer ) ;
-        if ( token && ( strcmp ( token, "*/" ) == 0) ) return ;
-    }
+    //do token = Lexer_ReadToken ( lexer ) ;
+    while ( ! String_Equal ( Lexer_ReadToken ( lexer ), "*/" ) ) ;
     if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 
@@ -56,7 +52,7 @@ CSL_Define ( )
     else
     {
         word = _CSL_->LastFinished_Word ;
-        if ( word ) word->W_ObjectAttributes |= (LITERAL|CONSTANT) ;
+        if ( word ) word->W_ObjectAttributes |= ( LITERAL | CONSTANT ) ;
     }
     CSL_Inline ( ) ;
     //CSL_SaveDebugInfo ( _CSL_->LastFinished_Word, 0 ) ; // how would this kind of thing work with an inline word??
