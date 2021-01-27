@@ -155,8 +155,7 @@ Do_Variable ( Word * word )
                 else if ( GetState ( cntx, IS_RVALUE ) ) value = word->W_Value ;
                 else value = ( int64 ) word->W_PtrToValue ;
             }
-            if ( GetState ( cntx, IS_REVERSE_DOTTED ) && ( cntx->BaseObject && ( cntx->BaseObject != word ) ) // guessing some logic here ??
-                && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) && ( ! ( word->W_ObjectAttributes & ( THIS ) ) ) ) TOS = value ; //?? maybe needs more precise state logic
+            if ( GetState ( cntx, IS_REVERSE_DOTTED ) && ( cntx->BaseObject && ( cntx->BaseObject != word ) ) ) TOS = value ; 
             else DataStack_Push ( value ) ;
         }
 done:
