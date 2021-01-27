@@ -192,7 +192,7 @@
 #define OPERAND_2_REG        RBX                     // rbx
 #define OREG2                        OPERAND_2_REG 
 #define CPU_OREG2                RBX
-#define THRU_REG                   RAX //R9                      // r9
+#define THRU_REG                   R10 //RAX //R9                      // r9
 #define SCRATCH_REG             R11 //RBX //R8 //RDX                      // r8 // eax/edx are both used sometimes by ops ebx/ecx are not ?
 #define SREG                            SCRATCH_REG
 #define DIV_MUL_REG_2           RDX                     // rdx

@@ -46,7 +46,7 @@ byte *
 JumpCallInstructionAddress_X64ABI ( byte * address )
 {
     int64 offset ;
-    if ( ( ( * ( address - 20 ) ) == 0x49 ) && ( ( * ( address - 19 ) ) == 0xb8 ) ) offset = 18 ;
+    if ( ( ( * ( address - 20 ) ) == 0x49 ) && ( ( * ( address - 19 ) ) == 0xbb ) ) offset = 18 ;
     else offset = 8 ;
     byte * jcAddress = * ( byte** ) ( address - offset ) ; //JumpCallInstructionAddress ( debugger->DebugAddress ) ;
     return jcAddress ;

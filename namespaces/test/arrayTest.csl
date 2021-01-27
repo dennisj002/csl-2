@@ -167,13 +167,8 @@ decimal
     a.ar[1] @ dup decimal p 0x89 _assert 
 ;
 #endif
-cOn
-// problem with local variables in yada (below) finding this 'b' and 'c'
-void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
-void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 _assert s
-//pause
-cOff
 sp
+' arr2 find wdiss
 Ar1 'arr1 new
 "arr1 : " ps location arr1 size @ dump // should be all zeroes
 arr1.ar [ 3 ] 0x89 =
@@ -181,6 +176,17 @@ arr1.ar[0] arr1.ar[3] @ =
 arr1.ar[0] @ 0x89 _assert
 sp
 "arr1 : " ps location arr1 size @ dump // should show 0x89 = 0x59 in first and last postion
+arr1 arr2 // should print 137
+"\narr1 : " ps location arr1 size @ dump 
+sp
+//pause
+cOn
+// problem with local variables in yada (below) finding this 'b' and 'c'
+void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
+void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 _assert s
+//pause
+cOff
+sp
 : arr2 ( Ar1 a ) 
     //a.b 0x23 = 
     //a.c 0x456 =

@@ -734,12 +734,12 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
         offset = * ( ( int32 * ) ( address + 2 ) ) ;
         iaddress = address + offset + 2 + INT32_SIZE ;
     }
-    else if ( ( ( * ( uint16* ) address ) == 0xff49 ) && ( ( *( address + 2 ) == 0xd1 ) || ( *( address + 2 ) == 0xd0 ) ) ) // call r8/r9
+    else if ( ( ( * ( uint16* ) address ) == 0xff49 ) && ( ( *( address + 2 ) == 0xd2 ) || ( *( address + 2 ) == 0xd3 ) ) ) // call r10/r11
     {
-        if ( ( ( * ( uint16* ) ( address - 20 ) ) == 0xb849 ) ) iaddress = ( byte* ) ( * ( ( uint64* ) ( address - 18 ) ) ) ; //mov r8, 0xxx in Compile_Call_TestRSP  
+        if ( ( ( * ( uint16* ) ( address - 20 ) ) == 0xbb49 ) ) iaddress = ( byte* ) ( * ( ( uint64* ) ( address - 18 ) ) ) ; //mov r11, 0xxx in Compile_Call_TestRSP  
         else iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ;
     }
-    else if ( ( ( * ( uint16* ) address ) == 0xff48 ) && ( *( address + 2 ) == 0xd0 ) ) // call rax
+    else if ( ( ( * ( uint16* ) address ) == 0xff48 ) && ( *( address + 2 ) == 0xd3 ) ) // call rax
     {
         iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ;
     }

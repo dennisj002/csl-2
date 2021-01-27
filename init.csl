@@ -429,6 +429,7 @@ Root
 'forStarters var 
 forStarters 0 =
 '_doDemo 1 const
+'_doTest 0 const
     
 dbgOff
 //dbgOn 
@@ -436,7 +437,7 @@ dbgOff
 
 #if Is_DebugOn 
 
-"testCsl" memspace
+//"testCsl" memspace
     
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
@@ -447,8 +448,9 @@ System C
 sp
 fload test.txt //pause
 //stack pause
+#if _doTest
 tc 
-//demo
+#endif
 
 #if _doDemo 
 demo 
@@ -457,7 +459,7 @@ demo
 
 stringMacrosOff
 mem //pause
-"testCsl" msDelete
+//"testCsl" msDelete
 
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your extra init code maybe here if you like
 : mct "namespaces/compiler/machineCode.csl" include ;

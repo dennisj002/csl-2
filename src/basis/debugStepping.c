@@ -103,19 +103,11 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
             Debugger_CASOI_Do_JmpOrCall_Insn ( debugger, jcAddress ) ;
         }
-        else if ( ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
+        else if ( ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd2 ) ) )
         {
             jcAddress = JumpCallInstructionAddress_X64ABI ( debugger->DebugAddress ) ;
             Debugger_CASOI_Do_JmpOrCall_Insn ( debugger, jcAddress ) ;
-            //debugger->DebugAddress = (byte*) *((uint64*) (debugger->DebugAddress - 8))  ; //jcAddress ;
         }
-#if 0 // old code ??       
-        else if ( ( * debugger->DebugAddress == CALL_JMP_MOD_RM ) && ( _RM ( debugger->DebugAddress ) == 16 ) ) // inc/dec are also opcode == 0xff
-        {
-            jcAddress = Debugger_CASOI_Do_IncDec_Insn ( debugger, jcAddress ) ;
-            _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ;
-        }
-#endif        
         else if ( adr = debugger->DebugAddress, ( ( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 ) ) ||
             ( adr = debugger->DebugAddress + 1, ( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 ) ) ) // jcc 
         {
@@ -464,7 +456,7 @@ _Debugger_COI_StepInto ( Debugger * debugger, Word * word, byte * jcAddress, int
 {
     byte * newDebugAddress ;
     while ( word->W_MorphismAttributes & ( ALIAS ) ) word = word->W_AliasOf ;
-    if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
+    if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd2 ) ) )
     {
         Printf ( ( byte* ) "\nstepping into a csl compiled function : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
         _Stack_Push ( debugger->ReturnStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
