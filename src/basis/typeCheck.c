@@ -65,7 +65,7 @@ TSI_TypeCheck_TypeVariable ( TSI * tsi )
     //if ( tsi->OpWord->CAttribute & CATEGORY_OP_STORE ) needs to be considered ??
     if ( rvalue && lvalue && lvalue->Name && rvalue->Name )
     {
-        if ( lvalue->ObjectByteSize && ( rvalue->ObjectByteSize > lvalue->ObjectByteSize ) ) tsi->TypeErrorStatus |= ( TSE_SIZE_MISMATCH ) ;
+        if ( lvalue->CompiledDataFieldByteSize && ( rvalue->CompiledDataFieldByteSize > lvalue->CompiledDataFieldByteSize ) ) tsi->TypeErrorStatus |= ( TSE_SIZE_MISMATCH ) ;
 #if 1 // infer TypeNamespace       
         else if ( lvalue->TypeNamespace )
         {
@@ -228,7 +228,7 @@ _TypeMismatch_CheckError_Print ( Word * lvalueWord, Word *rvalueWord, Boolean qu
 {
     if ( GetState ( _Context_, C_SYNTAX ) )
     {
-        int64 lvalueSize = lvalueWord->ObjectByteSize, rvalueSize = rvalueWord->ObjectByteSize ;
+        int64 lvalueSize = lvalueWord->CompiledDataFieldByteSize, rvalueSize = rvalueWord->CompiledDataFieldByteSize ;
         if ( ( lvalueSize > 0 ) && ( rvalueSize > lvalueSize ) ) // for C internal lvalue size may be 0
         {
             Printf ( "\nTypeError : Wrong data sizes :: lvalue : %s : size == %ld :: rvalue : %s : size == %ld",
@@ -657,9 +657,10 @@ CSL_ShowTypeWordStack ( )
     Stack_Print ( _CSL_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
     //else _Printf ( (byte*)"\ntypeChecking is off" ) ;
 }
+#if 0
 
 int64
-CSL_Get_ObjectByteSize ( Word * word )
+CSL_GetAndSet_ObjectByteSize ( Word * word )
 {
     if ( word->Size ) return word->Size ;
     else
@@ -675,19 +676,36 @@ CSL_Get_ObjectByteSize ( Word * word )
         return objectByteSize ;
     }
 }
-
 void
 CSL_Set_Namespace_ObjectByteSize ( Namespace * ns, int64 obsize )
 {
-    if ( ns ) ns->ObjectByteSize = obsize ; // not here ??
+    if ( ns ) ns->CompiledDataFieldByteSize = obsize ; // not here ??
 }
+
+#else
+
+int64
+CSL_GetAndSet_ObjectByteSize ( Word * word )
+{
+    int64 objectByteSize ; 
+    Namespace * typeNamespace ;
+    if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) objectByteSize = 8 ; //sizeof (byte*) ; 
+    else
+    {
+        if ( typeNamespace = TypeNamespace_Get ( word ) )
+            objectByteSize = ( int64 ) _CSL_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) ;
+        else objectByteSize = word->CompiledDataFieldByteSize ? word->CompiledDataFieldByteSize : 8 ;
+    }
+    return word->ObjectByteSize = objectByteSize ;
+}
+#endif
 
 int64
 CSL_Get_Namespace_SizeVar_Value ( Namespace * ns )
 {
     int64 objectByteSize ;
     objectByteSize = ( int64 ) _CSL_VariableValueGet ( ns->Name, ( byte* ) "size" ) ;
-    if ( ! objectByteSize ) objectByteSize = ns->ObjectByteSize ;
+    if ( ! objectByteSize ) objectByteSize = ns->CompiledDataFieldByteSize ;
     //else ns->ObjectByteSize = objectByteSize ; // not here ??
     return objectByteSize ;
 }
@@ -695,7 +713,7 @@ CSL_Get_Namespace_SizeVar_Value ( Namespace * ns )
 #if 0
 
 byte
-CSL_Get_ObjectByteSize ( Word * word )
+CSL_GetAndSet_ObjectByteSize ( Word * word )
 {
     byte size ;
     if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) size = - 1 ; // 8 ??

@@ -373,10 +373,15 @@ cOn
 C.Experimental 
 'wtdInclude find Word size dump
 'wtdInclude find 'C.Experimental.Word find wordStructPrint  
-printf ( "\nWord.size = %d, WordData.size = %d", Word.size, WordData.size ) ;
+printf ( "\nWord.size = %d, WordData.size = %d, Stack.size = %d", Word.size, WordData.size, Experimental.Stack.size ) ;
+printf ( "\nWord.size = %d, WordData.size = %d, Stack.size = %d", Word.size, WordData.size, C.Experimental.Stack.size ) ;
+cOff
+//C.Experimental.Stack.size @ p
+//C.Experimental.Stack.size @ p
+//Stack.size @ p
 stateAll
 'C.Experimental notUsing 
-//pause
+pause
 #endif
 #if 1
 cOn

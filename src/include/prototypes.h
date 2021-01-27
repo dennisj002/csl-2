@@ -55,7 +55,7 @@ void Compile_CallThru_AdjustRSP(Boolean reg, Boolean regOrMem);
 void Compile_Call(byte *address);
 void _Compile_Call_ThruReg_TestAlignRSP(Boolean thruReg);
 void Compile_Call_ToAddressThruReg_TestAlignRSP(byte *address, Boolean thruReg);
-void Compile_Call_ToAddressThruR8_TestAlignRSP(void);
+void Compile_Call_ToAddressThruSREG_TestAlignRSP(void);
 void Compile_Call_TestRSP(byte *address);
 void Compile_Call_X84_ABI_RSP_ADJUST(byte *address);
 void Compile_CallWord_Check_X84_ABI_RSP_ADJUST(Word *word);
@@ -1608,8 +1608,7 @@ void CSL_TypeCheckOff(void);
 void CSL_DbgTypecheckOff(void);
 void CSL_DbgTypecheckOn(void);
 void CSL_ShowTypeWordStack(void);
-int64 CSL_Get_ObjectByteSize(Word *word);
-void CSL_Set_Namespace_ObjectByteSize(Namespace *ns, int64 obsize);
+int64 CSL_GetAndSet_ObjectByteSize(Word *word);
 int64 CSL_Get_Namespace_SizeVar_Value(Namespace *ns);
 /* src/basis/linux.c */
 void _DisplaySignal(int64 signal);

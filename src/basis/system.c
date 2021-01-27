@@ -253,7 +253,7 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
         }
         if ( word->W_ObjectAttributes & STRUCTURE )
         {
-            Printf ( ( byte* ) "%s <:> %s : size = %d", name, "structure", word->ObjectByteSize ) ;
+            Printf ( ( byte* ) "%s <:> %s : size = %d", name, "structure", word->CompiledDataFieldByteSize ) ;
         }
         else if ( word->W_ObjectAttributes & NAMESPACE )
         {

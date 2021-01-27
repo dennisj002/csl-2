@@ -66,9 +66,9 @@ CSL_PokeRegAtAddress ( ) // @
 int
 Word_LvalueObjectByteSize ( Word * lvalueWord, Word * rValueWord ) // = 
 {
-    int size = ( ( rValueWord->Size == 8 ) || ( lvalueWord->W_ObjectAttributes & ( BIGNUM | REGISTER_VARIABLE ) )
-        || ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) ) ? ( sizeof (int64 ) ) :
-        lvalueWord->ObjectByteSize ? lvalueWord->ObjectByteSize : ( sizeof (int64 ) ) ;
+    int size = ( ( rValueWord->CompiledDataFieldByteSize == 8 ) || ( lvalueWord->W_ObjectAttributes & ( BIGNUM | REGISTER_VARIABLE ) ) || ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) ) ? 
+        ( sizeof (int64 ) ) :
+        lvalueWord->CompiledDataFieldByteSize ? lvalueWord->CompiledDataFieldByteSize : ( sizeof (int64 ) ) ;
     return size ;
 }
 

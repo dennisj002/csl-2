@@ -132,7 +132,7 @@ _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Bool
 Boolean
 RegParameterOrder ( Boolean n )
 {
-    Boolean regOrder [] = { RDI, RSI, RDX, RCX, ACC, OREG } ;
+    Boolean regOrder [] = { RDI, RSI, RDX, RCX, R8, R9 } ;
     return regOrder [n] ;
 }
 #endif
@@ -366,7 +366,7 @@ Compile_MoveImm ( Boolean mod, Boolean rm, int64 disp, int64 imm, Boolean immSiz
     {
         // there is no x64 instruction to move imm64 to mem directly
         uint8 thruReg = THRU_REG ;
-        Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : R8D : needs to be a parameter
+        Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : SREGD : needs to be a parameter
         Compile_Move_Reg_To_Rm ( rm, thruReg, disp ) ;
     }
     else Compile_Move ( 0, mod, 0, rm, 0, 0, 0, 0, imm, immSize ) ; // nb. reg == 0 in a move immediate
@@ -827,16 +827,16 @@ Compile_Call_ToAddressThruReg_TestAlignRSP ( byte * address, Boolean thruReg )
 }
 
 void
-Compile_Call_ToAddressThruR8_TestAlignRSP ( )
+Compile_Call_ToAddressThruSREG_TestAlignRSP ( )
 {
-    _Compile_Call_ThruReg_TestAlignRSP ( R8 ) ;
+    _Compile_Call_ThruReg_TestAlignRSP ( SREG ) ;
 }
 
 void
 Compile_Call_TestRSP ( byte * address )
 {
-    Compile_MoveImm_To_Reg ( R8, ( int64 ) address, CELL ) ;
-    Compile_Call ( ( byte* ) _CSL_->Call_ToAddressThruR8_TestAlignRSP ) ;
+    Compile_MoveImm_To_Reg ( SREG, ( int64 ) address, CELL ) ;
+    Compile_Call ( ( byte* ) _CSL_->Call_ToAddressThruSREG_TestAlignRSP ) ;
 }
 
 void

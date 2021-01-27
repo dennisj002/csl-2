@@ -52,8 +52,6 @@ Parse_Identifier ( int64 t_type )
     }
     else if ( t_type == POST_STRUCTURE_ID ) //&& GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
     {
-        //if ( ( ! tdsci->Tdsci_StructureUnion_Namespace->Name ) || String_Equal ( tdsci->Tdsci_StructureUnion_Namespace->Name, "<unnamed>" ) )
-        //    tdsci->Tdsci_StructureUnion_Namespace->Name = String_New ( identifier, DICTIONARY ) ;
         if ( tdsci->Tdsci_StructureUnion_Namespace ) id = Parse_Do_IdentifierAlias ( identifier, tdsci->Tdsci_StructureUnion_Size ) ;
         else tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS_CLONE, 0, identifier, 0, 0, 0, 0, 0, tdsci->Tdsci_InNamespace, 0, - 1, - 1 ) ;
         Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ; //+= ( tdsci->Tdsci_StructureUnion_Size % 8 ) ) ;
@@ -62,8 +60,6 @@ Parse_Identifier ( int64 t_type )
     }
     else if ( t_type == PRE_STRUCTURE_ID )
     {
-        //if ( ( ! tdsci->Tdsci_StructureUnion_Namespace->Name ) || String_Equal ( tdsci->Tdsci_StructureUnion_Namespace->Name, "<unnamed>" ) )
-        //    tdsci->Tdsci_StructureUnion_Namespace->Name = String_New ( identifier, DICTIONARY ) ;
         tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS, 0, identifier, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
         id->W_ObjectAttributes |= ( STRUCT | NAMESPACE ) ; //??
         id->Offset = tdsci->Tdsci_Offset ;
@@ -97,7 +93,7 @@ Parse_Array ( )
         }
         else
         {
-            if ( i ) //& size )
+            if ( i ) 
             {
                 tdsci->Tdsci_Field_Object->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64 ), DICTIONARY ) ; //tdsci->Tdsci_Field_Size, DICTIONARY ) ;
                 MemCpy ( tdsci->Tdsci_Field_Object->ArrayDimensions, arrayDimensions, i * sizeof (int64 ) ) ; //tdsci->Tdsci_Field_Size ) ;
@@ -366,13 +362,12 @@ Parse_PostStruct_Accounting ( )
     tdsci = TDSCI_GetTop ( ) ;
     if ( ctdsci ) // always should be there but check anyway
     {
-        ctdsci->Tdsci_StructureUnion_Size = ctdsci->Tdsci_StructureUnion_Size ? ( ctdsci->Tdsci_StructureUnion_Size + ( ctdsci->Tdsci_StructureUnion_Size % 8 ) ) : 0 ;
+        ctdsci->Tdsci_StructureUnion_Size = ctdsci->Tdsci_StructureUnion_Size ? ( ctdsci->Tdsci_StructureUnion_Size + ( ctdsci->Tdsci_StructureUnion_Size % 8 ) ) : 0 ; // % 8 : round up to even multiple of int64
         if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = ctdsci->Tdsci_StructureUnion_Namespace ;
         if ( GetState ( tdsci, TDSCI_UNION ) )
         {
             if ( ctdsci->Tdsci_StructureUnion_Size > tdsci->Tdsci_StructureUnion_Size ) tdsci->Tdsci_StructureUnion_Size = ctdsci->Tdsci_StructureUnion_Size ;
         }
-
         else tdsci->Tdsci_StructureUnion_Size += ctdsci->Tdsci_StructureUnion_Size ;
         tdsci->Tdsci_Offset = tdsci->Tdsci_StructureUnion_Size ;
         tdsci->TdsciToken = ctdsci->TdsciToken ;
@@ -491,7 +486,7 @@ TDSCI_Print_StructNameEtc ( )
 {
     TDSCI * tdsci = TDSCI_GetTop ( ) ;
     Printf ( "\n\t%16s : %s : size = %d : at %016lx",
-        tdsci->Tdsci_Field_Type_Namespace->Name, tdsci->TdsciToken, CSL_Get_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
+        tdsci->Tdsci_Field_Type_Namespace->Name, tdsci->TdsciToken, CSL_GetAndSet_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
         &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
 }
 
@@ -637,7 +632,7 @@ _CSL_TypedefAlias ( Word * word0, byte * name, Namespace * addToNs, int64 size )
         _CSL_->LastFinished_Word = alias ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
-        alias->Size = word->Size = size ;
+        alias->ObjectByteSize = word->ObjectByteSize = size ;
     }
     else Exception ( USEAGE_ERROR, ABORT ) ;
 

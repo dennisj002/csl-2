@@ -230,7 +230,7 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
     else if ( ! ( parent->W_ObjectAttributes & NAMESPACE ) )
     {
         parent->W_List = dllist_New ( ) ;
-        parent->W_ObjectAttributes |= OBJECT_FIELD | NAMESPACE ;
+        parent->W_ObjectAttributes |= DOBJECT_FIELD | NAMESPACE ;
         _Namespace_AddToNamespacesTail ( parent ) ;
     }
     if ( parent->S_WAllocType == WORD_COPY_MEM ) parent = Word_Copy ( ( Word* ) parent, DICTIONARY ) ; // nb! : this allows us to

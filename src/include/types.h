@@ -21,7 +21,6 @@ typedef int64( *cFunction_0_Arg ) ( ) ;
 typedef int64( *cFunction_1_Arg ) ( int64 ) ;
 typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;
 typedef VoidFunction block ; // code block
-//typedef byte AsciiCharSet [ 256 ] ;
 
 typedef struct
 {
@@ -155,7 +154,7 @@ typedef struct
         byte * do_bData ;
         int64 * do_iData ;
     } ;
-} dobject ; // size 4 x 64 bits
+} dobject ; 
 typedef struct
 {
     union
@@ -239,7 +238,7 @@ typedef struct _Identifier // _Symbol
     block Definition ;
     dllist * DebugWordList ;
     int64 StartCharRlIndex ;
-    int64 SC_WordIndex ; //, SC_FileIndex_Start, SC_FileIndex_End ;
+    int64 SC_WordIndex ; 
     struct _Identifier * CSLWord, * BaseObject ;
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer, CaseNode ;
@@ -248,7 +247,6 @@ typedef struct _Identifier // _Symbol
 #define S_After S_Cdr
 #define S_Before S_Car
 #define S_CurrentNode n_CurrentNode
-//#define S_AAttribute S_Node.n_Attributes.T_AAttribute // Allocation type Attribute
 #define S_MorphismAttributes S_Node.n_Attributes.T_MorphismAttributes
 #define S_ObjectAttributes S_Node.n_Attributes.T_ObjectAttributes
 #define S_WordAttributes S_Node.n_Attributes.T_WordAttributes
@@ -257,7 +255,8 @@ typedef struct _Identifier // _Symbol
 #define S_NumberOfPrefixedArgs S_Node.n_Attributes.T_NumberOfPrefixedArgs
 #define S_Size S_Node.n_Attributes.T_Size
 #define Size S_Size 
-#define ObjectByteSize S_Size
+#define CompiledDataFieldByteSize Size
+#define ObjectByteSize S_Node.n_Attributes.T_NumberOfBytes
 #define S_ChunkSize S_Node.n_Attributes.T_ChunkSize
 #define S_NumberOfSlots S_Node.n_Attributes.T_NumberOfSlots
 #define S_Pointer W_Value
@@ -285,7 +284,7 @@ typedef struct _Identifier // _Symbol
 #define Lo_CProp W_MorphismAttributes
 #define Lo_LProp W_LispAttributes
 #define Lo_Name Name
-#define Lo_Size ObjectByteSize
+#define Lo_Size CompiledDataFieldByteSize
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr
 #define Lo_NumberOfSlots S_NumberOfSlots //Slots
@@ -588,7 +587,7 @@ typedef struct SourceCodeInfo
 typedef struct Lexer
 {
     uint64 State ;
-    uint64 L_MorphismAttributes, L_ObjectAttributes, TokenObjectSize ;
+    uint64 L_MorphismAttributes, L_ObjectAttributes, Token_CompiledDataFieldByteSize ;
     int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex, TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
     byte *OriginalToken, *ParsedToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter ;
@@ -888,7 +887,7 @@ typedef struct _CSL
     FILE * LogFILE ;
     Cpu * cs_Cpu, * cs_Cpu2 ;
     block CurrentBlock, WordRun, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
-    block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
+    block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruSREG_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
     Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw ;
     Word *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;

@@ -44,8 +44,8 @@ Compile_CallCFunctionWithParameter_TestAlignRSP2 ( byte * cFunction, Word * word
 {
     //DBI_ON ;
     Compile_MoveImm_To_Reg ( RDI, ( int64 ) word, CELL ) ; // RDI is x64 abi first parameter 
-    Compile_MoveImm_To_Reg ( R8, ( int64 ) cFunction, CELL ) ;
-    Compile_Call ( ( byte* ) _CSL_->Call_ToAddressThruR8_TestAlignRSP ) ;
+    Compile_MoveImm_To_Reg ( SREG, ( int64 ) cFunction, CELL ) ;
+    Compile_Call ( ( byte* ) _CSL_->Call_ToAddressThruSREG_TestAlignRSP ) ;
     //DBI_OFF ;
 }
 
@@ -101,7 +101,7 @@ _Compile_RspReg_From ( )
 void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg, int size )
 {
-    if ( ! size ) size = CSL_Get_ObjectByteSize ( word ) ;
+    if ( ! size ) size = word->CompiledDataFieldByteSize ; 
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
     if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
@@ -171,17 +171,14 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 void
 _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg, int size )
 {
-    if ( ! size ) size = CSL_Get_ObjectByteSize ( word ) ;
+    if ( ! size ) size = word->CompiledDataFieldByteSize ; 
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
     if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
         else Compile_Move_Reg_To_Reg ( reg, word->RegToUse, 0 ) ;
     }
-        //else if ( ( word->CAttribute & ( OBJECT )  ) ) 
-        //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
-    else if ( ( word->W_ObjectAttributes & ( OBJECT | THIS ) ) )
-        _Compile_GetVarLitObj_RValue_To_Reg ( word, reg, 0 ) ;
+    else if ( ( word->W_ObjectAttributes & ( OBJECT | THIS ) ) ) _Compile_GetVarLitObj_RValue_To_Reg ( word, reg, 0 ) ;
     else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compile_LEA ( reg, FP, 0, LocalOrParameterVar_Disp ( word ) ) ;
     else if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value, size ) ;
     else if ( word->W_ObjectAttributes & DOBJECT ) _CSL_Do_DynamicObject_ToReg ( word, reg ) ;

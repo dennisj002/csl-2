@@ -448,6 +448,7 @@ typedef struct
 #define STRING_MACRO        ( (uint64) 1 << 16 )
 #define T_OBJECT            ( (uint64) 1 << 17 )
 //#define T_MORPHISM          ( (uint64) 1 << 18 )
+#define DOBJECT_FIELD        ( (uint64) 1 << 18 )
 #define RECYCLABLE_COPY     ( (uint64) 1 << 21 )
 #define RECYCLABLE_LOCAL    ( (uint64) 1 << 22 )
 #define T_TYPE_VARIABLE     ( (uint64) 1 << 23 )

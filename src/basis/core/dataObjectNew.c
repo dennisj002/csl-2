@@ -122,7 +122,7 @@ _CSL_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 {
     byte * obj = _CSL_NamelessObjectNew ( size, allocType ) ;
     Word * word = _DObject_New ( name, ( int64 ) obj, ( IMMEDIATE | CPRIMITIVE ), OBJECT | category, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
-    word->ObjectByteSize = size ;
+    word->CompiledDataFieldByteSize = size ;
     return word ;
 }
 
@@ -203,10 +203,10 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
             }
         }
     }
-    else if ( ns->ObjectByteSize )
+    else if ( ns->CompiledDataFieldByteSize )
     {
         Printf ( ( byte* ) "\nNamespace Error? : \'%s\' already exists! : \n  %s : size = %d : this namespace is %s.%s : size = %d : at %s\n",
-            ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectByteSize, ns->S_ContainingNamespace->Name, ns->Name, ns->ObjectByteSize, Context_Location ( ) ) ;
+            ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->CompiledDataFieldByteSize, ns->S_ContainingNamespace->Name, ns->Name, ns->CompiledDataFieldByteSize, Context_Location ( ) ) ;
         Namespace_Do_Namespace ( ns ) ;
     }
     CSL_WordList_Init ( 0 ) ;
@@ -219,7 +219,7 @@ CSL_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
 {
     Word * word = _DObject_New ( token, 0, ( IMMEDIATE | CPRIMITIVE ), OBJECT_FIELD, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, aclass, DICTIONARY ) ;
     word->TypeNamespace = aclass ;
-    word->ObjectByteSize = size ;
+    word->CompiledDataFieldByteSize = size ;
     if ( size == 1 ) word->W_ObjectAttributes |= T_BYTE ;
     else if ( size == 8 ) word->W_ObjectAttributes |= T_INT64 ;
     else if ( size == 4 ) word->W_ObjectAttributes |= T_INT32 ;
@@ -240,7 +240,7 @@ _CSL_Variable_New ( byte * name, int64 value )
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
     else word = _DObject_New ( name, value, ( IMMEDIATE ), NAMESPACE_VARIABLE, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
-    word->ObjectByteSize = 8 ;
+    word->CompiledDataFieldByteSize = 8 ;
     return word ;
 }
 

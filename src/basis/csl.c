@@ -131,8 +131,8 @@ CSL_DataStack_Init ( )
 void
 CSL_Setup_For_DObject_ValueDefinition_Init ( )
 {
-    _CSL_MachineCodePrimitive_NewAdd ( "call_ToAddressThruR8_TestAlignRSP", CSL_WORD | CSL_ASM_WORD, 0,
-        & _CSL_->Call_ToAddressThruR8_TestAlignRSP, ( byte* ) Compile_Call_ToAddressThruR8_TestAlignRSP, - 1 ) ;
+    _CSL_MachineCodePrimitive_NewAdd ( "call_ToAddressThruSREG_TestAlignRSP", CSL_WORD | CSL_ASM_WORD, 0,
+        & _CSL_->Call_ToAddressThruSREG_TestAlignRSP, ( byte* ) Compile_Call_ToAddressThruSREG_TestAlignRSP, - 1 ) ;
 }
 
 void

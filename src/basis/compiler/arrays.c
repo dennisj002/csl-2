@@ -203,7 +203,7 @@ _CSL_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
         CSL_OptimizeOn ( ) ; // internal to arrays optimize must be on
 
         if ( ! arrayBaseObject->ArrayDimensions ) CSL_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
-        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectByteSize ;
+        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->CompiledDataFieldByteSize ;
         if ( ! objSize ) CSL_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         if ( lispMode ) Arrays_DoArrayArgs_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;

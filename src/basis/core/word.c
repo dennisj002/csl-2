@@ -260,7 +260,7 @@ Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
             Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size (in bytes) = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
                 //name, cntx->BaseObject ? cntx->BaseObject->Name : ( byte* ) "",
                 name, word->TypeNamespace ? word->TypeNamespace->Name : ( byte* ) "",
-                word->ObjectByteSize,
+                word->CompiledDataFieldByteSize,
                 cntx->BaseObject ? String_ConvertToBackSlash ( cntx->BaseObject->Name ) : ( byte* ) "",
                 cntx->BaseObject ? cntx->BaseObject->W_Value : 0,
                 word->Offset, totalOffset, cntx->BaseObject ? ( ( ( byte* ) cntx->BaseObject->W_Value ) + totalOffset ) : ( byte* ) - 1 ) ;
@@ -399,7 +399,7 @@ _CSL_Alias ( Word * word, byte * name, Namespace * addToNs )
         Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
-        alias->Size = word->Size ;
+        alias->CompiledDataFieldByteSize = word->CompiledDataFieldByteSize ;
         alias->NamespaceStack = word->NamespaceStack ;
         Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 8 ) ;
         alias->W_SC_WordList = word->W_SC_WordList ;

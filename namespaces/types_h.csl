@@ -38,7 +38,7 @@ typedef struct
     uint64 *StackMin ;
     uint64 *StackMax ;
     uint64 *InitialTosPointer ;
-    d: uint64 StackData [0] ;
+    uint64 StackData [0] ;
 } Stack ;
 
 typedef byte * function, * object, * type, * slot ;

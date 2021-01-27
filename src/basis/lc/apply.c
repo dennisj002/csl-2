@@ -11,7 +11,7 @@ ListObject *
 LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
 {
     SetState ( lc, LC_APPLY, true ) ;
-    if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) 
+    if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) )
         || ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD ) ) ) )
     {
         if ( GetState ( lc, LC_DEFINE_MODE ) && ( ! CompileMode ) ) return lfirst ;
@@ -182,7 +182,7 @@ LO_PrepareReturnObject ( )
         Namespace * ns = CSL_In_Namespace ( ) ;
         name = ns->Name ;
         if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) type = T_BIG_NUM ;
-        return DataObject_New (T_LC_NEW, 0, 0, 0, LITERAL | type, LITERAL | type, 0, DataStack_Pop ( ), 0, 0, 0, - 1 ) ;
+        return DataObject_New ( T_LC_NEW, 0, 0, 0, LITERAL | type, LITERAL | type, 0, DataStack_Pop ( ), 0, 0, 0, - 1 ) ;
     }
     else return nil ;
 }
@@ -287,25 +287,28 @@ _LO_Apply_ArrayArg ( ListObject ** pl1, int64 *i )
 }
 
 // compile mode on
+
 void
 _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     ListObject *l1 = * pl1 ;
-    Word * word = l1 ;
-    word = l1->Lo_CSLWord ;
+    Word * word = l1->Lo_CSLWord ;
     byte * here = Here ;
     word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
     Word_Eval ( word ) ;
     Word *baseObject = _Context_->BaseObject ;
-    if ( ( word->Name [0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
+    if ( ( word->W_ObjectAttributes & OBJECT_TYPE ) )
     {
-        if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
-        else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
-        Compile_Move_Reg_To_Reg ( RegParameterOrder ( (*i) ++ ), ACC, 0 ) ;
-        if ( baseObject ) _Debugger_->SpecialPreHere = baseObject->Coding ;
-        else _Debugger_->SpecialPreHere = here ;
+        if ( ( word->Name [0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
+        {
+            if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
+            else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
+            Compile_Move_Reg_To_Reg ( RegParameterOrder ( ( *i ) ++ ), ACC, 0 ) ;
+            if ( baseObject ) _Debugger_->SpecialPreHere = baseObject->Coding ;
+            else _Debugger_->SpecialPreHere = here ;
+        }
     }
 }
 
@@ -324,11 +327,12 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
         Set_CompileMode ( false ) ;
         l2 = LO_Eval ( lc, l1 ) ;
         _Debugger_->SpecialPreHere = Here ;
-        if ( ! l2 || ( l2->W_LispAttributes & T_NIL ) ) Compile_MoveImm_To_Reg ( RegParameterOrder ( (*i) ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
-        else Compile_MoveImm_To_Reg ( RegParameterOrder ( (*i) ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
+        if ( ! l2 || ( l2->W_LispAttributes & T_NIL ) ) Compile_MoveImm_To_Reg ( RegParameterOrder ( ( *i ) ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
+        else Compile_MoveImm_To_Reg ( RegParameterOrder ( ( *i ) ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
         _DEBUG_SHOW ( l2, 1, 0 ) ;
     }
     else if ( ( l1->W_ObjectAttributes & NON_MORPHISM_TYPE ) ) _LO_Apply_NonMorphismArg ( pl1, i ) ;
+        //else if ( ( l1->W_ObjectAttributes & OBJECT_TYPE ) ) _LO_Apply_NonMorphismArg ( pl1, i ) ;
     else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
         Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CSLWord, l1->W_RL_Index, l1->W_SC_Index ) ;
     else if ( ( l1->Name[0] == '[' ) ) _LO_Apply_ArrayArg ( pl1, i ) ;
@@ -336,7 +340,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
     {
         word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
         DEBUG_SETUP ( word, 0 ) ;
-        _Compile_Move_StackN_To_Reg ( RegParameterOrder ( (*i) ++ ), DSP, 0 ) ;
+        _Compile_Move_StackN_To_Reg ( RegParameterOrder ( ( *i ) ++ ), DSP, 0 ) ;
         _DEBUG_SHOW ( word, 1, 0 ) ;
     }
 done:
@@ -366,13 +370,9 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         Set_CompileMode ( true ) ;
         _Debugger_->SpecialPreHere = Here ;
         //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
-        if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, i, CELL ) ; 
-#if 1        
+        if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, i, CELL ) ;
         word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
         Word_Eval ( word ) ;
-#else        
-        Interpreter_DoWord_Default ( _Interpreter_, word, word->W_RL_Index, word->W_SC_Index ) ;
-#endif        
         if ( word->W_MorphismAttributes & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
         if ( ! svcm )
         {
@@ -380,7 +380,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
             block b = ( block ) DataStack_Pop ( ) ;
             Set_CompileMode ( svcm ) ;
             Set_CompilerSpace ( scs ) ;
-            Word_DbgBlock_Eval (word, b) ;
+            Word_DbgBlock_Eval ( word, b ) ;
         }
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;
         SetState ( compiler, LC_ARG_PARSING, false ) ;
@@ -407,7 +407,7 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
     lc->ParenLevel = 1 ;
     if ( word->W_MorphismAttributes & ( C_PREFIX | C_PREFIX_RTL_ARGS ) )
     {
-        if ( ! Compiling ) Compiler_Init (compiler, 0) ;
+        if ( ! Compiling ) Compiler_Init ( compiler, 0 ) ;
         SetState ( compiler, LC_ARG_PARSING, true ) ;
         int64 svcm = CompileMode ;
         Set_CompileMode ( false ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
@@ -438,7 +438,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     Word * word = _Context_->CurrentWordBeingCompiled ;
     LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CSL_Parse_LocalsAndStackVariables will compile something
     SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ; // before _CSL_Parse_LocalsAndStackVariables
-    Namespace * locals = _CSL_Parse_LocalsAndStackVariables (1, 1, args, 0, 0 ) ; //(GetState ( _LC_, LC_BLOCK_COMPILE|LC_BEGIN_MODE ))) ;// ;false ) ;
+    Namespace * locals = _CSL_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0 ) ; //(GetState ( _LC_, LC_BLOCK_COMPILE|LC_BEGIN_MODE ))) ;// ;false ) ;
     word->W_MorphismAttributes = BLOCK ;
     word->W_LispAttributes |= T_LISP_COMPILED_WORD ;
     _LO_Eval ( lc, body, locals, 1 ) ;

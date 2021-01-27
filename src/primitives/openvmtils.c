@@ -118,7 +118,8 @@ OpenVmTil_Print_DataSizeofInfo ( int64 flag )
         Printf ( ( byte* ) "OpenVimTil size : %d bytes, ", sizeof (OpenVmTil ) ) ;
         Printf ( ( byte* ) "OVT_Static size : %d bytes, ", sizeof (OVT_Static ) ) ;
         Printf ( ( byte* ) "OS_Chunk size : %d bytes, ", sizeof (OS_Chunk ) ) ;
-        Printf ( ( byte* ) "OS_Node size : %d bytes", sizeof (OS_Node ) ) ;
+        Printf ( ( byte* ) "OS_Node size : %d bytes, ", sizeof (OS_Node ) ) ;
+        Printf ( ( byte* ) "Stack size : %d bytes", sizeof (Stack ) ) ;
     }
 }
 

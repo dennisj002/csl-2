@@ -146,14 +146,14 @@ _Do_Compile_Variable ( Word * word )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    int64 size = CSL_Get_ObjectByteSize ( word ) ;
+    //int64 size = word->CompiledDataFieldByteSize ; //CSL_Get_ObjectByteSize ( word ) ;
     if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) )
     {
-        if ( GetState ( cntx, IS_RVALUE ) ) Compile_GetVarLitObj_RValue_To_Reg ( word, ACC, size ) ;
+        if ( GetState ( cntx, IS_RVALUE ) ) Compile_GetVarLitObj_RValue_To_Reg ( word, ACC, 0 ) ;
         else
         {
             Compiler_Word_SCHCPUSCA ( word, 1 ) ;
-            if ( ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) ) _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC, size ) ;
+            if ( ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) ) _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC, 0 ) ;
             else // this compilation is delayed to _CSL_C_Infix_Equal/Op
             {
                 Word_SetCodingAndSourceCoding ( word, 0 ) ;
@@ -161,7 +161,7 @@ _Do_Compile_Variable ( Word * word )
             }
         }
     }
-    else _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC, size ) ;
+    else _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC, 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, ( word->W_ObjectAttributes & REGISTER_VARIABLE ) ? word->RegToUse : ACC, true ) ;
 }
 
@@ -283,14 +283,13 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
             //  C cast code here ; 
             // nb! : we have no (fully) implemented operations on operand size less than 8 bytes
             token1 = Lexer_ReadToken ( interp->Lexer0 ) ;
-            //interp->LastLexedChar = interp->Lexer0->LastLexedChar ;
             if ( token1 )
             {
                 Word * word0 = _Interpreter_TokenToWord ( interp, token1, - 1, - 1 ) ;
                 word = Compiler_CopyDuplicatesAndPush ( word0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
                 if ( word )
                 {
-                    word->ObjectByteSize = CSL_Get_ObjectByteSize ( word ) ;
+                    word->ObjectByteSize = CSL_GetAndSet_ObjectByteSize ( word ) ;
                     Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
                 }
             }

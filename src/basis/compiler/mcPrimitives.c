@@ -50,7 +50,7 @@ CSL_MachineCodePrimitive_AddWords ( CSL * csl )
 {
     Debugger * debugger = _Debugger_ ;
     // this form (below) can and should replace the loop because we need to have variables for some elements
-    CSL_MachineCodePrimitive_NewAdd ( "call_ToAddressThruR8_TestAlignRSP", CSL_WORD | CSL_ASM_WORD, 0, & csl->Call_ToAddressThruR8_TestAlignRSP, ( byte* ) Compile_Call_ToAddressThruR8_TestAlignRSP, - 1, "System", "Root" ) ;
+    CSL_MachineCodePrimitive_NewAdd ( "call_ToAddressThruSREG_TestAlignRSP", CSL_WORD | CSL_ASM_WORD, 0, & csl->Call_ToAddressThruSREG_TestAlignRSP, ( byte* ) Compile_Call_ToAddressThruSREG_TestAlignRSP, - 1, "System", "Root" ) ;
     CSL_MachineCodePrimitive_NewAdd ( "restoreCpuState", CSL_WORD | CSL_ASM_WORD, 0, & debugger->RestoreCpuState, ( byte* ) Compile_CpuState_Restore, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
     CSL_MachineCodePrimitive_NewAdd ( "saveCpuState", CSL_WORD | CSL_ASM_WORD, 0, & debugger->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
     CSL_MachineCodePrimitive_NewAdd ( "restoreCpuState", CSL_WORD | CSL_ASM_WORD, 0, & csl->RestoreCpuState, ( byte* ) Compile_CpuState_Restore, ( int64 ) csl->cs_Cpu, "System", "Root" ) ;

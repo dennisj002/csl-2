@@ -225,7 +225,7 @@ _CSL_C_Infix_EqualOp ( block op )
         {
             int64 svState = cntx->State ;
             SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
-            if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) lhsWord->ObjectByteSize = sizeof (byte* ) ;
+            if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) lhsWord->CompiledDataFieldByteSize = sizeof (byte* ) ;
             Interpreter_DoWord_Default ( interp, lhsWord, lhsWord->W_RL_Index, lhsWord->W_SC_Index ) ;
             //CSL_TypeStack_Drop ( ) ;
             SetState ( cntx, C_SYNTAX | INFIX_MODE, svState ) ;

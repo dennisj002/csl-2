@@ -414,7 +414,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
                     Compiler_TypedObjectInit ( word, objectTypeNamespace ) ;
                     Word_TypeChecking_SetSigInfoForAnObject ( word ) ;
                 }
-                else if ( typeNamespace ) word->ObjectByteSize = typeNamespace->ObjectByteSize ;
+                else if ( typeNamespace ) word->CompiledDataFieldByteSize = typeNamespace->CompiledDataFieldByteSize ;
                 if ( String_Equal ( token, "this" ) ) word->W_ObjectAttributes |= THIS ;
                 typeNamespace = 0 ;
                 objectTypeNamespace = 0 ;

@@ -255,10 +255,10 @@ _Compile_Write_Instruction_X64 ( uint8 rex, uint8 opCode0, uint8 opCode1, uint8 
 } prefix
 pwi _Compile_Write_Instruction_X64 //pause
 #if 0
-uint8
+Boolean
 RegParameterOrder ( uint8 n )
 {
-    uint8 regOrder [] = { RDI, RSI, RDX, RCX, ACC, OREG } ;
+    Boolean regOrder [] = { RDI, RSI, RDX, RCX, R8, R9 } ;
     return regOrder [n] ;
 }
 #endif

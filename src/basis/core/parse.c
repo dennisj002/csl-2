@@ -10,7 +10,7 @@ Compiler_TypedObjectInit ( Word * word, Namespace * typeNamespace )
     if ( typeNamespace->W_ObjectAttributes & CLASS ) word->W_ObjectAttributes |= OBJECT ;
     if ( Compiling ) word->W_ObjectAttributes |= LOCAL_OBJECT ;
     size = _Namespace_VariableValueGet ( word, ( byte* ) "size" ) ;
-    word->Size = size ? size : typeNamespace->ObjectByteSize ;
+    word->ObjectByteSize = size ? size : typeNamespace->ObjectByteSize ;
     //_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
     _DObject_Init ( word, ( int64 ) 0, LOCAL_OBJECT, ( byte* ) _DataObject_Run, 0 ) ;
     _Word_Add ( word, 1, 0 ) ;
@@ -85,7 +85,7 @@ Lexer_ParseBigNum ( Lexer * lexer, byte * token )
         mpfr_t *bfr = ( mpfr_t* ) _BigNum_New ( token ) ;
         lexer->Literal = ( int64 ) bfr ;
         lexer->L_ObjectAttributes = ( T_BIG_NUM | KNOWN_OBJECT ) ;
-        lexer->TokenObjectSize = 8 ;
+        lexer->Token_CompiledDataFieldByteSize = 8 ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
     }
 }
@@ -151,24 +151,24 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
         if ( lexer->Literal < 256 )
         {
             lexer->L_ObjectAttributes = ( T_BYTE | KNOWN_OBJECT ) ;
-            lexer->TokenObjectSize = 1 ;
+            lexer->Token_CompiledDataFieldByteSize = 1 ;
         }
         else if ( lexer->Literal <= 65535 )
         {
             lexer->L_MorphismAttributes = ( KNOWN_OBJECT ) ;
             lexer->L_ObjectAttributes |= ( T_INT16 ) ;
-            lexer->TokenObjectSize = 2 ;
+            lexer->Token_CompiledDataFieldByteSize = 2 ;
         }
         else if ( lexer->Literal <= 2147483647 )
         {
             lexer->L_MorphismAttributes = ( KNOWN_OBJECT ) ;
             lexer->L_ObjectAttributes = ( T_INT32 ) ;
-            lexer->TokenObjectSize = 4 ;
+            lexer->Token_CompiledDataFieldByteSize = 4 ;
         }
         else
         {
             lexer->L_ObjectAttributes = ( T_INT | KNOWN_OBJECT ) ;
-            lexer->TokenObjectSize = 8 ;
+            lexer->Token_CompiledDataFieldByteSize = 8 ;
         }
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
@@ -388,7 +388,7 @@ _CSL_SingleQuote ( )
         }
         CSL_WordLists_PopWord ( ) ; // pop the "'" token
         word = _DObject_New ( buffer, charLiteral, IMMEDIATE, LITERAL | CONSTANT, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
-        word->ObjectByteSize = 1 ;
+        word->CompiledDataFieldByteSize = 1 ;
         Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
     }
     else

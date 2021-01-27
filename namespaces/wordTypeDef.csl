@@ -115,6 +115,16 @@ typedef struct
     } ;
     AttributeInfo n_Attributes ;
 } DLNode, Node, ListNode, DLList, List ;
+typedef struct
+{
+    int64 StackSize ;
+    uint64 *StackPointer ;
+    uint64 *StackMin ;
+    uint64 *StackMax ;
+    uint64 *InitialTosPointer ;
+    uint64 StackData [0] ;
+} Stack ;
+
 typedef struct _WordData
 {
     uint64 RunType ;

@@ -179,7 +179,7 @@ LC_FindWord ( byte * name, ListObject * locals )
                         LC_Print_LispNamespace ( ) ;
                     }
 #endif        
-                    word = Finder_Word_FindUsing (_Context_->Finder0, name, 0) ;
+                    word = Finder_Word_FindUsing (_Finder_, name, 0) ;
                 }
             }
         }
