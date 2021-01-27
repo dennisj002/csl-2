@@ -134,6 +134,7 @@ Namespace *
 Compiler_LocalsNamespace_New ( Compiler * compiler )
 {
     Namespace * ns = Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack, 1 ) ;
+    //compiler->LocalsNamespace = ns ;
     //_CSL_Namespace_InNamespaceSet ( ns ) ; // done by Namespace_FindOrNew_Local
     Finder_SetQualifyingNamespace ( _Finder_, ns ) ;
     return ns ;

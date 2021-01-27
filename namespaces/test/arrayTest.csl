@@ -141,7 +141,38 @@ sp
 testnx tnax1
 sp
 decimal
+#if 0
 "Ar1" class :{ int64 ar [4] ; };
+: arr2 ( Ar1 a ) 
+    a.ar[1] a.ar[3] @ = 
+    a.ar[2] a.ar[3] @ = 
+    a.ar[1] @ dup decimal p 0x89 _assert 
+;
+#elif 0 // problem with local variables in yada (below) finding this 'b' and 'c'
+"Ar1" class :{ byte b ; int16 c ; int64 ar [4] ; };
+: arr2 ( Ar1 a ) 
+    a.b 0x23 = 
+    a.c 0x456 =
+    a.ar[1] a.ar[3] @ = 
+    a.ar[2] a.ar[3] @ = 
+    a.ar[1] @ dup decimal p 0x89 _assert 
+;
+#else
+"Ar1" class :{ byte b1 ; int16 c1 ; int64 ar [4] ; };
+: arr2 ( Ar1 a ) 
+    a.b1 0x23 = 
+    a.c1 0x456 =
+    a.ar[1] a.ar[3] @ = 
+    a.ar[2] a.ar[3] @ = 
+    a.ar[1] @ dup decimal p 0x89 _assert 
+;
+#endif
+cOn
+// problem with local variables in yada (below) finding this 'b' and 'c'
+void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
+void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 _assert s
+//pause
+cOff
 sp
 Ar1 'arr1 new
 "arr1 : " ps location arr1 size @ dump // should be all zeroes
@@ -151,15 +182,17 @@ arr1.ar[0] @ 0x89 _assert
 sp
 "arr1 : " ps location arr1 size @ dump // should show 0x89 = 0x59 in first and last postion
 : arr2 ( Ar1 a ) 
+    //a.b 0x23 = 
+    //a.c 0x456 =
     a.ar[1] a.ar[3] @ = 
     a.ar[2] a.ar[3] @ = 
     a.ar[1] @ dup decimal p 0x89 _assert 
 ;
 sp
 ' arr2 find wdiss
-"\narr1 : " ps location arr1 size @ dump 
 arr1 arr2 // should print 137
-sp
+"\narr1 : " ps location arr1 size @ dump 
+//s pause
 : a3 ( n Ar1 a ) 
     a.ar [n @ 1 +] a.ar[n @ 2 +] @ = 
     a.ar[ n @ 1 +] @ dup hp 0x89 _assert decimal

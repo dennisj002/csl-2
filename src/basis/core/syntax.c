@@ -211,10 +211,10 @@ _CSL_C_Infix_EqualOp ( block op )
     byte * svName ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
     _CSL_WordList_PopWords ( 1 ) ; // because we are going to call the opWord in compilable order below 
-    word0a = CSL_WordList ( 0 ) ;
+    word0a = CSL_WordList ( 0 ) ; // rem we just popped a word
     if ( lhsWord )
     {
-        if ( ( lhsWord->W_ObjectAttributes & ( OBJECT | OBJECT_FIELD | THIS | QID ) || GetState ( lhsWord, QID ) ) )
+        if ( ( lhsWord->W_ObjectAttributes & ( OBJECT | OBJECT_FIELD | THIS | QID ) ) || GetState ( lhsWord, QID ) ) 
         {
             if ( ( ! _String_EqualSingleCharString ( word0a->Name, ']' ) ) &&
                 ( ! ( word0a->W_ObjectAttributes & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) )

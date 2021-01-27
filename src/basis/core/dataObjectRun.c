@@ -245,8 +245,7 @@ _Compile_C_TypeDeclaration ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     byte * token ;
-    while ( token = Interpret_C_Until_NotIncluding_Token4 ( cntx->Interpreter0,
-        ( byte* ) ",", ( byte* ) ";", ( byte* ) "{", ( GetState ( cntx, C_SYNTAX ) ? ( byte* ) "}" : ( byte* ) "=" ), 0, 0 ) )
+    while ( token = Interpret_C_Until_NotIncluding_Token4 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", ( byte* ) "{",  ( byte* ) "}", 0, 0 ) )
     {
         if ( _String_EqualSingleCharString ( token, ';' ) )
         {
@@ -254,7 +253,7 @@ _Compile_C_TypeDeclaration ( )
             Interpreter_InterpretAToken ( cntx->Interpreter0, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
             break ;
         }
-        else if ( _String_EqualSingleCharString ( token, ',' ) || ( ( ! GetState ( cntx, C_SYNTAX ) ) && _String_EqualSingleCharString ( token, '=' ) ) ) Lexer_ReadToken ( _Lexer_ ) ;
+        else if ( _String_EqualSingleCharString ( token, ',' ) ) Lexer_ReadToken ( _Lexer_ ) ;
         else
         {
             if ( _String_EqualSingleCharString ( token, ')' ) && GetState ( compiler, DOING_A_PREFIX_WORD ) ) CSL_PushToken_OnTokenList ( token ) ;
@@ -297,7 +296,7 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
         else
         {
             Ovt_AutoVarOn ( ) ;
-            Compiler_LocalsNamespace_New ( _Compiler_ ) ;
+            Namespace * ns = Compiler_LocalsNamespace_New ( _Compiler_ ) ;
             word = Lexer_Do_MakeItAutoVar ( _Lexer_, token0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
             _Compiler_->LHS_Word = word ;
             Interpreter_DoWord ( interp, word, - 1, - 1 ) ;

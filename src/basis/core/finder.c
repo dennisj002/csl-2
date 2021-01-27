@@ -145,10 +145,10 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, Boolean saveQns )
         // the InNamespace takes precedence with this one exception but is this the best logic ??               
         if ( finder->QualifyingNamespace )
         {
-            if ( _String_EqualSingleCharString ( name, '.' ) ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
+            if ( _String_EqualSingleCharString ( name, '.' ) ) rword = _Finder_Word_Find ( finder, flag, name ) ;
             else
             {
-                rword = _Finder_FindWord_InOneNamespace ( _Finder_, Word_UnAlias ( finder->QualifyingNamespace ), name ) ;
+                rword = _Finder_FindWord_InOneNamespace ( finder, Word_UnAlias ( finder->QualifyingNamespace ), name ) ;
                 if ( rword && ( rword->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( finder, rword ) ;
                 else if ( ( ! saveQns ) &&( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) ) 
                     Finder_ClearQualifyingNamespace ( finder ) ; // nb. QualifyingNamespace is only good for one find unless we are in a quid

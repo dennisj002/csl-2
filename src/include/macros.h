@@ -204,6 +204,7 @@
 #define VARIABLE_TYPE ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | OBJECT_FIELD | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL )
 #define NON_MORPHISM_TYPE ( OBJECT_TYPE | VARIABLE_TYPE | NAMESPACE_RELATED_TYPE )
 #define IS_NON_MORPHISM_TYPE(word) (word->W_MorphismAttributes & NON_MORPHISM_TYPE)
+#define IS_VARIABLE_TYPE(word) (word->W_MorphismAttributes & VARIABLE_TYPE)
 #define IS_OBJECT_TYPE(word) (word->W_MorphismAttributes & OBJECT_TYPE)
 #define IS_NAMESPACE_RELATED_TYPE(word) (word->W_MorphismAttributes & NAMESPACE_RELATED_TYPE)
 #define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->W_ObjectAttributes & ( NON_MORPHISM_TYPE ) ) ) \
