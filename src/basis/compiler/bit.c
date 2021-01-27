@@ -96,7 +96,7 @@ Compile_X_Shift ( Compiler * compiler, int64 op, Boolean stackFlag, Boolean opEq
     }
     else
     {
-        Word *one = ( Word* ) _CSL_WordList (1) ; // the operand
+        Word *one = ( Word* ) CSL_WordList (1) ; // the operand
         if ( one->W_ObjectAttributes && LITERAL )
         {
             SetHere (one->Coding, 1) ;

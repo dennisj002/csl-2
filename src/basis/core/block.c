@@ -154,7 +154,7 @@ CSL_EndBlock ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
-    bi->LogicCodeWord = _CSL_WordList ( 1 ) ;
+    bi->LogicCodeWord = CSL_WordList ( 1 ) ;
     _CSL_EndBlock1 ( bi ) ;
     _CSL_EndBlock2 ( bi ) ;
 }

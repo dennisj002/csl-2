@@ -33,7 +33,7 @@ Compile_Multiply ( Compiler * compiler )
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 1 ) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
-        else _Word_CompileAndRecord_PushReg ( _CSL_WordList ( 0 ), optInfo->Optimize_Reg, true ) ;
+        else _Word_CompileAndRecord_PushReg ( CSL_WordList ( 0 ), optInfo->Optimize_Reg, true ) ;
     }
     else
     {
@@ -41,7 +41,7 @@ Compile_Multiply ( Compiler * compiler )
         //Compile_IMUL ( cell mod, cell reg, cell rm, sib, disp, imm, size )
         Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
         Compile_MUL ( MEM, DSP, REX_W | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
-        _CSL_WordList ( 0 )->StackPushRegisterCode = Here ;
+        CSL_WordList ( 0 )->StackPushRegisterCode = Here ;
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
     //DBI_OFF ;
@@ -132,7 +132,7 @@ _CSL_Do_IncDec ( int64 op )
     {
         Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
         int64 sd = List_Depth ( _CSL_->CSL_N_M_Node_WordList ) ;
-        Word *one = ( Word* ) _CSL_WordList ( 1 ) ; // the operand
+        Word *one = ( Word* ) CSL_WordList ( 1 ) ; // the operand
         if ( op == INC )
         {
             if ( ( sd > 1 ) && one->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )

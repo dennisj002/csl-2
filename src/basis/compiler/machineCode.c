@@ -609,7 +609,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
 {
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
-    Word *one = _CSL_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = CSL_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
     else if ( optSetupFlag )
     {

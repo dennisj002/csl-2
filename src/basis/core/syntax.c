@@ -270,10 +270,10 @@ CSL_IncDec ( int64 op ) // ++/--
     int64 sd = List_Depth ( _CSL_->CSL_N_M_Node_WordList ) ;
     if ( ( sd > 1 ) && ( ! GetState ( cntx, LC_CSL ) ) )
     {
-        Word * currentWord = _CSL_WordList ( 0 ) ;
-        Word *two = 0, *one = ( Word* ) _CSL_WordList ( 1 ) ;
+        Word * currentWord = CSL_WordList ( 0 ) ;
+        Word *two = 0, *one = ( Word* ) CSL_WordList ( 1 ) ;
         if ( GetState ( _Context_, C_SYNTAX ) && ( one->W_MorphismAttributes & CATEGORY_OP )
-            && ( ! ( one->W_MorphismAttributes & CATEGORY_OP_LOAD ) ) ) one = two = _CSL_WordList ( 2 ) ;
+            && ( ! ( one->W_MorphismAttributes & CATEGORY_OP_LOAD ) ) ) one = two = CSL_WordList ( 2 ) ;
         byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         if ( nextWord && IS_MORPHISM_TYPE ( nextWord )
@@ -347,8 +347,8 @@ CSL_IncDec ( int64 op ) // ++/--
                     Word * word ;
                     dllist * postfixList = List_New ( SESSION ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, WORD_RECYCLING ) ; // remember : this will be lifo
-                    for ( i = 1 ; word = _CSL_WordList ( i ), ( word->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) _CSL_WordList ( i ), WORD_RECYCLING ) ;
+                    for ( i = 1 ; word = CSL_WordList ( i ), ( word->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) CSL_WordList ( i ), WORD_RECYCLING ) ;
                     List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, WORD_RECYCLING ) ;
                     List_DropN ( _CSL_->CSL_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;
@@ -372,7 +372,7 @@ CSL_C_ConditionalExpression ( )
     if ( ! CompileMode ) CSL_If_ConditionalExpression ( ) ;
     else
     {
-        word = _CSL_WordList ( 1 ) ;
+        word = CSL_WordList ( 1 ) ;
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
         if ( word && word->StackPushRegisterCode )
         {

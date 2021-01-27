@@ -376,12 +376,13 @@ C.Experimental
 printf ( "\nWord.size = %d, WordData.size = %d, Stack.size = %d", Word.size, WordData.size, Experimental.Stack.size ) ;
 printf ( "\nWord.size = %d, WordData.size = %d, Stack.size = %d", Word.size, WordData.size, C.Experimental.Stack.size ) ;
 cOff
-//C.Experimental.Stack.size @ p
-//C.Experimental.Stack.size @ p
-//Stack.size @ p
+C.Experimental.Stack.size @ p
+Experimental.Stack.size @ p
+Experimental 
+Stack.size @ p
 stateAll
+//pause
 'C.Experimental notUsing 
-pause
 #endif
 #if 1
 cOn

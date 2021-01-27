@@ -340,17 +340,10 @@ CSL_WordLists_PopWord ( )
 }
 
 Word *
-_CSL_WordList ( int64 n )
-{
-    //Word * rword = ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CSL_->CSL_N_M_Node_WordList, n, SCN_T_WORD ) ;
-    Word * rword = CSL_WordList_DoOp ( n, WL_GET_NODE, SCN_IN_USE_FOR_OPTIMIZATION ) ;
-    return rword ;
-}
-
-Word *
 CSL_WordList ( int64 n )
 {
-    Word * rword = ( Word * ) _CSL_WordList ( n ) ;
+    //Word * rword = ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CSL_->CSL_N_M_Node_WordList, n, SCN_T_WORD ) ;
+    Word * rword = CSL_WordList_DoOp ( n, WL_GET_NODE, SCN_IN_USE_FLAG_ALL ) ;
     return rword ;
 }
 

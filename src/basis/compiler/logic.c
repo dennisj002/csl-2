@@ -149,7 +149,7 @@ Compile_LogicalAnd ( Compiler * compiler )
     else if ( optSetupFlag ) _Compile_LogicalAnd ( compiler ) ;
     else
     {
-        Word *one = _CSL_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+        Word *one = CSL_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
         if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -255,7 +255,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
     }
     Boolean reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Compile_SETcc_Tttn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
-    _Word_CompileAndRecord_PushReg ( _CSL_WordList ( 0 ), reg, true ) ; //ACC ) ;
+    _Word_CompileAndRecord_PushReg ( CSL_WordList ( 0 ), reg, true ) ; //ACC ) ;
     DBI_OFF ;
 }
 //  logical equals - "=="
@@ -328,7 +328,7 @@ Compile_Logical_X ( Compiler * compiler, int64 op, Boolean setTtn, Boolean setNe
 void
 Compile_LogicalNot ( Compiler * compiler )
 {
-    Word *one = _CSL_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = CSL_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ; // check especially for cases that optimize literal ops
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;

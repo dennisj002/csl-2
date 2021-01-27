@@ -276,11 +276,15 @@ Context_GetState ( Context * cntx, Word * word )
     int64 isForwardDotted, isReverseDotted ;
     isReverseDotted = Lexer_IsTokenReverseDotted ( cntx->Lexer0 ) ;
     isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ; //cntx->Lexer0->TokenEnd_ReadLineIndex - 1 ) ; //word->W_RL_Index ) ;
-    if ( ( isForwardDotted ) ) //&& Is_NamespaceType ( ns ) )
+    if ( ( isForwardDotted ) )
     {
-        CSL_Set_QidInNamespace ( word ) ;
-        Finder_SetQualifyingNamespace ( cntx->Finder0, word ) ;
+        //if ( IS_NAMESPACE_RELATED_TYPE ( word ) )
+        {
+            CSL_Set_QidInNamespace ( word ) ;
+            Finder_SetQualifyingNamespace ( cntx->Finder0, word ) ;
+        }
         if ( ( ! isReverseDotted ) || ( ! cntx->BaseObject ) ) cntx->BaseObject = word ;
+        //if ( ( IS_OBJECT_TYPE ( word )) && ( ! isReverseDotted ) || ( ! cntx->BaseObject ) ) cntx->BaseObject = word ;
     }
     SetState ( cntx, IS_FORWARD_DOTTED, isForwardDotted ) ;
     SetState ( cntx, IS_REVERSE_DOTTED, isReverseDotted ) ;

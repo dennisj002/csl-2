@@ -589,7 +589,7 @@ Compile_Optimize_Dup ( Compiler * compiler )
 void
 Compile_X_OpEqual ( Compiler * compiler, block op )
 {
-    Word * zero = _CSL_WordList ( 0 ) ;
+    Word * zero = CSL_WordList ( 0 ) ;
     uint8 valueReg = ACC ;
     //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
     _Compiler_GetWordStackState ( compiler, zero ) ;
@@ -646,7 +646,7 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
 void
 Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
 {
-    Word * zero = _CSL_WordList ( 0 ) ;
+    Word * zero = CSL_WordList ( 0 ) ;
     //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
     _Compiler_GetWordStackState ( compiler, zero ) ;
     CompileOptimizeInfo * optInfo = compiler->OptInfo ; // nb. after _Compiler_GetOptimizeState

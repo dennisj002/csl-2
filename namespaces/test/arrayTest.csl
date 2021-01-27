@@ -157,8 +157,8 @@ sp
 ;
 sp
 ' arr2 find wdiss
-arr1 arr2 // should print 137
 "\narr1 : " ps location arr1 size @ dump 
+arr1 arr2 // should print 137
 sp
 : a3 ( n Ar1 a ) 
     a.ar [n @ 1 +] a.ar[n @ 2 +] @ = 

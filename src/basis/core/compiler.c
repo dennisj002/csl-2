@@ -128,8 +128,9 @@ Word *
 Compiler_PreviousNonDebugWord ( int64 startIndex )
 {
     Word * word ;
-    int64 i ;
-    for ( i = startIndex ; ( word = ( Word* ) CSL_WordList ( i ) ) && i > - 3 ; i -- )
+    int64 i = startIndex ; 
+    if ( _O_->Verbosity > 2 ) CSL_SC_WordList_Show ( ) ;
+    for (  ; ( word = ( Word* ) CSL_WordList ( i ) ) ; i ++ )
     {
         if ( ( Symbol* ) word && ( ! ( word->W_MorphismAttributes & DEBUG_WORD ) ) ) break ;
     }
@@ -337,7 +338,7 @@ void
 CSL_CompileAndRecord_Word0_PushReg ( Boolean reg, Boolean recordFlag )
 {
 
-    Word * word = _CSL_WordList ( 0 ) ;
+    Word * word = CSL_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, reg, recordFlag ) ;
 }
 
@@ -345,14 +346,14 @@ void
 CSL_CompileAndRecord_Word0_PushRegToUse ( )
 {
 
-    Word * word = _CSL_WordList ( 0 ) ;
+    Word * word = CSL_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, word->RegToUse, true ) ;
 }
 
 void
 CSL_CompileAndRecord_PushAccum ( )
 {
-    Word * word = _CSL_WordList ( 0 ) ;
+    Word * word = CSL_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
 }
 
