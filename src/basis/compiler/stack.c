@@ -158,18 +158,19 @@ _Compile_Stack_Dup ( Boolean stackReg )
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
     else
     {
-        Word * one = CSL_WordList ( 1 ) ;
-        if ( ( ! ( one->W_ObjectAttributes & OBJECT ) ) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
+        Word * one = CSL_WordList ( 1 );
+        if ( one && ( ! ( one->W_ObjectAttributes & OBJECT ) ) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
         {
             SetHere ( one->StackPushRegisterCode, 1 ) ;
             Compile_ADDI ( REG, DSP, 0, 2 * CELL, 0 ) ;
             _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
             _Compile_Move_Reg_To_StackN ( DSP, - 1, ACC ) ;
         }
-        else
+        else 
         {
+            Word *zero = CSL_WordList ( 0 ) ;
             Compile_Move_Rm_To_Reg (ACC, DSP, 0 , 0) ;
-            CSL_WordList ( 0 )->StackPushRegisterCode = Here ;
+            if ( zero ) zero->StackPushRegisterCode = Here ;
             Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
             Compile_Move_Reg_To_Rm (DSP, ACC, 0 , 0) ;
         }

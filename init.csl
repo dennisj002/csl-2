@@ -427,17 +427,20 @@ Root
 'doScript 1 const
 'doScript2 1 const
 'forStarters var 
-forStarters 0 =
-'_doDemo 1 const
+forStarters 1 =
+'_doDemo 0 const
 '_doTest 0 const
+'doMemSpace 1 const
     
 dbgOff
-//dbgOn 
+dbgOn 
 // === controls ===
 
 #if Is_DebugOn 
 
-//"testCsl" memspace
+#if doMemSpace    
+"testCsl" memspace
+#endif
     
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
@@ -448,6 +451,7 @@ System C
 sp
 fload test.txt //pause
 //stack pause
+
 #if _doTest
 tc 
 #endif
@@ -459,7 +463,10 @@ demo
 
 stringMacrosOff
 mem //pause
-//"testCsl" msDelete
+
+#if doMemSpace    
+"testCsl" msDelete
+#endif
 
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your extra init code maybe here if you like
 : mct "namespaces/compiler/machineCode.csl" include ;
@@ -472,7 +479,7 @@ rtw
 
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
 #if forStarters @ 
-: hi ( n m ) n @ m @ + dup <dbg> p return tos ; pwi hi 2 9 d: hi 11 _assert
+d: : hi ( n m ) n @ m @ + dup <dbg> p return tos ; pwi hi 9 2 d: hi 11 _assert
 #endif 
 #if 0
 : hi ( n m | x ) x n @ m @ + = x @ p return ( x @ ) ; pwi hi 2 9 hi 11 _assert

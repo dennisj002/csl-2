@@ -305,17 +305,6 @@ NBA_FreeChunkType ( Symbol * s, uint64 allocType, int64 exactFlag )
     _NamedByteArray_AddNewByteArray ( nba, nba->NBA_DataSize ) ;
 }
 
-void
-_MemorySpace_Do_MemorySpace ( OpenVmTil * ovt, MemorySpace * ms )
-{
-    ovt->MemorySpace0 = ms ;
-    if ( ovt->OVT_CSL && ovt->OVT_CSL->Context0 )
-    {
-        NBA * cnba = ovt->OVT_CSL->Context0->ContextNba ;
-        ovt->MemorySpace0->ContextSpace = cnba ;
-    }
-}
-
 MemorySpace *
 MemorySpace_Find ( byte * name )
 {
@@ -331,6 +320,17 @@ MemorySpace_StaticMem_Allocate ( )
     return ms ;
 }
 
+void
+_MemorySpace_Do_MemorySpace ( OpenVmTil * ovt, MemorySpace * ms )
+{
+    ovt->MemorySpace0 = ms ;
+    if ( ovt->OVT_CSL && ovt->OVT_CSL->Context0 )
+    {
+        NBA * cnba = ovt->OVT_CSL->Context0->ContextNba ;
+        ovt->MemorySpace0->ContextSpace = cnba ;
+    }
+}
+
 MemorySpace *
 MemorySpace_New ( OpenVmTil * ovt, byte * name )
 {
@@ -342,6 +342,7 @@ MemorySpace_New ( OpenVmTil * ovt, byte * name )
         ( ( Symbol* ) ms )->S_Name = name ;
         dllist_AddNodeToHead ( ovt->MemorySpaceList, ( dlnode* ) ms ) ;
         _MemorySpace_Do_MemorySpace ( ovt, ms ) ;
+        //if (_CSL_) CSL_Context_PushNew ( _CSL_ ) ;
     }
     return ms ;
 }
@@ -367,7 +368,7 @@ MemorySpace_Delete ( byte * name )
         }
         dlnode_Remove ( ( dlnode * ) ms ) ;
         _MemorySpace_Do_MemorySpace ( _O_, defaultMs ) ;
-
+        //if (_CSL_) CSL_Context_PopDelete ( _CSL_ ) ;
     }
 }
 

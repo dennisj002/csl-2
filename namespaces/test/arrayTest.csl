@@ -7,7 +7,11 @@ lispOff
 decimal
 Int Class DLLNode
 "DLLNodeAlloc" class :{ DLLNode nodes [ 32 ] ; };
-: sp ; //stack pause ; sp
+#if 1
+: sp ;  //stack pause ; sp
+#else
+: sp stack pause ; sp
+#endif    
 
 DLLNodeAlloc "testna" new
 "DLLNode size = " prints DLLNode size @ Io.print nl 
@@ -161,7 +165,7 @@ decimal
 "Ar1" class :{ byte b1 ; int16 c1 ; int64 ar [4] ; };
 : arr2 ( Ar1 a ) 
     a.b1 0x23 = 
-    a.c1 0x456 =
+    a.c1 0x4567 =
     a.ar[1] a.ar[3] @ = 
     a.ar[2] a.ar[3] @ = 
     a.ar[1] @ dup decimal p 0x89 _assert 
@@ -198,7 +202,7 @@ sp
 ' arr2 find wdiss
 arr1 arr2 // should print 137
 "\narr1 : " ps location arr1 size @ dump 
-//s pause
+s //pause
 : a3 ( n Ar1 a ) 
     a.ar [n @ 1 +] a.ar[n @ 2 +] @ = 
     a.ar[ n @ 1 +] @ dup hp 0x89 _assert decimal
@@ -339,6 +343,7 @@ ab.ar [1][0][0] hp
 ab.ar [2][2][2] ab.ar [0][0][0] - p
 ab.ar [0][0][0] 254 = 
 ab.ar [0][0][0] @ dup p 254 _assert
+    
 : tct ( y ct a )
     a.ar [0][0][0] 0x77 = 
     a.ar [0][y @][0] a.ar [0][0][0] @ =
@@ -351,9 +356,9 @@ ab.ar [0][0][0] @ dup p 254 _assert
     a.ar [1][2][2] @ 7 _assert 
 ;
 ct "ac" new 
-'tct find wdiss
 ct
 2 ac tct 
+'tct find wdiss
 sp
 "cta" class :{ byte ar [3][3][3] ; };
 cta "aba" new

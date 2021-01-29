@@ -485,6 +485,7 @@ _Readline_CheckArrayDimensionForVariables ( ReadLiner * rl )
     return false ;
 }
 #if 0 // 0.908.300
+
 Boolean
 _Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
 {
@@ -510,34 +511,39 @@ _Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
 }
 
 #else
+
 Boolean
 _Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
 {
     ReadLiner * rl = ReadLine_Copy ( rl0, COMPILER_TEMP ) ;
     Word * word = CSL_WordList ( 0 ) ;
-    int64 iz, ib, index = word->W_RL_Index + Strlen ( word->Name ), sd = _Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
-    byte c ; Boolean zf = false ; // zero flag
-    for ( ib = false, iz = false ; 1 ; iz = false )
+    if ( word )
     {
-        if ( !zf ) c = rl->InputLine [ index ++ ] ;
-        else c = rl->InputStringCurrent [ index ++ ] ;
-        if ( ! c ) 
+        int64 iz, ib, index = word->W_RL_Index + Strlen ( word->Name ), sd = _Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
+        byte c ;
+        Boolean zf = false ; // zero flag
+        for ( ib = false, iz = false ; 1 ; iz = false )
         {
-            if ( zf ) return false ;
-            else zf = true ;
-            index = 0 ;
-            continue ;
-            //return false ;
+            if ( ! zf ) c = rl->InputLine [ index ++ ] ;
+            else c = rl->InputStringCurrent [ index ++ ] ;
+            if ( ! c )
+            {
+                if ( zf ) return false ;
+                else zf = true ;
+                index = 0 ;
+                continue ;
+                //return false ;
+            }
+            if ( ( c == ';' ) && ( ! GetState ( _Context_, C_SYNTAX ) ) ) return true ;
+            if ( c == '}' )
+            {
+                if ( -- sd <= 1 ) return true ;
+                ib = 1 ; // b : bracket
+                continue ;
+            }
+            if ( ( c == '/' ) && ( rl->InputLine [ index ] == '/' ) ) CSL_CommentToEndOfLine ( ) ;
+            else if ( ib && ( c > ' ' ) && ( c != ';' ) ) return false ;
         }
-        if ( ( c == ';' ) && ( ! GetState ( _Context_, C_SYNTAX ) ) ) return true ;
-        if ( c == '}' )
-        {
-            if ( -- sd <= 1 ) return true ;
-            ib = 1 ; // b : bracket
-            continue ;
-        }
-        if ( ( c == '/' ) && ( rl->InputLine [ index ] == '/' ) ) CSL_CommentToEndOfLine ( ) ;
-        else if ( ib && ( c > ' ' ) && ( c != ';' ) ) return false ;
     }
     return false ;
 }
@@ -554,7 +560,11 @@ ReadLine_Set_KeyedChar ( ReadLiner * rl, byte c )
 byte
 ReadLine_Get_Key ( ReadLiner * rl )
 {
-    if ( ! rl->Key ) { ReadLiner_Done ( rl ) ; return 0 ; }
+    if ( ! rl->Key )
+    {
+        ReadLiner_Done ( rl ) ;
+        return 0 ;
+    }
     else return ReadLine_Set_KeyedChar ( rl, rl->Key ? rl->Key ( rl ) : 0 ) ;
 }
 
@@ -588,7 +598,7 @@ ReadLine_ReadFileIntoAString ( ReadLiner * rl, FILE * file )
 {
     int64 size, result ;
     size = _File_Size ( file ) ;
-    byte * fstr = Mem_Allocate ( size, CONTEXT) ; //COMPILER_TEMP ) ; // 2 : an extra so readline doesn't read into another area of allocated mem
+    byte * fstr = Mem_Allocate ( size, CONTEXT ) ; //COMPILER_TEMP ) ; // 2 : an extra so readline doesn't read into another area of allocated mem
     result = fread ( fstr, 1, size, file ) ;
     if ( result != size )
     {

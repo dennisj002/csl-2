@@ -541,21 +541,20 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         {
             if ( optInfo->Optimize_Dest_RegOrMem == MEM ) return ; //_Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ; //return ;
             else if ( ( optInfo->Optimize_Dest_RegOrMem == REG ) && ( ! optInfo->xBetweenArg1AndArg2 ) ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
-            //_Compile_Move_StackN_To_Reg ( optInfo->Optimize_Reg, DSP, 0 ) ;
         }
         else _Word_CompileAndRecord_PushReg ( optInfo->COIW[0], optInfo->Optimize_Reg, true ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
     }
-    else
+    else // this works on unoptimized code and should be example for other functions !?
     {
         //_DBI_ON ;
-        Word * one = CSL_WordList ( 1 ) ;
+        Word * one = CSL_WordList ( 1 ), *zero = CSL_WordList ( 1 ) ;
         if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
-        else Compile_Pop_To_Acc ( DSP ) ;
-        //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
-        _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
-        _Word_CompileAndRecord_PushReg ( CSL_WordList ( 0 ), ACC, true ) ; // 0 : ?!? should be the exact variable 
+        else  _Compile_Stack_PopToReg ( DSP, RCX ) ; 
+        Compile_Pop_To_Acc ( DSP ) ;
+        _Compile_X_Group1 ( op, REG, REG, ACC, RCX, 0, 0, CELL_SIZE ) ; // result is on TOS
+        if ( zero ) _Word_CompileAndRecord_PushReg ( zero, ACC, true ) ; // 0 : ?!? should be the exact variable 
+        else _Compile_Stack_PushReg ( DSP, ACC ) ;
         //DBI_OFF ;
     }
 }

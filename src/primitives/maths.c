@@ -6,11 +6,27 @@ CSL_Plus ( ) // +
 {
     if ( CompileMode )
     {
-        Compile_X_Group1 ( _Context_->Compiler0, ADD, TTT_ZERO, NEGFLAG_ON ) ;
+        //Compile_X_Group1 ( _Context_->Compiler0, ADD, TTT_ZERO, NEGFLAG_ON ) ;
+        Compile_Plus ( _Compiler_ ) ;
     }
     else
     {
         _Dsp_ [ - 1 ] = _Dsp_ [ 0 ] + _Dsp_ [ - 1 ] ;
+        DataStack_Drop ( ) ;
+    }
+}
+
+void
+CSL_Minus ( )
+{
+    if ( CompileMode )
+    {
+        //Compile_X_Group1 ( _Context_->Compiler0, SUB, TTT_ZERO, NEGFLAG_ON ) ;
+        Compile_Minus ( _Compiler_ ) ;
+    }
+    else
+    {
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] - _Dsp_ [ 0 ] ;
         DataStack_Drop ( ) ;
     }
 }
@@ -102,20 +118,6 @@ CSL_DivideEqual ( ) // +=
 }
 
 // ( b top | b - top ) dpans
-
-void
-CSL_Minus ( )
-{
-    if ( CompileMode )
-    {
-        Compile_X_Group1 ( _Context_->Compiler0, SUB, TTT_ZERO, NEGFLAG_ON ) ;
-    }
-    else
-    {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] - _Dsp_ [ 0 ] ;
-        DataStack_Drop ( ) ;
-    }
-}
 
 void
 CSL_Multiply ( ) // *
