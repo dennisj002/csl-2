@@ -263,7 +263,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
     {
         reg = 0 ; // the rm is the destination and this is move immediate
         controlFlags |= IMM_B ;
-        if ( immSize && (immSize < 8) )
+        if ( immSize && ( immSize < 8 ) )
         {
             if ( immSize == 1 ) opCode = 0xb0 + rm ;
             else if ( immSize == 2 )
@@ -427,7 +427,7 @@ _Compile_X_Group1 ( Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, 
     // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
-    //Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
+    Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     //Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_W | MODRM_B, sib, disp, 0, 0, osize ) ;
     if ( operandSize < 8 )
     {
@@ -501,11 +501,11 @@ _Compile_X_Group1_Immediate ( Boolean code, Boolean mod, Boolean rm, int64 disp,
         //DBI_OFF ;
         return ;
     }
-    else if ( ( iSize > BYTE ) || ( abs ( (long) imm ) >= 0x7f ) ) //( imm >= 0x100 ) )
+    else if ( ( iSize > BYTE ) || ( abs ( ( long ) imm ) >= 0x7f ) ) //( imm >= 0x100 ) )
     {
         opCode |= 1 ;
     }
-    else if ( ( iSize <= BYTE ) || ( abs ( (long) imm ) < 0x100 ) ) //( imm < 0x100 ) ) 
+    else if ( ( iSize <= BYTE ) || ( abs ( ( long ) imm ) < 0x100 ) ) //( imm < 0x100 ) ) 
         opCode |= 3 ;
     // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
@@ -527,6 +527,28 @@ _Compile_XOR_AL_1_Immediate ( )
 // X variable op compile for group 1 opCodes : +/-/and/or/xor - ia32 
 
 void
+_Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    Compiler_Word_SCHCPUSCA ( optInfo->opWord, 1 ) ;
+    if ( ( optInfo->OptimizeFlag & OPTIMIZE_IMM ) && optInfo->Optimize_Imm )
+    {
+        int64 imm = optInfo->Optimize_Imm ;
+        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 1) ;
+        _Compile_X_Group1_Immediate ( op, optInfo->Optimize_Mod,
+            optInfo->Optimize_Rm, optInfo->Optimize_Disp,
+            optInfo->Optimize_Imm, ( imm >= 0x100000000 ) ? CELL : ( ( imm >= 0x100 ) ? 4 : 1 ) ) ;
+    }
+    else
+    {
+        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 0) ;
+        _Compile_X_Group1 ( op, optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
+            optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0,
+            optInfo->Optimize_Disp, CELL_SIZE ) ;
+    }
+}
+
+void
 Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
 {
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
@@ -542,19 +564,15 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
             if ( optInfo->Optimize_Dest_RegOrMem == MEM ) return ; //_Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ; //return ;
             else if ( ( optInfo->Optimize_Dest_RegOrMem == REG ) && ( ! optInfo->xBetweenArg1AndArg2 ) ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
         }
+            //else if (( optInfo->wordArg1 ) && ( ! ( optInfo->wordArg1->W_ObjectAttributes & REGISTER_VARIABLE ) ) ) _Word_CompileAndRecord_PushReg ( optInfo->COIW[0], optInfo->Optimize_Reg, true ) ; // 0 : ?!? should be the exact variable 
         else _Word_CompileAndRecord_PushReg ( optInfo->COIW[0], optInfo->Optimize_Reg, true ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
     }
     else // this works on unoptimized code and should be example for other functions !?
     {
-        //_DBI_ON ;
-        Word * one = CSL_WordList ( 1 ), *zero = CSL_WordList ( 1 ) ;
-        if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
-        else  _Compile_Stack_PopToReg ( DSP, RCX ) ; 
-        Compile_Pop_To_Acc ( DSP ) ;
-        _Compile_X_Group1 ( op, REG, REG, ACC, RCX, 0, 0, CELL_SIZE ) ; // result is on TOS
-        if ( zero ) _Word_CompileAndRecord_PushReg ( zero, ACC, true ) ; // 0 : ?!? should be the exact variable 
-        else _Compile_Stack_PushReg ( DSP, ACC ) ;
+        //DBI_ON ;
+        _Compile_Stack_PopToReg ( DSP, RAX ) ;
+        _Compile_X_Group1 ( op, MEM, MEM, RAX, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         //DBI_OFF ;
     }
 }

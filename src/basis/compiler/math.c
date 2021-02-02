@@ -97,29 +97,6 @@ Compile_Mod ( Compiler * compiler )
 }
 
 void
-_Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
-{
-    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    if ( ( optInfo->OptimizeFlag & OPTIMIZE_IMM ) || optInfo->Optimize_Imm )
-    {
-        int64 imm = optInfo->Optimize_Imm ;
-        // Compile_SUBI( mod, operandReg, offset, immediateData, size )
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 1) ;
-        _Compile_X_Group1_Immediate ( op, optInfo->Optimize_Mod,
-            optInfo->Optimize_Rm, optInfo->Optimize_Disp,
-            optInfo->Optimize_Imm, ( imm >= 0x100000000 ) ? CELL : ( ( imm >= 0x100 ) ? 4 : 1 ) ) ;
-    }
-    else
-    {
-        // _Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 0) ;
-        _Compile_X_Group1 ( op, optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
-            optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0,
-            optInfo->Optimize_Disp, CELL_SIZE ) ;
-    }
-}
-
-void
 _CSL_Do_IncDec ( int64 op )
 {
     Context * cntx = _Context_ ;

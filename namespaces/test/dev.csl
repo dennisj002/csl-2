@@ -18,7 +18,8 @@ Compiler Logic Int C User
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
 c_syntaxOn 
-int factoriali ( byte REG n | REG res )
+#if 1
+int factoriali ( int8 REG n | REG res )
 {
     res = 1;
     while ( n >= 2 )
@@ -29,15 +30,31 @@ int factoriali ( byte REG n | REG res )
         res *= (n--) ; 
 #elif 0
         res = res * n-- ;
+#elif 1
+        res = res * n ; n = n - 1  ;
 #else
         res = res * (n--) ;
 #endif
     }
+    //while ( n >= 2 ) ;
     return res;
 } prefix
 factoriali ( 7 ) ; p () ;
-'factoriali find wdiss //pause
 factoriali (7) ; dup p 5040 _assert //pause //sp
+#endif
+int factoriali2 ( int8 REG n | REG res )
+{
+    res = 1;
+    do 
+    {
+        res = res * n ; n -- ;
+    }
+    while ( n >= 2 ) ;
+    return res;
+} prefix
+'factoriali2 find wdiss //pause
+factoriali2 ( 7 ) ; p () ;
+factoriali2 (7) ; dup p 5040 _assert //pause //sp
 c_syntaxOff 
 : factorial ( n  | fac ) 
     fac 1 = 
@@ -222,7 +239,7 @@ reps 10000 =
 User "qexp" ffx
 C "bexp" ffx
 "bexp2" ffx
-"factoriali" ffx
+"factoriali" ffx 
 C "qexp" ffx
 C "qexp2" ffx
 "bexp" ffx
@@ -241,6 +258,8 @@ User
 "cfactorial3_O3" ffx
 using 
 "factorial" ffx
+"factoriali" ffx //pause
+"factoriali2" ffx //pause
 "faccs" ffx
 "fac5" ffx
 "fac40" ffx

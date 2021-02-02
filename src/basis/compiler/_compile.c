@@ -105,8 +105,9 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg, int size )
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
     if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
-        if ( word->RegToUse == reg ) return ;
-        else Compile_Move_Reg_To_Reg ( reg, word->RegToUse, 0 ) ;
+        return ;
+        //if ( word->RegToUse == reg ) return ;
+        //else Compile_Move_Reg_To_Reg ( reg, word->RegToUse, 0 ) ;
     }
     else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL | LOCAL_OBJECT ) || ( word->W_LispAttributes & T_LISP_SYMBOL ) )
     {

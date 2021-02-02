@@ -154,18 +154,21 @@ CSL_If_PrefixCombinators ( )
 void
 CSL_DoWhile_PrefixCombinators ( )
 {
+    SetState ( _Compiler_, IN_DO_WHILE, true ) ;
     Word * currentWord0 = CSL_WordList ( 0 ) ;
     currentWord0->W_SC_Index = _Lexer_->SC_Index ;
     byte * start = Here ;
     _Compiler_->BeginBlockFlag = false ;
     CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;
     // just assume 'while' is there 
-    Lexer_ReadToken ( _Context_->Lexer0 ) ; // drop the "while" token
+    byte * token = //Lexer_ReadToken ( _Context_->Lexer0 ) ; // drop the "while" token
+        _Lexer_Next_NonDebugOrCommentTokenWord ( _Context_->Lexer0, 0, 1, 0 ) ; 
     _Compiler_->TakesLParenAsBlock = true ;
     _Compiler_->BeginBlockFlag = false ;
     CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;
     _Context_->SC_CurrentCombinator = currentWord0 ;
     if ( ! CSL_DoWhileCombinator ( ) ) SetHere ( start, 1 ) ;
+    SetState ( _Compiler_, IN_DO_WHILE, false ) ;
 }
 
 void
@@ -195,6 +198,7 @@ CSL_Loop_PrefixCombinators ( )
 void
 CSL_While_PrefixCombinators ( )
 {
+    if ( GetState ( _Compiler_, IN_DO_WHILE ) ) return ;
     Word * currentWord0 = CSL_WordList ( 0 ) ;
     currentWord0->W_SC_Index = _Lexer_->SC_Index ;
     byte * start = Here ;

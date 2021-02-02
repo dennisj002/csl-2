@@ -80,7 +80,9 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                     compiler->TakesLParenAsBlock = false ;
                     Interpret_C_Block_EndBlock ( ( byte* ) ")", 1 ) ;
                     //CSL_TypeStack_Pop ( ) ; // the logic word
-                    if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
+                    //if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
+                    byte *token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0, 0 ) ;
+                    if ( token && (!(( String_Equal ( ( char* ) token, ( char* ) "{" ) || ( String_Equal ( ( char* ) token, ( char* ) ";" ) )))))
                     {
                         Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
                         semicolonEndsThisBlock = true ;

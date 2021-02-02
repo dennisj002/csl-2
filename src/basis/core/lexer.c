@@ -256,7 +256,6 @@ int64
 _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag )
 {
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ;
-    //int64 tsrli = - 1, scwi = - 1 ;
     Word_SetTsrliScwi ( word, - 1, - 1 ) ;
     if ( word && ( word->W_TypeAttributes & W_COMMENT ) )
     {
@@ -264,10 +263,9 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag )
         return true ;
     }
 #if 0  // this needs to be re-considered
-    else if ( word && ( word->CAttribute & DEBUG_WORD ) )
+    else if ( word && ( word->W_MorphismAttributes & DEBUG_WORD ) )
     {
         if ( evalFlag ) Word_Eval ( word ) ;
-
         return true ;
     }
 #endif    

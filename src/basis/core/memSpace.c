@@ -341,8 +341,8 @@ MemorySpace_New ( OpenVmTil * ovt, byte * name )
         MemorySpace_Init ( ms ) ;
         ( ( Symbol* ) ms )->S_Name = name ;
         dllist_AddNodeToHead ( ovt->MemorySpaceList, ( dlnode* ) ms ) ;
-        _MemorySpace_Do_MemorySpace ( ovt, ms ) ;
         //if (_CSL_) CSL_Context_PushNew ( _CSL_ ) ;
+        _MemorySpace_Do_MemorySpace ( ovt, ms ) ;
     }
     return ms ;
 }
@@ -367,8 +367,8 @@ MemorySpace_Delete ( byte * name )
             _OVT_MemList_FreeNBAMemory ( nba, 0, 1 ) ;
         }
         dlnode_Remove ( ( dlnode * ) ms ) ;
-        _MemorySpace_Do_MemorySpace ( _O_, defaultMs ) ;
         //if (_CSL_) CSL_Context_PopDelete ( _CSL_ ) ;
+        _MemorySpace_Do_MemorySpace ( _O_, defaultMs ) ;
     }
 }
 

@@ -53,7 +53,7 @@ TSI_TypeCheck_NonTypeVariable ( TSI * tsi, Word * stackWord, int64 ti )
 Boolean
 TSI_TypeCheck_TypeVariable ( TSI * tsi )
 {
-    // word1 correlates with the type variable so it can anything
+    // word1 correlates with the type variable so it can be anything
     // word0 is closer to top of stack than word1; word1 is lower in the stack than word 0
     // eg. if word0 is TOS word1 would be NOS
     // word1 was parsed and pushed before word0

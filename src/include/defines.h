@@ -799,6 +799,7 @@ typedef struct
 #define DOING_C_TYPE_DECLARATION ( (uint64) 1 << 37 )
 #define DOING_CASE ( (uint64) 1 << 38 )
 #define DOING_RETURN ( (uint64) 1 << 39 )
+#define IN_DO_WHILE ( (uint64) 1 << 40 )
 
 // Context flags
 #define C_SYNTAX ( (uint64) 1 << 20 )

@@ -431,6 +431,7 @@ pwi bttt
 bttt ( bt ) ;  //pause // error size not considered
 'bt find 'byteTest find wordStructPrint 
 cOff
+//pause    
 #endif
 
 #if doWp @

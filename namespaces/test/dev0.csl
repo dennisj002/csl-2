@@ -70,11 +70,11 @@ pwi factorial
 ' fac find wdiss 
 7 fac dup p 5040 _assert //pause
 C
-: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+: factorial ( int8 REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 'factorial find wdiss
 7 factorial dup p 5040 "factorial" assert1
 nl location "\nstarting Lisp\n stack is ..." ddps s
-sp
+sp //pause
 Lisp 
 ( define g23 ( lambda ( a b c ) ( a b c))) 
 (g23 + 3 4 ) (g23 / 14 2 ) 

@@ -105,6 +105,7 @@ _Compile_Stack_PushReg ( Boolean stackReg, Boolean reg )
     _Compile_Move_Reg_To_StackN ( stackReg, 0, reg ) ;
 }
 
+// nb. does not use intel syntax!? 
 void
 _Compile_Stack_PopToReg ( Boolean stackReg, Boolean reg )
 {

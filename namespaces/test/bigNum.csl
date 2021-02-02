@@ -11,7 +11,7 @@ C
 7 factorial dup p 5040 "factorial" _assert1 
 : factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return ( rec @ ) ;
 'factorial find wdiss 
-7 factorial dup p 5040 "factorial" _assert1
+7 factorial dup p 5040 "factorial" _assert1 //pause
 //verbosity 3 =
 sp
 c_syntaxOn

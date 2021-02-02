@@ -112,6 +112,7 @@ _Do_Compile_Variable ( Word * word )
         }
     }
     else _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC, 0 ) ;
+    //if ( ! ( word->W_ObjectAttributes & REGISTER_VARIABLE ) ) 
     _Word_CompileAndRecord_PushReg ( word, ( word->W_ObjectAttributes & REGISTER_VARIABLE ) ? word->RegToUse : ACC, true ) ;
 }
 

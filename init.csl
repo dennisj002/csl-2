@@ -426,22 +426,16 @@ Root
 'doTX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'forStarters var 
-forStarters 1 =
-'_doDemo 0 const
-'_doTest 0 const
-'doMemSpace 1 const
+'forStarters 0 const 
+'_doDemo 1 const
+'_doTest 1 const
     
 dbgOff
-dbgOn 
+//dbgOn 
 // === controls ===
 
-#if Is_DebugOn 
+#if Is_DebugOn forStarters ||
 
-#if doMemSpace    
-"testCsl" memspace
-#endif
-    
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
 : TODO ( str ) _TODO ( str @ ) pause ;;
@@ -464,10 +458,6 @@ demo
 stringMacrosOff
 mem //pause
 
-#if doMemSpace    
-"testCsl" msDelete
-#endif
-
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your extra init code maybe here if you like
 : mct "namespaces/compiler/machineCode.csl" include ;
 
@@ -478,11 +468,10 @@ Shell
 rtw
 
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
-#if forStarters @ 
-d: : hi ( n m ) n @ m @ + dup <dbg> p return tos ; pwi hi 9 2 d: hi 11 _assert
-#endif 
-#if 0
-: hi ( n m | x ) x n @ m @ + = x @ p return ( x @ ) ; pwi hi 2 9 hi 11 _assert
+#if forStarters 
+d: : hi0 ( n m ) n @ m @ - dup <dbg> p return tos ; pwi hi0 13 2 d: hi0 11 _assert
+#if 1
+: hi ( n m | x ) x n @ m @ - = x @ p return ( x @ ) ; pwi hi 13 2 hi 11 _assert
 cOn
 jcc8_On
 int fac5 ( REG n | REG facc )  {  facc = 1 ; while ( n > 1 )  { facc = facc * (n --) ; } return facc ; } 
@@ -490,14 +479,7 @@ fac5 ( 7 ) ; p
 jcc8_Off
 pwi fac5    
 cOff
-#endif    
-#if 0
-: one 1 ;
-'does> 'begin find alias
-'<does 'semi find alias
-: constant token wordNew dup 2 pick value= does> value _peek <does ;
-1 d: constant prime
-d: prime p
+#endif 
 #endif    
 2 + 7 assertStkChk // stack checking 
 // s
