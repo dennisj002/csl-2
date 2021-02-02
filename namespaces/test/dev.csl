@@ -42,6 +42,7 @@ int factoriali ( int8 REG n | REG res )
 factoriali ( 7 ) ; p () ;
 factoriali (7) ; dup p 5040 _assert //pause //sp
 #endif
+jcc8_On
 int factoriali2 ( int8 REG n | REG res )
 {
     res = 1;
@@ -167,6 +168,7 @@ User
 //'dn 'dfnba find alias  
 jcc8_On
 : factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+: factorial2 ( REG n | REG rec ) rec 1 = { rec @ n @ * rec store n -- } { n @ 1 > } doWhile return rec ;
 jcc8_Off
 'reps0 var
 : _ifx ( w | j ) 
@@ -249,6 +251,7 @@ C "qexp2" ffx
 "fac5" ffx 
 User
 "factorial" ffx
+"factorial2" ffx //pause
 "cfactorial3" ffx
 "cfactorial" ffx
 "cfactorial2" ffx
@@ -258,8 +261,9 @@ User
 "cfactorial3_O3" ffx
 using 
 "factorial" ffx
-"factoriali" ffx //pause
-"factoriali2" ffx //pause
+"factoriali" ffx 
+"factoriali2" ffx 
+"factoriali2" ffx pause
 "faccs" ffx
 "fac5" ffx
 "fac40" ffx

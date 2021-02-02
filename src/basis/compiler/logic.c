@@ -373,13 +373,16 @@ _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr, byte insn )
 }
 
 byte *
-_BI_Compile_Jcc ( BlockInfo *bi, byte * jmpToAddress )
+_BI_Compile_Jcc (BlockInfo *bi, byte * jmpToAddress , Boolean logicFlag)
 {
     if ( bi->CopiedToLogicJccCode ) SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
     else SetHere ( bi->JccLogicCode, 1 ) ;
     bi->ActualCopiedToJccCode = Here ;
     byte insn = GetState ( _CSL_, JCC8_ON ) ? JCC8 : 0 ;
-    byte * compiledAtAddress = _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress, insn ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
+    int64 setNegFlag = logicFlag ? ((bi->JccNegFlag == NEGFLAG_ON) ?  NEGFLAG_OFF :  NEGFLAG_ON) : bi->JccNegFlag ;
+    //byte * compiledAtAddress = _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress, insn ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
+    byte * compiledAtAddress = _Compile_Jcc ( setNegFlag, bi->JccTtt, jmpToAddress, insn ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
+    if ( logicFlag ) Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
     return compiledAtAddress ;
 }
 
@@ -387,10 +390,10 @@ byte *
 BI_Compile_Jcc ( BlockInfo *bi, Boolean setTtn, byte * jmpToAddress ) // , int8 nz
 {
     byte * compiledAtAddress ;
-    if ( bi->JccLogicCode ) compiledAtAddress = _BI_Compile_Jcc ( bi, jmpToAddress ) ;
+    if ( bi->JccLogicCode ) compiledAtAddress = _BI_Compile_Jcc (bi, jmpToAddress , 0) ;
     else
     {
-        Compile_BlockLogicTest ( bi ) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
+        Compile_BlockLogicTest (bi) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
         // then in the non optimized|inline case we cmp the TOS with 0. If ZERO (zf is 1) we know the test was false (for IF), if N(ot) ZERO we know it was true 
         // (for IF). So, in the non optimized|inline case if ZERO we jmp if N(ot) ZERO we continue. In the optimized|inline case we check result of first cmp; if jcc sees
         // not true (with IF that means jcc N(ot) ZERO) we jmp and if true (with IF that means jcc ZERO) we continue. 

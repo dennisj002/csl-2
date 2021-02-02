@@ -70,7 +70,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
 }
 
 void
-Compile_BlockLogicTest ( BlockInfo * bi )
+Compile_BlockLogicTest (BlockInfo * bi)
 {
     int64 diff ;
     if ( bi )
@@ -86,6 +86,8 @@ Compile_BlockLogicTest ( BlockInfo * bi )
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
                 BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
+                //if ( logicFlag == 2 ) BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_OFF, TTT_ZERO, NEGFLAG_OFF ) ;
+                //else 
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
             }
             else if ( bi->LogicCodeWord && ( bi->LogicCodeWord->W_MorphismAttributes & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->W_MorphismAttributes & LOGIC_NEGATE ) )
@@ -94,6 +96,8 @@ Compile_BlockLogicTest ( BlockInfo * bi )
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
                 BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
+                //if ( logicFlag == 2 ) BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_OFF, TTT_ZERO, NEGFLAG_OFF ) ;
+                //else 
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
             }
         }
@@ -106,7 +110,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
 }
 
 byte *
-Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
+Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag, byte* jmpToAddr )
 {
     byte * compiledAtAddress = 0 ;
     Compiler * compiler = _Context_->Compiler0 ;
@@ -114,8 +118,9 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
     BI_Block_Copy ( bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 1 ) ; //nb!! 0 : turns off peephole optimization ; peephole optimization will be done in CSL_EndCombinator
     if ( jccFlag )
     {
-        Compile_BlockLogicTest ( bi ) ;
-        compiledAtAddress = _BI_Compile_Jcc ( bi, 0 ) ;
+        Boolean logicFlag = (jccFlag == 2) ;
+        Compile_BlockLogicTest (bi) ;
+        compiledAtAddress = _BI_Compile_Jcc ( bi, jmpToAddr, logicFlag ) ;
         Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
         bi->CopiedToEnd = Here ;
         bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;

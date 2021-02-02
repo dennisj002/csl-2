@@ -323,14 +323,12 @@ CSL_CalculateAndSetPreviousJmpOffset_ToHere ( )
 void
 _Stack_PointerToJmpOffset_Set ( byte * address )
 {
-
     Stack_Push ( _Context_->Compiler0->PointerToOffsetStack, ( int64 ) address ) ;
 }
 
 void
 Stack_Push_PointerToJmpOffset ( byte * compiledAtAddress )
 {
-
     _Stack_PointerToJmpOffset_Set ( compiledAtAddress + 1 ) ;
 }
 

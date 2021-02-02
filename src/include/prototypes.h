@@ -204,7 +204,7 @@ void Compile_TestLogicAndStackPush(Compiler *compiler, Boolean reg, Boolean setN
 void Compile_Logical_X(Compiler *compiler, int64 op, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag);
 void Compile_LogicalNot(Compiler *compiler);
 byte *_Compile_Jcc(int64 setNegFlag, int64 setTtn, byte *jmpToAddr, byte insn);
-byte *_BI_Compile_Jcc(BlockInfo *bi, byte *jmpToAddress);
+byte *_BI_Compile_Jcc(BlockInfo *bi, byte *jmpToAddress, Boolean logicFlag);
 byte *BI_Compile_Jcc(BlockInfo *bi, Boolean setTtn, byte *jmpToAddress);
 byte *Compiler_Compile_Jcc(Compiler *compiler, int64 bindex, Boolean setTtn);
 void CSL_If_ConditionalExpression(void);
@@ -257,7 +257,7 @@ BlockInfo *BlockInfo_New(void);
 /* src/basis/compiler/blocks.c */
 BlockInfo *BI_Block_Copy(BlockInfo *bi, byte *dstAddress, byte *srcAddress, int64 bsize, Boolean optSetupFlag);
 void Compile_BlockLogicTest(BlockInfo *bi);
-byte *Block_CopyCompile(byte *srcAddress, int64 bindex, Boolean jccFlag);
+byte *Block_CopyCompile(byte *srcAddress, int64 bindex, Boolean jccFlag, byte *jmpToAddr);
 /* src/basis/core/conditionals.c */
 Boolean Match_MapFunction(dlnode *node, uint64 switchValue);
 void MatchAccessFunction(void);

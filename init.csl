@@ -380,6 +380,7 @@ Interpreter
 '_defined '_findUsing find alias 
 ' defined '_findUsing find alias immediate 
 C Compiler Int Lexer
+jcc8_Off
 : orpfile ( name | file input result )
     input 0 =
     "open/read/print :: " ps name @ ps nl
@@ -387,7 +388,7 @@ C Compiler Int Lexer
     nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
     file @ fclose
 ; prefix
-//'orpfile find wdiss
+'orpfile find wdiss //pause
 Root
 : license orpfile ( "./LICENSE" ) ;
 //license //pause
@@ -431,7 +432,7 @@ Root
 '_doTest 1 const
     
 dbgOff
-//dbgOn 
+dbgOn 
 // === controls ===
 
 #if Is_DebugOn forStarters ||
