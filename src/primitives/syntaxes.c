@@ -79,7 +79,6 @@ CSL_C_Semi ( )
     {
         CSL_InitSourceCode ( _CSL_ ) ;
     }
-
     Context_ClearQidInNamespace ( ) ;
 }
 
@@ -145,7 +144,7 @@ CSL_If_PrefixCombinators ( )
     if ( blocksParsed > 2 ) CSL_TrueFalseCombinator3 ( ) ;
     else
     {
-        d0 ( if ( Is_DebugOn ) Printf ( ( byte* ) "\n\nbefore CSL_If2Combinator : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
+        d0 ( if ( Is_DebugOn ) Printf ( "\n\nbefore CSL_If2Combinator : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
         CSL_If2Combinator ( ) ;
     }
     SetState ( compiler, C_COMBINATOR_PARSING, svscp ) ;

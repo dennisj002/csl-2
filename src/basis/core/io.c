@@ -24,7 +24,6 @@ char
 kbhit ( void )
 {
     int64 oldf ;
-
     oldf = fcntl ( STDIN_FILENO, F_GETFL, 0 ) ;
     fcntl ( STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK ) ;
     char ch = getchar ( ) ;
@@ -49,7 +48,7 @@ GetC ( )
 void
 getCursor ( int* x, int* y )
 {
-    Printf ( ( byte* ) "\033[6n" ) ;
+    Printf ( "\033[6n" ) ;
     int out = scanf ( "\033[%d;%dR", x, y ) ;
     //fflush ( stdout ) ; 
     //fflush ( stdin ) ; 
@@ -62,6 +61,8 @@ int64
 _Key ( FILE * f )
 {
     int64 key = getc ( f ) ; // GetC () ;
+    //if ( _O_->LogFlag && ( isalnum ( key ) || ispunct ( key ) ) ) CSL_LogChar ( key ) ;
+    if ( _O_->LogFlag && ( isgraph ( key ) || isspace ( key ) ) ) CSL_LogChar ( key ) ;
     return key ;
 }
 
@@ -95,14 +96,21 @@ _CSL_Key ( ReadLiner * rl )
 void
 _CSL_PrintString ( byte * string ) //  '."'
 {
-    printf ( "%s", string ) ;
+    Printf ( "%s", string ) ;
     fflush ( stdout ) ;
 }
 
 void
 _CSL_PrintChar ( byte c ) //  '."'
 {
-    printf ( "%c", c ) ;
+    Printf ( "%c", c ) ;
+    fflush ( stdout ) ;
+}
+
+void
+CSL_LogChar ( byte c ) //  '."'
+{
+    Printf_Log ( "%c", c ) ;
     fflush ( stdout ) ;
 }
 
@@ -117,9 +125,9 @@ Context_DoPrompt ( Context * cntx )
 {
     if ( ( ReadLiner_GetLastChar ( ) != '\n' ) || ( ! IS_INCLUDING_FILES ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) )
     {
-        _CSL_PrintChar ( '\n' ) ; //_Printf ( ( byte* ) "\n" ) ;
+        _CSL_PrintChar ( '\n' ) ; //_Printf ( "\n" ) ;
     }
-    Printf ( ( byte* ) "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
+    Printf ( "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
 }
 
 void
@@ -131,55 +139,60 @@ CSL_DoPrompt ( )
 // all output comes thru here
 
 void
-_Printf ( byte *format, ... )
+_Printf ( char *format, ... )
 {
-    //Boolean doLog = _CSL_ && _CSL_->LogFlag && _CSL_->LogFILE ;
     va_list args ;
-
     va_start ( args, ( char* ) format ) ;
     vprintf ( ( char* ) format, args ) ;
-#if 0    
-    if ( doLog )
-    {
-        vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
-        fflush ( _CSL_->LogFILE ) ;
-    }
-#endif    
     va_end ( args ) ;
     fflush ( stdout ) ;
+#if 1
+    if ( _O_->LogFlag )
+    {
+
+        va_start ( args, ( char* ) format ) ;
+        vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
+        va_end ( args ) ;
+        fflush ( _CSL_->LogFILE ) ;
+    }
+#endif  
 }
 
 void
-Printf ( byte *format, ... )
+Printf_Log ( char *format, ... )
 {
-    //Boolean doLog = _CSL_ && _CSL_->LogFlag && _CSL_->LogFILE ;
+    va_list args ;
+#if 1
+    if ( _O_->LogFlag )
+    {
+        va_start ( args, ( char* ) format ) ;
+        vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
+        va_end ( args ) ;
+        fflush ( _CSL_->LogFILE ) ;
+    }
+#endif  
+}
 
+void
+Printf ( char *format, ... )
+{
+    va_list args ;
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
     if ( _O_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
     {
-        va_list args ;
-
         va_start ( args, ( char* ) format ) ;
         vprintf ( ( char* ) format, args ) ;
-#if 0        
-        if ( doLog )
-        {
-            vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
-            fflush ( _CSL_->LogFILE ) ;
-        }
-#endif        
         va_end ( args ) ;
         fflush ( stdout ) ;
-#if 1
-        if ( _CSL_ && _CSL_->LogFlag && _CSL_->LogFILE )
-        {
-            va_start ( args, ( char* ) format ) ;
-            vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
-            va_end ( args ) ;
-            fflush ( _CSL_->LogFILE ) ;
-        }
-#endif        
     }
-    //ReadLiner_SetLastChar ( 0 ) ; //
+#if 1
+    if ( _O_->LogFlag )
+    {
+        va_start ( args, ( char* ) format ) ;
+        vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
+        va_end ( args ) ;
+        fflush ( _CSL_->LogFILE ) ;
+    }
+#endif  
 }
 

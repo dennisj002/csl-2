@@ -80,7 +80,7 @@ dlnode_Next ( dlnode * node )
     // don't return TailNode, return 0
     if ( node )
     {
-        dlnode * nextNode = node->n_After ; 
+        dlnode * nextNode = node->n_After ;
         if ( nextNode && nextNode->n_After ) return nextNode ;
     }
     return 0 ;
@@ -116,7 +116,7 @@ dlnode_InsertThisAfterANode ( dlnode * thisNode, dlnode * aNode ) // Insert this
 void
 dlnode_InsertThisBeforeANode ( dlnode * thisNode, dlnode * aNode ) // Insert thisNode Before aNode : toward the head of the list - "before" the Tail
 {
-    if ( thisNode && Is_NotAHeadNode ( aNode ) ) 
+    if ( thisNode && Is_NotAHeadNode ( aNode ) )
     {
         //if ( aNode->beforeNode ) 
         aNode->n_Before->n_After = thisNode ; // don't overwrite a Head or Tail node
@@ -171,6 +171,7 @@ _dllist_Init ( dllist * list )
         list->l_CurrentNode = 0 ;
     }
 }
+
 void
 dllist_Init ( dllist * list, dlnode * ahead, dlnode * atail )
 {
@@ -179,14 +180,13 @@ dllist_Init ( dllist * list, dlnode * ahead, dlnode * atail )
     _dllist_Init ( list ) ;
 }
 
-void 
+void
 OS_List_Init ( OS_List * osl )
 {
-    osl->osl_List.l_List.n_Head = &osl->n_Head ;
-    osl->osl_List.l_List.n_Tail = &osl->n_Tail ;
-    dllist_Init ( (dllist*)&osl->osl_List, &osl->n_Head, &osl->n_Tail ) ;
+    osl->osl_List.l_List.n_Head = & osl->n_Head ;
+    osl->osl_List.l_List.n_Tail = & osl->n_Tail ;
+    dllist_Init ( ( dllist* ) & osl->osl_List, &osl->n_Head, &osl->n_Tail ) ;
 }
-
 
 dllist *
 _dllist_New ( uint64 allocType )
@@ -298,6 +298,7 @@ Is_TheTailNode ( dlnode * anode )
 }
 
 #if 0
+
 Boolean
 Is_TheHeadOrTailNode ( dlnode * anode )
 {
@@ -591,7 +592,7 @@ dllist_Map1_Break ( dllist * list, MapFunction1 mf, int64 one )
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
     {
         nextNode = dlnode_Next ( node ) ;
-        if ( mf ( node, one ) ) break;
+        if ( mf ( node, one ) ) break ;
     }
 }
 
@@ -721,12 +722,12 @@ Tree_Map_Namespaces_State_2Args ( dllist * list, uint64 state, MapSymbolFunction
         nextNode = dlnode_Next ( node ) ;
         word = ( Word * ) node ;
         d0 ( _CSL_->FindWordCount ++ ) ;
-        //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nTree_Map_Namespaces_State_2Args : %s", word->Name ) ;
+        //if ( Is_DebugOn ) _Printf ( "\nTree_Map_Namespaces_State_2Args : %s", word->Name ) ;
         if ( Is_NamespaceType ( word ) )
         {
             if ( word->State & state )
             {
-                //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nTree_Map_Namespaces_State_2Args : pre-mf : %s", word->Name ) ;
+                //if ( Is_DebugOn ) _Printf ( "\nTree_Map_Namespaces_State_2Args : pre-mf : %s", word->Name ) ;
                 mf ( ( Symbol* ) word, one, two ) ;
             }
             Tree_Map_Namespaces_State_2Args ( word->W_List, state, mf, one, two ) ;
@@ -756,7 +757,7 @@ Tree_Map_OneNamespace ( Word * word, MapFunction_1 mf, int64 one )
     for ( ; word ; word = nextWord )
     {
         nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
-        //if ( Is_DebugOn ) _Printf ( ( byte* ) " %s.%s", word->ContainingNamespace ? word->ContainingNamespace->Name : (byte*) "", word->Name ) ;
+        //if ( Is_DebugOn ) _Printf ( " %s.%s", word->ContainingNamespace ? word->ContainingNamespace->Name : (byte*) "", word->Name ) ;
         //d0 ( CSL->FindWordCount ++ ) ;
         if ( mf ( ( Symbol* ) word, one ) ) return word ;
     }
@@ -787,13 +788,13 @@ Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
         {
             nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
             _CSL_->FindWordCount ++ ;
-            if ( ( ( word->State & state ) || Is_NamespaceType ( word ) ) && ( mf ( ( Symbol* ) word, one ) ) ) return word ;
+            if ( mf ( ( Symbol* ) word, one ) )
+                return word ;
+            //if ( ( ( word->State & state ) || Is_NamespaceType ( word ) ) && ( mf ( ( Symbol* ) word, one ) ) )
+            if ( ( word->State & state ) && ( Is_NamespaceType ( word ) ) )
             {
-                if ( Is_NamespaceType ( word ) )
-                {
-                    if ( ( word2 = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) word->W_List ), mf, one ) ) )
-                        return word2 ;
-                }
+                if ( ( word2 = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) word->W_List ), mf, one ) ) )
+                    return word2 ;
             }
         }
     }

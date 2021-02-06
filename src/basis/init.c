@@ -6,7 +6,7 @@
 void
 CSL_RuntimeInit ( CSL * csl, int64 cntxDelFlag )
 {
-    CSL_LogOff ( ) ;
+    //CSL_LogOff ( ) ;
     csl->SC_QuoteMode = 0 ;
     csl->SC_Word = 0 ;
     if ( cntxDelFlag )
@@ -88,7 +88,7 @@ CSL_ResetAll_Init ( CSL * csl )
                 {
                     if ( strcmp ( ( char* ) _O_->ErrorFilename, "Debug Context" ) )
                     {
-                        Printf ( ( byte* ) "\nError : \"%s\" include error!\n", _O_->SigLocation ? _O_->SigLocation : _O_->ErrorFilename ) ;
+                        Printf ( "\nError : \"%s\" include error!\n", _O_->SigLocation ? _O_->SigLocation : _O_->ErrorFilename ) ;
                     }
                 }
                 DefaultColors ;
@@ -97,7 +97,7 @@ CSL_ResetAll_Init ( CSL * csl )
     }
     if ( _O_->Verbosity > 3 )
     {
-        Printf ( ( byte* ) " \nInternal Namespaces have been initialized.  " ) ;
+        Printf ( " \nInternal Namespaces have been initialized.  " ) ;
         OVT_ShowMemoryAllocated ( ) ;
     }
     //if ( ( _O_->InitSessionCoreTimes == 1 ) || ( ! _O_->Verbosity ) ) _O_->Verbosity = 1 ;

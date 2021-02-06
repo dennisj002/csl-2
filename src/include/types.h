@@ -878,9 +878,9 @@ typedef struct _StringTokenInfo
 typedef struct _CSL
 {
     uint64 State, SavedState, * SaveDsp ;
-    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount, DebugLevel ; // SC_Index == SC_Buffer Index ;
+    int64 InitSessionCoreTimes, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount, DebugLevel ; // SC_Index == SC_Buffer Index ;
     Stack *ReturnStack, * DataStack ;
-    Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace ;
+    Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace, *C_Preprocessor_IncludeDirectory_List_Namespace ; 
     Context * Context0 ;
     Stack * ContextStack, * TypeWordStack ;
     Debugger * Debugger0 ;
@@ -896,10 +896,10 @@ typedef struct _CSL
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
     CharacterType LexerCharacterTypeTable [ 256 ] ;
     LexerFunction LexerCharacterFunctionTable [ 24 ] ;
-    Buffer *StringB, * TokenB, *OriginalInputLineB, *InputLineB, *svLineB, *SourceCodeBuffer, *StringInsertB, *StringInsertB2, *StringInsertB3, *StringInsertB4, *StringInsertB5, *StrCatBuffer ;
-    Buffer *TabCompletionBuf, * LC_PrintB, * LC_DefineB, *DebugB, *DebugB1, *DebugB2, *DebugB3, *ScratchB1, *ScratchB2, *ScratchB3, *StringMacroB ; // token buffer, tab completion backup, source code scratch pad, 
+    Buffer *StringB, * TokenB, *OriginalInputLineB, *InputLineB, *svLineB, *SourceCodeBuffer, *StringInsertB, *StringInsertB2, *StringInsertB3, *StringInsertB4, *StringInsertB5, *StringInsertB6, *StrCatBuffer ;
+    Buffer *TabCompletionBuf, * LC_PrintB, * LC_DefineB, *DebugB, *DebugB1, *DebugB2, *DebugB3, *ScratchB1, *ScratchB2, *ScratchB3, *ScratchB4, *ScratchB5, *StringMacroB ; // token buffer, tab completion backup, source code scratch pad, 
     StrTokInfo Sti ;
-    dllist * CSL_N_M_Node_WordList ; //, *TokenList,  ;
+    dllist * CSL_N_M_Node_WordList ;
     SourceCodeInfo SCI ;
     sigjmp_buf JmpBuf0 ;
 } CSL, ContextSensitiveLanguage ;
@@ -963,9 +963,9 @@ typedef struct
     CSL * OVT_CSL ;
     Context * OVT_Context ;
     Interpreter * OVT_Interpreter ;
-    //dllist * HistorySpace_StringList ;
     LambdaCalculus * OVT_LC ;
     ByteArray * CodeByteArray ; // a variable
+    Boolean LogFlag ;
 
     PrintStateInfo *psi_PrintStateInfo ;
     int64 SignalExceptionsHandled, LastRestartCondition, RestartCondition, Signal, ExceptionCode, Console ;

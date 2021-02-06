@@ -14,7 +14,7 @@ typecheckOn dbgTypecheckOn
 verbosity 1 = 
 Debug
 // higher debugLevel turns on more debugging
-: d: _dbgOn dbgSourceCodeOn ; immediate debugWord // use a possibly user set level : a debugWord has special behavior : doesn't interfere with optimization
+: d: _dbgOn debugLevel 0 = dbgSourceCodeOn ; immediate debugWord // use a possibly user set level : a debugWord has special behavior : doesn't interfere with optimization
 : d1: _dbgOn debugLevel 1 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
 : d2: _dbgOn debugLevel 2 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
 "OptimizeOn" variable
@@ -31,8 +31,10 @@ Root
 : ' _tick ; immediate
 'ndrop '_ndrop find alias immediate 
 'forth 'postfixOn find alias
+'c_syntaxOn '_c_syntaxOn find alias immediate
 'C_On 'c_syntaxOn find alias
 'C_Off 'c_syntaxOff find alias
+'_cOn '_c_syntaxOn find alias
 'cOn 'c_syntaxOn find alias
 'cOff 'c_syntaxOff find alias
 "log" variable 
@@ -378,7 +380,7 @@ vb3
 #endif
 Interpreter
 '_defined '_findUsing find alias 
-' defined '_findUsing find alias immediate 
+//' defined '_findUsing find alias immediate 
 C Compiler Int Lexer
 jcc8_Off
 : orpfile ( name | file input result )
@@ -388,7 +390,7 @@ jcc8_Off
     nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
     file @ fclose
 ; prefix
-'orpfile find wdiss //pause
+//'orpfile find wdiss //pause
 Root
 : license orpfile ( "./LICENSE" ) ;
 //license //pause
@@ -417,7 +419,7 @@ lispOff
 : mrm mem rdi mem ; 
 : mem2 verbosity 2 = mem verbosity 1 = ; 
 : typesInclude "namespaces/types.csl" include ;
-
+: minc stack _c_syntaxOn "/home/dennisj/csl-code/archive/maru-2.4/eval.c" include ;
 
 // === controls ===
 Root 
@@ -432,7 +434,8 @@ Root
 '_doTest 1 const
     
 dbgOff
-dbgOn 
+//dbgOn 
+//verbosity 2 = cOn d: minc cOff
 // === controls ===
 
 #if Is_DebugOn forStarters ||
@@ -485,3 +488,5 @@ cOff
 2 + 7 assertStkChk // stack checking 
 // s
 //mem
+
+//d: minc

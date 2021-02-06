@@ -28,10 +28,17 @@ CSL_TokenQID ( )
     DataStack_Push ( ( int64 ) token ) ;
 }
 
+byte *
+_CSL_FilenameToken ( )
+{
+    byte * token = _Lexer_LexNextToken_WithDelimiters ( _Lexer_, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
+    return token ;
+}
+
 void
 CSL_FilenameToken ( )
 {
-    byte * token = _Lexer_LexNextToken_WithDelimiters ( _Lexer_, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
+    byte * token = _CSL_FilenameToken ( ) ;
     DataStack_Push ( ( int64 ) token ) ;
 }
 

@@ -14,7 +14,8 @@ _Context_Location ( Context * cntx )
     if ( cntx && cntx->ReadLiner0 )
     {
         byte * buffer = Buffer_Data ( _CSL_->StringB ) ;
-        snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
+         snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", 
+            cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
         str = cntx->Location = String_New ( buffer, TEMPORARY ) ;
     }
     return str ;
@@ -122,7 +123,9 @@ Context *
 CSL_Context_PushNew ( CSL * csl )
 {
     _Stack_Push ( csl->ContextStack, ( int64 ) csl->Context0 ) ;
+    uint64 svState = csl->Context0->State ;
     Context * cntx = _Context_New ( csl ) ;
+    cntx->State = svState ;
     return cntx ;
 }
 
@@ -205,7 +208,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
         {
             ReadLiner * rl = cntx->ReadLiner0 ;
             rl->Filename = String_New ( filename, STRING_MEM ) ;
-            if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nincluding %s ...\n", filename ) ;
+            if ( _O_->Verbosity > 2 ) Printf ( "\nincluding %s ...\n", filename ) ;
             cntx->ReadLiner0->InputFile = file ;
             ReadLine_SetRawInputFunction ( rl, ReadLine_GetNextCharFromString ) ;
             SetState ( cntx->System0, ADD_READLINE_TO_HISTORY, false ) ;
@@ -218,13 +221,13 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
 
             cntx->System0->IncludeFileStackNumber -- ;
-            if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\n%s included\n", filename ) ;
+            if ( _O_->Verbosity > 2 ) Printf ( "\n%s included\n", filename ) ;
             //OVT_MemListFree_Objects ( ) ;
             //OVT_FreeTempMem ( ) ;// no because it would delete eg. literals in the debug word list!! -> crash
         }
         else
         {
-            Printf ( ( byte* ) "\nError : _CSL_IncludeFile : \"%s\" : not found! :: %s\n", filename,
+            Printf ( "\nError : _CSL_IncludeFile : \"%s\" : not found! :: %s\n", filename,
                 _Context_Location ( ( Context* ) _CSL_->ContextStack->StackPointer [0] ) ) ;
         }
     }

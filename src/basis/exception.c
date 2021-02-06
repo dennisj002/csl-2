@@ -84,7 +84,7 @@ _OpenVmTil_ShowExceptionInfo ( )
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ;
     }
     if ( word != _Context_->LastEvalWord ) _CSL_Source ( word, 0 ) ;
-    Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _O_->SigAddress, _O_->SigLocation ) ;
+    Printf ( "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _O_->SigAddress, _O_->SigLocation ) ;
 }
 
 int64
@@ -123,7 +123,7 @@ OVT_PauseInterpret ( Context * cntx, byte key )
     ReadLine_Init ( rl, _CSL_Key ) ;
     SetState ( cntx, AT_COMMAND_LINE, true ) ;
     if ( ( key <= ' ' ) || ( key == '\\' ) ) key = 0 ;
-    Printf ( ( byte* ) "\nPause interpreter : hit <enter> or <esc> to exit" ) ;
+    Printf ( "\nPause interpreter : hit <enter> or <esc> to exit" ) ;
     do
     {
         svPrompt = ReadLine_GetPrompt ( rl ) ;
@@ -164,24 +164,24 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
         DebugColors ;
         int64 tlw = Strlen ( defaultPrompt ) ;
         if ( tlw > _Debugger_->TerminalLineWidth ) _Debugger_->TerminalLineWidth = tlw ;
-        if ( signalExceptionsHandled ) Printf ( ( byte* ) "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n",
+        if ( signalExceptionsHandled ) Printf ( "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n",
             signalExceptionsHandled, _O_->Signal,
             _O_->RestartCondition ) ;
         do
         {
             if ( ( ! debugger->w_Word ) && ( ! debugger->Token ) ) debugger->w_Word = Context_CurrentWord ( ) ;
             _Debugger_ShowInfo ( _Debugger_, ( byte* ) "\r", _O_->Signal, 0 ) ;
-            Printf ( ( byte* ) "%s", buffer ) ;
+            Printf ( "%s", buffer ) ;
 
             int64 key = Key ( ) ;
             _ReadLine_PrintfClearTerminalLine ( ) ;
-            Printf ( ( byte* ) "\nPause : hit <enter> or <esc> to exit" ) ;
+            Printf ( "\nPause : hit <enter> or <esc> to exit" ) ;
             switch ( key )
             {
                 case 'x': case 'X':
                 {
                     byte * msg = ( byte * ) "Exit csl from pause?" ;
-                    Printf ( ( byte* ) "\n%s : 'x' to e(x)it csl : any other <key> to continue%s", msg, c_gd ( "\n-> " ) ) ;
+                    Printf ( "\n%s : 'x' to e(x)it csl : any other <key> to continue%s", msg, c_gd ( "\n-> " ) ) ;
                     key = Key ( ) ;
                     if ( ( key == 'x' ) || ( key == 'X' ) ) OVT_Exit ( ) ;
                     goto done ;
@@ -189,7 +189,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 case 'q':
                 {
                     byte * msg = ( byte * ) "Quit to interpreter loop from pause?" ;
-                    Printf ( ( byte* ) "\n%s : 'q' to (q)uit : any other key to continue%s", msg, c_gd ( "\n-> " ) ) ;
+                    Printf ( "\n%s : 'q' to (q)uit : any other key to continue%s", msg, c_gd ( "\n-> " ) ) ;
                     key = Key ( ) ;
                     if ( ( key == 'q' ) || ( key == 'Q' ) ) DefaultColors, CSL_Quit ( ) ;
                     goto done ;
@@ -247,7 +247,7 @@ done:
 int64
 _OpenVmTil_Pause ( byte * msg )
 {
-    Printf ( ( byte* ) "\n%s", msg ) ;
+    Printf ( "\n%s", msg ) ;
     return OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
 }
 
@@ -311,7 +311,7 @@ _OpenVmTil_LongJmp_WithMsg ( int64 restartCondition, byte * msg )
 void
 OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc ) //nb. void ptr (uc) necessary 
 {
-    d0 ( Printf ( ( byte* ) "\nOpenVmTil_SignalAction :: signal = %d\n", signal ) ) ;
+    d0 ( Printf ( "\nOpenVmTil_SignalAction :: signal = %d\n", signal ) ) ;
     if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) || ( signal == SIGSTOP ) ) OVT_Exit ( ) ;
     _O_->Signal = signal ;
     _O_->SigAddress = si->si_addr ; //( Is_DebugOn && _Debugger_->DebugAddress ) ? _Debugger_->DebugAddress : si->si_addr ;
@@ -560,12 +560,12 @@ _Error ( byte * msg, uint64 state )
 void
 OVT_ExceptionState_Print ( )
 {
-    Printf ( ( byte* ) "\nSignalExceptionsHandled = %d ; SigSegvs = %d ; Restarts = %d\nStartedTimes = %d ; RestartCondition = %s ; LastRestartCondtion = %s",
+    Printf ( "\nSignalExceptionsHandled = %d ; SigSegvs = %d ; Restarts = %d\nStartedTimes = %d ; RestartCondition = %s ; LastRestartCondtion = %s",
         _O_->SignalExceptionsHandled, _O_->SigSegvs, _O_->Restarts, _O_->StartedTimes, Convert_RestartCondtion ( _O_->LastRestartCondition ),
         Convert_RestartCondtion ( _O_->RestartCondition ) ) ;
 }
 
-int64
+byte
 _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
 {
     byte * msg = ovt->ThrowBuffer->Data ;
@@ -578,8 +578,8 @@ _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
         Pause ( ) ;
         return false ;
     }
-    else if ( key == 'x' ) OVT_Exit ( ) ;
-    else return false ;
+    else if ( key == 'x' ) OVT_Exit ( ) ; 
+    return key ;
 }
 
 void
@@ -597,7 +597,7 @@ OVT_Assert ( Boolean testBoolean, byte * msg )
         (
     if ( ! ( testBoolean ) )
     {
-        Printf ( ( byte* ) "\nAssert failed : %s : at %s", msg ? msg : ( byte* ) "", _Context_Location ( _Context_ ) ) ;
+        Printf ( "\nAssert failed : %s : at %s", msg ? msg : ( byte* ) "", _Context_Location ( _Context_ ) ) ;
             _Throw ( QUIT ) ;
     }
     ) ;

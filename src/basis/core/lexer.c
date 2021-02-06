@@ -74,7 +74,7 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
         if ( ! lword ) // a fix for the problem with local variables in c functions finding wrong words in other than using namespaces eg. class definitions
         {
             word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
-            if ( word && ( GetState ( compiler, DOING_C_TYPE )  && ( ! ( IS_MORPHISM_TYPE ( word ) ) ) ) )
+            if ( word && ( GetState ( compiler, DOING_C_TYPE ) && ( ! ( IS_MORPHISM_TYPE ( word ) ) ) ) )
             {
                 //if ( word && Is_DebugOn ) Printf ( "\nRejected C Type word %s = %lx", word->Name, word ) ;
                 word = _Lexer_ParseToken_ToWord ( lexer, token, - 1, - 1 ) ;
@@ -306,10 +306,13 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
     if ( word->Name[0] == '(' ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ) )
+    if ( ( word->W_TypeAttributes & W_PREPROCESSOR ) && ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) ) 
+        return false ;
+    else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
         //&& ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) 
         //&& IS_MORPHISM_TYPE( word ) 
-        && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) )
+        //&& ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) ) && ( ( ! ( word->W_TypeAttributes & W_PREPROCESSOR ) && ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) ) ) )
+        && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) ) ) 
     {
         return Lexer_IsNextWordLeftParen ( lexer ) ;
     }
@@ -799,7 +802,32 @@ Semi ( Lexer * lexer ) // ';':
 {
     if ( GetState ( _Context_, C_SYNTAX ) && lexer->TokenWriteIndex )
     {
-        Lexer_MakeItTheNextToken ( lexer ) ;
+        byte nextChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
+        if ( isspace ( nextChar ) )
+        {
+            Lexer_MakeItTheNextToken ( lexer ) ;
+            return ;
+        }
+    }
+    Lexer_Default ( lexer ) ;
+}
+
+void
+Exclam ( Lexer * lexer ) // ';':
+{
+    if ( GetState ( _Context_, ( C_SYNTAX | CONTEXT_PREPROCESSOR_MODE ) ) ) //&& lexer->TokenWriteIndex )
+    {
+        if ( lexer->TokenWriteIndex ) Lexer_MakeItTheNextToken ( lexer ) ;
+        else
+        {
+            byte nextChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
+            if ( nextChar != '=' )
+            {
+                Lexer_Default ( lexer ) ;
+                Lexer_FinishTokenHere ( lexer ) ;
+            }
+            else Lexer_Default ( lexer ) ;
+        }
         return ;
     }
     else Lexer_Default ( lexer ) ;
@@ -1028,6 +1056,7 @@ CSL_LexerTables_Setup ( CSL * csl )
     csl->LexerCharacterTypeTable [ '+' ].CharFunctionTableIndex = 19 ;
     csl->LexerCharacterTypeTable [ ESC ].CharFunctionTableIndex = 20 ;
     csl->LexerCharacterTypeTable [ 'm' ].CharFunctionTableIndex = 21 ;
+    csl->LexerCharacterTypeTable [ '!' ].CharFunctionTableIndex = 22 ;
 
     csl->LexerCharacterFunctionTable [ 0 ] = Lexer_Default ;
     csl->LexerCharacterFunctionTable [ 1 ] = _Zero ;
@@ -1052,6 +1081,7 @@ CSL_LexerTables_Setup ( CSL * csl )
     csl->LexerCharacterFunctionTable [ 19 ] = Plus ;
     csl->LexerCharacterFunctionTable [ 20 ] = Escape ;
     csl->LexerCharacterFunctionTable [ 21 ] = EndEscapeSequence ;
+    csl->LexerCharacterFunctionTable [ 22 ] = Exclam ;
 }
 
 int64

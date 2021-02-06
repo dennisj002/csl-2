@@ -22,17 +22,17 @@ _DisplaySignal ( int64 signal )
             }
             case SIGFPE:
             {
-                Printf ( ( byte* ) "\nSIGFPE : arithmetic exception - %s", location ) ;
+                Printf ( "\nSIGFPE : arithmetic exception - %s", location ) ;
                 break ;
             }
             case SIGILL:
             {
-                Printf ( ( byte* ) "\nSIGILL : illegal instruction - %s", location ) ;
+                Printf ( "\nSIGILL : illegal instruction - %s", location ) ;
                 break ;
             }
             case SIGTRAP:
             {
-                Printf ( ( byte* ) "\nSIGTRAP : int3/trap - %s", location ) ;
+                Printf ( "\nSIGTRAP : int3/trap - %s", location ) ;
                 break ;
             }
             default: break ;
@@ -72,7 +72,7 @@ Linux_SetInputMode ( struct termios * savedTerminalAttributes )
     // Make sure stdin is a terminal. /
     if ( ! isatty ( STDIN_FILENO ) )
     {
-        Printf ( ( byte* ) "Not a terminal.\n" ) ;
+        Printf ( "Not a terminal.\n" ) ;
         exit ( EXIT_FAILURE ) ;
     }
 

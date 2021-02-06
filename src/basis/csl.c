@@ -125,7 +125,7 @@ void
 CSL_DataStack_Init ( )
 {
     _CSL_DataStack_Init ( _CSL_ ) ;
-    if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nData Stack reset." ) ;
+    if ( _O_->Verbosity > 2 ) Printf ( "\nData Stack reset." ) ;
 }
 
 void
@@ -158,6 +158,8 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     csl->ScratchB1 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->ScratchB2 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->ScratchB3 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
+    csl->ScratchB4 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
+    csl->ScratchB5 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->StringB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->DebugB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->DebugB1 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
@@ -168,6 +170,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     csl->StringInsertB3 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->StringInsertB4 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->StringInsertB5 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
+    csl->StringInsertB6 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->TabCompletionBuf = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->StringMacroB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     csl->StrCatBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
@@ -176,14 +179,12 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     csl->TokenBuffer = Buffer_Data ( csl->TokenB ) ;
     SetState ( csl, CSL_RUN | OPTIMIZE_ON | INLINE_ON, true ) ;
 
-    if ( _O_->Verbosity > 2 ) Printf ( ( byte* ) "\nSystem Memory is being reallocated.  " ) ;
+    if ( _O_->Verbosity > 2 ) Printf ( "\nSystem Memory is being reallocated.  " ) ;
 
     csl->ContextStack = Stack_New ( 256, allocType ) ;
-    //csl->ObjectStack = Stack_New ( 1 * K, allocType ) ;
     csl->TypeWordStack = Stack_New ( 1 * K, allocType ) ;
-    //csl->TokenList = _dllist_New ( allocType ) ;
     csl->CSL_N_M_Node_WordList = _dllist_New ( T_CSL ) ;
-
+    
     _Context_ = csl->Context0 = _Context_New ( csl ) ;
 
     csl->Debugger0 = _Debugger_New ( allocType ) ;
@@ -209,9 +210,6 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     csl->StringNamespace = Namespace_Find ( ( byte* ) "String" ) ;
     csl->BigNumNamespace = Namespace_Find ( ( byte* ) "BigNum" ) ;
     csl->IntegerNamespace = Namespace_Find ( ( byte* ) "Integer" ) ;
-    //csl->RawStringNamespace = Namespace_Find ( (byte*) "RawString" ) ;
-    //csl->CharNamespace = Namespace_Find ( (byte*) "Char" ) ;
-    //csl->FloatNamespace = Namespace_Find ( (byte*) "Float" ) ;
     CSL_ReadTables_Setup ( csl ) ;
     CSL_LexerTables_Setup ( csl ) ;
     csl->LC = 0 ;
@@ -224,17 +222,6 @@ _CSL_Init ( CSL * csl, Namespace * nss )
 void
 CSL_ResetMemory ( CSL * csl )
 {
-#if 0    
-    if ( csl->ContextStack )
-    {
-        while ( Stack_Depth ( csl->ContextStack ) )
-        {
-            Context * cntx = ( Context* ) _Stack_Pop ( csl->ContextStack ) ;
-            Context_Recycle ( cntx ) ;
-        }
-        //if ( csl->Context0 ) NamedByteArray_Delete ( csl->Context0->ContextNba ) ;
-    }
-#else
     if ( csl->ContextStack )
     {
         while ( Stack_Depth ( csl->ContextStack ) )
@@ -244,8 +231,6 @@ CSL_ResetMemory ( CSL * csl )
         }
         if ( csl->Context0 ) NamedByteArray_Delete ( csl->Context0->ContextNba, 0 ) ;
     }
-#endif    
-    //OVT_MemListFree_ContextMemory ( ) ;
     OVT_MemListFree_Session ( ) ;
     OVT_MemListFree_ContextMemory ( ) ;
     OVT_MemListFree_LispTemp ( ) ;
@@ -266,10 +251,7 @@ _CSL_New ( CSL * csl )
         if ( _O_->RestartCondition < RESET_ALL )
         {
             nss = csl->Namespaces ; // in this case (see also below) only preserve Namespaces, all else is recycled and reinitialized
-            if ( csl->LogFILE )
-            {
-                CSL_LogOff ( ) ;
-            }
+            if ( csl->LogFILE ) CSL_LogOff ( ) ;
         }
         CSL_ResetMemory ( csl ) ;
     }

@@ -29,7 +29,7 @@ INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
 
 OBJECTS = $(SOURCES:%.c=%.o) 
 CC = gcc-10  
-#CC = g++-10 -fpermissive 
+#CC = g++-10 -fpermissive -Wwrite-strings
 OUT = csl-gdb
 
 default : debug

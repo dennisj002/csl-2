@@ -50,15 +50,15 @@ void
 _dobject_Print ( dobject * dobj )
 {
     int64 i ;
-    Printf ( ( byte* ) "\n\ndobject  = 0x%08x : word Name = %s", dobj, dobj->do_iData[2] ? ( ( Word* ) dobj->do_iData[2] )->Name : ( byte* ) "" ) ;
-    Printf ( ( byte* ) "\nType     = %d", dobj->do_Type ) ;
-    Printf ( ( byte* ) "\nSlots    = %d", dobj->do_Slots ) ;
-    Printf ( ( byte* ) "\nSize     = %d", dobj->do_Size ) ;
+    Printf ( "\n\ndobject  = 0x%08x : word Name = %s", dobj, dobj->do_iData[2] ? ( ( Word* ) dobj->do_iData[2] )->Name : ( byte* ) "" ) ;
+    Printf ( "\nType     = %d", dobj->do_Type ) ;
+    Printf ( "\nSlots    = %d", dobj->do_Slots ) ;
+    Printf ( "\nSize     = %d", dobj->do_Size ) ;
     for ( i = 0 ; i < dobj->do_Slots ; i ++ )
     {
-        Printf ( ( byte* ) "\nSlot [%d] = 0x%08x", i, dobj->do_iData[i] ) ;
+        Printf ( "\nSlot [%d] = 0x%08x", i, dobj->do_iData[i] ) ;
     }
-    //_Printf ( ( byte* ) "\n" ) ;
+    //_Printf ( "\n" ) ;
 }
 // remember : Word = DynamicObject = DObject = Namespace
 
@@ -131,7 +131,7 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
     else
     {
         word->W_Value = value ; // rvalue
-        d0 ( Printf ( ( byte* ) "\n_DObject_ValueDefinition_Init :" ) ) ;
+        d0 ( Printf ( "\n_DObject_ValueDefinition_Init :" ) ) ;
         ByteArray * svcs = _O_CodeByteArray ;
         int64 sscm = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
         //CSL_DbgSourceCodeOff ( ) ;

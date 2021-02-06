@@ -227,7 +227,7 @@ Location_New ( )
 void
 _Location_Printf ( Location * loc )
 {
-    if ( loc ) Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
+    if ( loc ) Printf ( "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
 }
 
 void
@@ -253,7 +253,7 @@ void
 CSL_Do ( )
 {
     CSL_LeftBracket ( ) ; // interpret mode
-    byte * token = Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    byte * token = Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
     _CSL_RightBracket ( ) ;
 }
 
@@ -262,7 +262,7 @@ CSL_Does ( )
 {
     Word * saveWord = _Context_->CurrentWordBeingCompiled ;
     _CSL_RightBracket ( ) ;
-    Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
     _Context_->CurrentWordBeingCompiled = saveWord ;
 }
 
@@ -272,7 +272,7 @@ void
 CSL_Do ( )
 {
     CSL_LeftBracket ( ) ; // interpret mode
-    byte * token = Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    byte * token = Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0, 0 ) ;
     _CSL_RightBracket ( ) ;
 }
 
@@ -282,7 +282,7 @@ CSL_Does ( )
     Word * saveWord = _Context_->CurrentWordBeingCompiled ;
     _CSL_RightBracket ( ) ;
     CSL_BeginBlock ( ) ;
-    byte * token = Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    byte * token = Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0, 0 ) ;
     CSL_EndBlock ( ) ;
     CSL_BlockRun ( ) ;
     if ( _String_EqualSingleCharString ( token, ';' ) ) { DataStack_Push ((int64)_Compiler_->Current_Word_Create) ; Word_DefinitionEqual ( ) ; } // for use with 'create - 'wordNew like ans forth ??
@@ -295,7 +295,7 @@ void
 CSL_Do ( )
 {
     CSL_LeftBracket ( ) ; // interpret mode
-    byte * token = Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    byte * token = Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
     _CSL_RightBracket ( ) ;
 }
 
@@ -305,7 +305,7 @@ CSL_Does ( )
     Word * saveWord = _Context_->CurrentWordBeingCompiled ;
     _CSL_RightBracket ( ) ;
     CSL_BeginBlock ( ) ;
-    Interpret_C_Until_NotIncluding_Token4 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
     CSL_EndBlock ( ) ;
     CSL_BlockRun ( ) ;
     _Context_->CurrentWordBeingCompiled = saveWord ;
@@ -454,13 +454,13 @@ CSL_DebugWord ( void )
 void
 Symbol_Print ( Symbol * symbol )
 {
-    Printf ( ( byte* ) "%s", symbol->Name ) ;
+    Printf ( "%s", symbol->Name ) ;
 }
 
 void
 Symbol_List_Print ( dllist * list )
 {
-    Printf ( ( byte* ) "\nSymbol List : " ) ;
+    Printf ( "\nSymbol List : " ) ;
     dllist_Map ( list, ( MapFunction0 ) Symbol_Print ) ;
 }
 
@@ -476,7 +476,7 @@ void
 _Words ( Symbol * symbol, MapFunction1 mf, int64 n )
 {
     Namespace * ns = ( Namespace * ) symbol ;
-    Printf ( ( byte* ) "\n - %s :> ", ns->Name ) ;
+    Printf ( "\n - %s :> ", ns->Name ) ;
     dllist_Map1 ( ns->Lo_List, mf, n ) ;
 }
 
@@ -491,23 +491,23 @@ _CSL_PrintWords ( int64 state )
 {
     int64 n = 0 ;
     _CSL_NamespacesMap ( ( MapSymbolFunction2 ) _DoWords, state, ( int64 ) & n, 0 ) ;
-    if ( _O_->Verbosity > 3 ) Printf ( ( byte* ) "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
+    if ( _O_->Verbosity > 3 ) Printf ( "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
     return n ;
 }
 
 void
 CSL_Words ( )
 {
-    Printf ( ( byte* ) "\nWords :\n - <namespace> ':>' <word list>" ) ;
+    Printf ( "\nWords :\n - <namespace> ':>' <word list>" ) ;
     int64 n = _CSL_PrintWords ( USING ) ;
-    Printf ( ( byte* ) "\n" INT_FRMT " words on the 'using' Namespaces List ::", n ) ;
-    if ( _O_->Verbosity > 3 ) Printf ( ( byte* ) "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
+    Printf ( "\n" INT_FRMT " words on the 'using' Namespaces List ::", n ) ;
+    if ( _O_->Verbosity > 3 ) Printf ( "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
 }
 
 void
 _Variable_Print ( Word * word )
 {
-    Printf ( ( byte* ) c_ud ( " %s = %x ;" ), word->Name, word->W_Value ) ;
+    Printf ( c_ud ( " %s = %x ;" ), word->Name, word->W_Value ) ;
 }
 
 void
@@ -526,9 +526,9 @@ _Variables ( Symbol * symbol, MapFunction1 mf, int64 n )
 {
     int64 pre_n = * ( int64* ) n ;
     Namespace * ns = ( Namespace * ) symbol ;
-    Printf ( ( byte* ) "\n - %s :> ", ns->Name ) ;
+    Printf ( "\n - %s :> ", ns->Name ) ;
     dllist_Map1 ( ns->Lo_List, mf, n ) ;
-    if ( *( int64* ) n == pre_n ) Printf ( ( byte* ) "\r" ) ;
+    if ( *( int64* ) n == pre_n ) Printf ( "\r" ) ;
 }
 
 void
@@ -548,9 +548,9 @@ _CSL_PrintVariables ( int64 nsStatus )
 void
 CSL_Variables ( )
 {
-    Printf ( ( byte* ) "\nGlobal Variables :\n - <namespace> ':>' <variable '=' value ';'>*" ) ;
+    Printf ( "\nGlobal Variables :\n - <namespace> ':>' <variable '=' value ';'>*" ) ;
     int64 n = _CSL_PrintVariables ( USING ) ;
-    Printf ( ( byte* ) "\n" INT_FRMT " global variables on the 'using' Namespaces List", n ) ;
+    Printf ( "\n" INT_FRMT " global variables on the 'using' Namespaces List", n ) ;
 }
 
 void
@@ -561,9 +561,9 @@ _CSL_NamespaceWords ( )
     if ( ns )
     {
         _DoWords ( ( Symbol * ) ns, &n ) ;
-        Printf ( ( byte* ) "\n" INT_FRMT " words in %s namespace", n, ns->Name ) ;
+        Printf ( "\n" INT_FRMT " words in %s namespace", n, ns->Name ) ;
     }
-    else Printf ( ( byte* ) "\nError : can't find that namespace" ) ;
+    else Printf ( "\nError : can't find that namespace" ) ;
 }
 
 void
@@ -578,15 +578,15 @@ CSL_NamespaceWords ( )
 void
 CSL_AllWords ( )
 {
-    Printf ( ( byte* ) "\n - <namespace> ':>' <word list>" ) ;
-    Printf ( ( byte* ) "\n'using' Namespaces List ::" ) ;
+    Printf ( "\n - <namespace> ':>' <word list>" ) ;
+    Printf ( "\n'using' Namespaces List ::" ) ;
     int64 n = _CSL_PrintWords ( USING ) ;
-    Printf ( ( byte* ) "\n" INT_FRMT " words on the Currently 'using' Namespaces List", n ) ;
-    Printf ( ( byte* ) "\n'notUsing' Namespaces List ::" ) ;
+    Printf ( "\n" INT_FRMT " words on the Currently 'using' Namespaces List", n ) ;
+    Printf ( "\n'notUsing' Namespaces List ::" ) ;
     int64 usingWords = _CSL_->FindWordCount ;
     int64 m = _CSL_PrintWords ( NOT_USING ) ;
-    Printf ( ( byte* ) "\n" INT_FRMT " words on the 'notUsing' List", m ) ;
-    Printf ( ( byte* ) "\n" INT_FRMT " total words", n + m ) ;
+    Printf ( "\n" INT_FRMT " words on the 'notUsing' List", m ) ;
+    Printf ( "\n" INT_FRMT " total words", n + m ) ;
     int64 notUsingWords = _CSL_->FindWordCount ;
     _CSL_->FindWordCount = usingWords + notUsingWords ;
     CSL_WordAccounting ( ( byte* ) "CSL_AllWords" ) ;

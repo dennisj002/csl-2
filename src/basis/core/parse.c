@@ -55,7 +55,7 @@ _Lexer_ParseBinary ( Lexer * lexer, int64 offset )
         else
         {
             SetState ( lexer, KNOWN_OBJECT, false ) ;
-            Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, (byte * )"\n_Lexer_ParseBinary : non binary digits with number base 2" ) ;
+            Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, ( byte * ) "\n_Lexer_ParseBinary : non binary digits with number base 2" ) ;
         }
     }
     SetState ( lexer, KNOWN_OBJECT, true ) ;
@@ -256,7 +256,7 @@ Parse_Macro ( int64 type )
 }
 
 Word *
-_Lexer_ParseTerminatingMacro (Lexer * lexer, byte termChar, Boolean includeTermChar , Boolean evalFlag)
+_Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTermChar, Boolean evalFlag )
 {
     ReadLiner * rl = _ReadLiner_ ;
     byte * token ;
@@ -280,8 +280,8 @@ _Lexer_ParseTerminatingMacro (Lexer * lexer, byte termChar, Boolean includeTermC
     token = String_New ( lexer->TokenBuffer, STRING_MEM ) ;
     if ( termChar == '\"' )
     {
-        word = _Lexer_ParseToken_ToWord ( lexer, token, -1, -1 ) ;
-        if ( evalFlag ) 
+        word = _Lexer_ParseToken_ToWord ( lexer, token, - 1, - 1 ) ;
+        if ( evalFlag )
         {
             Word_Eval ( word ) ;
             word = 0 ;
@@ -310,8 +310,12 @@ _CSL_ParseQid_Token ( byte * token0 )
         {
             if ( token0 ) cntx->BaseObject = 0 ;
             if ( ns ) word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, token ) ;
-            else word = Finder_Word_FindUsing (_Finder_, token, 1) ; // maybe need to respect a possible qualifying namespace ??
-            if ( word && ( nst = word->W_ObjectAttributes & THIS ) ) { ns = word ; _Context_SetAsQidInNamespace ( ns ) ;  }
+            else word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ; // maybe need to respect a possible qualifying namespace ??
+            if ( word && ( nst = word->W_ObjectAttributes & THIS ) )
+            {
+                ns = word ;
+                _Context_SetAsQidInNamespace ( ns ) ;
+            }
             else if ( word && ( nst = word->W_ObjectAttributes & ( token0 ? ( NAMESPACE_TYPE | THIS ) : ( C_TYPE | C_CLASS | NAMESPACE | THIS ) ) ) )
             {
                 ns = word ;
@@ -322,7 +326,7 @@ _CSL_ParseQid_Token ( byte * token0 )
             else if ( token0 )
             {
                 if ( ! nst ) _CSL_Do_Dot ( cntx, word ) ;
-                break ; 
+                break ;
             }
             token = 0 ;
         }

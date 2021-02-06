@@ -171,7 +171,10 @@ interpret3 ( | atoken aword )
         printf ( "\n\tinterpret3 : token = %s", atoken ) ; 
         if ( ! ( strcmp ( atoken, "i3halt" ) ) ) 
         { 
-            printf ( "\n\tinterpret3 exiting..." ) ; goto: done ; 
+            printf ( "\n\tinterpret3 exiting..." ) ; 
+            //break ; 
+            goto: done ;
+            //return ;
         }
         else 
         {       
@@ -204,13 +207,13 @@ fac40 ( n  | facc )
 #endif
     return facc ;
 } 
-c_syntaxOff
-pwi fac40 //pause
-7 fac40 dup p 5040 _assert sp
-#endif // <- l. 187
+pwi fac40  //pause
+fac40 (7) dup p 5040 _assert sp
+#endif 
 
-i2halt
+i2halt sp
 interpret3
+c_syntaxOff
 
 User
 words  
@@ -233,10 +236,10 @@ faccs2 ( n | rec )
     return rec ;
 } 
 pwi faccs2 // why not in c syntax here and in next line ??
-7 faccs2 dup p 5040 _assert0 
+faccs2 (7) dup p 5040 _assert0 
 sp 
 
-i3halt // code to exit interpret3
+i3halt sp // code to exit interpret3
 void
 interpret4 ( | atoken aword ) 
 {
@@ -270,10 +273,10 @@ faccs3 ( n | rec )
     } 
     return rec ;
 } 
-c_syntaxOff
 ' faccs3 find wdiss
-7 faccs3 dup p 5040 _assert0 sp
-i4halt // code to exit interpret4
+faccs3 (7) dup p 5040 _assert0 sp
+i4halt sp // code to exit interpret4
+c_syntaxOff
 #endif // <~ l.225
 
 C

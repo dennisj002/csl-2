@@ -97,7 +97,7 @@ CSL_PrintDataStack ( )
 void
 CSL_PrintStackDepth ( )
 {
-    Printf ( ( byte* ) "\nDataStack : depth = %d", Stack_Depth ( _DataStack_ ) ) ;
+    Printf ( "\nDataStack : depth = %d", Stack_Depth ( _DataStack_ ) ) ;
 }
 
 void
@@ -144,13 +144,27 @@ Set_DspReg_FromDataStackPointer ( )
 }
 
 void
+SetDataStackPointer ( uint64 *sp )
+{
+    _CSL_->DataStack->StackPointer = sp ;
+    _Dsp_ = _CSL_->DataStack->StackPointer ;
+}
+
+uint64 *
+GetDataStackPointer ( )
+{
+   //_CSL_->DataStack->StackPointer = _Dsp_ ;
+    return _Dsp_ ;
+}
+
+void
 CSL_CheckInitDataStack ( )
 {
     if ( Stack_Depth ( _DataStack_ ) < 0 )
     {
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
-        Printf ( ( byte* ) c_ad ( "\n\nError : %s : %s : Stack Underflow!" ), _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte * ) "", _Context_Location ( _Context_ ) ) ;
-        Printf ( ( byte* ) c_gd ( "\nReseting DataStack.\n" ) ) ;
+        Printf ( c_ad ( "\n\nError : %s : %s : Stack Underflow!" ), _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte * ) "", _Context_Location ( _Context_ ) ) ;
+        Printf ( c_gd ( "\nReseting DataStack.\n" ) ) ;
         _Stack_Init ( _CSL_->DataStack, _O_->DataStackSize ) ;
         _CSL_DataStack_Init ( _CSL_ ) ;
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;

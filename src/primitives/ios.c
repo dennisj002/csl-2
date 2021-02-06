@@ -99,7 +99,7 @@ _Print_Binary ( uint64 n )
 void
 Print_Binary ( uint64 n )
 {
-    Printf ( ( byte* ) "\n %s", _Print_Binary ( n ) ) ;
+    Printf ( "\n %s", _Print_Binary ( n ) ) ;
 }
 
 void
@@ -109,12 +109,12 @@ PrintfInt ( int64 n )
     if ( NUMBER_BASE_GET == 10 ) sprintf ( ( char* ) buffer, INT_FRMT, n ) ;
     else if ( NUMBER_BASE_GET == 2 )
     {
-        Print_Binary ( n ) ; 
+        Print_Binary ( n ) ;
         return ;
     }
     else /* if ( _Context->System0->NumberBase == 16 ) */ sprintf ( ( char* ) buffer, UINT_FRMT_0x016, n ) ; // hex
     // ?? any and all other number bases ??
-    Printf ( ( byte* ) buffer ) ;
+    Printf ( buffer ) ;
 }
 
 void
@@ -137,7 +137,7 @@ CSL_Emit ( )
 {
     int64 c = DataStack_Pop ( ) ;
     if ( ( c >= 0 ) && ( c < 256 ) ) _CSL_PrintChar ( c ) ;
-    else _CSL_PrintChar ( c ) ; //_Printf ( ( byte* ) "%c", ( ( CString ) c )[0] ) ;
+    else _CSL_PrintChar ( c ) ; //_Printf ( "%c", ( ( CString ) c )[0] ) ;
 }
 
 void
@@ -154,7 +154,7 @@ CSL_Key ( )
 void
 CSL_LogOn ( )
 {
-    _CSL_->LogFlag = true ;
+    _O_->LogFlag = true ;
     if ( ! _CSL_->LogFILE ) _CSL_->LogFILE = fopen ( ( char* ) "csl.log", "w" ) ;
 }
 
@@ -182,8 +182,8 @@ CSL_LogOff ( )
     {
         fflush ( csl->LogFILE ) ;
         if ( csl->LogFILE ) fclose ( csl->LogFILE ) ; // ? not needed  ?
-        csl->LogFlag = false ;
         csl->LogFILE = 0 ;
+        _O_->LogFlag = false ;
     }
 }
 

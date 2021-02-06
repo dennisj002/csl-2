@@ -2,7 +2,7 @@
 #include "../include/csl.h"
 
 byte *
-Interpret_C_Until_NotIncluding_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte* end4, byte * delimiters, Boolean newlineBreakFlag )
+Interpret_C_Until_NotIncluding_Token5 (Interpreter * interp, byte * end1, byte * end2, byte* end3, byte* end4, byte* end5, byte * delimiters, Boolean newlineBreakFlag )
 {
     byte * token ;
     int64 inChar ;
@@ -16,7 +16,7 @@ Interpret_C_Until_NotIncluding_Token4 ( Interpreter * interp, byte * end1, byte 
         }
         token = _Lexer_ReadToken ( lexer, delimiters ) ;
         List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
-        if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) ) break ;
+        if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) || String_Equal ( token, end5 ) ) break ;
         else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && _String_EqualSingleCharString ( token, ')' ) )
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
@@ -96,15 +96,9 @@ Interpret_DoPrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixF
             Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
             for ( i = 0 ; i < ( prefixFunction->W_NumberOfPrefixedArgs - 1 ) ; i ++ ) // -1 : we already did one above
             {
-                //Interpreter_InterpretNextToken ( interp ) ;
                 byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
-                if ( _String_EqualSingleCharString ( token, ',' ) && GetState ( _Context_, ASM_SYNTAX ) )
-                {
-                    i -- ; // don't count it 
-                    //continue ;
-                }
+                if ( _String_EqualSingleCharString ( token, ',' ) && GetState ( _Context_, ASM_SYNTAX ) ) i -- ; // don't count it 
                 Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-                //Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
             }
         }
         else

@@ -205,7 +205,7 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     }
     else if ( ns->CompiledDataFieldByteSize )
     {
-        Printf ( ( byte* ) "\nNamespace Error? : \'%s\' already exists! : \n  %s : size = %d : this namespace is %s.%s : size = %d : at %s\n",
+        Printf ( "\nNamespace Error? : \'%s\' already exists! : \n  %s : size = %d : this namespace is %s.%s : size = %d : at %s\n",
             ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->CompiledDataFieldByteSize, ns->S_ContainingNamespace->Name, ns->Name, ns->CompiledDataFieldByteSize, Context_Location ( ) ) ;
         Namespace_Do_Namespace ( ns ) ;
     }

@@ -1,8 +1,6 @@
 
 #include "../../include/csl.h"
 
-#define PP_ELIF 2
-#define PP_ELSE 1
 void
 CSL_PreProcessor ( )
 {
@@ -11,14 +9,33 @@ CSL_PreProcessor ( )
     int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( lexer ) ;
     _CSL_UnAppendFromSourceCode_NChars ( _CSL_, 1 ) ; // 1 : '#'
-    //Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
+    uint64 *svStackPointer = GetDataStackPointer ( ) ;
     byte * token = Lexer_ReadToken ( lexer ) ;
     Word * ppword = _Finder_FindWord_InOneNamespace ( _Finder_, Namespace_Find ( ( byte* ) "PreProcessor" ), token ) ;
-    Interpreter_DoWord ( interp, ppword, -1, -1 ) ;
-    //Interpreter_InterpretNextToken ( interp ) ;
+    Interpreter_DoWord ( interp, ppword, - 1, - 1 ) ;
     SetState ( interp, PREPROCESSOR_MODE, false ) ;
     if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
+    SetDataStackPointer ( svStackPointer ) ;
+}
+
+Boolean
+_GetCondStatus ( )
+{
+    Context * cntx = _Context_ ;
+    Boolean status, svcm = GetState ( cntx->Compiler0, COMPILE_MODE ), svcs = GetState ( cntx, C_SYNTAX ) ;
+    SetState ( cntx->Compiler0, COMPILE_MODE, false ) ;
+    SetState ( cntx, C_SYNTAX, false ) ;
+    SetState ( cntx, CONTEXT_PREPROCESSOR_MODE, true ) ;
+    uint64 *svStackPointer = GetDataStackPointer ( ) ;
+    Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
+    SetState ( cntx, CONTEXT_PREPROCESSOR_MODE, false ) ;
+    SetState ( cntx->Compiler0, COMPILE_MODE, svcm ) ;
+    SetState ( cntx, C_SYNTAX, svcs ) ;
+    status = DataStack_Pop ( ) ;
+    if ( status > 0 ) status = true ;
+    SetDataStackPointer ( svStackPointer ) ;
+    return status ;
 }
 
 Ppibs *
@@ -44,11 +61,11 @@ void
 Ppibs_Print ( Ppibs * ppibs, byte * prefix )
 {
     int64 depth = List_Length ( _Context_->PreprocessorStackList ) ;
-    Printf ( ( byte* ) "\n\nInputLineString = %s", _ReadLiner_->InputLineString ) ;
-    Printf ( ( byte* ) "\n%s : Ppibs = 0x%016lx : depth = %d : Filename = %s : Line = %d", prefix, ppibs, depth, ppibs->Filename, ppibs->LineNumber ) ;
-    Printf ( ( byte* ) "\nIfBlockStatus = %d", ppibs->IfBlockStatus ) ;
-    Printf ( ( byte* ) "\nElifStatus = %d", ppibs->ElifStatus ) ;
-    Printf ( ( byte* ) "\nElseStatus = %d", ppibs->ElseStatus ) ;
+    Printf ( "\n\nInputLineString = %s", _ReadLiner_->InputLineString ) ;
+    Printf ( "\n%s : Ppibs = 0x%016lx : depth = %d : Filename = %s : Line = %d", prefix, ppibs, depth, ppibs->Filename, ppibs->LineNumber ) ;
+    Printf ( "\nIfBlockStatus = %d", ppibs->IfBlockStatus ) ;
+    Printf ( "\nElifStatus = %d", ppibs->ElifStatus ) ;
+    Printf ( "\nElseStatus = %d", ppibs->ElseStatus ) ;
     //Pause () ;
 }
 #else 
@@ -116,25 +133,8 @@ GetElxxStatus ( int64 cond, int64 type )
         dbg ( Ppibs_Print ( top, ( byte* ) ( ( type == PP_ELSE ) ? "Else : ElxxStatus: top of PreprocessorStackList" : "Elif : ElxxStatus" ) ) ) ;
         return status ;
     }
-    else _SyntaxError ( ( byte* ) "#Elxx without #if", 1 ) ; 
+    else _SyntaxError ( ( byte* ) "#Elxx without #if", 1 ) ;
     return 0 ;
-}
-
-Boolean
-_GetCondStatus ( )
-{
-    Context * cntx = _Context_ ;
-    Boolean status, svcm = GetState ( cntx->Compiler0, COMPILE_MODE ), svcs = GetState ( cntx, C_SYNTAX ) ;
-    SetState ( cntx->Compiler0, COMPILE_MODE, false ) ;
-    SetState ( cntx, C_SYNTAX, false ) ;
-    SetState ( cntx, CONTEXT_PREPROCESSOR_MODE, true ) ;
-    Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
-    SetState ( cntx, CONTEXT_PREPROCESSOR_MODE, false ) ;
-    SetState ( cntx->Compiler0, COMPILE_MODE, svcm ) ;
-    SetState ( cntx, C_SYNTAX, svcs ) ;
-    status = DataStack_Pop ( ) ;
-    if ( status > 0 ) status = true ;
-    return status ;
 }
 
 Boolean
@@ -148,7 +148,7 @@ GetIfStatus ( )
     cstatus->Filename = _ReadLiner_->Filename ;
     cstatus->LineNumber = _ReadLiner_->LineNumber ;
     //_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
-    _List_PushNew_1Value (_Context_->PreprocessorStackList, CONTEXT , T_PREPROCESSOR, ( int64 ) cstatus) ; //SESSION ) ;
+    _List_PushNew_1Value ( _Context_->PreprocessorStackList, CONTEXT, T_PREPROCESSOR, ( int64 ) cstatus ) ; //SESSION ) ;
     dbg ( Ppibs_Print ( cstatus, ( byte* ) "IfStatus" ) ) ;
     return cstatus->IfBlockStatus ;
 }
@@ -218,19 +218,18 @@ SkipPreprocessorCode ( Boolean skipControl )
                 {
                     if ( String_Equal ( token1, "if" ) )
                     {
+                        if ( skipControl == PP_IFDEF ) continue ;
                         if ( skipControl == PP_ELSE ) ifLevel ++ ;
                         else if ( GetIfStatus ( ) ) goto done ; // PP_INTERP
                     }
                     else if ( String_Equal ( token1, "else" ) )
                     {
                         if ( skipControl == PP_ELSE ) continue ;
-                            //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
                         else if ( GetElseStatus ( ) ) goto done ;
                     }
                     else if ( String_Equal ( token1, "elif" ) )
                     {
                         if ( skipControl == PP_ELSE ) continue ;
-                            //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
                         else if ( GetElifStatus ( ) ) goto done ;
                     }
                     else if ( String_Equal ( token1, "endif" ) )
@@ -245,8 +244,19 @@ SkipPreprocessorCode ( Boolean skipControl )
                         }
                         else if ( GetEndifStatus ( ) ) goto done ;
                     }
+#if 1                    
                     else if ( String_Equal ( token1, "define" ) ) continue ;
+                    else if ( String_Equal ( token1, "defined" ) ) continue ;
+                    else if ( String_Equal ( token1, "undef" ) ) continue ;
+                    else if ( String_Equal ( token1, "ifdef" ) ) continue ;
+                    else if ( String_Equal ( token1, "ifndef" ) ) continue ;
+                    else if ( String_Equal ( token1, "include" ) ) continue ;
+                    else if ( String_Equal ( token1, "error" ) ) continue ;
+                    else if ( String_Equal ( token1, "warning" ) ) continue ;
                     else _SyntaxError ( ( byte* ) "Stray '#' in code!", 1 ) ;
+#else                    
+                    else continue ;
+#endif                    
                 }
                 else goto done ;
             }
@@ -279,5 +289,81 @@ void
 CSL_Endif_ConditionalInterpret ( )
 {
     if ( ! GetEndifStatus ( ) ) SkipPreprocessorCode ( PP_SKIP ) ;
+}
+
+void
+CSL_IfDef_Preprocessor ( )
+{
+    if ( ( ! _CSL_Defined ( ) ) && ( ! GetIfStatus ( ) ) ) SkipPreprocessorCode ( PP_IFDEF ) ;
+}
+
+void
+CSL_Ifndef_Preprocessor ( )
+{
+    if ( _CSL_Defined ( ) ) SkipPreprocessorCode ( PP_SKIP ) ;
+}
+
+void
+AddDirectoriesToPreprocessor_IncludeDirectory_List ( )
+{
+    Namespace * ns = _CSL_->C_Preprocessor_IncludeDirectory_List_Namespace ;
+    if ( ! ns ) ns = _CSL_->C_Preprocessor_IncludeDirectory_List_Namespace = _Namespace_New ( "cpidln", 0 ) ;
+    _Word_New ( "/usr/local/include/", 0, 0, 0, 0, ns, DICTIONARY ) ;
+    _Word_New ( "/usr/include/", 0, 0, 0, 0, ns, DICTIONARY ) ;
+}
+
+byte *
+CheckFilename ( Symbol * symbol, byte * fname )
+{
+    byte * fn = ( char* ) Buffer_Data_Cleared ( _CSL_->ScratchB4 ) ;
+    strncpy ( fn, symbol->Name, BUFFER_SIZE ) ;
+    strncat ( fn, fname, BUFFER_SIZE ) ;
+    FILE * file = fopen ( ( char* ) fn, "r" ) ;
+    if ( file ) return fn ;
+    else return 0 ;
+}
+
+int64
+_CSL_Defined ( )
+{
+    byte * token = Lexer_ReadToken ( _Lexer_ ) ;
+    Word * w = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+    d1 ( DataStack_Check ( ) ) ;
+    return ( int64 ) w ;
+}
+
+void
+CSL_Undef ( )
+{
+    Word * w = ( Word* ) _CSL_Defined ( ) ;
+    if ( w ) dlnode_Remove ( ( dlnode* ) w ) ;
+}
+
+int64
+CSL_Defined ( )
+{
+    int64 d = _CSL_Defined ( ) ;
+    DataStack_Push ( d ) ;
+}
+
+void
+CSL_Include_PreProcessor ( )
+{
+    FILE * file ;
+    char * _filename = ( char* ) _CSL_FilenameToken ( ), *fn = ( char* ) Buffer_Data_Cleared ( _CSL_->ScratchB5 ), *filename, *afn ;
+    strncpy ( fn, _filename, BUFFER_SIZE ) ;
+    CSL_CommentToEndOfLine ( ) ; // shouldn't be anything after the filename but if there is ignore it
+    if ( fn [0] == '<' )
+    {
+        if ( ! _CSL_->C_Preprocessor_IncludeDirectory_List_Namespace ) AddDirectoriesToPreprocessor_IncludeDirectory_List ( ) ;
+        fn [strlen ( ( char* ) fn ) - 1] = 0 ;
+        filename = & fn[1] ;
+        dllist * dirl = _CSL_->C_Preprocessor_IncludeDirectory_List_Namespace->W_List ;
+        afn = ( byte* ) dllist_Map1_WReturn ( dirl, ( MapFunction1 ) CheckFilename, ( int64 ) filename ) ;
+    }
+    else afn = filename ;
+    CSL_C_Syntax_On ( ) ;
+    if ( VERBOSITY > 1 ) Printf ( (byte*) "\nEntering : %s at %s", afn, Context_Location () ) ;
+    _CSL_ContextNew_IncludeFile ( afn ) ;
 }
 

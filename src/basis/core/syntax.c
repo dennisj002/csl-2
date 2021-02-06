@@ -389,16 +389,16 @@ CSL_C_ConditionalExpression ( )
         }
         byte * compiledAtAddress = Compile_UninitializedJumpEqualZero ( ) ;
         Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
-        byte * token = Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
-        if ( _String_EqualSingleCharString ( token, ':' ) )
+        byte * token = Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", "#", 0, 0 ) ;
+        if ( token && _String_EqualSingleCharString ( token, ':' ) )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CSL_Else ( ) ;
-            //Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
-            Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0,  0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+            //Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+            Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", "#", 0,  0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
             CSL_EndIf ( ) ;
         }
-        else SyntaxError ( 1 ) ;
+        else if ( ! String_Equal ( token, "#") ) SyntaxError ( 1 ) ;
     }
     SetState ( compiler, C_CONDITIONAL_IN, false ) ;
 }

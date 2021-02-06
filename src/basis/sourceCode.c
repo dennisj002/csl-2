@@ -34,7 +34,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
                         }
                         token = GetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) ? ( byte* ) "=" : word->Name ;
                         buffer = DBG_PrepareSourceCodeString ( word, token, sourceCode, 0, 0, 1 ) ;
-                        if ( buffer && buffer[0] ) Printf ( ( byte* ) "\n%s", buffer ) ;
+                        if ( buffer && buffer[0] ) Printf ( "\n%s", buffer ) ;
                         if ( storeFixed ) word->Name = ( byte* ) "store" ;
                         if ( _Debugger_ ) _Debugger_->LastSourceCodeWord = word ;
                     }
@@ -145,7 +145,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
     {
         if ( ( foundWord ) && ( _O_->Verbosity > 2 ) )
         {
-            //_Printf ( ( byte* ) "\nNumber Found = %d :: minDiffFound = %d : window = %d : Chosen word = \'%s\' : LastSourceCodeWord = \'%s\'", numFound, minDiffFound, fDiff, foundWord->Name, _Debugger_->LastSourceCodeWord ? _Debugger_->LastSourceCodeWord->Name : ( byte* ) "" ) ;
+            //_Printf ( "\nNumber Found = %d :: minDiffFound = %d : window = %d : Chosen word = \'%s\' : LastSourceCodeWord = \'%s\'", numFound, minDiffFound, fDiff, foundWord->Name, _Debugger_->LastSourceCodeWord ? _Debugger_->LastSourceCodeWord->Name : ( byte* ) "" ) ;
             _DWL_ShowWord_Print ( foundWord, 0, ( byte* ) "CHOSEN", foundWord->Coding, foundWord->SourceCoding, 0, foundWord->W_SC_Index, - 1 ) ; //_DWL_ShowWord ( foundWord, "CHOSEN", minDiffFound ) ;
         }
         if ( address ) _Debugger_->LastSourceCodeAddress = address ;
@@ -259,7 +259,7 @@ SC_ListClearAddress ( dlnode * node, byte * address )
     if ( nword->W_WordData && ( nword->SourceCoding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
         Word_SetSourceCoding ( nword, 0 ) ;
-        d0 ( if ( Is_DebugModeOn ) Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d",
+        d0 ( if ( Is_DebugModeOn ) Printf ( "\nnword %s with scwi %d :: cleared for word %s with scwi %d",
             nword->Name, nword->W_SC_Index, nword->Name, nword->W_SC_Index ) ) ;
     }
 }
@@ -408,18 +408,18 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
         }
         if ( newSourceCoding )
         {
-            Printf ( ( byte* ) "\n %s :: word = 0x%08x : \'%-12s\' : coding  = 0x%08x : oldCoding  = 0x%08x : newCoding = 0x%08x : scwi = %03d, inUse = %s",
+            Printf ( "\n %s :: word = 0x%08x : \'%-12s\' : coding  = 0x%08x : oldCoding  = 0x%08x : newCoding = 0x%08x : scwi = %03d, inUse = %s",
                 prefix, word, name, coding, sourceCoding, newSourceCoding, scwi, biuFlag ) ;
         }
         else //if ( index )
         {
-            Printf ( ( byte* ) "\n WordList : index %3d : word = 0x%08x : \'%-12s\' : sourceCoding = 0x%08x : scwi = %03d : inUse = %s",
+            Printf ( "\n WordList : index %3d : word = 0x%08x : \'%-12s\' : sourceCoding = 0x%08x : scwi = %03d : inUse = %s",
                 index, word, name, sourceCoding, scwi, biuFlag ) ;
         }
 #if 0        
         else //if ( scwiDiff )
         {
-            Printf ( ( byte* ) "\n %s :: \'%-12s\' : sourceCoding  = 0x%08x : scwi = %03d : inUse = %s",
+            Printf ( "\n %s :: \'%-12s\' : sourceCoding  = 0x%08x : scwi = %03d : inUse = %s",
                 prefix, name, sourceCoding, scwi, biuFlag ) ;
         }
 #endif    
@@ -444,7 +444,7 @@ DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag, int64 prefix, i
 void
 SC_WordList_Show ( dllist * list, Word * scWord, Boolean fromFirstFlag, Boolean inUseOnlyFlag, byte * listName )
 {
-    if ( scWord ) Printf ( ( byte* ) "\n%s WordList : for word \'%s\' :", listName, scWord->Name ) ;
+    if ( scWord ) Printf ( "\n%s WordList : for word \'%s\' :", listName, scWord->Name ) ;
     //if ( list ) dllist_Map4_FromFirstFlag_Indexed ( list, fromFirstFlag, DWL_ShowWord, inUseOnlyFlag, ( int64 ) "", 0 ) ;
     if ( list ) dllist_Map4_FromFirstFlag_Indexed ( list, fromFirstFlag, DWL_ShowWord, inUseOnlyFlag, 0, 0 ) ;
 }
@@ -455,7 +455,7 @@ void
 CSL_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors )
 {
     //dllist * list = Compiling ? CSL->CSL_N_M_Node_WordList : ( word && word->W_SC_WordList ) ? word->W_SC_WordList : CSL->CSL_N_M_Node_WordList ;
-    dllist * list = ( word && word->W_SC_WordList ) ? word->W_SC_WordList : _CSL_->CSL_N_M_Node_WordList ;
+    dllist * list = ( inUseOnlyFlag && word && word->W_SC_WordList ) ? word->W_SC_WordList : _CSL_->CSL_N_M_Node_WordList ;
     byte *buffer = Buffer_Data ( _CSL_->ScratchB1 ) ;
     buffer[0] = 0 ;
     if ( list )

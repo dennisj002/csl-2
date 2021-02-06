@@ -55,8 +55,8 @@ JumpCallInstructionAddress_X64ABI ( byte * address )
 void
 _CSL_ACharacterDump ( char aChar )
 {
-    if ( isprint ( aChar ) ) Printf ( ( byte* ) "%c", aChar ) ;
-    else Printf ( ( byte* ) "." ) ;
+    if ( isprint ( aChar ) ) Printf ( "%c", aChar ) ;
+    else Printf ( "." ) ;
 }
 
 void
@@ -64,13 +64,13 @@ CSL_CharacterDump ( byte * address, int64 number )
 {
     int64 i ;
     for ( i = 0 ; i < number ; i ++ ) _CSL_ACharacterDump ( address [ i ] ) ;
-    Printf ( ( byte* ) " " ) ;
+    Printf ( " " ) ;
 }
 
 void
 _CSL_AByteDump ( byte aByte )
 {
-    Printf ( ( byte* ) "%02x ", aByte ) ;
+    Printf ( "%02x ", aByte ) ;
 }
 
 void
@@ -78,7 +78,7 @@ CSL_NByteDump ( byte * address, int64 number )
 {
     int64 i ;
     for ( i = 0 ; i < number ; i ++ ) _CSL_AByteDump ( address [ i ] ) ;
-    Printf ( ( byte* ) " " ) ;
+    Printf ( " " ) ;
 }
 
 byte *

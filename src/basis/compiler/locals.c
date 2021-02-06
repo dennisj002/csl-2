@@ -366,7 +366,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
             if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( _String_EqualSingleCharString ( token, '{' ) ) || 
                 ( _String_EqualSingleCharString ( token, ';' ) ) )
             {
-                //_Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
+                //_Printf ( "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
                 CSL_Exception ( SYNTAX_ERROR, "\nLocal variables syntax error : no closing parenthesis ')' found", 1 ) ;
                 break ;
             }

@@ -18,8 +18,6 @@ CSL_CommentToEndOfLine ( )
     String_RemoveEndWhitespace ( _CSL_->SC_Buffer ) ;
     _CSL_SC_ScratchPadIndex_Init ( _CSL_ ) ;
     SetState ( lexer, LEXER_END_OF_LINE, true ) ;
-    //Lexer_SourceCodeOn ( _Lexer_ ) ;
-    //if ( Compiling ) 
     SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 
@@ -55,7 +53,7 @@ CSL_Define ( )
         if ( word ) word->W_ObjectAttributes |= ( LITERAL | CONSTANT ) ;
     }
     CSL_Inline ( ) ;
-    //CSL_SaveDebugInfo ( _CSL_->LastFinished_Word, 0 ) ; // how would this kind of thing work with an inline word??
+    CSL_SaveDebugInfo ( _CSL_->LastFinished_Word, 0 ) ; // how would this kind of thing work with an inline word??
     CSL_SourceCode_Init ( ) ; //don't leave the define in sc
 }
 

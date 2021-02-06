@@ -918,8 +918,9 @@ typedef struct
 #define PP_SKIP 0
 #define PP_INTERPRET 1
 #define PP_INTERP PP_INTERPRET
-//#define PP_ELSE 2
-//#define PP_ELIF 1
+#define PP_ELIF 2
+#define PP_ELSE 1
+#define PP_IFDEF 3
 
 #define CPU_SAVED    ( (uint64) 1 << 0 )
 #define CPU_SELECTED_SAVED ( (uint64) 1 << 1 )

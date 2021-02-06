@@ -38,7 +38,7 @@ _Finder_CompareDefinitionAddress ( Symbol * symbol, byte * address )
         Word * word = ( Word * ) symbol ;
         //byte * codeStart = ( byte* ) word->Definition ; // nb. this maybe more accurate ??
         byte * codeStart = word->CodeStart ;
-        d0 ( if ( String_Equal ( "iFactorialX", symbol->S_Name ) ) Printf ( ( byte* ) "\naddress = 0x%016lx :: %s :: codeStart = 0x%016lx : codeSize = %d", address, symbol->S_Name, codeStart, word->S_CodeSize ) ) ;
+        d0 ( if ( String_Equal ( "iFactorialX", symbol->S_Name ) ) Printf ( "\naddress = 0x%016lx :: %s :: codeStart = 0x%016lx : codeSize = %d", address, symbol->S_Name, codeStart, word->S_CodeSize ) ) ;
         //if ( ((byte*) symbol == address) || ( codeStart && ( address >= codeStart ) && ( address <= ( codeStart + word->S_CodeSize ) ) ) )
         if ( ( ( byte* ) symbol == address ) || ( codeStart && ( address >= codeStart ) &&
             ( word->S_CodeSize ? address < ( codeStart + word->S_CodeSize ) : address == codeStart ) ) )
@@ -227,7 +227,7 @@ Finder_FindToken_WithException ( Finder * finder, byte * token )
 {
     if ( Finder_Word_FindUsing ( finder, token, 0 ) == 0 )
     {
-        Printf ( ( byte* ) "\n%s ?", ( char* ) token ) ;
+        Printf ( "\n%s ?", ( char* ) token ) ;
         CSL_Using ( ) ;
         CSL_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
     }
@@ -267,7 +267,7 @@ Finder_FindWord_InOneNamespace ( Finder * finder, byte *nsName, byte * name )
 void
 CSL_Find ( )
 {
-    DataStack_Push ( ( int64 ) Finder_FindToken ( _Context_->Finder0, _Context_->Lexer0->OriginalToken ) ) ;
+    DataStack_Push ( ( int64 ) Finder_FindToken ( _Context_->Finder0, ( byte* ) DataStack_Pop ( ) ) ) ;
 }
 
 void

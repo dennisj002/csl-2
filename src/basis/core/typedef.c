@@ -567,7 +567,7 @@ void
 TDSCI_DebugPrintWord ( Word * word )
 {
     TDSCI * tdsci = TDSCI_GetTop ( ) ;
-    if ( word ) Printf ( ( byte* ) "\n%s.%s : field size = %ld : structure size = %ld : total size = %ld : dataPtr = 0x%09x : offset == %ld : at %s",
+    if ( word ) Printf ( "\n%s.%s : field size = %ld : structure size = %ld : total size = %ld : dataPtr = 0x%09x : offset == %ld : at %s",
         ( word->TypeNamespace ? word->TypeNamespace->Name : word->S_ContainingNamespace->Name ),
         word->Name, tdsci->Tdsci_Field_Size, tdsci->Tdsci_StructureUnion_Size,
         tdsci->Tdsci_StructureUnion_Size, tdsci->DataPtr, tdsci->Tdsci_Offset, Context_Location ( ) ) ;
@@ -604,7 +604,7 @@ TDSCI_ReadToken ( )
             tdsci->TdsciToken = Lexer_ReadToken ( cntx->Lexer0 ) ;
             //if ( ! ( GetState ( tdsci, TDSCI_PRINT ) ) ) 
             DEBUG_SETUP_TOKEN ( tdsci->TdsciToken, 0 ) ;
-            //if ( Is_DebugOn ) _Printf ( ( byte* ) "%s ", tdsci->TdsciToken ) ;
+            //if ( Is_DebugOn ) _Printf ( "%s ", tdsci->TdsciToken ) ;
         }
 
         while ( Parser_Check_Do_Debug_Token ( tdsci->TdsciToken ) ) ;

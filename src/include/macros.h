@@ -250,6 +250,7 @@
 #define DBI_OFF DEBUG_ASM_SHOW_OFF
 #define DBI ( Is_DebugOn & _DBI )
 #define Is_DebugOn_DBI ( Is_DebugOn ? DBI_ON : 0 )
+#define VERBOSITY _O_->Verbosity
 #define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _O_->Verbosity > n ) )
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber
 #define Is_DbiOn _O_->Dbi

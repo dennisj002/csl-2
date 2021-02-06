@@ -140,7 +140,7 @@ CalculateModRegardingDisplacement ( uint8 mod, int64 disp )
 {
     // bits :
     //  mod reg r/m 
-    //   00 000 000
+    //   00 000 000    
     if ( mod != REG )
     {
         if ( disp == 0 )

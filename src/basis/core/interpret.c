@@ -53,23 +53,23 @@ Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, in
     return word ; //let callee know about actual word evaled here after Compiler_CopyDuplicatesAndPush
 }
 
-Word * 
+Word *
 Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
 {
     byte * token = 0 ;
     Compiler * compiler = _Compiler_ ;
     SetState ( compiler, ( DOING_AN_INFIX_WORD | DOING_BEFORE_AN_INFIX_WORD ), true ) ;
-    if ( GetState ( _Context_, C_SYNTAX ) && ( word->W_MorphismAttributes & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) ) 
+    if ( GetState ( _Context_, C_SYNTAX ) && ( word->W_MorphismAttributes & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) )
     {
         if ( ( word->W_MorphismAttributes & C_INFIX_OP_EQUAL ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
-        token = Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) " \n\r\t", 0 ) ; // nb : delimiters parameter is necessary
-        //token = Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", 0, 0 ) ;
+        token = Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", "#", ( byte* ) " \n\r\t", 0 ) ; // nb : delimiters parameter is necessary
+        //token = Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", 0, 0 ) ;
     }
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
     SetState ( compiler, DOING_BEFORE_AN_INFIX_WORD, false ) ; //svState ) ;
     word = Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-    SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ; 
+    SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ;
     return word ;
 }
 
@@ -101,17 +101,17 @@ Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
 Word *
 Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
 {
-    if ( word ) 
+    if ( word )
     {
         Context * cntx = _Context_ ;
         if ( word->W_TypeAttributes == WT_C_PREFIX_RTL_ARGS ) word = Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
-        else if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) word = Interpreter_DoInfixWord ( interp, word ) ;
+        else if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, ( INFIX_MODE | C_SYNTAX ) ) ) ) word = Interpreter_DoInfixWord ( interp, word ) ;
             // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
-        else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) ) 
+        else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) )
         {
             // with Lexer_IsWordPrefixing any postfix word that is not a keyword or a c_rtl arg word can now be used as a prefix function with parentheses (in PREFIX_MODE) - some 'syntactic sugar'
             // nb! : for this to work you must turn prefix mode on - 'prefixOn'
-            word = _Interpreter_DoPrefixWord ( cntx, interp, word ) ; 
+            word = _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
         }
         else return 0 ;
     }
@@ -132,7 +132,7 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
     {
         Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
         interp->w_Word = word ;
-        if ( ! ( word1 = Interpreter_DoInfixOrPrefixWord ( interp, word ) ) ) word1 = Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; 
+        if ( ! ( word1 = Interpreter_DoInfixOrPrefixWord ( interp, word ) ) ) word1 = Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ;
         if ( word1 && ( ! ( word1->W_MorphismAttributes & DEBUG_WORD ) ) ) word = word1, interp->LastWord = word1 ;
     }
     return word ;

@@ -34,7 +34,7 @@ CSL_ReadTables_Setup ( CSL * cfrl )
     cfrl->ReadLine_CharacterTable [ 'F' ] = 18 ;
     cfrl->ReadLine_CharacterTable [ '~' ] = 19 ;
     cfrl->ReadLine_CharacterTable [ '(' ] = 22 ;
-    //cfrl->ReadLine_CharacterTable [ '\\' ] = 23 ; // the lexer handles this
+    //cfrl->ReadLine_CharacterTable [ '!' ] = 23 ; // the lexer handles this
 
     cfrl->ReadLine_FunctionTable [ 0 ] = ReadTable_Default ;
     cfrl->ReadLine_FunctionTable [ 1 ] = ReadTable_BackSpace ;
@@ -59,7 +59,7 @@ CSL_ReadTables_Setup ( CSL * cfrl )
     cfrl->ReadLine_FunctionTable [ 20 ] = ReadTable_CarriageReturn ; // '\r'
     cfrl->ReadLine_FunctionTable [ 21 ] = ReadTable_Zero ;
     cfrl->ReadLine_FunctionTable [ 22 ] = ReadTable_LParen ;
-    //cfrl->ReadLine_FunctionTable [ 23 ] = ReadTable_Backslash ;
+    //cfrl->ReadLine_FunctionTable [ 23 ] = ReadTable_Exclam ;
 }
 
 void

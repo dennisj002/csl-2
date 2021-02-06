@@ -48,7 +48,7 @@ int factoriali2 ( int8 REG n | REG res )
     res = 1;
     do 
     {
-        res = res * n ; n -- ;
+        res = res * n ; n = n - 1 ;
     }
     while ( n >= 2 ) ;
     return res;
@@ -252,6 +252,10 @@ C "qexp2" ffx
 User
 "factorial" ffx
 "factorial2" ffx //pause
+"factorial" ffx
+"factoriali" ffx 
+"factoriali2" ffx 
+"factoriali2" ffx //pause
 "cfactorial3" ffx
 "cfactorial" ffx
 "cfactorial2" ffx
@@ -259,11 +263,8 @@ User
 "cfactorial_O3" ffx
 "cfactorial2_O3" ffx
 "cfactorial3_O3" ffx
+//pause
 using 
-"factorial" ffx
-"factoriali" ffx 
-"factoriali2" ffx 
-"factoriali2" ffx pause
 "faccs" ffx
 "fac5" ffx
 "fac40" ffx
@@ -279,8 +280,8 @@ Root
 int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
 //verbosity 3 =
 'cpow find wdiss
+cpow ( 2 30 ) dup p  1073741824 _assert //pause
 c_syntaxOff
-2 30 int.cpow dup p  1073741824 _assert //pause
 
 : sp ; //stack pause ;
 : pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ; //"II.I" typeSignature
@@ -364,7 +365,28 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 pwi fibPTC2? 
 20 fibPTC2? dup p 6765 _assert sp //pause
 "fibPTC?" ffx 
+"fibPTC2?" ffx 
+int
+fibPTC4? ( REG n | REG fn, REG fn1, REG fn2 )
+{
+    fn = 0, fn1 = 0, fn2 = 1 ; 
+    do 
+    {   
+        fn1 = fn2 ;
+        fn2 = fn ;
+        fn = fn1 + fn2 ; 
+        n -- ;
+    }
+    while ( n > 0 ) ;
+    return fn ;
+}
+pwi fibPTC4? 
+fibPTC4? (20) ; 
 c_syntaxOff
+dup p 6765 _assert sp //pause
+//"cfib_O3" ffx 
+"cfib2_O3" ffx 
+"fibPTC4?" ffx pause
 : sp ;
 sp
 

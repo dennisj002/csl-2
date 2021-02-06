@@ -15,7 +15,7 @@ _dlsym ( byte * sym, byte * lib )
     }
     if ( ( ! hLibrary ) || ( ! fp ) )
     {
-        Printf ( ( byte* ) c_ad ( "\ndlsym : dlerror = %s\n" ), dlerror ( ) ) ;
+        Printf ( c_ad ( "\ndlsym : dlerror = %s\n" ), dlerror ( ) ) ;
         return 0 ;
     }
     return fp ;
@@ -35,7 +35,7 @@ _Dlsym ( byte * sym, byte * lib )
         functionPointer = _dlsym ( sym, ( byte* ) buffer ) ;
         if ( ! functionPointer )
         {
-            Printf ( ( byte* ) c_ad ( "\ndlsym : dlerror = %s\n" ), dlerror ( ) ) ;
+            Printf ( c_ad ( "\ndlsym : dlerror = %s\n" ), dlerror ( ) ) ;
             return 0 ;
         }
     }
@@ -104,10 +104,10 @@ CSL_system3 ( )
 void
 _CSL_WordAccounting_Print ( byte * functionName )
 {
-    Printf ( ( byte* ) "\n%s :: DObjectCreateCount = %d : WordCreateCount = %d : WordsAdded = %d : FindWordCount = %d : FindWordMaxCount = %d",
+    Printf ( "\n%s :: DObjectCreateCount = %d : WordCreateCount = %d : WordsAdded = %d : FindWordCount = %d : FindWordMaxCount = %d",
         functionName, _CSL_->DObjectCreateCount, _CSL_->WordCreateCount, _CSL_->WordsAdded, _CSL_->FindWordCount, _CSL_->FindWordMaxCount ) ;
-    Printf ( ( byte* ) "\nRecycledWordCount : %d", _O_->MemorySpace0->RecycledWordCount ) ;
-    Printf ( ( byte* ) "\nWordsInRecycling : %d", _O_->MemorySpace0->WordsInRecycling ) ;
+    Printf ( "\nRecycledWordCount : %d", _O_->MemorySpace0->RecycledWordCount ) ;
+    Printf ( "\nWordsInRecycling : %d", _O_->MemorySpace0->WordsInRecycling ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
@@ -186,24 +186,24 @@ _CSL_SystemState_Print ( int64 pflag )
     Finder * finder = _Finder_ ;
     byte * buf = Buffer_Data ( _CSL_->ScratchB1 ) ;
     buf = _CSL_GetSystemState_String0 ( buf ) ;
-    Printf ( ( byte* ) buf ) ;
+    Printf ( buf ) ;
     buf = _CSL_GetSystemState_String1 ( buf ) ;
-    Printf ( ( byte* ) buf ) ;
+    Printf ( buf ) ;
     Boolean dsc = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
-    Printf ( ( byte* ) "\nDebugSourceCode %s", dsc ? "on" : "off" ) ;
+    Printf ( "\nDebugSourceCode %s", dsc ? "on" : "off" ) ;
     Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;
-    Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
+    Printf ( " : BigNum %s", bno ? "on" : "off" ) ;
     Boolean lo = Namespace_IsUsing ( ( byte* ) "Lisp" ) ;
-    Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
-    Printf ( ( byte* ) " : jcc8 %s", GetState ( _CSL_, JCC8_ON ) ? "on" : "off" ) ;
-    Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
+    Printf ( " : Lisp %s", lo ? "on" : "off" ) ;
+    Printf ( " : jcc8 %s", GetState ( _CSL_, JCC8_ON ) ? "on" : "off" ) ;
+    Printf ( "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
     OVT_ExceptionState_Print ( ) ;
     Namespace * ins = _CSL_Namespace_InNamespaceGet ( ) ;
-    if ( ins ) Printf ( ( byte* ) "\nInNamespace = %s.%s", ins->S_ContainingNamespace->Name, ins->Name ) ;
-    if ( finder->QualifyingNamespace ) Printf ( ( byte* ) "\nQualifyingNamespace = %s.%s",
+    if ( ins ) Printf ( "\nInNamespace = %s.%s", ins->S_ContainingNamespace->Name, ins->Name ) ;
+    if ( finder->QualifyingNamespace ) Printf ( "\nQualifyingNamespace = %s.%s",
         finder->QualifyingNamespace->S_ContainingNamespace ? finder->QualifyingNamespace->S_ContainingNamespace->Name : ( byte* ) "", 
         finder->QualifyingNamespace->Name ) ;
-    if ( _Context_->QidInNamespace ) Printf ( ( byte* ) "\nQualifyingNamespace = %s.%s",
+    if ( _Context_->QidInNamespace ) Printf ( "\nQualifyingNamespace = %s.%s",
         _Context_->QidInNamespace->S_ContainingNamespace ? _Context_->QidInNamespace->S_ContainingNamespace->Name : ( byte* ) "", 
         _Context_->QidInNamespace->Name ) ;
     if ( pflag || ( _O_->Verbosity > 1 ) )
@@ -226,10 +226,10 @@ __CSL_Dump ( byte * address, int64 number, int64 dumpMod )
         Printf ( nformat, ( int64 ) address, number ) ;
         for ( i = 0 ; i < number ; )
         {
-            Printf ( ( byte* ) "\n" UINT_FRMT " : ", address + i ) ;
+            Printf ( "\n" UINT_FRMT " : ", address + i ) ;
             if ( ! ( i % dumpMod ) )
             {
-                Printf ( ( byte* ) " " ) ;
+                Printf ( " " ) ;
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CSL_NByteDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CSL_CharacterDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
                 i += dumpMod ;
@@ -246,70 +246,70 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
     {
         Word * aword = 0 ;
         byte * name = c_gd ( word->Name ) ;
-        if ( word->ContainingNamespace ) Printf ( ( byte* ) "\n%s.", word->ContainingNamespace->Name ) ;
+        if ( word->ContainingNamespace ) Printf ( "\n%s.", word->ContainingNamespace->Name ) ;
         if ( word->W_ObjectAttributes & OBJECT )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "object" ) ;
+            Printf ( "%s <:> %s", name, "object" ) ;
         }
         if ( word->W_ObjectAttributes & STRUCTURE )
         {
-            Printf ( ( byte* ) "%s <:> %s : size = %d", name, "structure", word->CompiledDataFieldByteSize ) ;
+            Printf ( "%s <:> %s : size = %d", name, "structure", word->CompiledDataFieldByteSize ) ;
         }
         else if ( word->W_ObjectAttributes & NAMESPACE )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "namespace" ) ;
+            Printf ( "%s <:> %s", name, "namespace" ) ;
         }
         else if ( word->W_ObjectAttributes & TEXT_MACRO )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "macro" ) ;
+            Printf ( "%s <:> %s", name, "macro" ) ;
         }
         else if ( word->W_ObjectAttributes & LOCAL_VARIABLE )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "local variable" ) ;
+            Printf ( "%s <:> %s", name, "local variable" ) ;
         }
         else if ( word->W_ObjectAttributes & PARAMETER_VARIABLE )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "stack variable" ) ;
+            Printf ( "%s <:> %s", name, "stack variable" ) ;
         }
         else if ( word->W_ObjectAttributes & NAMESPACE_VARIABLE )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "variable" ) ;
+            Printf ( "%s <:> %s", name, "variable" ) ;
         }
         else if ( word->W_ObjectAttributes & CONSTANT )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "constant" ) ;
+            Printf ( "%s <:> %s", name, "constant" ) ;
         }
         if ( word->W_MorphismAttributes & ALIAS )
         {
             aword = Word_UnAlias ( word ) ; //word->W_AliasOf ;
-            if ( aword ) Printf ( ( byte* ) ", %s alias for %s", name, ( char* ) c_gd ( aword->Name ) ) ;
+            if ( aword ) Printf ( ", %s alias for %s", name, ( char* ) c_gd ( aword->Name ) ) ;
         }
         else if ( word->W_MorphismAttributes & CPRIMITIVE )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "C compiled primitive" ) ;
+            Printf ( "%s <:> %s", name, "C compiled primitive" ) ;
         }
         else if ( word->W_LispAttributes & T_LISP_COMPILED_WORD )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "lambdaCalculus compiled word" ) ;
+            Printf ( "%s <:> %s", name, "lambdaCalculus compiled word" ) ;
         }
         else if ( word->W_MorphismAttributes & CSL_WORD )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "csl compiled word" ) ;
+            Printf ( "%s <:> %s", name, "csl compiled word" ) ;
         }
         else if ( word->W_LispAttributes & T_LC_DEFINE )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "lambdaCalculus defined word" ) ;
+            Printf ( "%s <:> %s", name, "lambdaCalculus defined word" ) ;
         }
         else if ( word->W_MorphismAttributes & BLOCK )
         {
-            Printf ( ( byte* ) "%s <:> %s", name, "csl compiled code block" ) ;
+            Printf ( "%s <:> %s", name, "csl compiled code block" ) ;
         }
-        if ( word->W_MorphismAttributes & INLINE ) Printf ( ( byte* ) ", %s", "inline" ) ;
-        if ( word->W_MorphismAttributes & IMMEDIATE ) Printf ( ( byte* ) ", %s", "immediate" ) ;
-        if ( word->W_MorphismAttributes & PREFIX ) Printf ( ( byte* ) ", %s", "prefix" ) ;
-        if ( word->W_MorphismAttributes & C_PREFIX ) Printf ( ( byte* ) ", %s", "c_prefix" ) ;
-        //if ( word->W_MorphismAttributes & C_RETURN ) Printf ( ( byte* ) ", %s", "c_return" ) ;
-        if ( word->W_MorphismAttributes & INFIXABLE ) Printf ( ( byte* ) ", %s", "infixable" ) ;
+        if ( word->W_MorphismAttributes & INLINE ) Printf ( ", %s", "inline" ) ;
+        if ( word->W_MorphismAttributes & IMMEDIATE ) Printf ( ", %s", "immediate" ) ;
+        if ( word->W_MorphismAttributes & PREFIX ) Printf ( ", %s", "prefix" ) ;
+        if ( word->W_MorphismAttributes & C_PREFIX ) Printf ( ", %s", "c_prefix" ) ;
+        //if ( word->W_MorphismAttributes & C_RETURN ) Printf ( ", %s", "c_return" ) ;
+        if ( word->W_MorphismAttributes & INFIXABLE ) Printf ( ", %s", "infixable" ) ;
         if ( word->W_WordData )
         {
             _Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
@@ -318,26 +318,26 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
                 _Word_ShowSourceCode ( aword ) ;
             }
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
-            if ( word->W_WordData->Filename ) Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, 
+            if ( word->W_WordData->Filename ) Printf ( "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, 
                 word->W_WordData->Filename, word->W_WordData->LineNumber, word->W_TokenStart_LineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
-            if ( ( word->W_LispAttributes & T_LC_DEFINE ) && ( ! ( word->W_LispAttributes & T_LISP_COMPILED_WORD ) ) ) Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
+            if ( ( word->W_LispAttributes & T_LC_DEFINE ) && ( ! ( word->W_LispAttributes & T_LISP_COMPILED_WORD ) ) ) Printf ( "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
             else if ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) )
             {
-                Printf ( ( byte* ) "\nCompiled with : %s%s%s%s%s",
+                Printf ( "\nCompiled with : %s%s%s%s%s",
                     GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
                     ( ( word->W_TypeAttributes & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", 
                     GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "", GetState ( word, W_JCC8_ON ) ? ", Jcc8 on" : ", Jcc8 off" ) ;
                 Boolean dsc = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
-                Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
+                Printf ( "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
                 Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;
-                Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
+                Printf ( " : BigNum %s", bno ? "on" : "off" ) ;
                 Boolean lo = Namespace_IsUsing ( ( byte* ) "Lisp" ) ;
-                Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
+                Printf ( " : Lisp %s", lo ? "on" : "off" ) ;
                 Boolean wsc = GetState ( word, W_SOURCE_CODE_MODE ) ;
-                Printf ( ( byte* ) " : Word Source Code %s", wsc ? "on" : "off" ) ;
+                Printf ( " : Word Source Code %s", wsc ? "on" : "off" ) ;
             }
-            if ( word->Definition && word->S_CodeSize ) Printf ( ( byte* ) "\nstarting at address : 0x%x -- code size = %d bytes", word->Definition, word->S_CodeSize ) ;
-            if ( word->W_TypeSignatureString[0] ) Printf ( ( byte* ) "\nTypeSignature : %s", Word_ExpandTypeLetterSignature ( word, 0 ) ) ;
+            if ( word->Definition && word->S_CodeSize ) Printf ( "\nstarting at address : 0x%x -- code size = %d bytes", word->Definition, word->S_CodeSize ) ;
+            if ( word->W_TypeSignatureString[0] ) Printf ( "\nTypeSignature : %s", Word_ExpandTypeLetterSignature ( word, 0 ) ) ;
         }
     }
 }
@@ -467,14 +467,14 @@ dlOpen_Dlsym ( char * lib, char * sym )
     }
     if ( ! hLibrary )
     {
-        Printf ( ( byte* ) "\nCannot open %s - cannot import library\n", buffer ) ;
+        Printf ( "\nCannot open %s - cannot import library\n", buffer ) ;
         return 0 ;
     }
     fp = ( void* ) dlsym ( RTLD_DEFAULT /*hLibrary*/, ( char* ) sym ) ;
     //if ( ( error = dlerror ( ) ) != NULL )
     if ( ( ! fp ) || ( ( error = dlerror ( ) ) != NULL ) )
     {
-        Printf ( ( byte* ) "dlOpen_Dlsym : dlerror: %s\n", error ) ;
+        Printf ( "dlOpen_Dlsym : dlerror: %s\n", error ) ;
         return 0 ;
     }
 

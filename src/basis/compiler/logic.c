@@ -33,7 +33,7 @@ _Compile_TestCode ( Boolean reg, Boolean size )
 }
 
 void
-BI_CompileRecord_TestCode_Reg (BlockInfo *bi, Boolean reg, Boolean size)
+BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size )
 {
     if ( ( ( ! bi->LogicTestCode ) || ( Here != ( bi->LogicTestCode + 3 ) ) ) ) // prevent two "test reg, reg" in a row
     {
@@ -46,14 +46,14 @@ BI_CompileRecord_TestCode_Reg (BlockInfo *bi, Boolean reg, Boolean size)
 void
 BI_CompileRecord_TestCode_ArgRegNum ( BlockInfo *bi, uint8 argRegNum )
 {
-    BI_CompileRecord_TestCode_Reg (bi, _COI_GetReg ( _Compiler_->OptInfo, argRegNum ), CELL) ;
+    BI_CompileRecord_TestCode_Reg ( bi, _COI_GetReg ( _Compiler_->OptInfo, argRegNum ), CELL ) ;
 }
 
 BlockInfo *
 Compiler_BI_CompileRecord_TestCode_Reg ( Compiler * compiler, Boolean reg, Boolean size, Boolean force )
 {
     BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    BI_CompileRecord_TestCode_Reg (bi, reg, size) ;
+    BI_CompileRecord_TestCode_Reg ( bi, reg, size ) ;
     return bi ;
 }
 
@@ -232,7 +232,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
                 }
                 else size = 0 ;
                 WordList_SetCoding ( 0, Here ) ;
-                Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Reg, 
+                Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Reg,
                     compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, size ) ;
             }
         }
@@ -297,7 +297,7 @@ Compile_GreaterThanOrEqual ( Compiler * compiler )
 }
 
 void
-Compile_TestLogicAndStackPush (Compiler * compiler, Boolean reg, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
+Compile_TestLogicAndStackPush ( Compiler * compiler, Boolean reg, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag, false ) ;
     CSL_CompileAndRecord_PushAccum ( ) ;
@@ -322,7 +322,7 @@ Compile_Logical_X ( Compiler * compiler, int64 op, Boolean setTtn, Boolean setNe
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, CELL, CELL ) ;
         _Compile_Stack_DropN ( DSP, 2 ) ;
     }
-    Compile_TestLogicAndStackPush (compiler, ACC, setNegateFlag, jccTtt, jccNegFlag ) ; //NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
+    Compile_TestLogicAndStackPush ( compiler, ACC, setNegateFlag, jccTtt, jccNegFlag ) ; //NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
 }
 
 void
@@ -341,7 +341,7 @@ Compile_LogicalNot ( Compiler * compiler )
             if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
             else _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
         }
-        else if ( optInfo->Optimize_Rm != ACC ) Compile_GetVarLitObj_RValue_To_Reg (one, ACC , 0) ;
+        else if ( optInfo->Optimize_Rm != ACC ) Compile_GetVarLitObj_RValue_To_Reg ( one, ACC, 0 ) ;
     }
     else
     {
@@ -353,6 +353,7 @@ Compile_LogicalNot ( Compiler * compiler )
 
 
 // JE, JNE, JZ, JNZ, ... see machineCode.h
+
 byte *
 _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr, byte insn )
 {
@@ -373,13 +374,13 @@ _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr, byte insn )
 }
 
 byte *
-_BI_Compile_Jcc (BlockInfo *bi, byte * jmpToAddress , Boolean logicFlag)
+_BI_Compile_Jcc ( BlockInfo *bi, byte * jmpToAddress, Boolean logicFlag )
 {
     if ( bi->CopiedToLogicJccCode ) SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
     else SetHere ( bi->JccLogicCode, 1 ) ;
     bi->ActualCopiedToJccCode = Here ;
     byte insn = GetState ( _CSL_, JCC8_ON ) ? JCC8 : 0 ;
-    int64 setNegFlag = logicFlag ? ((bi->JccNegFlag == NEGFLAG_ON) ?  NEGFLAG_OFF :  NEGFLAG_ON) : bi->JccNegFlag ;
+    int64 setNegFlag = logicFlag ? ( ( bi->JccNegFlag == NEGFLAG_ON ) ? NEGFLAG_OFF : NEGFLAG_ON ) : bi->JccNegFlag ;
     //byte * compiledAtAddress = _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress, insn ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
     byte * compiledAtAddress = _Compile_Jcc ( setNegFlag, bi->JccTtt, jmpToAddress, insn ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
     if ( logicFlag ) Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
@@ -390,10 +391,10 @@ byte *
 BI_Compile_Jcc ( BlockInfo *bi, Boolean setTtn, byte * jmpToAddress ) // , int8 nz
 {
     byte * compiledAtAddress ;
-    if ( bi->JccLogicCode ) compiledAtAddress = _BI_Compile_Jcc (bi, jmpToAddress , 0) ;
+    if ( bi->JccLogicCode ) compiledAtAddress = _BI_Compile_Jcc ( bi, jmpToAddress, 0 ) ;
     else
     {
-        Compile_BlockLogicTest (bi) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
+        Compile_BlockLogicTest ( bi ) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
         // then in the non optimized|inline case we cmp the TOS with 0. If ZERO (zf is 1) we know the test was false (for IF), if N(ot) ZERO we know it was true 
         // (for IF). So, in the non optimized|inline case if ZERO we jmp if N(ot) ZERO we continue. In the optimized|inline case we check result of first cmp; if jcc sees
         // not true (with IF that means jcc N(ot) ZERO) we jmp and if true (with IF that means jcc ZERO) we continue. 
@@ -435,7 +436,7 @@ CSL_If_ConditionalExpression ( )
             CSL_If2Combinator ( ) ;
         else if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '#' ) )
             CSL_If_ConditionalInterpret ( ) ;
-        else if ( GetState ( _Context_, C_SYNTAX | PREFIX_MODE | INFIX_MODE ) ) CSL_If_PrefixCombinators ( ) ;
+        else if ( GetState ( _Context_, C_SYNTAX | PREFIX_MODE | INFIX_MODE ) && ( ! ( String_Equal ( _Lexer_->OriginalToken, "?" ) ) ) ) CSL_If_PrefixCombinators ( ) ;
         else
         {
             Interpreter * interp = _Context_->Interpreter0 ;
@@ -443,7 +444,7 @@ CSL_If_ConditionalExpression ( )
             {
                 byte * token ;
                 // interpret until ":", "else" or "endif"
-                token = Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) "else", ( byte* ) "endif", ( byte* ) ":", 0, 0, 1 ) ;
+                token = Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) "else", ( byte* ) "endif", ( byte* ) ":", ( byte* ) ")", "#", 0, 1 ) ;
                 if ( ( token == 0 ) || ( String_Equal ( token, "endif" ) ) ) return ;
                 Parse_SkipUntil_EitherToken_OrNewline ( ( byte* ) "endif", 0 ) ;
             }
@@ -451,7 +452,7 @@ CSL_If_ConditionalExpression ( )
             {
                 // skip until ":" or "else"
                 Parse_SkipUntil_EitherToken_OrNewline ( ( byte* ) ":", ( byte* ) "else" ) ;
-                Interpret_C_Until_NotIncluding_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) "endif", ( byte* ) "}", 0, 1 ) ;
+                Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) "endif", ( byte* ) "#", ( byte* ) ")", 0, 1 ) ;
             }
         }
     }

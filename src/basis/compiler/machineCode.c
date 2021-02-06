@@ -939,7 +939,7 @@ Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( Word * word )
 {
     if ( word->W_MorphismAttributes & CPRIMITIVE )
     {
-        d0 ( Printf ( ( byte* ) "\n_Word_Compile : %s : name = %s", Context_Location ( ), word->Name ) ) ;
+        d0 ( Printf ( "\n_Word_Compile : %s : name = %s", Context_Location ( ), word->Name ) ) ;
         // there is an slight overhead for CPRIMITIVE functions to align RSP for ABI-X64
         Compile_Call_TestRSP ( ( byte* ) word->Definition ) ;
     }

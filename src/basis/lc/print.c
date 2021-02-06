@@ -137,7 +137,7 @@ void
 _LO_Print ( ListObject * l0, byte * prefix, byte * postfix, Boolean valueFlag )
 {
     LO_PrintListToString ( _LC_, ( ListObject * ) l0, 0, valueFlag ) ;
-    Printf ( ( byte* ) "%s%s%s", prefix, _LC_->outBuffer, postfix ) ;
+    Printf ( "%s%s%s", prefix, _LC_->outBuffer, postfix ) ;
 }
 
 void

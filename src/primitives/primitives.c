@@ -59,7 +59,7 @@ CPrimitive CPrimitives [] = {
     { "if{", 0, 0, 0, CSL_If_ConditionalExpression, IMMEDIATE, 0, 0, "C", "Root" },
     { "}else{", 0, 0, 0, CSL_Else, IMMEDIATE, 0, 0, "C", "Root" },
     { "}fi", 0, 0, 0, CSL_EndIf, IMMEDIATE, 0, 0, "C", "Root" },
-    //{ "case", 0, 0, 0, CSL_Case, IMMEDIATE, 0, 0, "C", "Root" },
+    { "case", 0, 0, 0, CS_Case, IMMEDIATE | KEYWORD, 0, 0, "C", "Root" },
     { "switch", 0, 0, 0, CSL_Switch, IMMEDIATE|KEYWORD, 0, 0, "C", "Root" },
     { ">?", 0, 0, 0, CSL_EndIf, IMMEDIATE, 0, 0, "C", "Root" },
     { ">:<", 0, 0, 0, CSL_Else, IMMEDIATE, 0, 0, "C", "Root" },
@@ -98,7 +98,6 @@ CPrimitive CPrimitives [] = {
     { "typedef", 0, 0, 0, CSL_Typedef, 0, 0, 0, "C_Syntax", "C" },
     { "&", 0, 0, 0, CSL_AddressOf, ( NO_CODING | ADDRESS_OF_OP | IMMEDIATE ), 0, 0, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
     //{ "mcase", 0, 0, 0, CS_Case, IMMEDIATE, 0, 0, "C_Syntax", "C" },
-    { "case", 0, 0, 0, CS_Case, IMMEDIATE | KEYWORD, 0, 0, "C_Syntax", "C" },
     //{ "switch", 0, 0, 0, CS_Match, IMMEDIATE, 0, 0, "C_Syntax", "C" },
     { "match", 0, 0, 0, CS_Match, IMMEDIATE | KEYWORD, 0, 0, "C_Syntax", "C" },
 
@@ -488,14 +487,21 @@ CPrimitive CPrimitives [] = {
     { "interpretFile", 0, 0, 0, CSL_Interpret, 0, 0, 0, "Interpreter", "Root" },
     { "l:", 0, 0, 0, CSL_Interpret_ReadToList, 0, 0, 0, "Interpreter", "Root" },
     { "_lx_", 0, 0, 0, CSL_Interpret_List, 0, 0, 0, "Interpreter", "Root" },
+    { "defined", 0, 0, 0, (block) CSL_Defined, IMMEDIATE, 0, 0, "Interpreter", "Root" },
 
     { "#", 0, 0, 0, CSL_PreProcessor, IMMEDIATE, 0, W_PREPROCESSOR, "Interpreter", "Root" },
+    
     { "!", 0, 0, 0, CSL_CommentToEndOfLine, 0, 0, W_PREPROCESSOR, "PreProcessor", "Root" }, // in init.csl ; needed for script files starting with #! csl -s
     { "endif", 0, 0, 0, CSL_Endif_ConditionalInterpret, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
     { "else", 0, 0, 0, CSL_Else_ConditionalInterpret, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
     { "if", 0, 0, 0, CSL_If_ConditionalInterpret, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
     { "elif", 0, 0, 0, CSL_Elif_ConditionalInterpret, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
     { "define", 0, 0, 0, CSL_Define, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
+    { "include", 0, 0, 0, CSL_Include_PreProcessor, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
+    { "defined", 0, 0, 0, (block) CSL_Defined, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
+    { "undef", 0, 0, 0, CSL_Undef, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
+    { "ifdef", 0, 0, 0, CSL_IfDef_Preprocessor, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
+    { "ifndef", 0, 0, 0, CSL_Ifndef_Preprocessor, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
 
     { "sm:", 0, 0, 0, CSL_StringMacro, 0, 0, 0, "Macro", "Root" },
     { "alias", 0, 0, 0, CSL_Alias, 0, 0, 0, "Macro", "Root" },
@@ -530,7 +536,7 @@ CPrimitive CPrimitives [] = {
     { "clone", 0, 0, 0, CSL_DObject_Clone, 0, 0, 0, "DObject", "Root" },
     { "new", 0, 0, 0, CSL_DObject_New, 0, 0, 0, "DObject", "Root" },
 
-    { "c_syntaxOn", 0, 0, 0, CSL_C_Syntax_On, IMMEDIATE, 0, 0, "Compiler", "Root" }, // put this here so Compiler will be in Root namespace and Compiler will close to the top
+    { "_c_syntaxOn", 0, 0, 0, CSL_C_Syntax_On, 0, 0, 0, "Compiler", "Root" }, // put this here so Compiler will be in Root namespace and Compiler will close to the top
     { "c_syntaxOff", 0, 0, 0, CSL_C_Syntax_Off, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "postfixOn", 0, 0, 0, CSL_PostfixModeOn, IMMEDIATE | KEYWORD, 0, 0, "Compiler", "Root" },
     { "goto", 0, 0, 0, CSL_Goto, IMMEDIATE, 0, 0, "Compiler", "Root" },

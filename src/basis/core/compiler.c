@@ -55,8 +55,8 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
         }
         else wordp = word0 ;
         if ( ( word0->W_MorphismAttributes & ( DEBUG_WORD | INTERPRET_DBG ) ) || (
-            word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) || GetState ( _Context_, CONTEXT_PREPROCESSOR_MODE ) ) return word0 ;
-        //word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
+            //word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) || GetState ( _Context_, CONTEXT_PREPROCESSOR_MODE ) ) return word0 ;
+            word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
         Lexer_Set_ScIndex_RlIndex ( _Lexer_, wordp, tsrli, scwi ) ;
         CSL_WordList_PushWord ( wordp ) ;
     }
@@ -128,9 +128,9 @@ Word *
 Compiler_PreviousNonDebugWord ( int64 startIndex )
 {
     Word * word ;
-    int64 i = startIndex ; 
+    int64 i = startIndex ;
     if ( _O_->Verbosity > 2 ) CSL_SC_WordList_Show ( ) ;
-    for (  ; ( word = ( Word* ) CSL_WordList ( i ) ) ; i ++ )
+    for ( ; ( word = ( Word* ) CSL_WordList ( i ) ) ; i ++ )
     {
         if ( ( Symbol* ) word && ( ! ( word->W_MorphismAttributes & DEBUG_WORD ) ) ) break ;
     }
@@ -141,7 +141,7 @@ void
 GotoInfo_Print ( dlnode * node )
 {
     GotoInfo * gi = ( GotoInfo * ) node ;
-    Printf ( ( byte* ) "\nLabelName = %s : Type = %3d : CompileAtAddress = 0x%016lx : LabeledAddress = 0x%016lx : JmpOffsetPointer = : 0x%016lx",
+    Printf ( "\nLabelName = %s : Type = %3d : CompileAtAddress = 0x%016lx : LabeledAddress = 0x%016lx : JmpOffsetPointer = : 0x%016lx",
         gi->pb_LabelName, gi->GI_CAttribute, gi->CompileAtAddress, gi->LabeledAddress, gi->pb_JmpOffsetPointer ) ;
 }
 
@@ -149,7 +149,7 @@ void
 Compiler_GotoList_Print ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    Printf ( ( byte* ) "\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
+    Printf ( "\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
     dllist_Map ( compiler->GotoList, ( MapFunction0 ) GotoInfo_Print ) ;
 }
 
@@ -231,6 +231,7 @@ Compiler_FreeLocalsNamespaces ( Compiler * compiler )
 {
     if ( compiler->NumberOfVariables ) Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, 1, 0 ) ;
     if ( compiler->LocalsNamespace ) _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 1, 0 ) ;
+    compiler->LocalsNamespace = 0 ;
 }
 
 void
@@ -257,6 +258,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->ReturnLParenVariableWord = 0 ;
     compiler->ReturnLParenOperandWord = 0 ;
     compiler->Current_Word_New = 0 ;
+    compiler->LocalsNamespace = 0 ;
     compiler->Current_Word_Create = 0 ;
     Stack_Init ( compiler->BlockStack ) ;
     Stack_Init ( compiler->CombinatorBlockInfoStack ) ;

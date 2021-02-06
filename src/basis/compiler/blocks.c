@@ -59,7 +59,8 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
             }
             else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
         }
-        _CompileN ( srcAddress, isize ) ;
+        if ( * srcAddress )  _CompileN ( srcAddress, isize ) ;
+        else break ;
         //if ( _DBI || _O_->Dbi ) Debugger_UdisOneInstruction ( _Debugger_, srcAddress, ( byte* ) "", ( byte* ) "" ) ;
         //if ( _DBI  ) Debugger_UdisOneInstruction ( _Debugger_, srcAddress, ( byte* ) "", ( byte* ) "" ) ;
     }

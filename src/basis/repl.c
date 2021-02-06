@@ -17,18 +17,18 @@ _Repl ( block repl )
         while ( 1 )
         {
             uint64 * svDsp = _Dsp_ ;
-            Printf ( ( byte* ) "<= " ) ;
+            Printf ( "<= " ) ;
             //LC_SaveStack ( ) ; // ?!? maybe we should do this stuff differently : literals are pushed on the stack by the interpreter
             ReadLine_GetLine ( rl ) ;
             if ( strstr ( ( char* ) rl->InputLineString, ".." ) || strstr ( ( char* ) rl->InputLineString, "bye" ) || strstr ( ( char* ) rl->InputLineString, "exit" ) ) goto done ;
             repl ( ) ;
-            Printf ( ( byte* ) "\n" ) ;
+            Printf ( "\n" ) ;
             _Dsp_ = svDsp ;
        }
     }
     {
         AlertColors ;
-        Printf ( ( byte* ) "\n_Repl Error ... continuing" ) ;
+        Printf ( "\n_Repl Error ... continuing" ) ;
         DefaultColors ;
         goto start ;
     }

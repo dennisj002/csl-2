@@ -1,18 +1,6 @@
 
 #include "../../include/csl.h"
 
-#if 0
-
-void
-Byte_PtrCall ( byte * bptr )
-{
-    if ( bptr )
-    {
-        ( ( block ) bptr ) ( ) ;
-    }
-}
-#endif
-
 void
 _ByteArray_UnAppendSpace ( ByteArray * ba, int64 size ) // size in bytes
 {
@@ -251,7 +239,7 @@ NamedByteArray *
 NamedByteArray_New ( byte * name, int64 size, int64 atype )
 {
     NamedByteArray * nba ;
-    //if ( String_Equal ( "HistorySpace", name ) ) _Printf ( ( byte* ) "\nNamedByteArray_New : name = %s", name ) ;
+    //if ( String_Equal ( "HistorySpace", name ) ) _Printf ( "\nNamedByteArray_New : name = %s", name ) ;
     //if (atype == OVT_STATIC) nba = (NamedByteArray * ) Mem_Allocate ( sizeof ( OpenVmTil ), OVT_STATIC ) ; 
     //else 
     nba = NamedByteArray_Allocate ( ) ; //NamedByteArray_Allocate ( ) ; // else the nba would be deleted with MemList_FreeExactType ( nba->NBA_AAttribute ) ;

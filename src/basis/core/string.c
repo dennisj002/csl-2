@@ -516,7 +516,7 @@ byte *
 String_RemoveEndWhitespace ( byte * string )
 {
     byte * ptr = string + Strlen ( ( char* ) string ) ;
-    for ( ; *ptr <= ' ' ; ptr -- ) ;
+    for ( ; ((*ptr) && (*ptr <= ' ')) ; ptr -- ) ;
     //*++ ptr = '\n' ;
     *++ ptr = ' ' ;
     *++ ptr = 0 ;
@@ -1130,7 +1130,7 @@ Buffer_PrintBuffers ( )
             total ++ ;
         }
     }
-    if ( _O_->Verbosity > 1 ) Printf ( ( byte* ) "\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
+    if ( _O_->Verbosity > 1 ) Printf ( "\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
 }
 
 Buffer *

@@ -4,30 +4,30 @@ void
 _CpuState_Show ( Cpu * cpu )
 {
     byte * location = Context_Location ( ) ;
-    if ( cpu == _Debugger_->cs_Cpu ) Printf ( ( byte* ) "\nDebugger CpuState : at %s", location ) ;
-    else if ( cpu == _CSL_->cs_Cpu2 ) Printf ( ( byte* ) "\nCurrent CpuState : at %s", location ) ;
-    else Printf ( ( byte* ) "\nC Runtime (CSL) CpuState : at %s", location ) ;
-    Printf ( ( byte* ) "\nRAX " UINT_FRMT_0x016, cpu->Rax ) ;
-    Printf ( ( byte* ) " RCX " UINT_FRMT_0x016, cpu->Rcx ) ;
-    Printf ( ( byte* ) " RDX " UINT_FRMT_0x016, cpu->Rdx ) ;
-    Printf ( ( byte* ) " RBX " UINT_FRMT_0x016, cpu->Rbx ) ;
-    Printf ( ( byte* ) "\nRSP " UINT_FRMT_0x016, cpu->Rsp ) ;
-    Printf ( ( byte* ) " RBP " UINT_FRMT_0x016, cpu->Rbp ) ;
-    Printf ( ( byte* ) " RSI " UINT_FRMT_0x016, cpu->Rsi ) ;
-    Printf ( ( byte* ) " RDI " UINT_FRMT_0x016, cpu->Rdi ) ;
-    Printf ( ( byte* ) "\nR8  " UINT_FRMT_0x016, cpu->R8d ) ;
-    Printf ( ( byte* ) " R9  " UINT_FRMT_0x016, cpu->R9d ) ;
-    Printf ( ( byte* ) " R10 " UINT_FRMT_0x016, cpu->R10d ) ;
-    Printf ( ( byte* ) " R11 " UINT_FRMT_0x016, cpu->R11d ) ;
-    Printf ( ( byte* ) "\nR12 " UINT_FRMT_0x016, cpu->R12d ) ;
-    Printf ( ( byte* ) " R13 " UINT_FRMT_0x016, cpu->R13d ) ;
-    Printf ( ( byte* ) " R14 " UINT_FRMT_0x016, cpu->R14d ) ;
-    Printf ( ( byte* ) " R15 " UINT_FRMT_0x016, cpu->R15d ) ;
-    if ( _Debugger_->DebugAddress ) Printf ( ( byte* ) "\nRIP " UINT_FRMT_0x016, _Debugger_->DebugAddress ) ;
-    else Printf ( ( byte* ) "\nRIP " UINT_FRMT_0x016, cpu->Rip ) ;
-    Printf ( ( byte* ) " RFlags :: 0x%08x :: %s", cpu->RFlags, _Print_Binary ( ( uint64 ) cpu->RFlags ) ) ;
+    if ( cpu == _Debugger_->cs_Cpu ) Printf ( "\nDebugger CpuState : at %s", location ) ;
+    else if ( cpu == _CSL_->cs_Cpu2 ) Printf ( "\nCurrent CpuState : at %s", location ) ;
+    else Printf ( "\nC Runtime (CSL) CpuState : at %s", location ) ;
+    Printf ( "\nRAX " UINT_FRMT_0x016, cpu->Rax ) ;
+    Printf ( " RCX " UINT_FRMT_0x016, cpu->Rcx ) ;
+    Printf ( " RDX " UINT_FRMT_0x016, cpu->Rdx ) ;
+    Printf ( " RBX " UINT_FRMT_0x016, cpu->Rbx ) ;
+    Printf ( "\nRSP " UINT_FRMT_0x016, cpu->Rsp ) ;
+    Printf ( " RBP " UINT_FRMT_0x016, cpu->Rbp ) ;
+    Printf ( " RSI " UINT_FRMT_0x016, cpu->Rsi ) ;
+    Printf ( " RDI " UINT_FRMT_0x016, cpu->Rdi ) ;
+    Printf ( "\nR8  " UINT_FRMT_0x016, cpu->R8d ) ;
+    Printf ( " R9  " UINT_FRMT_0x016, cpu->R9d ) ;
+    Printf ( " R10 " UINT_FRMT_0x016, cpu->R10d ) ;
+    Printf ( " R11 " UINT_FRMT_0x016, cpu->R11d ) ;
+    Printf ( "\nR12 " UINT_FRMT_0x016, cpu->R12d ) ;
+    Printf ( " R13 " UINT_FRMT_0x016, cpu->R13d ) ;
+    Printf ( " R14 " UINT_FRMT_0x016, cpu->R14d ) ;
+    Printf ( " R15 " UINT_FRMT_0x016, cpu->R15d ) ;
+    if ( _Debugger_->DebugAddress ) Printf ( "\nRIP " UINT_FRMT_0x016, _Debugger_->DebugAddress ) ;
+    else Printf ( "\nRIP " UINT_FRMT_0x016, cpu->Rip ) ;
+    Printf ( " RFlags :: 0x%08x :: %s", cpu->RFlags, _Print_Binary ( ( uint64 ) cpu->RFlags ) ) ;
     //_Printf ( (byte*) "_Printf_Binary ( ( uint64 ) cpu->RFlags ) ; //, 14, 14 ) ;
-    Printf ( ( byte* ) " :: of:11:%d sf:7:%d, zf:6:%d, af:4:%d, pf:2:%d, cf:0:%d :: flag:bit:value",
+    Printf ( " :: of:11:%d sf:7:%d, zf:6:%d, af:4:%d, pf:2:%d, cf:0:%d :: flag:bit:value",
         ( uint64 ) cpu->RFlags & OVERFLOW_FLAG ? 1 : 0, ( uint64 ) cpu->RFlags & SIGN_FLAG ? 1 : 0, ( uint64 ) cpu->RFlags & ZERO_FLAG ? 1 : 0,
         ( uint64 ) cpu->RFlags & AUX_FLAG ? 1 : 0, ( uint64 ) cpu->RFlags & PARITY_FLAG ? 1 : 0, ( uint64 ) cpu->RFlags & CARRY_FLAG ? 1 : 0
         ) ;

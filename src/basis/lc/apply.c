@@ -456,7 +456,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
         if ( _O_->Verbosity > 1 )
         {
             AlertColors ;
-            Printf ( ( byte* ) "\nLisp can not compile this word yet : %s : -- interpreting ...\n ", _Word_SourceCodeLocation_pbyte ( word ) ) ;
+            Printf ( "\nLisp can not compile this word yet : %s : -- interpreting ...\n ", _Word_SourceCodeLocation_pbyte ( word ) ) ;
             DefaultColors ;
         }
     }

@@ -105,14 +105,14 @@ _ReadLine_MoveInputStartToLineStart ( int64 fromPosition, int64 lineUpFlag )
         if ( ( fromPosition % columns ) < 2 ) n -- ; // nb : ?? -- i don't understand this but it works
         if ( n ) Cursor_Up ( n ) ; //_Printf ( "\r%c[%dA", ESC, n ) ; // move n lines up 
     }
-    else Printf ( ( byte* ) "\r" ) ; // nb -- a workaround : ?? second sequence ( clear 2 eol ) not necessary but seems to reset things to work -- ??
+    else Printf ( "\r" ) ; // nb -- a workaround : ?? second sequence ( clear 2 eol ) not necessary but seems to reset things to work -- ??
     //_Printf ( "\r%c[2K", ESC ) ; // nb -- a workaround : ?? second sequence ( clear 2 eol ) not necessary but seems to reset things to work -- ??
 }
 
 void
 _ReadLine_PrintfClearTerminalLine ( )
 {
-    Printf ( ( byte* ) "\r%c[J", ESC ) ; // clear from cursor to end of screen -- important if we have (mistakenly) gone up an extra line
+    Printf ( "\r%c[J", ESC ) ; // clear from cursor to end of screen -- important if we have (mistakenly) gone up an extra line
 }
 
 void
@@ -265,7 +265,7 @@ ReadLine_GetNormalPrompt ( ReadLiner * rl )
 void
 _ReadLine_Show ( ReadLiner * rl, byte * prompt )
 {
-    Printf ( ( byte* ) "\r%s%s", prompt, rl->InputLine ) ;
+    Printf ( "\r%s%s", prompt, rl->InputLine ) ;
 }
 
 void
@@ -345,7 +345,7 @@ ReadLine_ShowNormalPrompt ( ReadLiner * rl )
 {
     //_ReadLine_ShowStringWithCursor ( rl, ( byte* ) "", rl->NormalPrompt ) ;
     _ReadLine_PrintfClearTerminalLine ( ) ;
-    Printf ( ( byte* ) "\r%s", rl->NormalPrompt ) ;
+    Printf ( "\r%s", rl->NormalPrompt ) ;
     rl->EndPosition = 0 ;
     rl->InputLine [ 0 ] = 0 ;
 }

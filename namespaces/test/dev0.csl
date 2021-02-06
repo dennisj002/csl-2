@@ -147,8 +147,8 @@ Compiler C
  20 _fib1 dup p 6765 _assert0 
 c_syntaxOn
 int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; } }
+_fib1c (20) dup p 6765 _assert0 
 c_syntaxOff
-20 int._fib1c dup p 6765 _assert0 
 : fibPTC? ( n | fn fn1 fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ } { n n @ 1 - = } 
     {   

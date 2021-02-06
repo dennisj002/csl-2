@@ -246,7 +246,7 @@ _Compile_C_TypeDeclaration ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     byte * token ;
-    while ( token = Interpret_C_Until_NotIncluding_Token4 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", ( byte* ) "{",  ( byte* ) "}", 0, 0 ) )
+    while ( token = Interpret_C_Until_NotIncluding_Token5 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", ( byte* ) "{",  ( byte* ) "}", 0, 0, 0 ) )
     {
         if ( _String_EqualSingleCharString ( token, ';' ) )
         {

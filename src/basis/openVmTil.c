@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.914.500" ) 
+#define VERSION ((byte*) "0.915.100" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -42,7 +42,7 @@ _OpenVmTil_Delete ( OpenVmTil * ovt )
 {
     if ( ovt )
     {
-        if ( ovt->Verbosity > 2 ) Printf ( ( byte* ) "\nAll allocated, non-static memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
+        if ( ovt->Verbosity > 2 ) Printf ( "\nAll allocated, non-static memory is being freed.\nRestart : verbosity = %d.", ovt->Verbosity ) ;
         FreeChunkList ( _OS_->OvtMemChunkList ) ;
     }
     _O_ = 0 ;
@@ -78,7 +78,7 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
     }
     if ( ovt->Verbosity > 1 )
     {
-        Printf ( ( byte* ) "\nRestart : All memory freed, allocated and initialized as at startup. "
+        Printf ( "\nRestart : All memory freed, allocated and initialized as at startup. "
             "termios, verbosity and memory category allocation sizes preserved. verbosity = %d.", ovt->Verbosity ) ;
         OpenVmTil_Print_DataSizeofInfo ( 0 ) ;
     }
@@ -165,10 +165,10 @@ Ovt_RunInit ( OpenVmTil * ovt )
 void
 OVT_PrintStartupOptions ( OpenVmTil * ovt )
 {
-    Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [0] = %s\n\n", ovt->Argv [0] ) ;
-    Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [1] = %s\n\n", ovt->Argv [1] ) ;
-    Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [2] = %s\n\n", ovt->Argv [2] ) ;
-    Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->StartupFilename = %s\n\n", ovt->StartupFilename ) ;
+    Printf ( "\n\nOVT_GetStartupOptions :: ovt->Argv [0] = %s\n\n", ovt->Argv [0] ) ;
+    Printf ( "\n\nOVT_GetStartupOptions :: ovt->Argv [1] = %s\n\n", ovt->Argv [1] ) ;
+    Printf ( "\n\nOVT_GetStartupOptions :: ovt->Argv [2] = %s\n\n", ovt->Argv [2] ) ;
+    Printf ( "\n\nOVT_GetStartupOptions :: ovt->StartupFilename = %s\n\n", ovt->StartupFilename ) ;
     //if ( ovt->Verbosity > 1 ) Pause ( ) ;
 }
 

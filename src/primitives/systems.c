@@ -195,7 +195,7 @@ shell ( )
     ReadLiner * rl = cntx->ReadLiner0 ;
     byte * svPrompt = ReadLine_GetPrompt ( rl ) ;
     ReadLine_SetPrompt ( rl, "$ " ) ;
-    Printf ( ( byte* ) "\n type \'exit\' to exit" ) ;
+    Printf ( "\n type \'exit\' to exit" ) ;
     Context_DoPrompt ( cntx ) ;
     while ( 1 )
     {
@@ -205,7 +205,7 @@ shell ( )
         ShellEscape ( str ) ; // prompt is included in ShellEscape
     }
     ReadLine_SetPrompt ( rl, svPrompt ) ;
-    Printf ( ( byte* ) "\n leaving shell ..." ) ;
+    Printf ( "\n leaving shell ..." ) ;
 }
 
 void
@@ -240,8 +240,8 @@ _CSL_Version ( Boolean flag )
     //if ( flag || ( ( _O_->Verbosity ) && ( _O_->StartedTimes == 1 ) ) && (CSL->InitSessionCoreTimes == 1) )
     if ( flag || ( _O_->Restarts < 2 ) )
     {
-        //_Printf ( ( byte* ) "\ncsl %s", _O_->VersionString ) ;
-        Printf ( ( byte* ) "\nversion %s", _O_->VersionString ) ;
+        //_Printf ( "\ncsl %s", _O_->VersionString ) ;
+        Printf ( "\nversion %s", _O_->VersionString ) ;
     }
 }
 
@@ -327,9 +327,9 @@ void
 CSL_Dump ( )
 {
     byte * location = Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "" ;
-    Printf ( ( byte* ) "\nDump at : %s :", location ) ;
+    Printf ( "\nDump at : %s :", location ) ;
     _CSL_Dump ( 16 ) ;
-    Printf ( ( byte* ) "\n" ) ;
+    Printf ( "\n" ) ;
 }
 
 void
