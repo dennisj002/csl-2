@@ -327,7 +327,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc ) //nb. void ptr 
             _O_->Signal = 0 ;
         }
     }
-    else if ( _O_->SigSegvs )
+    else if ( _O_->SigSegvs > 1 )
     {
         OVT_SeriousErrorPause ( ) ;
         _OVT_SigLongJump ( & _O_->JmpBuf0 ) ;

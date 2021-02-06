@@ -817,6 +817,7 @@ typedef struct
 #define IS_REVERSE_DOTTED ( (uint64) 1 << 32 )
 #define IS_RVALUE ( (uint64) 1 << 33 )
 #define ASM_SYNTAX ( (uint64) 1 << 34 )
+#define PREPROCESSOR_IF_MODE ( (uint64) 1 << 35 )
 
 #define NON_INLINABLE ( (uint64) 1 << 0 )
 #define DONE true

@@ -533,6 +533,7 @@ byte *DLList_CheckRecycledForAllocation(dllist *list, int64 size);
 void OVT_RecyclingAccounting(int64 flag);
 void OVT_Recycle(dlnode *anode);
 void Word_Recycle(Word *w);
+void dbg_new(Word *w);
 void _CheckRecycleWord(Word *w);
 void CheckRecycleNamespaceWord(Node *node);
 void DLList_Recycle_NamespaceList(dllist *list);

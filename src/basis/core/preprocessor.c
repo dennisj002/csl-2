@@ -99,7 +99,7 @@ int64
 GetElxxStatus ( int64 cond, int64 type )
 {
     int64 llen = List_Length ( _Context_->PreprocessorStackList ) ;
-    if ( llen )
+    if ( llen ) //|| GetState ( _Context_, PREPROCESSOR_IF_MODE ))
     {
         Ppibs *top = ( Ppibs * ) List_Top_Value ( _Context_->PreprocessorStackList ) ;
         Boolean status = false, accStatus = GetAccumulatedBlockStatus ( 1 ) ; // 1 ??
@@ -133,7 +133,7 @@ GetElxxStatus ( int64 cond, int64 type )
         dbg ( Ppibs_Print ( top, ( byte* ) ( ( type == PP_ELSE ) ? "Else : ElxxStatus: top of PreprocessorStackList" : "Elif : ElxxStatus" ) ) ) ;
         return status ;
     }
-    else _SyntaxError ( ( byte* ) "#Elxx without #if", 1 ) ;
+    else _SyntaxError ( ( byte* ) "#elxx without #if", 1 ) ;
     return 0 ;
 }
 
@@ -142,14 +142,15 @@ GetIfStatus ( )
 {
     Ppibs * cstatus = Ppibs_New ( ) ;
     Boolean accStatus, cond ;
+    //SetState ( _Context_, PREPROCESSOR_IF_MODE, true ) ;
     accStatus = GetAccumulatedBlockStatus ( 0 ) ;
     cond = _GetCondStatus ( ) ;
     cstatus->IfBlockStatus = cond && accStatus ;
     cstatus->Filename = _ReadLiner_->Filename ;
     cstatus->LineNumber = _ReadLiner_->LineNumber ;
-    //_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
-    _List_PushNew_1Value ( _Context_->PreprocessorStackList, CONTEXT, T_PREPROCESSOR, ( int64 ) cstatus ) ; //SESSION ) ;
+    _List_PushNew_1Value ( _Context_->PreprocessorStackList, CONTEXT, T_PREPROCESSOR, ( int64 ) cstatus ) ;
     dbg ( Ppibs_Print ( cstatus, ( byte* ) "IfStatus" ) ) ;
+    //SetState ( _Context_, PREPROCESSOR_IF_MODE, false ) ;
     return cstatus->IfBlockStatus ;
 }
 
@@ -363,7 +364,7 @@ CSL_Include_PreProcessor ( )
     }
     else afn = filename ;
     CSL_C_Syntax_On ( ) ;
-    if ( VERBOSITY > 1 ) Printf ( (byte*) "\nEntering : %s at %s", afn, Context_Location () ) ;
+    if ( VERBOSITY > 1 ) Printf ( ( byte* ) "\nEntering : %s at %s", afn, Context_Location ( ) ) ;
     _CSL_ContextNew_IncludeFile ( afn ) ;
 }
 

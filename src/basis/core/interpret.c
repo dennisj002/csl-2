@@ -128,7 +128,7 @@ Word *
 Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi )
 {
     Word * word1 ;
-    if ( word )
+    if ( word && word->Name )
     {
         Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
         interp->w_Word = word ;

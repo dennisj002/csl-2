@@ -42,7 +42,7 @@ testc1 ()
     ps ( "\nxhii =" ) ; xhii (4) ; xhi (4) ; xhi0(); xhi1 () ; xhi( 4 ); xhi01 ; xhi1 ; xhi2(8) ; xhi2a ( "xhi2a =", 8 ) ; 
 } prefix
 'testc1 find wdiss sp
-d: testc1 () ; sp 
+testc1 () ; sp 
 #if 1
 C libc
 #if 0

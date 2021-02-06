@@ -291,31 +291,25 @@ Boolean
 Lexer_IsNextWordLeftParen ( Lexer * lexer )
 {
     // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses (in PREFIX_MODE)
-#if 0   
-    byte chr = ReadLine_LastChar ( _ReadLiner_ ) ;
-    if ( ! _CharSet_IsDelimiter ( lexer->DelimiterCharSet, chr ) ) return false ; // we need to start from a delimiter
-#endif    
     byte c = Lexer_NextPrintChar ( lexer ) ;
     if ( ( c == '(' ) ) return true ;
-
     else return false ;
 }
 
 Boolean
 Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
-    if ( word->Name[0] == '(' ) return false ;
+    if ( ( ! word->Name || ( word->Name[0] == '(' ) ) ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    if ( ( word->W_TypeAttributes & W_PREPROCESSOR ) && ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) ) 
+    if ( ( word->W_TypeAttributes & W_PREPROCESSOR ) && ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) )
         return false ;
+    else if ( ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) && ( ! ( word->W_MorphismAttributes & PREFIX ) ) && ( ! ( word->W_MorphismAttributes & CSL_WORD ) ) ) return false ;
     else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
-        //&& ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) 
-        //&& IS_MORPHISM_TYPE( word ) 
-        //&& ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) ) && ( ( ! ( word->W_TypeAttributes & W_PREPROCESSOR ) && ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) ) ) )
-        && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) ) ) 
+        && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) ) )
     {
         return Lexer_IsNextWordLeftParen ( lexer ) ;
     }
+
     else return false ;
 }
 
@@ -327,18 +321,21 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     CSL_PushToken_OnTokenList ( token ) ;
     if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
+
     return token ;
 }
 
 void
 _Lexer_DoChar ( Lexer * lexer, byte c )
 {
+
     _CSL_->LexerCharacterFunctionTable [ _CSL_->LexerCharacterTypeTable [ c ].CharInfo ] ( lexer ) ;
 }
 
 void
 Lexer_DoChar ( Lexer * lexer, byte c )
 {
+
     lexer->TokenInputByte = c ;
     _Lexer_DoChar ( lexer, c ) ;
     lexer->CurrentReadIndex = lexer->ReadLiner0->ReadIndex ;
@@ -354,6 +351,7 @@ Lexer_DoNextChar ( Lexer * lexer )
 void
 Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters )
 {
+
     _Lexer_LexNextToken_WithDelimiters ( lexer, delimiters, 1, 0, 1, 0 ) ;
 }
 
@@ -379,6 +377,7 @@ _Lexer_AppendByteToTokenBuffer ( Lexer * lexer, byte c )
     ReadLiner * rl = lexer->ReadLiner0 ;
     if ( lexer->TokenStart_ReadLineIndex == - 1 ) // -1 : Lexer_Init marker
     {
+
         lexer->TokenStart_ReadLineIndex = rl->ReadIndex - 1 ; // -1 : ReadIndex has already been incremented for the next char so this char is -1
     }
     lexer->TokenBuffer [ lexer->TokenWriteIndex ++ ] = c ;
@@ -388,12 +387,14 @@ _Lexer_AppendByteToTokenBuffer ( Lexer * lexer, byte c )
 void
 Lexer_AppendByteToTokenBuffer ( Lexer * lexer )
 {
+
     _Lexer_AppendByteToTokenBuffer ( lexer, lexer->TokenInputByte ) ;
 }
 
 void
 Lexer_Append_ConvertedCharacterToTokenBuffer ( Lexer * lexer )
 {
+
     _String_AppendConvertCharToBackSlash ( TokenBuffer_AppendPoint ( lexer ), lexer->TokenInputByte, 0, false ) ;
     _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
     lexer->TokenWriteIndex ++ ;
@@ -405,6 +406,7 @@ Lexer_AppendCharacterToTokenBuffer ( Lexer * lexer )
     // if ( AtCommandLine () && ! formattingChar )
     if ( ! GetState ( lexer, LEXER_ESCAPE_SEQUENCE ) )
     {
+
         Lexer_AppendByteToTokenBuffer ( lexer ) ;
         _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
     }
@@ -413,18 +415,21 @@ Lexer_AppendCharacterToTokenBuffer ( Lexer * lexer )
 byte
 Lexer_UnAppendCharacterToTokenBuffer ( Lexer * lexer )
 {
+
     return lexer->TokenBuffer [ -- lexer->TokenWriteIndex ] ;
 }
 
 byte
 Lexer_LastChar ( Lexer * lexer )
 {
+
     return lexer->TokenBuffer [ lexer->TokenWriteIndex - 1 ] ;
 }
 
 void
 Lexer_SetTokenDelimiters ( Lexer * lexer, byte * delimiters, uint64 allocType )
 {
+
     lexer->TokenDelimiters = delimiters ;
     //if ( lexer->DelimiterCharSet ) CharSet_Init ( lexer->DelimiterCharSet, 128, delimiters ) ;
     //else 
@@ -447,6 +452,7 @@ Lexer_New ( uint64 allocType )
 void
 _Lexer_Copy ( Lexer * lexer, Lexer * lexer0, uint64 allocType )
 {
+
     MemCpy ( lexer, lexer0, sizeof (Lexer ) ) ;
     Lexer_Init ( lexer, 0, 0, allocType ) ;
     ReadLiner * rl = ReadLine_Copy ( lexer0->ReadLiner0, allocType ) ;
@@ -459,12 +465,14 @@ Lexer_Copy ( Lexer * lexer0, uint64 allocType )
 {
     Lexer * lexer = ( Lexer * ) Mem_Allocate ( sizeof (Lexer ), allocType ) ;
     _Lexer_Copy ( lexer, lexer0, allocType ) ;
+
     return lexer ;
 }
 
 void
 Lexer_RestartToken ( Lexer * lexer )
 {
+
     lexer->TokenWriteIndex = 0 ;
 }
 
@@ -475,12 +483,14 @@ Lexer_RestartToken ( Lexer * lexer )
 void
 Lexer_SourceCodeOn ( Lexer * lexer )
 {
+
     SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), true ) ;
 }
 
 void
 Lexer_SourceCodeOff ( Lexer * lexer )
 {
+
     SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), false ) ;
 }
 
@@ -489,6 +499,7 @@ _Lexer_AppendCharToSourceCode ( Lexer * lexer, byte c, int64 convert )
 {
     if ( GetState ( _CSL_, SOURCE_CODE_ON ) && GetState ( lexer, ADD_CHAR_TO_SOURCE ) )
     {
+
         CSL_AppendCharToSourceCode ( _CSL_, c ) ;
     }
 }
@@ -515,6 +526,7 @@ Lexer_DoDelimiter ( Lexer * lexer )
 Boolean
 Lexer_IsCurrentInputCharADelimiter ( Lexer * lexer )
 {
+
     return ( Boolean ) _Lexer_IsCharDelimiter ( lexer, lexer->TokenInputByte ) ;
 }
 
@@ -660,7 +672,7 @@ _BackSlash ( Lexer * lexer, int64 flag )
         i = ReadLiner_PeekSkipSpaces ( rl ) ;
         if ( _ReadLine_PeekOffsetChar ( rl, i ) == '\n' ) ; // do nothing - don't append the newline 
     }
-    else if ( nextChar == '\n' && GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ; // ignore the newline
+    else if ( nextChar == '\n' && GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ; // ignore the newline
     else if ( flag )
     {
         //Lexer_AppendCharacterToTokenBuffer ( lexer ) ; // the backslash
@@ -669,12 +681,15 @@ _BackSlash ( Lexer * lexer, int64 flag )
         _Lexer_AppendCharToSourceCode ( lexer, nextChar, 0 ) ;
         _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ;
     }
-    else if ( ! flag ) SingleEscape ( lexer ) ; //Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
+    else
+
+        if ( ! flag ) SingleEscape ( lexer ) ; //Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
 }
 
 void
 BackSlash ( Lexer * lexer )
 {
+
     _BackSlash ( lexer, 1 ) ;
 }
 
@@ -685,6 +700,7 @@ _MultipleEscape ( Lexer * lexer )
     while ( 1 )
     {
         lexer->TokenInputByte = ReadLine_NextChar ( lexer->ReadLiner0 ) ;
+
         if ( lexer->TokenInputByte == multipleEscapeChar ) break ;
         Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
     }
@@ -696,6 +712,7 @@ _MultipleEscape ( Lexer * lexer )
 void
 DoubleQuote ( Lexer * lexer )
 {
+
     TerminatingMacro ( lexer ) ;
 }
 
@@ -713,6 +730,7 @@ Minus ( Lexer * lexer ) // '-':
         {
             ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '--' as next token
             SetState ( lexer, LEXER_DONE, true ) ;
+
             return ;
         }
     }
@@ -730,6 +748,7 @@ Plus ( Lexer * lexer ) // '+':
         {
             ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '++' as next token
             SetState ( lexer, LEXER_DONE, true ) ;
+
             return ;
         }
     }
@@ -743,12 +762,14 @@ EndEscapeSequence ( Lexer * lexer )
     {
         SetState ( lexer, LEXER_ESCAPE_SEQUENCE, false ) ;
     }
+
     else Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
 }
 
 void
 Escape ( Lexer * lexer )
 {
+
     SetState ( lexer, LEXER_ESCAPE_SEQUENCE, true ) ;
 }
 
@@ -759,6 +780,7 @@ ForwardSlash ( Lexer * lexer ) // '/':
     byte nextChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
     if ( ( nextChar == '/' ) || ( nextChar == '*' ) )
     {
+
         lexer->TokenInputByte = ReadLine_NextChar ( lexer->ReadLiner0 ) ;
         Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
         SetState ( lexer, LEXER_DONE, true ) ;
@@ -780,6 +802,7 @@ Star ( Lexer * lexer ) // '*':
         Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
         SetState ( lexer, LEXER_DONE, true ) ;
     }
+
     else Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
 }
 
@@ -787,6 +810,7 @@ void
 AddressOf ( Lexer * lexer ) // ';':
 {
     if ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) TerminatingMacro ( lexer ) ;
+
     else Lexer_Default ( lexer ) ;
 }
 
@@ -794,6 +818,7 @@ void
 AtFetch ( Lexer * lexer ) // ';':
 {
     Lexer_Default ( lexer ) ;
+
     if ( _LC_ && GetState ( _LC_, LC_READ ) ) Lexer_FinishTokenHere ( lexer ) ;
 }
 
@@ -806,6 +831,7 @@ Semi ( Lexer * lexer ) // ';':
         if ( isspace ( nextChar ) )
         {
             Lexer_MakeItTheNextToken ( lexer ) ;
+
             return ;
         }
     }
@@ -830,6 +856,7 @@ Exclam ( Lexer * lexer ) // ';':
         }
         return ;
     }
+
     else Lexer_Default ( lexer ) ;
 }
 
@@ -842,6 +869,7 @@ GreaterThan ( Lexer * lexer ) // '>':
         {
             Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
             SetState ( lexer, LEXER_DONE, true ) ;
+
             return ;
         }
     }
@@ -901,6 +929,7 @@ Dot ( Lexer * lexer ) //  '.':
                     }
                 }
             }
+
             if ( ! isdigit ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ) ) SetState ( lexer, LEXER_DONE, true ) ;
         }
     }
@@ -938,6 +967,7 @@ Comma ( Lexer * lexer )
                 }
                 Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
                 Lexer_FinishTokenHere ( lexer ) ;
+
                 return ;
             }
         }
@@ -948,6 +978,7 @@ Comma ( Lexer * lexer )
 void
 CarriageReturn ( Lexer * lexer )
 {
+
     NewLine ( lexer ) ;
 }
 
@@ -960,6 +991,7 @@ NewLine ( Lexer * lexer )
     }
     else
     {
+
         SetState ( lexer, LEXER_END_OF_LINE, true ) ;
         Lexer_Default ( lexer ) ;
     }
@@ -968,18 +1000,21 @@ NewLine ( Lexer * lexer )
 void
 _EOF ( Lexer * lexer ) // case eof:
 {
+
     SetState ( lexer, LEXER_DONE | END_OF_FILE, true ) ;
 }
 
 void
 _Zero ( Lexer * lexer ) // case 0
 {
+
     SetState ( lexer, LEXER_DONE | END_OF_STRING | END_OF_FILE, true ) ;
 }
 
 int64
 Lexer_CheckIfDone ( Lexer * lexer, int64 flags )
 {
+
     return lexer->State & flags ;
 }
 
@@ -988,24 +1023,28 @@ Lexer_CheckIfDone ( Lexer * lexer, int64 flags )
 byte
 _Lexer_NextChar ( ReadLiner * rl )
 {
+
     return ReadLine_NextChar ( rl ) ;
 }
 
 void
 Lexer_SetInputFunction ( Lexer * lexer, byte ( *lipf ) ( ReadLiner * ) )
 {
+
     lexer->NextChar = lipf ;
 }
 
 Boolean
 _Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
 {
+
     return ReadLiner_IsTokenForwardDotted ( lexer->ReadLiner0, end ? end - 1 : lexer->TokenStart_ReadLineIndex ) ;
 }
 
 Boolean
 Lexer_IsTokenForwardDotted ( Lexer * lexer )
 {
+
     return _Lexer_IsTokenForwardDotted ( lexer, 0 ) ;
 }
 
@@ -1013,6 +1052,7 @@ Boolean
 Lexer_IsTokenQualifiedID ( Lexer * lexer )
 {
     if ( Lexer_IsTokenReverseDotted ( lexer ) ) return true ;
+
     else return Lexer_IsTokenForwardDotted ( lexer ) ;
 }
 
@@ -1087,6 +1127,7 @@ CSL_LexerTables_Setup ( CSL * csl )
 int64
 Lexer_ConvertLineIndexToFileIndex ( Lexer * lexer, int64 index )
 {
+
     return lexer->TokenStart_FileIndex = lexer->ReadLiner0->LineStartFileIndex + index ; //- lexer->Token_Length ;
 }
 

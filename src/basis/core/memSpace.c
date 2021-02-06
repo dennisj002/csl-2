@@ -920,6 +920,11 @@ Word_Recycle ( Word * w )
     w->W_ObjectAttributes &= ~ ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ;
 }
 
+void dbg_new ( Word * w )
+{
+    if ( (uint64) w == 0x7ffff4928020 ) 
+        Printf ( "\n got it at %s", Context_Location () ) ;
+}
 void
 _CheckRecycleWord ( Word * w )
 {
@@ -927,6 +932,7 @@ _CheckRecycleWord ( Word * w )
     {
         if ( _O_->Verbosity > 2 ) _Printf ( "\n_CheckRecycleWord : recycling : %s%s%s",
             w->S_ContainingNamespace ? w->S_ContainingNamespace->Name : ( byte* ) "", w->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", w->Name ) ; //, Pause () ;
+        Word_Recycle ( w ) ;
     }
 }
 

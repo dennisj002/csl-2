@@ -4,7 +4,7 @@ void
 CSL_DoWord ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
+    if ( word && word->Name ) Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }
 
 void

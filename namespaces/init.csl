@@ -435,7 +435,7 @@ Root
     
 dbgOff
 //dbgOn 
-verbosity 2 = cOn d: minc cOff
+//vb2 cOn d: minc cOff
 // === controls ===
 
 #if Is_DebugOn forStarters ||

@@ -55,8 +55,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
         }
         else wordp = word0 ;
         if ( ( word0->W_MorphismAttributes & ( DEBUG_WORD | INTERPRET_DBG ) ) || (
-            //word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) || GetState ( _Context_, CONTEXT_PREPROCESSOR_MODE ) ) return word0 ;
-            word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
+            word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) || GetState ( _Context_, CONTEXT_PREPROCESSOR_MODE ) ) return word0 ;
         Lexer_Set_ScIndex_RlIndex ( _Lexer_, wordp, tsrli, scwi ) ;
         CSL_WordList_PushWord ( wordp ) ;
     }
