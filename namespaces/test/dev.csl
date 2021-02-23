@@ -386,7 +386,7 @@ c_syntaxOff
 dup p 6765 _assert sp //pause
 //"cfib_O3" ffx 
 "cfib2_O3" ffx 
-"fibPTC4?" ffx pause
+"fibPTC4?" ffx //pause
 : sp ;
 sp
 

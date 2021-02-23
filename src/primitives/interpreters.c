@@ -35,29 +35,6 @@ CSL_ParenthesisComment ( )
 }
 
 void
-CSL_Define ( )
-{
-    Context * cntx = _Context_ ;
-    Interpreter * interp = cntx->Interpreter0 ;
-    Word * word ;
-    SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
-    CSL_Colon ( ) ;
-    Interpret_ToEndOfLine ( interp ) ;
-    int64 locals = Compiler_IsFrameNecessary ( _Compiler_ ) ;
-    SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
-    CSL_SemiColon ( ) ;
-    if ( locals ) CSL_Prefix ( ) ; // if we have local variables make it a prefix word ; maybe : if ( GetState ( _Context_, C_SYNTAX ) ) 
-    else
-    {
-        word = _CSL_->LastFinished_Word ;
-        if ( word ) word->W_ObjectAttributes |= ( LITERAL | CONSTANT ) ;
-    }
-    CSL_Inline ( ) ;
-    CSL_SaveDebugInfo ( _CSL_->LastFinished_Word, 0 ) ; // how would this kind of thing work with an inline word??
-    CSL_SourceCode_Init ( ) ; //don't leave the define in sc
-}
-
-void
 CSL_Interpreter_IsDone ( )
 {
     DataStack_Push ( GetState ( _Context_->Interpreter0, END_OF_FILE | END_OF_STRING | INTERPRETER_DONE ) ) ;

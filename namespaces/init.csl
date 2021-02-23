@@ -419,8 +419,8 @@ lispOff
 : mrm mem rdi mem ; 
 : mem2 verbosity 2 = mem verbosity 1 = ; 
 : typesInclude "namespaces/types.csl" include ;
-: minc stack _c_syntaxOn "/home/dennisj/csl-code/archive/maru-2.4/eval.c" include ;
-
+: minc vb2 _c_syntaxOn "/home/dennisj/csl-code/archive/maru-2.4/eval.c" include ;
+: minc2 vb2 cOn includesOnlyOn minc cOff includesOnlyOff ;
 // === controls ===
 Root 
 
@@ -435,7 +435,7 @@ Root
     
 dbgOff
 //dbgOn 
-//vb2 cOn d: minc cOff
+//d: minc2
 // === controls ===
 
 #if Is_DebugOn forStarters ||

@@ -395,4 +395,15 @@ _CSL_FinishWordDebugInfo ( Word * word )
     else CSL_SaveDebugInfo ( word, 0 ) ;
 }
 
+void
+CSL_PP_IncludeFileOnly_On ()
+{
+    SetState ( _CSL_, PP_INCLUDE_FILES_ONLY, true ) ;
+}
+
+void
+CSL_PP_IncludeFileOnly_Off ()
+{
+    SetState ( _CSL_, PP_INCLUDE_FILES_ONLY, false ) ;
+}
 

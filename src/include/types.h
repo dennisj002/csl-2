@@ -449,11 +449,6 @@ typedef struct _WordData
 #define W_TypeSignatureString W_WordData->TypeSignature
 #define W_TypeObjectsNamespaces W_WordData->TypeObjectsNamespaces
 #define NamespaceStack W_WordData->WD_NamespaceStack
-typedef struct
-{
-    Symbol P_Symbol ;
-    slot P_Attributes ;
-} Attribute ;
 
 struct NamedByteArray ;
 typedef struct
@@ -507,11 +502,6 @@ typedef struct
     Word * LogicCodeWord ;
     Namespace * BI_LocalsNamespace ;
 } BlockInfo ;
-typedef struct
-{
-    uint64 State ;
-    int64 OutputLineCharacterNumber ;
-} PrintStateInfo ;
 typedef struct
 {
     int64 State ;
@@ -880,7 +870,8 @@ typedef struct _CSL
     uint64 State, SavedState, * SaveDsp ;
     int64 InitSessionCoreTimes, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount, DebugLevel ; // SC_Index == SC_Buffer Index ;
     Stack *ReturnStack, * DataStack ;
-    Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace, *C_Preprocessor_IncludeDirectory_List_Namespace ; 
+    Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace, 
+            *C_Preprocessor_IncludeDirectory_SearchList, *C_Preprocessor_IncludedList ; 
     Context * Context0 ;
     Stack * ContextStack, * TypeWordStack ;
     Debugger * Debugger0 ;
@@ -967,7 +958,6 @@ typedef struct
     ByteArray * CodeByteArray ; // a variable
     Boolean LogFlag ;
 
-    PrintStateInfo *psi_PrintStateInfo ;
     int64 SignalExceptionsHandled, LastRestartCondition, RestartCondition, Signal, ExceptionCode, Console ;
 
     byte *InitString, *StartupString, *StartupFilename, *ErrorFilename, *VersionString, *ExceptionMessage, *ExceptionSpecialMessage, * ExceptionToken ;

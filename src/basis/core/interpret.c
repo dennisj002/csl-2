@@ -43,6 +43,18 @@ Interpreter_InterpretNextToken ( Interpreter * interp )
     Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
 }
 
+void
+Interpreter_InterpretSelectedTokens ( Interpreter * interp )
+{
+    ReadLiner * rl = _ReadLiner_ ;
+    byte * token = Lexer_ReadToken ( _Lexer_ ) ;
+    //Printf ( (byte*) "\nInterpreter_InterpretNextToken : token = %s", token ) ;
+    if ( String_Equal ( "#", token ) && ( rl->ReadIndex == 1 ) )
+    {
+        Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
+    }
+}
+
 Word *
 Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, int64 scwi )
 {

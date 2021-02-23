@@ -19,14 +19,12 @@ _DLList_FindName_InOneNamespaceList ( dllist * list, byte * name )
 Symbol *
 DLList_FindName_InOneNamespace ( Namespace * ns, byte * name )
 {
-#if 0    
-    Symbol * s = ( Symbol* ) Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) ns->W_List ),
-        ( MapFunction_1 ) _Symbol_CompareName, ( int64 ) name ) ;
-    if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace_TwoArgs ( _CSL_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
-    return s ;
-#endif    
-    Symbol * s = DLList_FindName_InOneNamespaceList ( ( dllist* ) ns->W_List, name ) ;
-    if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace_TwoArgs ( _CSL_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
+    Symbol * s = 0 ;
+    if ( ns && name )
+    {
+        s = DLList_FindName_InOneNamespaceList ( ( dllist* ) ns->W_List, name ) ;
+        if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace_TwoArgs ( _CSL_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
+    }
     return s ;
 }
 
@@ -150,7 +148,7 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, Boolean saveQns )
             {
                 rword = _Finder_FindWord_InOneNamespace ( finder, Word_UnAlias ( finder->QualifyingNamespace ), name ) ;
                 if ( rword && ( rword->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( finder, rword ) ;
-                else if ( ( ! saveQns ) &&( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) ) 
+                else if ( ( ! saveQns ) &&( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) )
                     Finder_ClearQualifyingNamespace ( finder ) ; // nb. QualifyingNamespace is only good for one find unless we are in a quid
             }
         }

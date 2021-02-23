@@ -422,8 +422,10 @@ Lexer_UnAppendCharacterToTokenBuffer ( Lexer * lexer )
 byte
 Lexer_LastChar ( Lexer * lexer )
 {
-
-    return lexer->TokenBuffer [ lexer->TokenWriteIndex - 1 ] ;
+    ReadLiner * rl = lexer->ReadLiner0 ;
+    //return lexer->TokenBuffer [ lexer->TokenWriteIndex - 1 ] ;
+    byte lastChar = rl->InputLine [ rl->ReadIndex - 2 ] ;
+    return lastChar ;
 }
 
 void
@@ -991,7 +993,6 @@ NewLine ( Lexer * lexer )
     }
     else
     {
-
         SetState ( lexer, LEXER_END_OF_LINE, true ) ;
         Lexer_Default ( lexer ) ;
     }
@@ -1007,7 +1008,7 @@ _EOF ( Lexer * lexer ) // case eof:
 void
 _Zero ( Lexer * lexer ) // case 0
 {
-
+    //SetState ( lexer, LEXER_DONE | END_OF_STRING | LEXER_END_OF_LINE | END_OF_FILE, true ) ;
     SetState ( lexer, LEXER_DONE | END_OF_STRING | END_OF_FILE, true ) ;
 }
 

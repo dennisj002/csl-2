@@ -4,15 +4,14 @@
 void
 _CSL_Colon ( Boolean initSC )
 {
-    //CSL_DeleteWordDebugInfo ( _CSL_->LastFinished_Word ) ;
     CSL_RightBracket ( ) ;
     if ( initSC ) CSL_SourceCode_Init ( ) ;
     CSL_Token ( ) ;
     CSL_Word_New ( ) ;
     CSL_BeginBlock ( ) ;
 
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-    if ( ( _String_EqualSingleCharString ( token, '(' ) ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) )
+    byte c = Lexer_NextPrintChar ( _Lexer_ ) ;
+    if ( ( c == '(' ) && ( ! GetState ( _Interpreter_, PREPROCESSOR_DEFINE ) ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;
         CSL_LocalsAndStackVariablesBegin ( ) ;

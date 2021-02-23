@@ -720,6 +720,9 @@ typedef struct
 #define SCA_ON ( (uint64) 1 << 29 )
 #define TYPECHECK_ON ( (uint64) 1 << 30 )
 #define RT_DEBUG_ON ( (uint64) 1 << 31 ) // Runtime Debug
+// CSL state flags
+#define PP_INCLUDE_FILES_ONLY ( (uint64) 1 << 32 )
+
 
 // interpreter flags
 #define INTERPRETER_DONE ( (uint64) 1 << 28 )

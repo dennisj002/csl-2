@@ -122,9 +122,9 @@ _Context_Run ( Context * cntx, ContextFunction contextFunction )
 Context *
 CSL_Context_PushNew ( CSL * csl )
 {
-    _Stack_Push ( csl->ContextStack, ( int64 ) csl->Context0 ) ;
     uint64 svState = csl->Context0->State ;
-    Context * cntx = _Context_New ( csl ) ;
+    _Stack_Push ( csl->ContextStack, ( int64 ) csl->Context0 ) ;
+     Context * cntx = _Context_New ( csl ) ;
     cntx->State = svState ;
     return cntx ;
 }
@@ -218,7 +218,8 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             ReadLine_ReadFileIntoAString ( rl, file ) ;
             fclose ( file ) ;
 
-            if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
+            if ( interpretFlag == 1 ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
+            else if ( interpretFlag == 2 ) Interpret_UntilFlagged2WithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
 
             cntx->System0->IncludeFileStackNumber -- ;
             if ( _O_->Verbosity > 2 ) Printf ( "\n%s included\n", filename ) ;

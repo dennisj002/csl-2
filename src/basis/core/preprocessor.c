@@ -7,15 +7,28 @@ CSL_PreProcessor ( )
     Lexer * lexer = _Lexer_ ;
     Interpreter * interp = _Context_->Interpreter0 ;
     int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
+    Word * ppword ;
     Lexer_SourceCodeOff ( lexer ) ;
     _CSL_UnAppendFromSourceCode_NChars ( _CSL_, 1 ) ; // 1 : '#'
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
     uint64 *svStackPointer = GetDataStackPointer ( ) ;
     byte * token = Lexer_ReadToken ( lexer ) ;
-    Word * ppword = _Finder_FindWord_InOneNamespace ( _Finder_, Namespace_Find ( ( byte* ) "PreProcessor" ), token ) ;
-    Interpreter_DoWord ( interp, ppword, - 1, - 1 ) ;
+    if ( GetState ( _CSL_, PP_INCLUDE_FILES_ONLY ) )
+    {
+        if ( String_Equal ( token, "include" ) )
+        {
+            ppword = _Finder_FindWord_InOneNamespace ( _Finder_, Namespace_Find ( ( byte* ) "PreProcessor" ), token ) ;
+            Interpreter_DoWord ( interp, ppword, - 1, - 1 ) ;
+        }
+    }
+    else
+    {
+        ppword = _Finder_FindWord_InOneNamespace ( _Finder_, Namespace_Find ( ( byte* ) "PreProcessor" ), token ) ;
+        Interpreter_DoWord ( interp, ppword, - 1, - 1 ) ;
+    }
     SetState ( interp, PREPROCESSOR_MODE, false ) ;
     if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
+    CSL_TypeStackReset ( ) ;
     SetDataStackPointer ( svStackPointer ) ;
 }
 
@@ -295,7 +308,7 @@ CSL_Endif_ConditionalInterpret ( )
 void
 CSL_IfDef_Preprocessor ( )
 {
-    if ( ( ! _CSL_Defined ( ) ) && ( ! GetIfStatus ( ) ) ) SkipPreprocessorCode ( PP_IFDEF ) ;
+    if ( ( ! _CSL_Defined ( ) ) && ( ! GetIfStatus ( ) ) ) SkipPreprocessorCode ( PP_SKIP ) ; //PP_IFDEF ) ;
 }
 
 void
@@ -305,16 +318,24 @@ CSL_Ifndef_Preprocessor ( )
 }
 
 void
-AddDirectoriesToPreprocessor_IncludeDirectory_List ( )
+AddFilenameTo_C_Preprocessor_IncludedList ( byte * name )
 {
-    Namespace * ns = _CSL_->C_Preprocessor_IncludeDirectory_List_Namespace ;
-    if ( ! ns ) ns = _CSL_->C_Preprocessor_IncludeDirectory_List_Namespace = _Namespace_New ( "cpidln", 0 ) ;
+    Namespace * ns = _CSL_->C_Preprocessor_IncludedList ;
+    if ( ! ns ) ns = _CSL_->C_Preprocessor_IncludedList = _Namespace_New ( "cpidsl", 0 ) ;
+    _Word_New ( name, 0, 0, 0, 0, ns, DICTIONARY ) ;
+}
+
+void
+AddDirectoriesToPreprocessor_IncludeDirectory_SearchList ( )
+{
+    Namespace * ns = _CSL_->C_Preprocessor_IncludeDirectory_SearchList ;
+    if ( ! ns ) ns = _CSL_->C_Preprocessor_IncludeDirectory_SearchList = _Namespace_New ( "cpidsl", 0 ) ;
     _Word_New ( "/usr/local/include/", 0, 0, 0, 0, ns, DICTIONARY ) ;
     _Word_New ( "/usr/include/", 0, 0, 0, 0, ns, DICTIONARY ) ;
 }
 
 byte *
-CheckFilename ( Symbol * symbol, byte * fname )
+CheckFilenameExists ( Symbol * symbol, byte * fname )
 {
     byte * fn = ( char* ) Buffer_Data_Cleared ( _CSL_->ScratchB4 ) ;
     strncpy ( fn, symbol->Name, BUFFER_SIZE ) ;
@@ -322,6 +343,43 @@ CheckFilename ( Symbol * symbol, byte * fname )
     FILE * file = fopen ( ( char* ) fn, "r" ) ;
     if ( file ) return fn ;
     else return 0 ;
+}
+
+void
+CSL_PP_Define ( )
+{
+    Context * cntx = _Context_ ;
+    Interpreter * interp = cntx->Interpreter0 ;
+    ReadLiner * rl = cntx->ReadLiner0 ;
+    Word * word ;
+    SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
+    CSL_Colon ( ) ;
+#if 1    
+    Interpret_ToEndOfLine ( interp ) ;
+    int64 locals = Compiler_IsFrameNecessary ( _Compiler_ ) ;
+#else    
+    int64 locals = (int64) _Compiler_->LocalsNamespace ; //Compiler_IsFrameNecessary ( _Compiler_ ) ;
+    if ( locals ) Interpret_ToEndOfLine ( interp ) ;
+    else
+    {
+        byte * token = String_New ( &rl->InputLine [ rl->ReadIndex ], DICTIONARY ) ;
+        String_RemoveFinalNewline ( token ) ;
+        //ReadLiner_CommentToEndOfLine ( _Context_->ReadLiner0 ) ;
+        CSL_CommentToEndOfLine ( ) ; 
+        Interpreter_InterpretAToken ( _Interpreter_, token, - 1, - 1 ) ;
+    }
+#endif    
+    SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
+    CSL_SemiColon ( ) ;
+    if ( locals ) CSL_Prefix ( ) ; // if we have local variables make it a prefix word ; maybe : if ( GetState ( _Context_, C_SYNTAX ) ) 
+    else
+    {
+        word = _CSL_->LastFinished_Word ;
+        if ( word ) word->W_ObjectAttributes |= ( LITERAL | CONSTANT ) ;
+    }
+    CSL_Inline ( ) ;
+    CSL_SaveDebugInfo ( _CSL_->LastFinished_Word, 0 ) ; // how would this kind of thing work with an inline word??
+    CSL_SourceCode_Init ( ) ; //don't leave the define in sc
 }
 
 int64
@@ -350,21 +408,39 @@ CSL_Defined ( )
 void
 CSL_Include_PreProcessor ( )
 {
-    FILE * file ;
     char * _filename = ( char* ) _CSL_FilenameToken ( ), *fn = ( char* ) Buffer_Data_Cleared ( _CSL_->ScratchB5 ), *filename, *afn ;
+    //char * _filename = ( char* ) _CSL_Token ( ), *fn = ( char* ) Buffer_Data_Cleared ( _CSL_->ScratchB5 ), *filename, *afn ;
     strncpy ( fn, _filename, BUFFER_SIZE ) ;
-    CSL_CommentToEndOfLine ( ) ; // shouldn't be anything after the filename but if there is ignore it
     if ( fn [0] == '<' )
     {
-        if ( ! _CSL_->C_Preprocessor_IncludeDirectory_List_Namespace ) AddDirectoriesToPreprocessor_IncludeDirectory_List ( ) ;
+        if ( ! _CSL_->C_Preprocessor_IncludeDirectory_SearchList ) AddDirectoriesToPreprocessor_IncludeDirectory_SearchList ( ) ;
         fn [strlen ( ( char* ) fn ) - 1] = 0 ;
         filename = & fn[1] ;
-        dllist * dirl = _CSL_->C_Preprocessor_IncludeDirectory_List_Namespace->W_List ;
-        afn = ( byte* ) dllist_Map1_WReturn ( dirl, ( MapFunction1 ) CheckFilename, ( int64 ) filename ) ;
+        dllist * dirl = _CSL_->C_Preprocessor_IncludeDirectory_SearchList->W_List ;
+        afn = ( byte* ) dllist_Map1_WReturn ( dirl, ( MapFunction1 ) CheckFilenameExists, ( int64 ) filename ) ;
     }
-    else afn = filename ;
+    else if ( fn[0] = '\"' )
+    {
+        Interpreter_InterpretAToken ( _Interpreter_, fn, - 1, - 1 ) ;
+        afn = ( char* ) DataStack_Pop ( ) ;
+        CSL_CommentToEndOfLine ( ) ; // shouldn't be anything after the filename but if there is ignore it
+    }
+    else afn = fn ;
     CSL_C_Syntax_On ( ) ;
-    if ( VERBOSITY > 1 ) Printf ( ( byte* ) "\nEntering : %s at %s", afn, Context_Location ( ) ) ;
-    _CSL_ContextNew_IncludeFile ( afn ) ;
+    if ( afn )
+    {
+        uint64 *svStackPointer = GetDataStackPointer ( ) ;
+        if ( GetState ( _CSL_, PP_INCLUDE_FILES_ONLY ) )
+        {
+            if ( ! DLList_FindName_InOneNamespace ( _CSL_->C_Preprocessor_IncludedList, afn ) )
+            {
+                if ( VERBOSITY > 1 ) Printf ( ( byte* ) "\nEntering : %s at %s", afn, Context_Location ( ) ) ;
+                AddFilenameTo_C_Preprocessor_IncludedList ( afn ) ;
+                _CSL_Contex_NewRun_2 ( _CSL_, _Context_IncludeFile, afn, 2 ) ;
+            }
+        }
+        else _CSL_ContextNew_IncludeFile ( afn ) ;
+        SetDataStackPointer ( svStackPointer ) ;
+    }
 }
 

@@ -125,32 +125,17 @@ _Interpret_Until_Including_Token ( Interpreter * interp, byte * end, byte * deli
     }
 }
 
-#if 0
-byte *
-_Interpret_Until_NotIncluding_Token ( Interpreter * interp, byte * end, byte * delimiters )
-{
-    byte * token ;
-    while ( token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) )
-    {
-        if ( String_Equal ( ( char* ) token, end ) ) return token ;
-        Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-    }
-}
-
-void
-Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
-{
-    int64 svscwi = _CSL_->SC_Index ;
-    Interpret_Until_Token ( interp, end, delimiters ) ;
-    SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
-    if ( prefixFunction ) Interpreter_DoWord_Default ( interp, prefixFunction, - 1, svscwi ) ;
-}
-#endif
-
 void
 Interpret_UntilFlagged ( Interpreter * interp, int64 doneFlags )
 {
     do Interpreter_InterpretNextToken ( interp ) ;
+    while ( ( ! Interpreter_IsDone ( interp, doneFlags ) ) ) ;
+}
+
+void
+Interpret_UntilFlagged2 ( Interpreter * interp, int64 doneFlags )
+{
+    do Interpreter_InterpretSelectedTokens ( interp ) ;
     while ( ( ! Interpreter_IsDone ( interp, doneFlags ) ) ) ;
 }
 
@@ -160,9 +145,9 @@ Interpret_ToEndOfLine ( Interpreter * interp )
     ReadLiner * rl = interp->ReadLiner0 ;
     do
     {
-        Interpreter_InterpretNextToken ( interp ) ;
-        if ( GetState ( interp->Lexer0, LEXER_END_OF_LINE ) ) break ; // either the lexer with get a newline or the readLiner
+        if ( GetState ( interp->Lexer0, (LEXER_END_OF_LINE|END_OF_STRING) ) ) break ; // either the lexer will get a newline or the readLiner
         if ( ReadLine_AreWeAtNewlineAfterSpaces ( rl ) ) break ;
+        Interpreter_InterpretNextToken ( interp ) ;
     }
     while ( ( ! Interpreter_IsDone ( interp, END_OF_FILE | END_OF_STRING ) ) ) ;
 }
@@ -172,6 +157,13 @@ Interpret_UntilFlaggedWithInit ( Interpreter * interp, int64 doneFlags )
 {
     Interpreter_Init ( interp ) ;
     Interpret_UntilFlagged ( interp, doneFlags ) ;
+}
+
+void
+Interpret_UntilFlagged2WithInit ( Interpreter * interp, int64 doneFlags )
+{
+    Interpreter_Init ( interp ) ;
+    Interpret_UntilFlagged2 ( interp, doneFlags ) ;
 }
 
 void

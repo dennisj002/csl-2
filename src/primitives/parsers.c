@@ -1,6 +1,13 @@
 
 #include "../include/csl.h"
 
+byte *
+_CSL_Token ( )
+{
+    byte * token = Lexer_ReadToken ( _Lexer_ ) ;
+    return token ;
+}
+
 void
 CSL_Token ( )
 {

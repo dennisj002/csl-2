@@ -617,10 +617,11 @@ byte *
 String_New ( byte * string, uint64 allocType )
 {
     byte * newString ;
+    int slen ;
     if ( string )
     {
-        newString = Mem_Allocate ( Strlen ( ( char* ) string ) + 1, allocType ) ;
-        strcpy ( ( char* ) newString, ( char* ) string ) ;
+        newString = Mem_Allocate ( slen = Strlen ( ( char* ) string ) + 1, allocType ) ;
+        strncpy ( ( char* ) newString, ( char* ) string, slen ) ;
         return newString ;
     }
     return 0 ;
