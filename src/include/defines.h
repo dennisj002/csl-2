@@ -10,6 +10,11 @@
 #define DSP_IS_GLOBAL_REGISTER 1 
 #endif
 #define EXPERIMENTAL true
+#if 0
+#define NEW_INTERPRET true
+#else
+#define NEW_INTERPRET false 
+#endif
 
 #if DEBUG 
 #define D( x ) x
@@ -898,6 +903,8 @@ typedef struct
 // OpenVmTil State defines
 #define OVT_IN_USEFUL_DIRECTORY     ( (uint64) 1 << 0 )
 #define OVT_PAUSE                   ( (uint64) 1 << 1 )
+#define OVT_THROW                   ( (uint64) 1 << 2 )
+#define OVT_FRC                   ( (uint64) 1 << 3 )
 
 // tree node states
 // #define GONE_DEPTH 
@@ -948,6 +955,21 @@ typedef struct
 
 #define T_WORD                  ( (uint8) 1 << 0 )
 #define T_PREPROCESSOR          ( (uint8) 1 << 1 )   
+
+// Interpreter Infix Module State or input type
+#define IMS_INIT            ( (uint8) 1 << 0 )
+#define IMS_LHS            ( (uint8) 1 << 1 )
+#define IMS_EQUAL       ( (uint8) 1 << 2 )
+#define IMS_OPERAND   ( (uint8) 1 << 3 )
+#define IMS_OP              ( (uint8) 1 << 4 )
+#define IMS_INC_DEC     ( (uint8) 1 << 5 )
+#define IMS_VARIABLE   ( (uint8) 1 << 6 )
+#define IMS_FUNC          ( (uint8) 1 << 7 )
+#define IMS_LPAREN        ( (uint8) 1 << 8 )
+#define IMS_RPAREN        ( (uint8) 1 << 9 )
+#define IMS_LITERAL      ( (uint8) 1 << 10 )
+#define IMS_OP_EQUAL    ( (uint8) 1 << 11 )
+#define IMS_OBJECT    ( (uint8) 1 << 12 )
 
 #if 0
 // abstract types - 't'

@@ -392,6 +392,7 @@ void Interpret_C_Block_BeginBlock(byte *tokenToUse, Boolean insertFlag);
 int64 CSL_Interpret_C_Blocks(int64 blocks, Boolean takesAnElseFlag, Boolean semicolonEndsThisBlock);
 void CSL_C_LeftParen(void);
 void _CSL_C_Infix_EqualOp(block op);
+void Do_IncDec_PostFixList(Word *currentWord, Word *one);
 void CSL_IncDec(int64 op);
 void CSL_C_ConditionalExpression(void);
 Boolean Syntax_AreWeParsingACFunctionCall(Lexer *lexer);
@@ -678,7 +679,7 @@ Word *Interpreter_InterpretAToken(Interpreter *interp, byte *token, int64 tsrli,
 void Interpreter_InterpretNextToken(Interpreter *interp);
 void Interpreter_InterpretSelectedTokens(Interpreter *interp);
 Word *Interpreter_DoWord_Default(Interpreter *interp, Word *word0, int64 tsrli, int64 scwi);
-Word *Interpreter_DoInfixWord(Interpreter *interp, Word *word);
+Word *_Interpreter_DoInfixWord(Interpreter *interp, Word *word);
 Word *_Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 Word *Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 Word *Interpreter_C_PREFIX_RTL_ARGS_Word(Word *word);
@@ -791,6 +792,7 @@ void Stack_Dup(Stack *stack);
 int64 _Stack_IntegrityCheck(Stack *stack);
 int64 _Stack_Depth(Stack *stack);
 int64 Stack_Depth(Stack *stack);
+void Stack_InitQuick(Stack *stack);
 void _Stack_Init(Stack *stack, int64 slots);
 void Stack_Init(Stack *stack);
 Stack *Stack_New(int64 slots, uint64 allocType);
@@ -828,8 +830,8 @@ byte *String_HighlightTokenInputLine(byte *nvw, int64 lef, int64 leftBorder, int
 byte *PSCS_Using_WordSC(byte *scs, byte *token, int64 scswci);
 byte *PSCS_Using_ReadlinerInputString(byte *il, byte *token1, byte *token0, int64 scswci, int64 tvw);
 byte *DBG_PrepareSourceCodeString(Word *word, byte *token0, byte *il, int tvw, int rlIndex, Boolean useScFlag);
-byte *Debugger_PrepareDbgSourceCodeString(Debugger *debugger, Word *word, byte *token, int64 twAlreayUsed);
-void Debugger_ShowInfo_Token(Debugger *debugger, Word *word, byte *prompt, int64 signal, byte *token0, byte *signalAscii);
+byte *CSL_PrepareDbgSourceCodeString(Word *word, byte *token, int64 twAlreayUsed);
+void CSL_ShowInfo_Token(Word *word, byte *prompt, int64 signal, byte *token0, byte *signalAscii);
 void LO_Debug_ExtraShow(int64 showStackFlag, int64 verbosity, int64 wordList, byte *format, ...);
 /* src/basis/core/namespace.c */
 void _Namespace_DoAddSymbol(Namespace *ns, Symbol *symbol);
@@ -1640,6 +1642,7 @@ void Linux_SetInputMode(struct termios *savedTerminalAttributes);
 void _LinuxInit(struct termios *savedTerminalAttributes);
 void LinuxInit(void);
 /* src/basis/exception.c */
+void OVT_CheckThrowState(int64 restartCondition);
 void OVT_Throw(int signal, int64 restartCondition, Boolean pauseFlag);
 void _OpenVmTil_ShowExceptionInfo(void);
 int64 OpenVmTil_ShowExceptionInfo(void);
@@ -1762,8 +1765,9 @@ void Debugger_Exit(Debugger *debugger);
 void Debugger_Wdiss(Debugger *debugger);
 void Debugger_TableSetup(Debugger *debugger);
 /* src/basis/interpreter.c */
+void _Interpreter_Init(Interpreter *interp);
 void Interpreter_Init(Interpreter *interp);
-Interpreter *Interpreter_New(uint64 type);
+Interpreter *Interpreter_New(uint64 allocType);
 void _Interpreter_Copy(Interpreter *interp, Interpreter *interp0);
 Interpreter *Interpreter_Copy(Interpreter *interp0, uint64 type);
 int64 Interpreter_IsDone(Interpreter *interp, uint64 flags);

@@ -568,7 +568,7 @@ typedef struct
     Namespace * QualifyingNamespace ;
 } Finder ;
 
-struct Interpreter ;
+struct _Interpreter ;
 typedef struct SourceCodeInfo
 {
     int64 SciIndex, SciQuoteMode, SciFileIndexScStart, SciFileIndexScEnd ;
@@ -738,7 +738,7 @@ typedef struct
     //TypeDefStructCompileInfo * C_Tdsci ;
     Stack * TDSCI_StructUnionStack ;
 } Compiler ;
-typedef struct Interpreter
+typedef struct _Interpreter
 {
     uint64 State ;
     ReadLiner * ReadLiner0 ;
@@ -750,6 +750,10 @@ typedef struct Interpreter
     Word *CurrentObjectNamespace, *ThisNamespace ;
     int64 WordType ;
     dllist * InterpList ;
+#if NEW_INTERPRET
+    Stack *InfixOpStack ;
+    int64 InfixInterpState ;
+#endif    
 } Interpreter ;
 
 struct _Debugger ;

@@ -247,6 +247,7 @@ TSI_TypeStatus_Print ( TSI *tsi )
     Printf ( "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
         tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
+    Printf ( "%s", CSL_PrepareDbgSourceCodeString ( tsi->OpWord, tsi->OpWord->Name, 0 )) ;
     if ( GetState ( _CSL_, DBG_TYPECHECK_ON ) )
     {
         CSL_TypeStackPrint ( ) ;

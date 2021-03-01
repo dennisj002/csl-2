@@ -52,7 +52,7 @@ Io Int
 "nl" ' newline find alias keyword
 : _logWrite "csl.log" logWrite ;
 : _logAppend "csl.log" logAppend ;
-
+sp
 // aliases 
 User
 "const" ' constant find alias
@@ -109,7 +109,7 @@ User
 : mp ; //mem pause ;
 : sp ; //stack pause ;
 #endif
-
+sp
 Combinators
 "ix" ' call find alias immediate
 "qEval" ' call find alias immediate
@@ -146,7 +146,7 @@ DebugFlag 0 =
 : dbiOn dbi 1 = ;
 : DbiOn dbi 2 = ;
 : dbiOff dbi 0 = ;
-
+sp
 Compiler 
 // nb :: .'"[] :: these five characters - dot, tick, quote left bracket, right bracket - .'"[] - are character macros including the brackets they work at the char level in readline
 // set up some traditional Forth words from internal primitives
@@ -192,7 +192,7 @@ type Boolean ; Boolean.size = 1 ;
 type Pointer ; Pointer.size = 8 ;
 type block ; block.size = 8 ;
 c_syntaxOff
-
+sp
 BigNum
 : fprint space _fprint ;
 'p 'fprint find alias

@@ -204,6 +204,16 @@ Stack_Depth ( Stack * stack )
 }
 
 void
+Stack_InitQuick ( Stack * stack )
+{
+    if ( stack )
+    {
+        stack->InitialTosPointer = & stack->StackData [ - 1 ] ; // first push goes to stack->StackData [ 0 ]
+        stack->StackPointer = stack->InitialTosPointer ;
+    }
+}
+
+void
 _Stack_Init ( Stack * stack, int64 slots )
 {
     if ( stack )
@@ -212,12 +222,12 @@ _Stack_Init ( Stack * stack, int64 slots )
         stack->StackSize = slots ; // re-init size after memset cleared it
         stack->StackMin = & stack->StackData [ 0 ] ; // 
         stack->StackMax = & stack->StackData [ stack->StackSize - 1 ] ;
-        stack->InitialTosPointer = & stack->StackData [ - 1 ] ; // first push goes to stack->StackData [ 0 ]
-        stack->StackPointer = stack->InitialTosPointer ;
+        Stack_InitQuick ( stack ) ;
     }
 }
 
 #if 0
+
 void
 Stack_Delete ( Stack * stack )
 {
@@ -286,7 +296,7 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
                 ( tsl ? "signature " : "" ), c_gd ( ts ) ) ;
         }
     }
-    else string = String_CheckForAtAdddress (( byte* ) stackPointer[i], &_O_->Debug, &_O_->User) ;
+    else string = String_CheckForAtAdddress ( ( byte* ) stackPointer[i], &_O_->Debug, &_O_->User ) ;
     Printf ( "\n  %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
         stackName, i, ( uint64 ) & stackPointer [ i ], stackPointer [ i ], word ? buffer : string ? string : ( byte* ) "" ) ;
 }

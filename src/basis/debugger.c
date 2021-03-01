@@ -206,6 +206,7 @@ Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
         debugger->Key = 0 ;
     }
 
+    Debugger_TerminalLineWidth ( debugger ) ;
     DebugColors ;
     if ( address ) debugger->DebugAddress = address ;
     if ( ! GetState ( debugger, DBG_BRK_INIT ) ) debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;

@@ -127,7 +127,8 @@ Do_Variable ( Word * word )
         if ( CompileMode ) //&& ( ! GetState ( compiler, LC_ARG_PARSING )))
         {
             if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! GetState ( cntx, IS_RVALUE ) )
-                && ( ! compiler->LHS_Word ) && ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) ) compiler->LHS_Word = word ;
+                //&& ( ! compiler->LHS_Word ) && ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) ) compiler->LHS_Word = word ;
+                && ( ! compiler->LHS_Word ) ) compiler->LHS_Word = word ;
             _Do_Compile_Variable ( word ) ;
         }
         else

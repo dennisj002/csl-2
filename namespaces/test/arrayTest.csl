@@ -184,12 +184,6 @@ arr1 arr2 // should print 137
 "\narr1 : " ps location arr1 size @ dump 
 sp
 //pause
-cOn
-// problem with local variables in yada (below) finding this 'b' and 'c'
-void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
-void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 _assert s
-//pause
-cOff
 sp
 : arr2 ( Ar1 a ) 
     //a.b 0x23 = 

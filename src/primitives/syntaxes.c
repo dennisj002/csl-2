@@ -74,12 +74,16 @@ CSL_AddressOf ( )
 void
 CSL_C_Semi ( )
 {
-    _Compiler_->LHS_Word = 0 ;
     if ( ( ! Compiling ) )
     {
         CSL_InitSourceCode ( _CSL_ ) ;
     }
     Context_ClearQidInNamespace ( ) ;
+#if NEW_INTERPRET
+    Interpreter_DoInfixOpStackWord ( ) ;
+    Interpreter_InitInfixModule ( _Interpreter_ ) ; 
+#endif    
+    _Compiler_->LHS_Word = 0 ; // nb. : after NEW_INTERPRET
 }
 
 void

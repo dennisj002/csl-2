@@ -75,7 +75,7 @@ Word_LvalueObjectByteSize ( Word * lvalueWord, Word * rValueWord ) // =
 void
 Do_MoveErrorReport ( int64 value, byte * one, byte * two )
 {
-    byte *buffer = Buffer_Data_QuickReset ( _CSL_->ScratchB3 ) ; 
+    byte *buffer = Buffer_Data_QuickReset ( _CSL_->DebugB3 ) ; 
     snprintf ( buffer, 127, "\n_CSL_Move : Type Error : value == %ld : is greater than %s - max value for sizeof %s", value, one, two ) ;
     Error ( buffer, QUIT ) ;
 }

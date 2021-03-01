@@ -1,9 +1,14 @@
 5
-: sp ; //stack pause ;
+#if 0
+: sp stack pause ; 
+#else
+: sp ; //stack pause ; 
+#endif
 sp
 Int 
 //dbgOff 
 C
+//infixOff
 //jcc8_Off
 // testing before bignum starts // - tail recursion ideas from http://c2.com/cgi/wiki?TailCallOptimization
 : factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return ( rec @ ) ;
@@ -20,6 +25,8 @@ factorial ( n | rec )
 {
     rec = 1;
     while ( n > 1 ) rec *= (n--) ;
+    //while ( n > 1 ) rec *= n-- ;
+    //d: while ( n > 1 ) rec *= n - 1 ;
     return rec ;
 } 
 c_syntaxOff
@@ -30,12 +37,13 @@ sp
 Combinators
 #if 0
 BigNum 
-//dlsym: mpfr_sum /usr/local/lib/libmpfr.so ; void_return
-dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
+bnInit ( 16 16 )
+dlsym: mpfr_printf /usr/lib/x86_64-linux-gnu/libmpfr.so.6.0.2 ; void_return
 : mpfrp ( value ) mpfr_printf ( "%*.*Rf", 16, 16, value ) ;
 : p mpfrp ;
-: !! qexp p nl ;
-d: 7 !! pause
+//: !! ( n) factorial (n) p nl ;;
+//d: !! (7) pause
+7 p pause
 #endif
 
 

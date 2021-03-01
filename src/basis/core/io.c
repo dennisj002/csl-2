@@ -76,7 +76,7 @@ int64
 Key_Kbhit ( FILE * f )
 {
     int64 key = _Key ( f ) ;
-    if ( ! GetState ( _Debugger_, DBG_STEPPING ) ) Kbhit_Pause ( ) ;
+    if ( _O_ &&  ( ! _O_->SigSegvs ) && ( ! GetState ( _Debugger_, DBG_STEPPING ) ) ) Kbhit_Pause ( ) ;
     return key ;
 }
 

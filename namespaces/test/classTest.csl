@@ -1,4 +1,8 @@
-: sp ; //stack pause ; sp
+#if 0
+: sp stack pause ; 
+#else
+: sp ; //stack pause ; 
+#endif
 /* test comment */ 5  // for stack checking see last lines
 "\nclassTest.csl" ps sp //pause
 #if "_ClassTest_" defined not sp // prevent including this file twice
@@ -10,7 +14,11 @@ Int Logic C
 Compiler
 hex
 Class C
-: sp ; //stack pause ; sp
+#if 0
+: sp stack pause ; 
+#else
+: sp ; //stack pause ; 
+#endif
 
 using
 Class // "class" works like "namespace" so here we switch back to namespace 'Class' else following words would be in class 'Pointer'
@@ -101,7 +109,7 @@ using
     int64 Four ;
     int64 Accum ;
 }; // add seven elements
-
+//s pause
 : init ( this ) 
 //<dbg>
     this.Category 12 =
@@ -157,6 +165,7 @@ using
     this.Category @ dup 12 "\nCategory should be 12 : assert10 =" assert p //_pause // 12
 ;
 ' init find wdiss 
+//s pause        
 sp
 DLListClone 'testClone new 
 "\nthis = " ps this hex p //pause

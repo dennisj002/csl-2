@@ -53,11 +53,11 @@
 #define _GetState( aState, state ) ( (aState) & (state) ) 
 #define GetState( obj, state ) ((obj) && _GetState( (obj)->State, (state) )) 
 #define GetState_TrueFalse( obj, _true, _false )  (obj) ? ( ( (obj)->State & (_true) ) && ( ! ( (obj)->State & (_false) ) ) ) : 0
-#define _SetState( state, newState, flag ) ( ( (flag) > 0 ) ? ( (state) |= (newState) ) : ( (state) &= ~ (newState) ) ) 
+#define _SetStateVar( state, newState, flag ) ( ( (flag) > 0 ) ? ( (state) |= (newState) ) : ( (state) &= ~ (newState) ) ) 
 #define SetState_TrueFalse( obj, _true, _false )  (obj) ? ( ( (obj)->State |= (_true) ), ( (obj)->State &= ~ (_false) ) ) : 0
-#define SetState( obj, state, flag ) (obj) ? _SetState ( ((obj)->State), (state), flag ) : 0
-#define SaveAndSetState( obj, state, flag ) (obj)->SavedState = ((obj)->State & (state)), _SetState ( ((obj)->State), (state), flag )
-#define RestoreSavedState( obj, state ) SetState_TrueFalse ( obj, state, (obj)->SavedState )
+#define SetState( obj, state, flag ) (obj) ? _SetStateVar ( ((obj)->State), (state), flag ) : 0
+#define SaveAndSetState( obj, state, flag ) (obj)->SavedState = ((obj)->State & (state)), _SetStateVar ( ((obj)->State), (state), flag )
+#define RestoreSavedState( obj, state ) SetState ( obj, state, (obj)->SavedState )
 #define Debugger_IsStepping( debugger ) GetState ( debugger, DBG_STEPPING )
 #define Debugger_SetStepping( debugger, flag ) SetState ( debugger, DBG_STEPPING, flag )  
 #define Debugger_SetMenu( debugger, flag ) SetState ( debugger, DBG_MENU, flag )

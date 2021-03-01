@@ -296,14 +296,15 @@ Lexer_IsNextWordLeftParen ( Lexer * lexer )
     else return false ;
 }
 
+#if 0
+
 Boolean
 Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
     if ( ( ! word->Name || ( word->Name[0] == '(' ) ) ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    if ( ( word->W_TypeAttributes & W_PREPROCESSOR ) && ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) )
-        return false ;
-    else if ( ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) && ( ! ( word->W_MorphismAttributes & PREFIX ) ) && ( ! ( word->W_MorphismAttributes & CSL_WORD ) ) ) return false ;
+    else if ( ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) && ( ( word->W_TypeAttributes & W_PREPROCESSOR ) ||
+        ( ! ( word->W_MorphismAttributes & PREFIX ) ) && ( ! ( word->W_MorphismAttributes & CSL_WORD ) ) ) ) return false ;
     else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
         && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) ) )
     {
@@ -312,6 +313,22 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 
     else return false ;
 }
+#else
+
+Boolean
+Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
+{
+    if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
+    else if ( ( ( ! word->Name || ( word->Name[0] == '(' ) ) ) || ( ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) && ( ( word->W_TypeAttributes & W_PREPROCESSOR ) ||
+        ( ! ( word->W_MorphismAttributes & PREFIX ) ) && ( ! ( word->W_MorphismAttributes & CSL_WORD ) ) ) ) ) return false ;
+    else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
+        && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) ) )
+    {
+        return Lexer_IsNextWordLeftParen ( lexer ) ;
+    }
+    else return false ;
+}
+#endif
 
 byte *
 Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svReadIndexFlag )
@@ -328,14 +345,12 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
 void
 _Lexer_DoChar ( Lexer * lexer, byte c )
 {
-
     _CSL_->LexerCharacterFunctionTable [ _CSL_->LexerCharacterTypeTable [ c ].CharInfo ] ( lexer ) ;
 }
 
 void
 Lexer_DoChar ( Lexer * lexer, byte c )
 {
-
     lexer->TokenInputByte = c ;
     _Lexer_DoChar ( lexer, c ) ;
     lexer->CurrentReadIndex = lexer->ReadLiner0->ReadIndex ;
@@ -344,14 +359,12 @@ Lexer_DoChar ( Lexer * lexer, byte c )
 void
 Lexer_DoNextChar ( Lexer * lexer )
 {
-
     Lexer_DoChar ( lexer, lexer->NextChar ( lexer->ReadLiner0 ) ) ;
 }
 
 void
 Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters )
 {
-
     _Lexer_LexNextToken_WithDelimiters ( lexer, delimiters, 1, 0, 1, 0 ) ;
 }
 

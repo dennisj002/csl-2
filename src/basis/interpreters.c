@@ -155,14 +155,14 @@ Interpret_ToEndOfLine ( Interpreter * interp )
 void
 Interpret_UntilFlaggedWithInit ( Interpreter * interp, int64 doneFlags )
 {
-    Interpreter_Init ( interp ) ;
+    _Interpreter_Init ( interp ) ;
     Interpret_UntilFlagged ( interp, doneFlags ) ;
 }
 
 void
 Interpret_UntilFlagged2WithInit ( Interpreter * interp, int64 doneFlags )
 {
-    Interpreter_Init ( interp ) ;
+    _Interpreter_Init ( interp ) ;
     Interpret_UntilFlagged2 ( interp, doneFlags ) ;
 }
 

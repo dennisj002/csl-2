@@ -31,6 +31,11 @@ CSL_TurnOffBlockCompiler ( )
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
     cntx->LastCompiledWord = cntx->CurrentWordBeingCompiled ;
     cntx->CurrentWordBeingCompiled = 0 ;
+#if 0 //NEW_INTERPRET   
+    Interpreter_DoInfixOpStackWord ( ) ;
+    Interpreter_InitInfixModule ( _Interpreter_ ) ; 
+#endif    
+    compiler->LHS_Word = 0 ;
 }
 
 void
@@ -125,7 +130,7 @@ _CSL_EndBlock1 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     if ( ! Compiler_BlockLevel ( compiler ) ) CSL_FinalizeBlocks ( bi ) ;
-    compiler->LHS_Word = 0 ;
+    //compiler->LHS_Word = 0 ;
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;

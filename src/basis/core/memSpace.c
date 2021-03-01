@@ -155,7 +155,7 @@ void
 OVT_FullRestartCompleteDelete ( )
 {
     Free_OVT_Static_Mem ( ) ;
-    if ( _O_ ) _OpenVmTil_Delete ( _O_ ) ;
+    if ( _O_ && ( _O_->SigSegvs ++ < 2 ) ) _OpenVmTil_Delete ( _O_ ) ;
     _OSMS_ = 0 ;
     _OS_ = 0 ;
     _O_ = 0 ;
@@ -819,7 +819,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     if ( ! vf ) Printf ( c_gu ( "\nIncrease the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
     OVT_CalculateAndShow_TotalNbaAccountedMemAllocated ( ovt, 1 ) ;
     _OVT_ShowPermanentMemList ( ovt ) ;
-    int64 leak = ovt->PermanentMemListRemainingAccounted - (_OS_->TotalMemAllocated - _OS_->TotalMemFreed ) ; //- _OS_->HistoryAllocation ; //sizeof (OVT_Static ) ;
+    int64 leak = ovt->PermanentMemListRemainingAccounted - ( _OS_->TotalMemAllocated - _OS_->TotalMemFreed ) ; //- _OS_->HistoryAllocation ; //sizeof (OVT_Static ) ;
     //int64 leak = ovt->PermanentMemListRemainingAccounted - _OSMS_->OVT_MmapAllocated - (_OS_->TotalMemAllocated - _OS_->TotalMemFreed ) - _OS_->HistoryAllocation ; //sizeof (OVT_Static ) ;
     //int64 leak = (_OSMS_->OVT_MmapAllocated - ovt->PermanentMemListRemainingAccounted) - (_OS_->TotalMemAllocated - _OS_->TotalMemFreed ) - _OS_->HistoryAllocation ; //sizeof (OVT_Static ) ;
     int64 memDiff2 = _OS_->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted ;
@@ -920,11 +920,13 @@ Word_Recycle ( Word * w )
     w->W_ObjectAttributes &= ~ ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ;
 }
 
-void dbg_new ( Word * w )
+void
+dbg_new ( Word * w )
 {
-    if ( (uint64) w == 0x7ffff4928020 ) 
-        Printf ( "\n got it at %s", Context_Location () ) ;
+    if ( ( uint64 ) w == 0x7ffff4928020 )
+        Printf ( "\n got it at %s", Context_Location ( ) ) ;
 }
+
 void
 _CheckRecycleWord ( Word * w )
 {

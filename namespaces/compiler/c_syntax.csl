@@ -132,6 +132,7 @@ chi ( CObj chey0, d | a b c )
 pwi chi
 chi ( chey, 7 ) ;
 //pause
+interpret () ; // from interpreter.csl
 sp
 #if 1
 void
@@ -456,6 +457,7 @@ infixOn
 (1 + 5) / (2 + 1) 2 _assert
 infixOff
 sp
+ihalt
 2 + 7 assertStkChk // stack checking
 sp
 

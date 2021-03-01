@@ -6,7 +6,13 @@ Interpret_DoParenthesizedValue ( )
 {
     Compiler * compiler = _Compiler_ ;
     int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
-    _Interpret_Until_Including_Token ( _Interpreter_, (byte * ) ")", 0 ) ;
+#if NEW_INTERPRET
+    if ( GetState ( _Context_, ( INFIX_MODE | C_SYNTAX ) ) ) Stack_Push ( _Interpreter_->InfixOpStack, ( int64 ) 0 ) ;
+    _Interpret_Until_Including_Token ( _Interpreter_, ( byte * ) ")", 0 ) ;
+    if ( GetState ( _Context_, ( INFIX_MODE | C_SYNTAX ) ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) ) _Stack_Pop ( _Interpreter_->InfixOpStack ) ;
+#else
+    _Interpret_Until_Including_Token ( _Interpreter_, ( byte * ) ")", 0 ) ;
+#endif    
     SetState ( compiler, COMPILE_MODE, svcm ) ;
 }
 
@@ -18,7 +24,8 @@ Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
     //int64 tsrli = - 1, scwi = - 1 ;
     //Word_SetTsrliScwi ( _CSL_->EndBlockWord, tsrli, scwi ) ;
     if ( tokenToUse ) _Debugger_->SubstitutedWord = _CSL_->EndBlockWord ;
-    Interpreter_DoWord_Default ( _Interpreter_, _CSL_->EndBlockWord, -1, -1 ) ;
+    //Interpreter_DoWord_Default ( _Interpreter_, _CSL_->EndBlockWord, - 1, - 1 ) ;
+    Interpreter_DoWord ( _Interpreter_, _CSL_->EndBlockWord, - 1, - 1 ) ;
     _CSL_->EndBlockWord->Name = ( byte* ) "}" ;
     _Debugger_->SubstitutedWord = 0 ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -35,7 +42,9 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     //int64 tsrli = - 1, scwi = - 1 ;
     //Word_SetTsrliScwi ( _CSL_->BeginBlockWord, tsrli, scwi ) ;
     if ( tokenToUse ) _Debugger_->SubstitutedWord = _CSL_->BeginBlockWord ;
-    Interpreter_DoWord_Default ( _Interpreter_, _CSL_->BeginBlockWord, -1, -1) ;
+    //Interpreter_DoWord_Default ( _Interpreter_, _CSL_->BeginBlockWord, - 1, - 1 ) ;
+    Interpreter_DoWord ( _Interpreter_, _CSL_->BeginBlockWord, - 1, - 1 ) ;
+
     _CSL_->BeginBlockWord->Name = ( byte* ) "{" ;
     _Debugger_->SubstitutedWord = 0 ;
     compiler->BeginBlockFlag = false ;
@@ -82,7 +91,7 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                     //CSL_TypeStack_Pop ( ) ; // the logic word
                     //if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
                     byte *token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0, 0 ) ;
-                    if ( token && (!(( String_Equal ( ( char* ) token, ( char* ) "{" ) || ( String_Equal ( ( char* ) token, ( char* ) ";" ) )))))
+                    if ( token && ( ! ( ( String_Equal ( ( char* ) token, ( char* ) "{" ) || ( String_Equal ( ( char* ) token, ( char* ) ";" ) ) ) ) ) )
                     {
                         Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
                         semicolonEndsThisBlock = true ;
@@ -115,6 +124,7 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                 }
                 if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
                 else CSL_C_Semi ( ) ;
+                //else if ( ! semicolonEndsThisBlock ) CSL_C_Semi ( ) ;
                 break ;
             }
             case 'r':
@@ -123,7 +133,7 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                 {
                     CSL_Return ( ) ;
                     continue ;
-                 }
+                }
                 else goto doDefault ;
             }
             case 'e':
@@ -140,11 +150,11 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                         }
                         continue ;
                     }
-                    else _SyntaxError ( (byte * )"Syntax Error : incorrect \"else\" (with no \"if\"?) : ", 1 ) ;
+                    else _SyntaxError ( ( byte * ) "Syntax Error : incorrect \"else\" (with no \"if\"?) : ", 1 ) ;
                 }
                 // ... drop thru to default:
             }
- doDefault:
+doDefault:
             default:
             {
                 word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
@@ -216,11 +226,13 @@ _CSL_C_Infix_EqualOp ( block op )
     word0a = CSL_WordList ( 0 ) ; // rem we just popped a word
     if ( lhsWord )
     {
-        if ( ( lhsWord->W_ObjectAttributes & ( OBJECT | OBJECT_FIELD | THIS | QID ) ) || GetState ( lhsWord, QID ) ) 
+        if ( ( lhsWord->W_ObjectAttributes & ( OBJECT | OBJECT_FIELD | THIS | QID ) ) || GetState ( lhsWord, QID ) )
         {
+#if 0            
             if ( ( ! _String_EqualSingleCharString ( word0a->Name, ']' ) ) &&
                 ( ! ( word0a->W_ObjectAttributes & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) )
                 Compile_TosRmToTOS ( ) ;
+#endif            
             wordr = _CSL_->PokeWord ;
         }
         else
@@ -261,7 +273,18 @@ _CSL_C_Infix_EqualOp ( block op )
     compiler->LHS_Word = 0 ;
     if ( ! Compiling ) CSL_InitSourceCode ( _CSL_ ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
-    
+
+}
+
+void
+Do_IncDec_PostFixList ( Word * currentWord, Word * one )
+{
+    //if ( one ) SetHere (one->Coding, 1) ;
+    // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
+    dllist * postfixList = List_New ( CONTEXT ) ;
+    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, WORD_RECYCLING ) ; // op : setup a prefix inc/dec variable list ??
+    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, WORD_RECYCLING ) ; // variable
+    List_Push_1Value_NewNode_T_WORD ( _Compiler_->PostfixLists, ( int64 ) postfixList, WORD_RECYCLING ) ;
 }
 
 void
@@ -284,12 +307,7 @@ CSL_IncDec ( int64 op ) // ++/--
             _CSL_WordList_PopWords ( 1 ) ; // because we are going to call the opWord in compilable order below 
             if ( GetState ( compiler, ( C_INFIX_EQUAL | DOING_AN_INFIX_WORD | DOING_BEFORE_AN_INFIX_WORD ) ) && GetState ( _CSL_, OPTIMIZE_ON ) && CompileMode )
             {
-                //if ( one ) SetHere (one->Coding, 1) ;
-                // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
-                dllist * postfixList = List_New ( SESSION ) ;
-                List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, WORD_RECYCLING ) ;
-                if ( one ) List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, WORD_RECYCLING ) ;
-                List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, WORD_RECYCLING ) ;
+                Do_IncDec_PostFixList ( currentWord, one ) ;
                 return ;
             }
             else
@@ -311,34 +329,29 @@ CSL_IncDec ( int64 op ) // ++/--
                 {
                     _CSL_WordList_PopWords ( 1 ) ; // op
                     if ( GetState ( _CSL_, OPTIMIZE_ON ) && ( ! two ) ) SetHere ( one->Coding, 1 ) ;
-                    CSL_WordList_PushWord ( one ) ; // variable
-                    dllist * postfixList = List_New ( SESSION ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, WORD_RECYCLING ) ; // op : setup a prefix inc/dec variable list ??
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, WORD_RECYCLING ) ; // variable
-                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, WORD_RECYCLING ) ;
-                    _CSL_WordList_PopWords ( 1 ) ;
+                    //CSL_WordList_PushWord ( one ) ; // variable
+                    Do_IncDec_PostFixList ( currentWord, one ) ;
+                    //_CSL_WordList_PopWords ( 1 ) ;
                     return ;
                 }
             }
         }
         else if ( nextWord && ( nextWord->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) ) // prefix
         {
-            if ( String_Equal ( currentWord->Name, "++" ) ) op = INC ;
-            else op = DEC ;
-            if ( nextWord->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE ) )
-            {
-                _Compile_Group5 ( op, MEM, FP, 0, LocalOrParameterVar_Disp ( nextWord ), 0 ) ;
-            }
+            //if ( nextWord->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE ) )
+            _Compile_Group5 ( op, MEM, FP, 0, LocalOrParameterVar_Disp ( nextWord ), 0 ) ;
+#if 0  // not in use ?!      
             else // crash ; FIXME!!
             {
                 _Compile_Move_Literal_Immediate_To_Reg ( THRU_REG, ( int64 ) nextWord->W_PtrToValue, 0 ) ;
                 Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0, 0 ) ;
                 _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
                 Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0, 0 ) ;
-
             }
+#endif        
             return ;
         }
+#if 0  // not in use ?!      
         else
         {
             if ( GetState ( compiler, C_INFIX_EQUAL ) )
@@ -347,7 +360,7 @@ CSL_IncDec ( int64 op ) // ++/--
                 {
                     int64 i ;
                     Word * word ;
-                    dllist * postfixList = List_New ( SESSION ) ;
+                    dllist * postfixList = List_New ( CONTEXT ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, WORD_RECYCLING ) ; // remember : this will be lifo
                     for ( i = 1 ; word = CSL_WordList ( i ), ( word->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) CSL_WordList ( i ), WORD_RECYCLING ) ;
@@ -357,6 +370,7 @@ CSL_IncDec ( int64 op ) // ++/--
                 }
             }
         }
+#endif        
     }
     _CSL_Do_IncDec ( op ) ;
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
@@ -395,10 +409,10 @@ CSL_C_ConditionalExpression ( )
             Lexer_ReadToken ( _Lexer_ ) ;
             CSL_Else ( ) ;
             //Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
-            Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", "#", 0,  0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+            Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", "#", 0, 0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
             CSL_EndIf ( ) ;
         }
-        else if ( ! String_Equal ( token, "#") ) SyntaxError ( 1 ) ;
+        else if ( ! String_Equal ( token, "#" ) ) SyntaxError ( 1 ) ;
     }
     SetState ( compiler, C_CONDITIONAL_IN, false ) ;
 }

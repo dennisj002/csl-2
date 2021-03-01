@@ -1,5 +1,5 @@
 make install
-#rm bin/csl*
+rm bin/cslo3
 make xz
 cp ../csl.tar.xz ../csl.$1.tar.xz
 cp ../csl.$1.tar.xz ~/backup/csl.$1.tar.xz

@@ -150,7 +150,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
 
-        if ( token0 ) Debugger_ShowInfo_Token (debugger, word, prompt, signal, token0, signalAscii ) ;
+        if ( token0 ) CSL_ShowInfo_Token (word, prompt, signal, token0, signalAscii ) ;
         else
         {
             byte *cc_line = ( char* ) Buffer_Data ( _CSL_->DebugB ) ;
@@ -515,7 +515,7 @@ DBG_PrepareSourceCodeString ( Word * word, byte* token0, byte* il, int tvw, int 
 // lef : left ellipsis flag, ref : right ellipsis flag
 
 byte *
-Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, byte* token, int64 twAlreayUsed )
+CSL_PrepareDbgSourceCodeString (Word * word, byte* token, int64 twAlreayUsed )
 {
     byte * cc_line = ( byte* ) "" ;
     if ( word || token )
@@ -524,9 +524,9 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, byte* to
         byte * il = Buffer_Data_Cleared ( _CSL_->StringInsertB6 ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
        strncpy ( il, rl->InputLineString, BUFFER_IX_SIZE ) ;
         String_RemoveEndWhitespace ( ( byte* ) il ) ;
-        int64 fel, tw, tvw ;
+        int64 fel, tw = GetTerminalWidth ( ), tvw ;
         fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
-        tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
+        //tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
         tvw = tw - ( ( twAlreayUsed > fel ) ? ( twAlreayUsed - fel ) : fel ) ; //subtract the formatting chars which don't add to visible length
         cc_line = DBG_PrepareSourceCodeString ( word, token, il, tvw, word ? word->W_RL_Index : _Lexer_->TokenStart_ReadLineIndex, 0 ) ; //tvw, tvw/2 ) ;// sc : source code ; scwi : source code word index
     }
@@ -534,7 +534,7 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, byte* to
 }
 
 void
-Debugger_ShowInfo_Token (Debugger * debugger, Word * word, byte * prompt, int64 signal, byte * token0, byte * signalAscii )
+CSL_ShowInfo_Token (Word * word, byte * prompt, int64 signal, byte * token0, byte * signalAscii )
 {
     ReadLiner * rl = _ReadLiner_ ;
     char * compileOrInterpret = ( char* ) ( ( signal || ( int64 ) signalAscii[0] ) ?
@@ -573,7 +573,7 @@ Debugger_ShowInfo_Token (Debugger * debugger, Word * word, byte * prompt, int64 
             prompt, signal ? signalAscii : ( byte* ) " ", cc_location, rl->LineNumber, rl->ReadIndex,
             "<literal>", cc_Token ) ; //, _O_->StartedTimes, _O_->SignalExceptionsHandled ) ;
     }
-    byte *cc_line = ( char* ) Debugger_PrepareDbgSourceCodeString ( debugger, word, token1, ( int64 ) Strlen ( obuffer ) ) ;
+    byte *cc_line = ( char* ) CSL_PrepareDbgSourceCodeString (word, token1, ( int64 ) Strlen ( obuffer ) ) ;
     if ( cc_line ) strncat ( obuffer, cc_line, BUFFER_IX_SIZE ) ;
     _Printf ( "%s", obuffer ) ;
 }
