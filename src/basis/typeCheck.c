@@ -157,8 +157,12 @@ TSI_TypeCheckAndInfer ( TSI * tsi )
                 // word0 is closer to top of stack than word1; word1 is lower in the stack than word 0
                 // word1 was parsed and pushed before word0
                 // in the case of equal ('=' : word1 = word0 , word1 word0 = , word0 word1 store) word1 will be a type variable and word0 can be any fixed type
+                if ( Is_DebugOn ) CSL_TypeStackPrint ( ) ;
                 if ( tsi->OpWord->W_MorphismAttributes & CATEGORY_OP_EQUAL )
                 {
+                    //if (  GetState ( _Context_, C_SYNTAX | INFIX_MODE )  )
+                    //    tsi->StackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ -1 ], tsi->StackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ] ; // this idea seems right ??
+                    //else 
                     tsi->StackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ], tsi->StackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ - 1 ] ; // this idea seems right ??
                 }
                 else if ( tsi->OpWord->W_MorphismAttributes & CATEGORY_OP_STORE )
@@ -243,6 +247,7 @@ _TypeMismatch_CheckError_Print ( Word * lvalueWord, Word *rvalueWord, Boolean qu
 void
 TSI_TypeStatus_Print ( TSI *tsi )
 {
+    //CSL_ShowInfo_Token (tsi->OpWord, "", _O_->RestartCondition, tsi->OpWord->Name, "" ) ;
     if ( tsi->TypeErrorStatus & TSE_SIZE_MISMATCH ) _TypeMismatch_CheckError_Print ( tsi->StackWord1, tsi->StackWord0, 0 ) ; //TSI_TypeMismatchError_Print ( tsi ) ;
     Printf ( "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
@@ -280,8 +285,6 @@ TSI_UpdateActualTypeStackRecordingBuffer ( TSI * tsi, Word * word, Boolean prefi
         byte *etlc = Tsi_ExpandTypeLetterCode ( wtlc, tsi->ExpandedTypeCodeBuffer ) ;
         Strncat ( buffer, etlc, 127 ) ;
         if ( prefixWithSeparatorFlag ) strcat ( ( char* ) buffer, ". " ) ;
-        //strncat ( buffer, tsi->ActualTypeStackRecordingBuffer, 128 ) ;
-        //strncpy ( tsi->ActualTypeStackRecordingBuffer, buffer, 128 ) ;
         Strncat ( buffer, atsrb, 127 ) ;
         Strncpy ( atsrb, buffer, 127 ) ;
     }

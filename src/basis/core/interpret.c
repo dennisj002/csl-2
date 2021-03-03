@@ -44,12 +44,12 @@ Interpreter_InterpretNextToken ( Interpreter * interp )
 }
 
 void
-Interpreter_InterpretSelectedTokens ( Interpreter * interp )
+Interpreter_InterpretSelectedTokens ( Interpreter * interp, byte * target )
 {
     ReadLiner * rl = _ReadLiner_ ;
     byte * token = Lexer_ReadToken ( _Lexer_ ) ;
     //Printf ( (byte*) "\nInterpreter_InterpretNextToken : token = %s", token ) ;
-    if ( String_Equal ( "#", token ) && ( rl->ReadIndex == 1 ) )
+    if ( String_Equal ( target, token ) && ( rl->ReadIndex == 1 ) )
     {
         Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
     }
@@ -74,8 +74,7 @@ _Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     if ( GetState ( _Context_, C_SYNTAX ) && ( word->W_MorphismAttributes & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) )
     {
         if ( ( word->W_MorphismAttributes & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
-        token = Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", "#", ( byte* ) " \n\r\t", 0 ) ; // nb : delimiters parameter is necessary
-        //token = Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", 0, 0 ) ;
+        token = Interpret_C_Until_NotIncluding_Token5 (interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) "}", ( byte* ) " \n\r\t", 0 , 1) ; // nb : delimiters parameter is necessary
     }
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
@@ -84,163 +83,6 @@ _Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ;
     return word ;
 }
-#if NEW_INTERPRET
-#if 0
-
-Word *
-Interpreter_DoInfixOpStackWord ( )
-{
-    Interpreter * interp = _Interpreter_ ;
-    Compiler * compiler = _Compiler_ ;
-    Word * rtn ;
-    if ( GetState ( compiler, ( DOING_AN_INFIX_WORD | DOING_BEFORE_AN_INFIX_WORD ) ) || GetState ( compiler, C_INFIX_EQUAL ) )
-    {
-        rtn = 0 ;
-        goto done ;
-    }
-    Word * iopWord = ( Word * ) Stack_Top ( interp->InfixOpStack ) ;
-    if ( iopWord )
-    {
-        SetState ( compiler, DOING_BEFORE_AN_INFIX_WORD, false ) ;
-        if ( ( iopWord->W_MorphismAttributes & C_INFIX_OP_EQUAL ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
-        iopWord = Interpreter_DoWord_Default ( interp, iopWord, iopWord->W_RL_Index, iopWord->W_SC_Index ) ;
-        _Stack_Pop ( interp->InfixOpStack ) ;
-    }
-    rtn = iopWord ;
-done:
-    SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ;
-    return rtn ;
-}
-
-Word *
-Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
-{
-    DEBUG_SETUP ( word, 0 ) ;
-    //if ( ( word->W_MorphismAttributes & (CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | CATEGORY_PLUS_PLUS_MINUS_MINUS) ) ) word = _Interpreter_DoInfixWord ( interp, word ) ;
-    //else
-    {
-        // we assume infix word takes only one following 'arg'
-        if ( word->W_TypeAttributes == WT_INFIXABLE )
-            Stack_Push ( interp->InfixOpStack, ( int64 ) word ) ;
-        else
-        {
-            Compiler * compiler = _Compiler_ ;
-            SetState ( compiler, ( DOING_AN_INFIX_WORD | DOING_BEFORE_AN_INFIX_WORD ), true ) ;
-            word = Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-            Word * iopWord = ( Word * ) Stack_Top ( interp->InfixOpStack ) ;
-            if ( iopWord && ( iopWord->W_MorphismAttributes & C_INFIX_OP_EQUAL ) ) word = Interpreter_DoInfixOpStackWord ( ) ;
-        }
-    }
-    return word ;
-}
-#else
-
-Word *
-Interpreter_DoInfixOpStackWord ( )
-{
-    Interpreter * interp = _Interpreter_ ;
-    Compiler * compiler = _Compiler_ ;
-    Word * iopWord = ( Word * ) Stack_Top ( interp->InfixOpStack ) ;
-    if ( iopWord )
-    {
-        iopWord = Interpreter_DoWord_Default ( interp, iopWord, iopWord->W_RL_Index, iopWord->W_SC_Index ) ;
-        Stack_Pop_WithZeroOnEmpty ( interp->InfixOpStack ) ;
-    }
-    return iopWord ;
-}
-
-Word *
-Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
-{
-    DEBUG_SETUP ( word, 0 ) ;
-    Compiler * compiler = _Compiler_ ;
-    Word * iopWord ;
-    if ( word->W_MorphismAttributes & ( COMBINATOR | BLOCK_DELIMITER | KEYWORD ) ) return 0 ;
-    if ( word->W_MorphismAttributes & ( COMBINATOR | BLOCK_DELIMITER ) ) return 0 ;
-    if ( word->W_MorphismAttributes & LEFT_PAREN ) Stack_Push ( interp->InfixOpStack, 0 ) ;
-    else if ( word->W_MorphismAttributes & RIGHT_PAREN )
-    {
-        iopWord = ( Word * ) Stack_Top ( interp->InfixOpStack ) ;
-        word = Interpreter_DoInfixOpStackWord ( ) ;
-    }
-    else if ( IS_OBJECT_TYPE ( word ) )
-    {
-        if ( interp->InfixInterpState & ( IMS_EQUAL | IMS_OP_EQUAL ) ) word = Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-        else if ( interp->InfixInterpState & ( IMS_INIT | IMS_OP ) )
-        {
-            word = Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-            iopWord = ( Word * ) Stack_Top ( interp->InfixOpStack ) ;
-            word = Interpreter_DoInfixOpStackWord ( ) ;
-        }
-        else if ( interp->InfixInterpState & ( IMS_OBJECT ) )
-        {
-            iopWord = ( Word * ) Stack_Top ( interp->InfixOpStack ) ;
-            word = Interpreter_DoInfixOpStackWord ( ) ;
-        }
-        interp->InfixInterpState = IMS_OBJECT ;
-    }
-    else // IMS_OP | IMS_EQUAL | IMS_OP_EQUAL
-    {
-        if ( word->W_MorphismAttributes & ( CATEGORY_OP_EQUAL ) )
-        {
-            Stack_Push ( interp->InfixOpStack, ( int64 ) word ) ;
-            interp->InfixInterpState = IMS_EQUAL ;
-        }
-        else if ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL ) )
-        {
-            Stack_Push ( interp->InfixOpStack, ( int64 ) word ) ;
-            interp->InfixInterpState = IMS_OP_EQUAL ;
-        }
-        if ( word->W_TypeAttributes == WT_INFIXABLE )
-        {
-            Stack_Push ( interp->InfixOpStack, ( int64 ) word ) ;
-            interp->InfixInterpState |= IMS_OP ;
-        }
-        else
-        {
-            word = _Interpreter_DoPrefixWord ( _Context_, interp, word ) ;
-            interp->InfixInterpState = IMS_OBJECT ;
-        }
-        //return 0 ;
-    }
-    return word ;
-}
-#endif
-
-#elif 0
-
-Word *
-Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
-{
-    Context * cntx = _Context_ ;
-    if ( word->W_TypeAttributes == WT_INFIXABLE )
-        Stack_Push ( interp->InfixOpStack, ( int64 ) word ) ;
-    else
-    {
-        Compiler * compiler = _Compiler_ ;
-        Word * iopWord ; //Boolean flag = false ;
-        SetState ( compiler, ( DOING_AN_INFIX_WORD | DOING_BEFORE_AN_INFIX_WORD ), true ) ;
-#if 0        
-        if ( ( word->Name[0] == ';' ) ) //&& ( GetState ( cntx->Compiler0, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) )
-        {
-            iopWord = ( Word * ) Stack_Top ( interp->InfixOpStack ) ;
-            flag = true ;
-        }
-#endif        
-        word = Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-        //if ( flag == false )
-        iopWord = ( Word * ) Stack_Top ( interp->InfixOpStack ) ;
-        if ( iopWord && ( ! GetState ( cntx->Compiler0, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) )
-        {
-            if ( ( iopWord->W_MorphismAttributes & C_INFIX_OP_EQUAL ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
-            word = iopWord ;
-            word = Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-            _Stack_Pop ( _Interpreter_->InfixOpStack ) ;
-        }
-        SetState ( compiler, ( DOING_AN_INFIX_WORD | DOING_BEFORE_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ;
-    }
-}
-#endif
 
 Word *
 _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
@@ -267,25 +109,6 @@ Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
     return word ;
 }
 
-#if NEW_INTERPRET
-
-Word *
-Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
-{
-    if ( word )
-    {
-        Context * cntx = _Context_ ;
-        if ( word->W_TypeAttributes == WT_C_PREFIX_RTL_ARGS ) word = Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
-            //else if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, ( INFIX_MODE | C_SYNTAX ) ) ) ) word = Interpreter_DoInfixWord ( interp, word ) ;
-            // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
-        else if ( GetState ( cntx, ( INFIX_MODE | C_SYNTAX ) ) && ( ! ( word->W_MorphismAttributes & COMBINATOR ) ) ) word = Interpreter_DoInfixWord ( interp, word ) ;
-        else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) ) word = _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
-        else return 0 ;
-    }
-    return word ;
-}
-#else
-
 Word *
 Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
 {
@@ -306,7 +129,6 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
     return word ;
 }
 
-#endif
 // four types of words related to syntax
 // 1. regular rpn - reverse polish notation
 // 2. regular prefix : polish, prefix notation where the function precedes the arguments - as in lisp

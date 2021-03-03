@@ -2,6 +2,7 @@
 // TODO : types, database, garbage collection : integration
 typedef char int8 ;
 typedef unsigned char uint8 ;
+typedef uint8 ubyte ;
 typedef uint8 byte ;
 typedef short int16 ;
 typedef unsigned short uint16 ;
@@ -750,10 +751,6 @@ typedef struct _Interpreter
     Word *CurrentObjectNamespace, *ThisNamespace ;
     int64 WordType ;
     dllist * InterpList ;
-#if NEW_INTERPRET
-    Stack *InfixOpStack ;
-    int64 InfixInterpState ;
-#endif    
 } Interpreter ;
 
 struct _Debugger ;

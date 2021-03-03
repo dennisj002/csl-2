@@ -10,11 +10,6 @@
 #define DSP_IS_GLOBAL_REGISTER 1 
 #endif
 #define EXPERIMENTAL true
-#if 0
-#define NEW_INTERPRET true
-#else
-#define NEW_INTERPRET false 
-#endif
 
 #if DEBUG 
 #define D( x ) x

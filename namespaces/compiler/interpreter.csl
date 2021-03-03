@@ -45,7 +45,7 @@ testc1 ()
 testc1 () ; sp 
 #if 1
 C libc
-#if 0
+#if 1
 void
 interpret ( | atoken aword ) 
 {

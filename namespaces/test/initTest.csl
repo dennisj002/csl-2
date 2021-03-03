@@ -60,7 +60,7 @@ C
 : dtestAll cT aT lT loT mT oT x64 cntT ; // for stepping thru test
 : demo! sOn 5 itest ;
 : odemo sOff 5 itest ;
-: demo _TestDone_ @ not { itest } if1 dT rtw ; //dT0 ; 
+: demo 1 ti _TestDone_ @ not { itest } if1 dT rtw 1 time ; //dT0 ; 
 : tdemo ( n ) { n @ } { demo n -- } while ; 
 //' demo wdiss pause
 // : demo dT ;

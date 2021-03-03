@@ -2,7 +2,7 @@
 #include "../include/csl.h"
 
 byte *
-Interpret_C_Until_NotIncluding_Token5 (Interpreter * interp, byte * end1, byte * end2, byte* end3, byte* end4, byte* end5, byte * delimiters, Boolean newlineBreakFlag )
+Interpret_C_Until_NotIncluding_Token5 ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte* end4, byte* end5, byte * delimiters, Boolean newlineBreakFlag, Boolean charsFlag )
 {
     byte * token ;
     int64 inChar ;
@@ -16,14 +16,18 @@ Interpret_C_Until_NotIncluding_Token5 (Interpreter * interp, byte * end1, byte *
         }
         token = _Lexer_ReadToken ( lexer, delimiters ) ;
         List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
-        if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) || String_Equal ( token, end5 ) ) break ;
-        else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && _String_EqualSingleCharString ( token, ')' ) )
+        if ( charsFlag )
+        {
+            if ( ( token[0] == end1[0] ) || ( token[0] == end2[0] ) || ( token[0] == end3[0] ) || ( token[0] == end4[0] ) || ( token[0] == end5[0] ) ) break ;
+        }
+        else if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) || String_Equal ( token, end5 ) ) break ;
+        if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) &&  ( token[0] == ')' ) )
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
             token = 0 ;
             break ;
         }
-        else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || _String_EqualSingleCharString ( token, ';' ) ) )
+        else if ( GetState ( _Context_, C_SYNTAX ) && ( ( token[0] == ',' ) || ( token[0] == ';' ) ) )
         {
             CSL_ArrayModeOff_OptimizeOn ( ) ;
             break ;
@@ -135,7 +139,7 @@ Interpret_UntilFlagged ( Interpreter * interp, int64 doneFlags )
 void
 Interpret_UntilFlagged2 ( Interpreter * interp, int64 doneFlags )
 {
-    do Interpreter_InterpretSelectedTokens ( interp ) ;
+    do Interpreter_InterpretSelectedTokens ( interp, "#" ) ;
     while ( ( ! Interpreter_IsDone ( interp, doneFlags ) ) ) ;
 }
 
@@ -145,7 +149,7 @@ Interpret_ToEndOfLine ( Interpreter * interp )
     ReadLiner * rl = interp->ReadLiner0 ;
     do
     {
-        if ( GetState ( interp->Lexer0, (LEXER_END_OF_LINE|END_OF_STRING) ) ) break ; // either the lexer will get a newline or the readLiner
+        if ( GetState ( interp->Lexer0, ( LEXER_END_OF_LINE | END_OF_STRING ) ) ) break ; // either the lexer will get a newline or the readLiner
         if ( ReadLine_AreWeAtNewlineAfterSpaces ( rl ) ) break ;
         Interpreter_InterpretNextToken ( interp ) ;
     }

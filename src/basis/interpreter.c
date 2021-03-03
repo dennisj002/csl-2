@@ -1,17 +1,6 @@
 
 #include "../include/csl.h"
 
-#if NEW_INTERPRET
-
-void
-Interpreter_InitInfixModule ( Interpreter * interp )
-{
-    //Stack_Init ( interp->InfixOpStack ) ;
-    Stack_InitQuick ( interp->InfixOpStack ) ;
-    interp->InfixInterpState = IMS_INIT ;
-}
-#endif
-
 void
 _Interpreter_Init ( Interpreter * interp )
 {
@@ -23,9 +12,6 @@ void
 Interpreter_Init ( Interpreter * interp )
 {
     _Interpreter_Init ( interp ) ;
-#if NEW_INTERPRET
-    Interpreter_InitInfixModule ( interp ) ;
-#endif    
 }
 
 Interpreter *
@@ -37,9 +23,6 @@ Interpreter_New ( uint64 allocType )
     interp->ReadLiner0 = interp->Lexer0->ReadLiner0 ;
     interp->Finder0 = Finder_New ( allocType ) ;
     interp->Compiler0 = Compiler_New ( allocType ) ;
-#if NEW_INTERPRET
-    interp->InfixOpStack = Stack_New ( 32, allocType ) ;
-#endif    
     _Interpreter_Init ( interp ) ;
     return interp ;
 }

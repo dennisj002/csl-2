@@ -79,11 +79,8 @@ CSL_C_Semi ( )
         CSL_InitSourceCode ( _CSL_ ) ;
     }
     Context_ClearQidInNamespace ( ) ;
-#if NEW_INTERPRET
-    Interpreter_DoInfixOpStackWord ( ) ;
-    Interpreter_InitInfixModule ( _Interpreter_ ) ; 
-#endif    
     _Compiler_->LHS_Word = 0 ; // nb. : after NEW_INTERPRET
+    CSL_TypeStackReset ( ) ;
 }
 
 void
@@ -179,7 +176,6 @@ CSL_For_PrefixCombinators ( )
 {
     Word * currentWord0 = CSL_WordList ( 0 ) ;
     currentWord0->W_SC_Index = _Lexer_->SC_Index ;
-    //_Compiler_->SemicolonEndsThisBlock = true ;
     _Compiler_->TakesLParenAsBlock = true ;
     _Compiler_->BeginBlockFlag = false ;
     CSL_Interpret_C_Blocks ( 4, 0, 1 ) ;
@@ -218,8 +214,4 @@ CSL_TypedefStructEnd ( void )
     Namespace_SetAsNotUsing ( ( byte* ) "C_Typedef" ) ;
     //Compiler_SetAs_InNamespace_C_BackgroundNamespace ( _Compiler_ ) ;
 }
-
-// infix equal is unique in 'C' because the right hand side of '=' runs to the ';'
-
-// type : typedef
 

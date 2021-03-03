@@ -104,6 +104,13 @@ _Compiler_GetCodeSpaceHere ( )
 }
 
 void
+Compiler_Set_LHS ( Word * word )
+{
+    _Compiler_->LHS_Word = word ;
+    CSL_TypeStackReset ( ) ;
+}
+
+void
 Compiler_SetCompilingSpace ( byte * name )
 {
     _Compiler_SetCompilingSpace ( name ) ;

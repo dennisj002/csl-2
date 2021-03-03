@@ -252,7 +252,7 @@ void
 CSL_Do ( )
 {
     CSL_LeftBracket ( ) ; // interpret mode
-    byte * token = Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    byte * token = Interpret_C_Until_NotIncluding_Token5 (_Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 , 0) ;
     _CSL_RightBracket ( ) ;
 }
 
@@ -261,7 +261,7 @@ CSL_Does ( )
 {
     Word * saveWord = _Context_->CurrentWordBeingCompiled ;
     _CSL_RightBracket ( ) ;
-    Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    Interpret_C_Until_NotIncluding_Token5 (_Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 , 0) ;
     _Context_->CurrentWordBeingCompiled = saveWord ;
 }
 
@@ -271,7 +271,7 @@ void
 CSL_Do ( )
 {
     CSL_LeftBracket ( ) ; // interpret mode
-    byte * token = Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0, 0 ) ;
+    byte * token = Interpret_C_Until_NotIncluding_Token5 (_Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0, 0 , 0) ;
     _CSL_RightBracket ( ) ;
 }
 
@@ -281,7 +281,7 @@ CSL_Does ( )
     Word * saveWord = _Context_->CurrentWordBeingCompiled ;
     _CSL_RightBracket ( ) ;
     CSL_BeginBlock ( ) ;
-    byte * token = Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0, 0 ) ;
+    byte * token = Interpret_C_Until_NotIncluding_Token5 (_Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0, 0 , 0) ;
     CSL_EndBlock ( ) ;
     CSL_BlockRun ( ) ;
     if ( _String_EqualSingleCharString ( token, ';' ) ) { DataStack_Push ((int64)_Compiler_->Current_Word_Create) ; Word_DefinitionEqual ( ) ; } // for use with 'create - 'wordNew like ans forth ??
@@ -294,7 +294,7 @@ void
 CSL_Do ( )
 {
     CSL_LeftBracket ( ) ; // interpret mode
-    byte * token = Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    byte * token = Interpret_C_Until_NotIncluding_Token5 (_Interpreter_, ( byte* ) "does>", ( byte* ) "<do", ( byte* ) ";", ( byte* ) ",", 0, 0 , 0) ;
     _CSL_RightBracket ( ) ;
 }
 
@@ -304,7 +304,7 @@ CSL_Does ( )
     Word * saveWord = _Context_->CurrentWordBeingCompiled ;
     _CSL_RightBracket ( ) ;
     CSL_BeginBlock ( ) ;
-    Interpret_C_Until_NotIncluding_Token5 ( _Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 ) ;
+    Interpret_C_Until_NotIncluding_Token5 (_Interpreter_, ( byte* ) "<does", ( byte* ) "<;", ( byte* ) ";", ( byte* ) ",", 0, 0 , 0) ;
     CSL_EndBlock ( ) ;
     CSL_BlockRun ( ) ;
     _Context_->CurrentWordBeingCompiled = saveWord ;

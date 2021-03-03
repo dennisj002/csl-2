@@ -411,7 +411,7 @@ Root
 // rtw : recycle some test/debug words 
 : rtw "test" purgeAll "hi" purge "hey" purge "heey" purgeAll "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
 : tCSL "namespaces/ninit.csl" include ; // namespaces init
-: tc lispOff tCSL rtw ;
+: tc 1 ti lispOff tCSL rtw 1 time ;
 : x64 "namespaces/compiler/x64.csl" include ; 
 : bx "namespaces/test/bigNum.test.csl" include ;
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
@@ -451,7 +451,7 @@ fload test.txt //pause
 //stack pause
 
 #if _doTest
-tc 
+tc
 #endif
 
 #if _doDemo 

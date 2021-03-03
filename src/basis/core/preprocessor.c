@@ -406,7 +406,7 @@ CSL_Defined ( )
 }
 
 void
-CSL_Include_PreProcessor ( )
+CSL_C_Include_PreProcessor ( )
 {
     char * _filename = ( char* ) _CSL_FilenameToken ( ), *fn = ( char* ) Buffer_Data_Cleared ( _CSL_->ScratchB5 ), *filename, *afn ;
     //char * _filename = ( char* ) _CSL_Token ( ), *fn = ( char* ) Buffer_Data_Cleared ( _CSL_->ScratchB5 ), *filename, *afn ;

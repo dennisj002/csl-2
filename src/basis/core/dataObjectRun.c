@@ -16,14 +16,14 @@ Word_ObjectRun ( Word * word )
     {
         Context_GetState ( cntx, word ) ;
 
-        if ( word->W_ObjectAttributes & LOCAL_OBJECT ) CSL_Do_LocalObject ( word) ;
+        if ( word->W_ObjectAttributes & LOCAL_OBJECT ) CSL_Do_LocalObject ( word ) ;
         else if ( ( word->W_LispAttributes & T_LISP_SYMBOL ) || ( word->W_ObjectAttributes & T_LISP_SYMBOL ) ) //lambda variables are parsed as CAttribute & T_LISP_SYMBOL
         {
             if ( ! GetState ( cntx, LC_CSL ) ) CSL_Do_LispSymbol ( word ) ;
-            else CSL_Do_Variable ( word) ;
+            else CSL_Do_Variable ( word ) ;
         }
         else if ( word->W_ObjectAttributes & DOBJECT ) CSL_Do_DynamicObject ( word, ACC ) ;
-        else if ( word->W_ObjectAttributes & OBJECT_FIELD ) CSL_Do_ClassField ( word) ;
+        else if ( word->W_ObjectAttributes & OBJECT_FIELD ) CSL_Do_ClassField ( word ) ;
         else if ( word->W_ObjectAttributes & ( STRUCTURE ) ) CSL_Do_Object ( word ) ;
         else if ( word->W_ObjectAttributes & ( THIS | OBJECT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) CSL_Do_Variable ( word ) ;
         else if ( word->W_ObjectAttributes & ( C_TYPE | C_CLASS ) ) CSL_Do_C_Type ( word ) ;
@@ -76,7 +76,7 @@ _Do_LocalObject_AllocateInit ( Namespace * typeNamespace, byte ** value, int64 s
 }
 
 void
-CSL_Do_LocalObject ( Word * word)
+CSL_Do_LocalObject ( Word * word )
 {
     if ( ( word->W_ObjectAttributes & LOCAL_VARIABLE ) && ( ! GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
     {
@@ -128,7 +128,8 @@ Do_Variable ( Word * word )
         {
             if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! GetState ( cntx, IS_RVALUE ) )
                 //&& ( ! compiler->LHS_Word ) && ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) ) compiler->LHS_Word = word ;
-                && ( ! compiler->LHS_Word ) ) compiler->LHS_Word = word ;
+                && ( ! compiler->LHS_Word ) )
+                Compiler_Set_LHS ( word ) ;
             _Do_Compile_Variable ( word ) ;
         }
         else
@@ -149,7 +150,7 @@ Do_Variable ( Word * word )
                     if ( GetState ( cntx, IS_RVALUE ) ) value = ( int64 ) * word->W_PtrToValue ;
                     else
                     {
-                        if ( ! compiler->LHS_Word ) compiler->LHS_Word = word ;
+                        if ( ! compiler->LHS_Word ) Compiler_Set_LHS ( word ) ;
                         goto done ; // LHS_Word : delayed compile by _CSL_C_Infix_EqualOp
                         //else value = ( int64 ) word->W_PtrToValue ;
                     }
@@ -157,7 +158,7 @@ Do_Variable ( Word * word )
                 else if ( GetState ( cntx, IS_RVALUE ) ) value = word->W_Value ;
                 else value = ( int64 ) word->W_PtrToValue ;
             }
-            if ( GetState ( cntx, IS_REVERSE_DOTTED ) && ( cntx->BaseObject && ( cntx->BaseObject != word ) ) ) TOS = value ; 
+            if ( GetState ( cntx, IS_REVERSE_DOTTED ) && ( cntx->BaseObject && ( cntx->BaseObject != word ) ) ) TOS = value ;
             else DataStack_Push ( value ) ;
         }
 done:
@@ -185,7 +186,7 @@ CSL_Do_Variable ( Word * word )
     }
     if ( ( ! GetState ( compiler, ARRAY_MODE ) ) && ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) && ( ! GetState ( cntx, IS_REVERSE_DOTTED ) ) )
         cntx->BaseObject = 0 ;
-    Do_Variable ( word) ;
+    Do_Variable ( word ) ;
 }
 
 void
@@ -247,7 +248,7 @@ _Compile_C_TypeDeclaration ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     byte * token ;
-    while ( token = Interpret_C_Until_NotIncluding_Token5 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", ( byte* ) "{",  ( byte* ) "}", 0, 0, 0 ) )
+    while ( token = Interpret_C_Until_NotIncluding_Token5 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", ( byte* ) "{", ( byte* ) "}", ( byte* ) "#", 0, 0, 1 ) )
     {
         if ( _String_EqualSingleCharString ( token, ';' ) )
         {
@@ -300,7 +301,7 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
             Ovt_AutoVarOn ( ) ;
             Namespace * ns = Compiler_LocalsNamespace_New ( _Compiler_ ) ;
             word = Lexer_Do_MakeItAutoVar ( _Lexer_, token0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
-            _Compiler_->LHS_Word = word ;
+            Compiler_Set_LHS ( word ) ;
             Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
             _Compile_C_TypeDeclaration ( ) ;
         }
@@ -370,7 +371,7 @@ CSL_Do_ClassField ( Word * word )
     cntx->Interpreter0->CurrentObjectNamespace = word ; // update this namespace 
     compiler->ArrayEnds = 0 ;
 
-    if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! compiler->LHS_Word ) && ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) && ( ! GetState ( cntx, IS_RVALUE ) ) ) compiler->LHS_Word = word ;
+    if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! compiler->LHS_Word ) && ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) && ( ! GetState ( cntx, IS_RVALUE ) ) ) Compiler_Set_LHS ( word ) ;
     if ( word->Offset ) offsetPtr = Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
     if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) ) CSL_Do_AccumulatedAddress ( word, ( byte* ) TOS, word->Offset ) ;
     if ( GetState ( cntx, IS_FORWARD_DOTTED ) ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;

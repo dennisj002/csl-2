@@ -361,8 +361,8 @@ xyxz @ ix
 "\nabove line should show 3 3" ps
 cOn
 infixOn
-void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return x ; } pwi yada yada () ; 7 s _assert s
-void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return x ; } pwi yadaYada yadaYada () ; 7 _assert s
+void yada () { int a = 2, b = 12, x ; x = (( a + b ) / 2 ) ; return (x) ; } pwi yada yada () ; 7 s _assert s
+void yadaYada () { int a, b, x ; a = 2, b = 12 ; x = (( a + b ) / 2 ) ; return  ( x ) ; } pwi yadaYada yadaYada () ; 7 _assert s
 cOff
 //forStarters 1 =
 #endif
@@ -413,6 +413,7 @@ ps ( "\nbt.size =" ) ; p ( bt.size ) ;
 void bttt ( byteTest xbt | btt ) 
 { 
     printf ( "\nbtt" ) ;
+    //d: xbt.a8_123 = 598 ; 
     xbt.a8_123 = 'a' ; 
     btt = xbt.a8_123 ; 
     printf ( "\nbtt = %c", btt ) ; 
