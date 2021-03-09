@@ -9,6 +9,8 @@ Context_PreWordRun_Init ( Context * cntx, Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         if ( ( GetState ( cntx->Compiler0, ( COMPILE_MODE | ASM_MODE ) ) ) ) Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         cntx->CurrentlyRunningWord = word ;
+        //if ( GetState ( _LC_, ( LC_DEFINE_MODE ) ) )
+        //    word->W_MySourceCodeWord = _Context_->CurrentWordBeingCompiled ; 
     }
 }
 
@@ -92,6 +94,7 @@ _Word_Compile ( Word * word )
     if ( ! word->Definition ) CSL_SetupRecursiveCall ( ) ;
     else if ( ( GetState ( _CSL_, INLINE_ON ) ) && ( word->W_MorphismAttributes & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
     else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;
+    word->W_MySourceCodeWord = _Context_->CurrentWordBeingCompiled ;
 }
 
 Namespace *
@@ -106,9 +109,10 @@ _Word_Namespace ( Word * word )
 void
 _Word_Copy ( Word * word, Word * word0 )
 {
-    WordData * swdata = word->W_WordData ;
+    //WordData * swdata = word->W_WordData ;
     MemCpy ( word, word0, sizeof ( Word ) + sizeof ( WordData ) ) ;
-    word->W_WordData = swdata ; // restore the WordData pointer we overwrote by the above MemCpy
+    //word->W_WordData = swdata ; // restore the WordData pointer we overwrote by the above MemCpy
+    word->W_WordData = ( WordData* ) ( word + 1 ) ; //swdata ; // restore the WordData pointer we overwrote by the above MemCpy
 }
 
 Word *
@@ -171,13 +175,9 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
 
     if ( Is_DbiOn && ( ( addToInNs || addToNs ) ) ) //&& word->S_ContainingNamespace ) )//&& String_Equal ("bt", word->Name) )
     {
-        //if ( Is_DbiOn && String_Equal ("locals_0", word->Name) || String_Equal ("bt", word->Name) )
-        //if ( String_Equal ("locals_0", word->Name) || String_Equal ("bt", word->Name) )
         _Printf ( c_ad ( "\n_Word_Add : %s.%s = %lx : at %s\n" ),
             ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "" ), word->Name, word, Context_Location ( ) ) ;
-        //Pause () ;
     }
-    //if ( word == (Word*) 0x7ffff61f2184 ) Printf ( "\ngot it!") ;
 }
 
 Word *
@@ -190,7 +190,6 @@ _Word_Allocate ( uint64 allocType )
     else word = ( Word* ) Mem_Allocate ( size, allocType ) ;
     ( ( DLNode* ) word )->n_DLNode.n_Size = size ;
     word->W_WordData = ( WordData * ) ( word + 1 ) ; // nb. "pointer arithmetic"
-    //dbg_new ( word ) ;
     return word ;
 }
 
@@ -205,7 +204,7 @@ _Word_Create ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispT
     word->W_MorphismAttributes = morphismType ;
     word->W_ObjectAttributes = objectType ;
     word->W_LispAttributes = lispType ;
-    if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
+    if ( Is_NamespaceType ( word ) ) word->Lo_List = _dllist_New ( allocType ) ;
     _Compiler_->Current_Word_Create = word ;
     _CSL_->WordCreateCount ++ ;
     Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, - 1, - 1 ) ; // default values

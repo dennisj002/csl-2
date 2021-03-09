@@ -9,8 +9,8 @@ _LO_Print_Lambda_ToString ( LambdaCalculus * lc, ListObject * l0, int64 printVal
     lc->buffer [0] = 0 ;
     LC_sprintName ( lc->buffer, l0 ) ;
     LO_strcat ( lc->outBuffer, lc->buffer ) ;
-    _LO_PrintListToString (lc, ( ListObject * ) l0->Lo_LambdaFunctionParameters, 1, printValueFlag) ; // 1 : lambdaFlag = 1 
-    _LO_PrintListToString (lc, ( ListObject * ) l0->Lo_LambdaFunctionBody, 1, printValueFlag) ; // 1 : lambdaFlag = 1 
+    _LO_PrintListToString ( lc, ( ListObject * ) l0->Lo_LambdaFunctionParameters, 1, printValueFlag ) ; // 1 : lambdaFlag = 1 
+    _LO_PrintListToString ( lc, ( ListObject * ) l0->Lo_LambdaFunctionBody, 1, printValueFlag ) ; // 1 : lambdaFlag = 1 
 }
 
 void
@@ -46,7 +46,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
     {
         if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) )
         {
-            _LO_PrintListToString (lc, l0, in_a_LambdaFlag, printSymbolValueFlag) ;
+            _LO_PrintListToString ( lc, l0, in_a_LambdaFlag, printSymbolValueFlag ) ;
         }
         else if ( ( l0 == _LC_->Nil ) || ( l0->W_LispAttributes & T_NIL ) )
         {
@@ -68,7 +68,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
                 _LO_Print_Lambda_ToString ( lc, l0, printSymbolValueFlag ) ;
             else _LO_Print_NonLambdaSymbol_ToString ( lc, l0, printSymbolValueFlag ) ;
         }
-        else if (( l0->W_ObjectAttributes & (T_STRING|T_RAW_STRING|T_LISP_SYMBOL) ) ) //||( l0->W_LispAttributes & (T_LISP_SYMBOL) ))
+        else if ( ( l0->W_ObjectAttributes & ( T_STRING | T_RAW_STRING | T_LISP_SYMBOL ) ) ) //||( l0->W_LispAttributes & (T_LISP_SYMBOL) ))
         {
             if ( l0->State & UNQUOTED ) LC_sprintString ( lc->buffer, l0->Lo_String ) ;
             else LC_sprintf_String ( lc->buffer, " \"%s\"", l0->Lo_String ) ;
@@ -82,7 +82,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
         }
         else if ( l0->W_ObjectAttributes & LITERAL )
         {
-            if ( Namespace_IsUsing ( (byte*) "BigNum" ) ) _BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
+            if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) _BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
             else if ( ( l0->Lo_Integer < 0 ) || ( NUMBER_BASE_GET == 16 ) )
                 LC_snprintf1 ( lc->buffer, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
             else LC_snprintf1 ( lc->buffer, ( ( l0->Lo_Integer < 0 ) ? " 0x%016lx" : " %ld" ), l0->Lo_Integer ) ;
@@ -99,7 +99,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
 }
 
 void
-_LO_PrintListToString (LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, int64 printValueFlag)
+_LO_PrintListToString ( LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, int64 printValueFlag )
 {
     ListObject * l1, *lnext ;
     //lc->outBuffer[0] = 0 ;
@@ -109,17 +109,16 @@ _LO_PrintListToString (LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, i
         {
             LC_sprintAString ( lc->buffer, "(" ) ;
             LO_strcat ( lc->outBuffer, lc->buffer ) ;
-        }
-        for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext )
-        {
-            lnext = _LO_Next ( l1 ) ;
-            _LO_PrintOneToString ( lc, l1, lambdaFlag, printValueFlag ) ;
-        }
-        if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) )
-        {
+            for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext )
+            {
+                lnext = _LO_Next ( l1 ) ;
+                _LO_PrintOneToString ( lc, l1, lambdaFlag, printValueFlag ) ;
+            }
             LC_sprintAString ( lc->buffer, ")" ) ;
             LO_strcat ( lc->outBuffer, lc->buffer ) ;
         }
+        else _LO_PrintOneToString ( lc, l0, lambdaFlag, printValueFlag ) ;
+
     }
 }
 
@@ -128,7 +127,7 @@ LO_PrintListToString ( LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, i
 {
     Buffer_Init ( lc->PrintBuffer, 0 ) ;
     Buffer_Init ( lc->OutBuffer, 0 ) ;
-    _LO_PrintListToString (lc, l0, lambdaFlag, printValueFlag) ;
+    _LO_PrintListToString ( lc, l0, lambdaFlag, printValueFlag ) ;
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
     return lc->outBuffer ;
 }
@@ -149,7 +148,7 @@ _LO_PrintWithValue ( ListObject * l0, byte * prefix, byte * postfix )
 void
 LO_PrintWithValue ( ListObject * l0 )
 {
-    _LO_PrintWithValue ( l0, (byte*) "", (byte*) "" ) ;
+    _LO_PrintWithValue ( l0, ( byte* ) "", ( byte* ) "" ) ;
 }
 
 void
@@ -175,6 +174,6 @@ void
 LO_Print ( ListObject * l0 )
 {
     DefaultColors ;
-    _LO_Print ( l0, (byte*) "", (byte*) "", 1 ) ;
+    _LO_Print ( l0, ( byte* ) "", ( byte* ) "", 1 ) ;
 }
 

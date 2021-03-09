@@ -41,7 +41,7 @@ _LO_Read ( LambdaCalculus * lc )
                 if ( lnew )
                 {
                     if ( ( l0->State & SPLICE ) || ( ( l0->State & UNQUOTE_SPLICE ) &&
-                        ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, LO_Eval ( lc, l0 ) ) ;
+                        ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, LO_Eval ( l0 ) ) ;
                     else LO_AddToTail ( lnew, l0 ) ;
                 }
                 else lnew = l0 ;
@@ -126,7 +126,7 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
     {
         int64 allocType = GetState ( _Compiler_, LC_ARG_PARSING ) ? DICTIONARY : LISP ;
         Lexer_ParseObject ( lexer, token ) ;
-        l0 = DataObject_New (T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, 0, 0, allocType, tsrli, scwi ) ;
+        l0 = DataObject_New (T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, lexer->Literal, 0, allocType, tsrli, scwi ) ;
     }
     if ( l0 )
     {

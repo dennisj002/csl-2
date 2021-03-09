@@ -252,7 +252,7 @@ TSI_TypeStatus_Print ( TSI *tsi )
     Printf ( "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
         tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
-    Printf ( "%s", CSL_PrepareDbgSourceCodeString ( tsi->OpWord, tsi->OpWord->Name, 0 )) ;
+    Printf ( "%s", CSL_PrepareDbgShowInfoString ( tsi->OpWord, tsi->OpWord->Name, 0 ) ) ;
     if ( GetState ( _CSL_, DBG_TYPECHECK_ON ) )
     {
         CSL_TypeStackPrint ( ) ;
@@ -586,8 +586,8 @@ CSL_TypeStackReset ( )
 void
 CSL_TypeStackPush ( Word * word )
 {
-    //if ( GetState ( CSL, TYPECHECK_ON ) ) 
-    Stack_Push ( _CSL_->TypeWordStack, ( int64 ) word ) ;
+    if ( GetState ( _CSL_, TYPECHECK_ON ) )
+        Stack_Push ( _CSL_->TypeWordStack, ( int64 ) word ) ;
 }
 
 void
@@ -680,6 +680,7 @@ CSL_GetAndSet_ObjectByteSize ( Word * word )
         return objectByteSize ;
     }
 }
+
 void
 CSL_Set_Namespace_ObjectByteSize ( Namespace * ns, int64 obsize )
 {
@@ -691,7 +692,7 @@ CSL_Set_Namespace_ObjectByteSize ( Namespace * ns, int64 obsize )
 int64
 CSL_GetAndSet_ObjectByteSize ( Word * word )
 {
-    int64 objectByteSize ; 
+    int64 objectByteSize ;
     Namespace * typeNamespace ;
     if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) objectByteSize = 8 ; //sizeof (byte*) ; 
     else

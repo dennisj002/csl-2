@@ -20,7 +20,11 @@ _Repl ( block repl )
             Printf ( "<= " ) ;
             //LC_SaveStack ( ) ; // ?!? maybe we should do this stuff differently : literals are pushed on the stack by the interpreter
             ReadLine_GetLine ( rl ) ;
-            if ( strstr ( ( char* ) rl->InputLineString, ".." ) || strstr ( ( char* ) rl->InputLineString, "bye" ) || strstr ( ( char* ) rl->InputLineString, "exit" ) ) goto done ;
+            if ( strstr ( ( char* ) rl->InputLineString, ".." ) || strstr ( ( char* ) rl->InputLineString, "bye" ) || strstr ( ( char* ) rl->InputLineString, "exit" ) ) 
+            {
+                Lexer_ReadToken ( _Lexer_ ) ;
+                goto done ;
+            }
             repl ( ) ;
             Printf ( "\n" ) ;
             _Dsp_ = svDsp ;
@@ -36,6 +40,7 @@ done:
     rl->NormalPrompt = snp ;
     rl->AltPrompt = sap ;
     SetState ( _LC_, LC_REPL, false ) ;
-    //AllowNewlines ;
+    Printf ( "\n_Repl Exiting ... " ) ;
+    DefaultColors ;
 }
 

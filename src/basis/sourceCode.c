@@ -11,7 +11,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
     int64 storeFixed ;
     if ( ! Compiling )
     {
-        if ( ! scWord0 ) scWord = Get_SourceCodeWord ( ) ;
+        if ( ! scWord0 ) scWord = Get_SourceCodeWord ( 0 ) ;
         else scWord = scWord0 ;
         if ( scWord )
         {
@@ -33,7 +33,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
                             SetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION, true ) ;
                         }
                         token = GetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) ? ( byte* ) "=" : word->Name ;
-                        buffer = DBG_PrepareSourceCodeString ( word, token, sourceCode, 0, 0, 1 ) ;
+                        buffer = DBG_PrepareShowInfoString ( word, token, sourceCode, 0, 0, 1 ) ;
                         if ( buffer && buffer[0] ) Printf ( "\n%s", buffer ) ;
                         if ( storeFixed ) word->Name = ( byte* ) "store" ;
                         if ( _Debugger_ ) _Debugger_->LastSourceCodeWord = word ;
@@ -49,7 +49,7 @@ SC_ShowSourceCode_In_Word_At_Address ( Word * word, byte * address )
 {
     if ( GetState ( _CSL_, GLOBAL_SOURCE_CODE_MODE ) ) //DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
     {
-        if ( ! word ) word = Get_SourceCodeWord ( ) ;
+        if ( ! word ) word = Get_SourceCodeWord ( word ) ;
         SC_ShowDbgSourceCodeWord_Or_AtAddress ( word, address ) ;
         return true ;
     }
@@ -351,8 +351,8 @@ void
 CSL_WordList_Push ( Word * word, Boolean inUseFlag )
 {
 #if 0 // debugging    
-    if ( ( word == (Word*) 0x7ffff711ef58 ) || ( word == (Word*) 0x7ffff711af58 ) )
-        Printf ( (byte*) "\nword 0x7ffff711ef58\n" ) ;
+    if ( ( word == ( Word* ) 0x7ffff711ef58 ) || ( word == ( Word* ) 0x7ffff711af58 ) )
+        Printf ( ( byte* ) "\nword 0x7ffff711ef58\n" ) ;
 #endif    
     _List_PushNew_ForWordList ( _CSL_->CSL_N_M_Node_WordList, word, inUseFlag ) ;
 }
@@ -376,7 +376,7 @@ CSL_WordList_PushWord ( Word * word )
             if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE ) ) || ( ! ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) )
                 || ( word->W_ObjectAttributes & ( NAMESPACE | OBJECT_FIELD ) ) ) ) ) inUseFlag |= SCN_IN_USE_FLAG_ALL ;
             //if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE | NAMESPACE | OBJECT_FIELD ) ) || ( ! ( ( word->W_MorphismAttributes & ( OBJECT_OPERATOR ) ) ) ) ) inUseFlag |= SCN_IN_USE_FLAG_ALL ;
-            if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE | NAMESPACE | OBJECT_FIELD | LOCAL_OBJECT ) ) ) 
+            if ( ( word->W_ObjectAttributes & ( DOBJECT | NAMESPACE_VARIABLE | NAMESPACE | OBJECT_FIELD | LOCAL_OBJECT ) ) )
                 inUseFlag |= SCN_IN_USE_FOR_SOURCE_CODE ;
         }
         //if ( ! (word->W_TypeAttributes &WT_INIT ))
@@ -418,7 +418,7 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
                 index, word, name, sourceCoding, scwi, biuFlag ) ;
         }
 #if 0        
-        else //if ( scwiDiff )
+else //if ( scwiDiff )
         {
             Printf ( "\n %s :: \'%-12s\' : sourceCoding  = 0x%08x : scwi = %03d : inUse = %s",
                 prefix, name, sourceCoding, scwi, biuFlag ) ;
@@ -475,7 +475,7 @@ CSL_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Boolean s
 void
 _CSL_SC_WordList_Show ( byte * prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors )
 {
-    Word * scWord = Get_SourceCodeWord ( ) ;
+    Word * scWord = Get_SourceCodeWord ( 0 ) ;
     CSL_WordList_Show ( scWord, prefix, inUseOnlyFlag, showInDebugColors ) ;
 }
 
@@ -636,7 +636,7 @@ CSL_SetSourceCodeWord ( )
 }
 
 void
-CSL_Finish_WordSourceCode (CSL * csl, Word * word , Boolean force)
+CSL_Finish_WordSourceCode ( CSL * csl, Word * word, Boolean force )
 {
     if ( word )
     {
@@ -698,25 +698,54 @@ CSL_AppendCharToSourceCode ( CSL * csl, byte c )
 }
 
 Word *
-Get_SourceCodeWord ( )
+FindSourceCodeWord ( Word * word )
+{
+    if ( word )
+    {
+        do
+        {
+            if ( word->W_SourceCode ) return word ;
+            if ( word == word->W_MySourceCodeWord ) break ;
+            else word = word->W_MySourceCodeWord ;
+        }
+        while ( word ) ;
+    }
+    return 0 ;
+}
+// this is terrible ???!!!
+
+Word *
+Get_SourceCodeWord ( Word * word )
 {
     Debugger * debugger = _Debugger_ ;
     Word * scWord ;
-    if ( ! ( scWord = _Context_->CurrentDisassemblyWord ) )
+    //if ( ! scWord  )
     {
-        if ( GetState ( debugger, DBG_STEPPING ) ) scWord = debugger->w_Word ;
-        if ( ( ! scWord ) && ( ! ( scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
-            _Context_->CurrentWordBeingCompiled : _CSL_->LastFinished_Word ?
-            _CSL_->LastFinished_Word : _CSL_->SC_Word ? _CSL_->SC_Word : _Compiler_->Current_Word_Create ) ) )
+        if ( _LC_ )
         {
-            if ( debugger && Is_DebugOn )
+            if ( ! ( scWord = word ? word->W_MySourceCodeWord : 0 ) )
             {
-                if ( debugger->LastShowEffectsWord ) scWord = debugger->LastShowEffectsWord ;
-                else scWord = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+                if ( GetState ( _LC_, LC_APPLY ) ) scWord = _LC_->Sc_Word ;
+                else scWord = _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentEvalWord ;
             }
         }
+        else if ( ! ( scWord = _Context_->CurrentDisassemblyWord ) )
+        {
+            if ( GetState ( debugger, DBG_STEPPING ) ) scWord = debugger->w_Word ;
+            if ( ( ! scWord ) && ( ! ( scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
+                _Context_->CurrentWordBeingCompiled : _CSL_->LastFinished_Word ?
+                _CSL_->LastFinished_Word : _CSL_->SC_Word ? _CSL_->SC_Word : _Compiler_->Current_Word_Create ) ) )
+            {
+                if ( debugger && Is_DebugOn )
+                {
+                    if ( debugger->LastShowEffectsWord ) scWord = debugger->LastShowEffectsWord ;
+                    else scWord = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+                }
+            }
+            else scWord = word ? word->W_MySourceCodeWord : 0 ;
+        }
     }
-    return (scWord && scWord->W_WordData ) ? scWord : 0 ;
+    return ( scWord && scWord->W_WordData ) ? scWord : 0 ;
 }
 
 #if 0

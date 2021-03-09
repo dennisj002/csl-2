@@ -196,7 +196,6 @@ Mem_Allocate ( int64 size, uint64 allocType )
         case T_CSL: case DATA_STACK: return _Allocate ( size, ovt->CSLInternalSpace ) ;
         case INTERNAL_OBJECT_MEM: return _Allocate ( size, ovt->InternalObjectSpace ) ;
         case OPENVMTIL: return _Allocate ( size, ovt->OpenVmTilSpace ) ;
-            //case _STATIC_: case OS_STATIC: case OVT_STATIC: case HISTORY:
         case _STATIC_: case OVT_STATIC: case HISTORY:
         {
             if ( allocType == _STATIC_ ) return Mmap ( size ) ;
@@ -218,8 +217,8 @@ MemorySpace_Init ( MemorySpace * ms )
     ms->DictionarySpace = ( oldMs && oldMs->DictionarySpace ) ? oldMs->DictionarySpace : MemorySpace_NBA_New ( ms, ( byte* ) "DictionarySpace", ovt->DictionarySize, DICTIONARY ) ;
     ms->CodeSpace = ( oldMs && oldMs->CodeSpace ) ? oldMs->CodeSpace : MemorySpace_NBA_New ( ms, ( byte* ) "CodeSpace", ovt->MachineCodeSize, CODE ) ;
 
-    ms->LispSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
-    ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectsSize, OBJECT_MEM ) ;
+    ms->LispSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSpaceSize, LISP ) ;
+    ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectSpaceSize, OBJECT_MEM ) ;
     ms->StringSpace = MemorySpace_NBA_New ( ms, ( byte* ) "StringSpace", ovt->StringSpaceSize, STRING_MEMORY ) ;
     ms->BufferSpace = MemorySpace_NBA_New ( ms, ( byte* ) "BufferSpace", ovt->BufferSpaceSize, BUFFER ) ;
 

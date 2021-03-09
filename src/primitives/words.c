@@ -216,7 +216,7 @@ Location *
 Location_New ( )
 {
     Lexer * lexer = _Lexer_ ;
-    Location * loc = ( Location * ) Mem_Allocate ( sizeof ( Location ), ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
+    Location * loc = ( Location * ) Mem_Allocate ( sizeof ( Location ), ( CompileMode ? OBJECT_MEM : OBJECT_MEM ) ) ;
     loc->Filename = lexer->Filename ;
     loc->LineNumber = lexer->LineNumber ;
     loc->CursorPosition = _Context_->Lexer0->CurrentReadIndex ;

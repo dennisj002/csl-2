@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.915.440" ) 
+#define VERSION ((byte*) "0.915.700" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -60,7 +60,7 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
 {
     ovt->MemorySpace0 = MemorySpace_New ( ovt, "DefaultMemorySpace" ) ;
     ovt->CSLInternalSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "CSLInternalSpace", ovt->CSLSize, T_CSL ) ;
-    ovt->InternalObjectSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "InternalObjectSpace", ovt->InternalObjectsSize, INTERNAL_OBJECT_MEM ) ;
+    ovt->InternalObjectSpace = MemorySpace_NBA_OvtNew ( ( byte* ) "InternalObjectSpace", ovt->InternalObjectsSize, INTERNAL_OBJECT_MEM ) ; // used in _DObject_ValueDefinition_Init
     ovt->BufferList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
     ovt->RecycledWordList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
     ovt->RecycledOptInfoList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
@@ -106,11 +106,11 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     ovt->StartedTimes = startedTimes ;
     OVT_GetStartupOptions ( ovt ) ;
 
-    allocSize = 200 * K ;
-    ovt->InternalObjectsSize = allocSize ;
-    ovt->ObjectsSize = 2 * allocSize ; //1 * M ; 
-    ovt->LispSize = allocSize ;
-    ovt->LispTempSize = allocSize ;
+    allocSize = 430 * K ;
+    ovt->InternalObjectsSize = 1 * M ;
+    ovt->ObjectSpaceSize = 1 * M ;
+    ovt->LispSpaceSize = 1 * M ;
+    ovt->LispTempSize = 1 * M ;
     ovt->CompilerTempObjectsSize = 2 * allocSize ;
     ovt->BufferSpaceSize = allocSize ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
     ovt->MachineCodeSize = allocSize ;

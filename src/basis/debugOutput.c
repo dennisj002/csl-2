@@ -26,7 +26,7 @@ _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // u
             IsFrameNecessary ( scWord->W_NumberOfNonRegisterLocals, scWord->W_NumberOfNonRegisterArgs ) ) ;
         byte * address = ( byte* ) ( uint64 ) ( fp ? fp [ varOffset ] : 0 ) ;
 
-        byte * stringValue = String_CheckForAtAdddress (address, &_O_->Default, &_O_->User) ;
+        byte * stringValue = String_CheckForAtAdddress ( address, &_O_->Default, &_O_->User ) ;
         if ( address && ( ! stringValue ) ) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
         if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s %s", word2->ContainingNamespace->Name, c_u ( word2->Name ), c_g ( ">" ) ) ;
 
@@ -41,7 +41,7 @@ _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // u
         }
         else Printf ( "\n%-018s : index = [r15%s0x%02x]  : <0x%016lx> = 0x%016lx : %16s.%-16s : %s",
             localVarFlag ? "LocalVariable" : "Parameter Variable", localVarFlag ? "+" : "-", Abs ( varOffset * CELL ),
-            fp + varOffset, ( uint64 ) ( fp ? fp [ varOffset ] : 0 ), localsWord->S_ContainingNamespace ? localsWord->S_ContainingNamespace->Name: (byte*)"",
+            fp + varOffset, ( uint64 ) ( fp ? fp [ varOffset ] : 0 ), localsWord->S_ContainingNamespace ? localsWord->S_ContainingNamespace->Name : ( byte* ) "",
             c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
     }
 }
@@ -119,16 +119,20 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         byte *location = ( rl->Filename ) ? rl->Filename : ( byte* ) "<command line>" ;
         byte signalAscii [ 128 ] ;
         int64 iw = false ;
-        Word * word = debugger->w_Word ? debugger->w_Word : ((!debugger->Token)? (_Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentTokenWord) : 0)  ;
+        Word * word = debugger->w_Word ? debugger->w_Word : ( ( ! debugger->Token ) ? ( _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentTokenWord ) : 0 ) ;
         byte wordName [300], aliasName [256], * token0 ;
-        if ( word && ( iw = String_Equal ( "init", word->Name ) ) ) { debugger->SubstitutedWord = word ; word = cntx->Interpreter0->w_Word ; } // 'new'
+        if ( word && ( iw = String_Equal ( "init", word->Name ) ) )
+        {
+            debugger->SubstitutedWord = word ;
+            word = cntx->Interpreter0->w_Word ;
+        } // 'new'
         debugger->w_AliasOf = debugger->SubstitutedWord ? debugger->SubstitutedWord : debugger->w_AliasOf ;
         if ( debugger->w_AliasOf ) //= Word_UnAlias ( word ) )
         {
-            if ( iw ) snprintf ( aliasName, 255, "%s.%s", 
-                (debugger->w_AliasOf->S_ContainingNamespace ? debugger->w_AliasOf->S_ContainingNamespace->Name : (byte*) ""), debugger->w_AliasOf->Name) ;
-            snprintf ( wordName, 299, "%s%s%s%s", word ? (char*) word->Name : "", ( ( char* ) debugger->w_AliasOf ? " -> " : "" ),
-                iw ? aliasName : ( debugger->w_AliasOf ? debugger->w_AliasOf->Name : ( byte* ) "" ), debugger->w_AliasOf ? ( byte* ) " " : (byte*)"" ) ;
+            if ( iw ) snprintf ( aliasName, 255, "%s.%s",
+                ( debugger->w_AliasOf->S_ContainingNamespace ? debugger->w_AliasOf->S_ContainingNamespace->Name : ( byte* ) "" ), debugger->w_AliasOf->Name ) ;
+            snprintf ( wordName, 299, "%s%s%s%s", word ? ( char* ) word->Name : "", ( ( char* ) debugger->w_AliasOf ? " -> " : "" ),
+                iw ? aliasName : ( debugger->w_AliasOf ? debugger->w_AliasOf->Name : ( byte* ) "" ), debugger->w_AliasOf ? ( byte* ) " " : ( byte* ) "" ) ;
             debugger->SubstitutedWord = 0 ;
             SetState ( debugger, DBG_OUTPUT_SUBSTITUTION, true ) ;
             token0 = wordName ;
@@ -150,7 +154,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
 
-        if ( token0 ) CSL_ShowInfo_Token (word, prompt, signal, token0, signalAscii ) ;
+        if ( token0 ) CSL_ShowInfo_Token ( word, prompt, signal, token0, signalAscii ) ;
         else
         {
             byte *cc_line = ( char* ) Buffer_Data ( _CSL_->DebugB ) ;
@@ -261,7 +265,7 @@ Debugger_DoState ( Debugger * debugger )
     }
     if ( GetState ( debugger, DBG_INFO ) ) Debugger_ShowInfo ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg", 0 ) ;
     else if ( GetState ( debugger, DBG_PROMPT ) ) Debugger_ShowState ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ;
-    else if ( GetState ( debugger, DBG_STEPPING | DBG_CONTINUE_MODE ) ) 
+    else if ( GetState ( debugger, DBG_STEPPING | DBG_CONTINUE_MODE ) )
     {
         if ( GetState ( debugger, DBG_START_STEPPING ) ) Printf ( "\n ... Next stepping instruction ..." ) ;
         SetState ( debugger, DBG_START_STEPPING, false ) ;
@@ -290,8 +294,8 @@ Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte
     while ( 1 )
     {
         if ( GetState ( debugger, DBG_STEPPING ) )
-            snprintf ( ( char* ) b, BUFFER_IX_SIZE, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_gd ( name ), ( char* ) c_gd (achange) ) ;
-        else snprintf ( ( char* ) b, BUFFER_IX_SIZE, "\nStack : %s at %s :> %s <: %s", insert, ( char* ) location, name, ( char* ) c_gd (achange) ) ;
+            snprintf ( ( char* ) b, BUFFER_IX_SIZE, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_gd ( name ), ( char* ) c_gd ( achange ) ) ;
+        else snprintf ( ( char* ) b, BUFFER_IX_SIZE, "\nStack : %s at %s :> %s <: %s", insert, ( char* ) location, name, ( char* ) c_gd ( achange ) ) ;
         if ( ( sl = strlen ( ( char* ) b ) ) > GetTerminalWidth ( ) ) //220 ) //183 ) //GetTerminalWidth ( ) ) //_Debugger_->TerminalLineWidth ) //220 ) 
         {
             location = ( char* ) "..." ;
@@ -382,7 +386,7 @@ String_HighlightTokenInputLine ( byte * nvw, int64 lef, int64 leftBorder, int64 
 }
 
 byte *
-PSCS_Using_WordSC (byte* scs, byte * token, int64 scswci ) // scs : source code string
+PSCS_Using_WordSC ( byte* il, byte* scs, byte * token, int64 index, int64 tvw ) // scs : source code string
 {
     byte *nvw ;
     // ts : tokenStart ; tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
@@ -390,19 +394,27 @@ PSCS_Using_WordSC (byte* scs, byte * token, int64 scswci ) // scs : source code 
     slsc = strlen ( ( char* ) scs ) ;
     nvw = Buffer_Data_Cleared ( _CSL_->DebugB3 ) ; //Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
     slt = Strlen ( token ) ;
-    tw = Debugger_TerminalLineWidth ( _Debugger_ ) ;
+    tw = tvw ? tvw : Debugger_TerminalLineWidth ( _Debugger_ ) ;
     tp = 42 ; // 42 : aligned with disassembler code
-    if ( ( slsc > tp ) && ( scswci > tp ) )
+    //strncpy ( nvw, il, BUFFER_IX_SIZE) ;
+    if ( tvw && ( index > tvw ) )
+    {
+        //leftBorder = tvw / 2 ; //0 ; //ts = tp ;
+        leftBorder = ts = tp ;
+        lef = ref = rightBorder = 0 ;
+        strncat ( nvw, & scs [index - tp], tvw ) ; // must Strncat because we might have done a strcat above based on the 'pad' variable
+    }
+    else if ( ( slsc > tp ) && ( index > tp ) )
     {
         lef = 4 ;
         leftBorder = ts = tp ;
         rightBorder = tw - ( ts + slt ) ;
         ref = ( slsc - 4 ) > tw ? 4 : 0 ;
-        strncpy ( nvw, & scs [scswci - tp], tw - ( lef + ref ) ) ;
+        strncat ( nvw, & scs [index - tp], tw - ( lef + ref ) ) ;
     }
     else
     {
-        pad = tp - scswci ;
+        pad = tp - index ;
         if ( pad >= 4 ) lef = 4 ;
         else lef = 0 ;
         for ( i = 0 ; i < pad ; i ++ ) strncat ( ( char* ) nvw, " ", BUFFER_IX_SIZE ) ;
@@ -438,7 +450,7 @@ PSCS_Using_ReadlinerInputString ( byte* il, byte * token1, byte* token0, int64 s
         nts = leftBorder = scswci ;
         rightBorder = totalBorder - leftBorder ;
     }
-    else if ( (lbm = slil - ( scswci + slt1 + idealBorder )) > 0 )
+    else if ( ( lbm = slil - ( scswci + slt1 + idealBorder ) ) > 0 )
     {
         nws = slil - tvw ;
         rightBorder = slil - ( scswci + slt1 ) ; // nb! : try to keep all on right beyond token - the cutoff should be on the left side
@@ -480,15 +492,20 @@ PSCS_Using_ReadlinerInputString ( byte* il, byte * token1, byte* token0, int64 s
 // ...source code source code TP source code source code ... EOL
 
 byte *
-DBG_PrepareSourceCodeString ( Word * word, byte* token0, byte* il, int tvw, int rlIndex, Boolean useScFlag ) // otoken : original token; il : instruction line ; tvw text view window
+DBG_PrepareShowInfoString ( Word * word, byte* token0, byte* il, int tvw, int rlIndex, Boolean useScFlag ) // otoken : original token; il : instruction line ; tvw text view window
 {
     // usingSC == 1 denotes il string is from word->W_SourceCode else il is copied from rl->InputLineString
     Debugger * debugger = _Debugger_ ;
-    byte * cc_line = ( byte* ) "" ;
-    if ( ( word || token0 ) && il )
+    byte * cc_line = ( byte* ) "", *scs = 0 ;
+    Word * scWord = 0 ;
+    if ( ( _LC_ && _LC_->Sc_Word ) && ( word->W_MySourceCodeWord == _LC_->Sc_Word ) ) scWord = _LC_->Sc_Word ;
+    else if ( useScFlag ) scWord = Get_SourceCodeWord ( word ) ;
+    scs = scWord ? scWord->W_SourceCode : 0 ;
+
+    if ( ( word || token0 ) )
     {
         byte *token = ( word ? word->Name : token0 ), * token1, *token2 ;
-        int64 scswi0, slt, slsc, scswci ;
+        int64 slt, index ;
         if ( GetState ( debugger, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) )
         {
             token1 = debugger->SubstitutedWord ? debugger->SubstitutedWord->Name : token0 ? token0 : word->Name ;
@@ -496,14 +513,14 @@ DBG_PrepareSourceCodeString ( Word * word, byte* token0, byte* il, int tvw, int 
         else token1 = token0 ;
         token2 = String_ConvertToBackSlash ( token1 ) ;
         slt = Strlen ( token2 ) ;
-        slsc = strlen ( ( char* ) il ) ;
-        scswi0 = useScFlag ? word->W_SC_Index : rlIndex ? rlIndex : 0 ; //word->W_SC_Index ;
-        scswci = String_FindStrnCmpIndex ( il, token2, scswi0, slt, slt ) ;
-        if ( scswci != - 1 ) // did we find token in scs
+        index = scs ? word->W_SC_Index : rlIndex ; //word->W_SC_Index ;
+        index = String_FindStrnCmpIndex ( scs ? scs : il, token2, index, slt, slt ) ;
+        if ( index != - 1 ) // did we find token in scs
         {
             // these two functions maybe should be integrated ; the whole series of 'ShowInfo' functions could be reworked
-            if ( useScFlag ) cc_line = PSCS_Using_WordSC (il, token2, scswci ) ;
-            else cc_line = PSCS_Using_ReadlinerInputString ( il, token2, token, scswci, tvw ) ; // scs : source code string
+            if ( scs ) cc_line = PSCS_Using_WordSC ( il, scs, token2, index, tvw ) ; // scs : source code string
+                //else cc_line = PSCS_Using_ReadlinerInputString ( il, token2, token, scswci, tvw ) ; 
+            else cc_line = PSCS_Using_ReadlinerInputString ( il, token2, token, index, tvw ) ;
         }
     }
     return cc_line ;
@@ -515,26 +532,26 @@ DBG_PrepareSourceCodeString ( Word * word, byte* token0, byte* il, int tvw, int 
 // lef : left ellipsis flag, ref : right ellipsis flag
 
 byte *
-CSL_PrepareDbgSourceCodeString (Word * word, byte* token, int64 twAlreayUsed )
+CSL_PrepareDbgShowInfoString ( Word * word, byte* token, int64 twAlreayUsed )
 {
     byte * cc_line = ( byte* ) "" ;
     if ( word || token )
     {
         ReadLiner * rl = _Context_->ReadLiner0 ;
         byte * il = Buffer_Data_Cleared ( _CSL_->StringInsertB6 ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
-       strncpy ( il, rl->InputLineString, BUFFER_IX_SIZE ) ;
+        strncpy ( il, rl->InputLineString, BUFFER_IX_SIZE ) ;
         String_RemoveEndWhitespace ( ( byte* ) il ) ;
         int64 fel, tw = GetTerminalWidth ( ), tvw ;
         fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
         //tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
         tvw = tw - ( ( twAlreayUsed > fel ) ? ( twAlreayUsed - fel ) : fel ) ; //subtract the formatting chars which don't add to visible length
-        cc_line = DBG_PrepareSourceCodeString ( word, token, il, tvw, word ? word->W_RL_Index : _Lexer_->TokenStart_ReadLineIndex, 0 ) ; //tvw, tvw/2 ) ;// sc : source code ; scwi : source code word index
+        cc_line = DBG_PrepareShowInfoString ( word, token, il, tvw, word ? word->W_RL_Index : _Lexer_->TokenStart_ReadLineIndex, 0 ) ; //tvw, tvw/2 ) ;// sc : source code ; scwi : source code word index
     }
     return cc_line ;
 }
 
 void
-CSL_ShowInfo_Token (Word * word, byte * prompt, int64 signal, byte * token0, byte * signalAscii )
+CSL_ShowInfo_Token ( Word * word, byte * prompt, int64 signal, byte * token0, byte * signalAscii )
 {
     ReadLiner * rl = _ReadLiner_ ;
     char * compileOrInterpret = ( char* ) ( ( signal || ( int64 ) signalAscii[0] ) ?
@@ -543,25 +560,26 @@ CSL_ShowInfo_Token (Word * word, byte * prompt, int64 signal, byte * token0, byt
     byte * obuffer = Buffer_Data_Cleared ( _CSL_->DebugB1 ) ;
     byte * token1 = String_ConvertToBackSlash ( token0 ) ;
     char * cc_Token = ( char* ) cc ( token1, &_O_->Notice ) ;
-    char * cc_location = ( char* ) cc ( Context_Location (), &_O_->Debug ) ;
+    char * cc_location = ( char* ) cc ( Context_Location ( ), &_O_->Debug ) ;
 
     prompt = prompt ? prompt : ( byte* ) "" ;
     strncpy ( buffer, prompt, BUFFER_IX_SIZE ) ;
     strncat ( buffer, compileOrInterpret, 32 ) ;
     prompt = ( byte* ) buffer ;
+#if 0    
     if ( word )
     {
         if ( word->W_MorphismAttributes & CPRIMITIVE )
         {
             snprintf ( ( char* ) obuffer, BUFFER_IX_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
-                prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
+                prompt, signal ? ( char* ) signalAscii : " ", cc_location, word->W_LineNumber, word->W_TokenStart_LineIndex,
                 word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>",
                 cc_Token ) ;
         }
         else
         {
             snprintf ( ( char* ) obuffer, BUFFER_IX_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: 0x%016lx :> ", // <:: " INT_FRMT "." INT_FRMT " ",
-                prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
+                prompt, signal ? ( char* ) signalAscii : " ", cc_location, word->W_LineNumber, word->W_TokenStart_LineIndex,
                 word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
                 ( char* ) cc_Token, ( uint64 ) word ) ;
         }
@@ -570,10 +588,36 @@ CSL_ShowInfo_Token (Word * word, byte * prompt, int64 signal, byte * token0, byt
     else
     {
         snprintf ( ( char* ) obuffer, BUFFER_IX_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <::> ", // <:: " INT_FRMT "." INT_FRMT " ",
-            prompt, signal ? signalAscii : ( byte* ) " ", cc_location, rl->LineNumber, rl->ReadIndex,
+            prompt, signal ? signalAscii : ( byte* ) " ", cc_location, word->W_LineNumber, word->W_TokenStart_LineIndex,
             "<literal>", cc_Token ) ; //, _O_->StartedTimes, _O_->SignalExceptionsHandled ) ;
     }
-    byte *cc_line = ( char* ) CSL_PrepareDbgSourceCodeString (word, token1, ( int64 ) Strlen ( obuffer ) ) ;
+#else
+    if ( word )
+    {
+        if ( word->W_MorphismAttributes & CPRIMITIVE )
+        {
+            snprintf ( ( char* ) obuffer, BUFFER_IX_SIZE, "\n%s%s:: %s : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
+                prompt, signal ? ( char* ) signalAscii : " ", cc_location,
+                word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>",
+                cc_Token ) ;
+        }
+        else
+        {
+            snprintf ( ( char* ) obuffer, BUFFER_IX_SIZE, "\n%s%s:: %s : %s :> %s <: 0x%016lx :> ", // <:: " INT_FRMT "." INT_FRMT " ",
+                prompt, signal ? ( char* ) signalAscii : " ", cc_location,
+                word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
+                ( char* ) cc_Token, ( uint64 ) word ) ;
+        }
+        //fflush ( stdout ) ;
+    }
+    else
+    {
+        snprintf ( ( char* ) obuffer, BUFFER_IX_SIZE, "\n%s%s:: %s : %s :> %s <::> ", // <:: " INT_FRMT "." INT_FRMT " ",
+            prompt, signal ? signalAscii : ( byte* ) " ", cc_location,
+            "<literal>", cc_Token ) ; //, _O_->StartedTimes, _O_->SignalExceptionsHandled ) ;
+    }
+#endif    
+    byte *cc_line = ( char* ) CSL_PrepareDbgShowInfoString ( word, token1, ( int64 ) Strlen ( obuffer ) ) ;
     if ( cc_line ) strncat ( obuffer, cc_line, BUFFER_IX_SIZE ) ;
     _Printf ( "%s", obuffer ) ;
 }

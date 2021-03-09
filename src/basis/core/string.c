@@ -175,11 +175,11 @@ String_New_RemoveColors ( byte * str, uint64 allocType )
     //printf ( "%c[%ld;%ldm", ESC, fg, bg )
     byte * buf0 = Buffer_Data_QuickReset ( _CSL_->StringInsertB ), *buf1 ;
     int64 si, bi, j ;
-    for ( si = 0, bi = 0 ; str[si] ; bi++, si ++ )
+    for ( si = 0, bi = 0 ; str[si] ; bi ++, si ++ )
     {
-        if ( str [si] == ESC ) 
+        if ( str [si] == ESC )
         {
-            for ( j = si ; str[j++] != 'm' ; ) ;
+            for ( j = si ; str[j ++] != 'm' ; ) ;
             si = j ;
         }
         else buf0[bi] = str[si] ;
@@ -516,7 +516,7 @@ byte *
 String_RemoveEndWhitespace ( byte * string )
 {
     byte * ptr = string + Strlen ( ( char* ) string ) ;
-    for ( ; ((*ptr) && (*ptr <= ' ')) ; ptr -- ) ;
+    for ( ; ( ( *ptr ) && ( *ptr <= ' ' ) ) ; ptr -- ) ;
     //*++ ptr = '\n' ;
     *++ ptr = ' ' ;
     *++ ptr = 0 ;
@@ -591,8 +591,15 @@ String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot
 byte *
 String_RemoveFinalNewline ( byte * astring )
 {
-    byte character = astring [ Strlen ( ( char* ) astring ) - 1 ] ;
-    if ( character == '\n' || character == '\r' || character == eof ) astring [ Strlen ( ( char* ) astring ) - 1 ] = 0 ;
+    byte character ;
+    int64 index = 1 ;
+    do
+    {
+        character = astring [ Strlen ( ( char* ) astring ) - (index++) ] ;
+        if ( character == '\n' || character == '\r' || character == eof ) astring [ Strlen ( ( char* ) astring ) - 1 ] = 0 ;
+        else break ;
+    }
+    while ( 1 ) ;
 
     return astring ;
 }
@@ -634,13 +641,14 @@ String_New_SourceCode ( byte * string )
 }
 
 #if 0
+
 byte
 _String_NextNonDelimiterChar ( byte * str, byte * cset )
 {
     if ( ! str ) return 0 ;
     else
     {
-        for ( ; *str ; str ++ ) 
+        for ( ; *str ; str ++ )
         {
             if ( ! _CharSet_IsDelimiter ( cset, *str ) ) break ;
         }
@@ -648,13 +656,14 @@ _String_NextNonDelimiterChar ( byte * str, byte * cset )
     return *str ;
 }
 #endif
+
 byte
 _String_NextPrintChar ( byte * str, byte * cset )
 {
     if ( ! str ) return 0 ;
     else
     {
-        for ( ; *str ; str ++ ) 
+        for ( ; *str ; str ++ )
         {
             if ( CharTable_IsCharType ( *str, CHAR_PRINT ) ) break ;
         }
@@ -816,15 +825,15 @@ String_CheckWordSize ( byte * str, int64 wl )
 // it makes or attempts to make sure that that tokenStart (ts) is correct for any string
 
 int64
-String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 wrli, int64 wl0, int64 inc )
+String_FindStrnCmpIndex ( byte * str, byte* name0, int64 index, int64 wlen, int64 inc )
 {
-    byte * scspp2, *scspp, *scindex ;
-    d0 ( scspp = & sc [ wrli ] ) ;
-    int64 i, n, index = wrli, slsc = Strlen ( sc ) ;
+    byte * scspp2, *scspp, *stri ;
+    d0 ( scspp = & str [ index ] ) ;
+    int64 i, n, slsc = Strlen ( str ) ;
     for ( i = 0, n = inc + 1 ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
-        scindex = & sc [ index + i ] ;
-        if ( ( index + i <= slsc ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
+        stri = & str [ index + i ] ;
+        if ( ( index + i <= slsc ) && ( ! Strncmp ( stri, name0, wlen ) ) )
         {
             //if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
@@ -835,8 +844,8 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 wrli, int64 wl0, int64 i
     }
     for ( i = 0, n = inc + 1 ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
-        scindex = & sc [ index - i ] ;
-        if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
+        stri = & str [ index - i ] ;
+        if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( stri, name0, wlen ) ) )
         {
             //if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
@@ -845,10 +854,10 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 wrli, int64 wl0, int64 i
             }
         }
     }
-    index = wrli ;
-    //return -1 ;
+    //index = index ;
+    return - 1 ;
 done:
-    d0 ( scspp2 = & sc [ index ] ) ;
+    d0 ( scspp2 = & str [ index ] ) ;
     return index ;
 }
 
@@ -860,9 +869,10 @@ done:
 // dl : diff in length of token and token with highlighting :: dl = slt1 - slt0 :: not currently used
 
 byte *
-_String_HighlightTokenInputLine (byte * nvw, Boolean lef, int64 leftBorder, int64 tokenStart, byte *token, byte * token0, int64 rightBorder, Boolean ref )
+_String_HighlightTokenInputLine ( byte * nvw, Boolean lef, int64 leftBorder, int64 tokenStart, byte *token, byte * token0, int64 rightBorder, Boolean ref )
 {
     int32 slt = Strlen ( token ) ;
+    String_RemoveFinalNewline ( nvw ) ;
     if ( ! GetState ( _Debugger_, DEBUG_SHTL_OFF ) )
     {
         byte * b2 = Buffer_Data_Cleared ( _CSL_->DebugB2 ) ;
@@ -871,14 +881,14 @@ _String_HighlightTokenInputLine (byte * nvw, Boolean lef, int64 leftBorder, int6
         // we are building our output in b2
         // our scratch buffer is b3
 #if 0    
-    if ( GetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ) ) )
-    {
-        int64 slt0 = strlen ( token0 ) ;
-        Strncpy ( nvw, &il[nws], scswci ) ; //leftBorder + (slt0/2) ) ; //scswci ) ; // tvw ) ; // copy the the new view window to buffer nvw
-        Strncat ( nvw, token, slt ) ; // tvw ) ; // copy the the new view window to buffer nvw
-        Strncat ( nvw, &il[nws + slt0], tvw ) ; // tvw ) ; // copy the the new view window to buffer nvw
-    }
-    //else 
+        if ( GetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ) ) )
+        {
+            int64 slt0 = strlen ( token0 ) ;
+            Strncpy ( nvw, &il[nws], scswci ) ; //leftBorder + (slt0/2) ) ; //scswci ) ; // tvw ) ; // copy the the new view window to buffer nvw
+            Strncat ( nvw, token, slt ) ; // tvw ) ; // copy the the new view window to buffer nvw
+            Strncat ( nvw, &il[nws + slt0], tvw ) ; // tvw ) ; // copy the the new view window to buffer nvw
+        }
+        //else 
 #endif    
         if ( leftBorder < 0 ) leftBorder = 0 ; // something more precise here with C syntax is needed !?!?
         if ( lef )
@@ -911,7 +921,7 @@ int64
 _IsString ( byte * address, int64 maxLength )
 {
     int64 i, count ;
-    if ( address < (byte*) 0x7f0000000000 ) return false ; // prevent integer 'string's 
+    if ( address < ( byte* ) 0x7f0000000000 ) return false ; // prevent integer 'string's 
     for ( i = 0, count = 0 ; i < maxLength ; i ++ )
     {
         //if ( ! ( isprint ( address [i] ) || iscntrl ( address [i] ) ) ) return false ;
@@ -934,7 +944,7 @@ IsString ( byte * address )
 }
 
 byte *
-String_CheckForAtAdddress (byte * address, Colors * c1, Colors * c2)
+String_CheckForAtAdddress ( byte * address, Colors * c1, Colors * c2 )
 {
     byte *str = 0 ;
     if ( NamedByteArray_CheckAddress ( _O_->MemorySpace0->StringSpace, address )
@@ -949,7 +959,7 @@ String_CheckForAtAdddress (byte * address, Colors * c1, Colors * c2)
             byte * bstr = String_ConvertToBackSlash ( address ) ;
             byte * prefix = cc ( "< string : \'", c2 ) ;
             byte * cbstr = cc ( bstr, c1 ) ;
-            byte * postfx = cc ( "\' >", c2 ) ; 
+            byte * postfx = cc ( "\' >", c2 ) ;
             snprintf ( ( char* ) str, 128, "%s%s%s", prefix, cbstr, postfx ) ;
             //strcat ( str, cc ( "\' >", c2 ) ) ; 
         }

@@ -81,7 +81,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
         else if ( lexer->L_ObjectAttributes & ( T_RAW_STRING ) )
         {
             // nb. we don't want to do this block with literals it slows down the eval and is wrong
-            word->W_LispAttributes |= ( T_LISP_SYMBOL | T_RAW_STRING )  ;
+            word->W_LispAttributes |= ( T_LISP_SYMBOL | T_RAW_STRING ) ;
             word->Lo_Value = ( int64 ) word->Lo_Name ;
         }
         word->Lo_CSLWord = word ;
@@ -135,7 +135,7 @@ _LO_First ( ListObject * l0 )
 ListObject *
 _LO_Last ( ListObject * l0 )
 {
-    if ( l0 )
+    if ( l0 && ( ! ( l0->W_LispAttributes & ( T_NIL ) ) ) )
     {
         if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) return ( ListObject* ) dllist_Last ( ( dllist * ) l0->Lo_List ) ;
         else return l0 ;
@@ -146,14 +146,15 @@ _LO_Last ( ListObject * l0 )
 ListObject *
 _LO_Next ( ListObject * l0 )
 {
-    return ( ListObject* ) dlnode_Next ( ( dlnode* ) l0 ) ;
+    ListObject * l1 = ( ListObject* ) dlnode_Next ( ( dlnode* ) l0 ) ;
+    return l1 ;
 }
 
 Word *
 LC_FindWord ( byte * name, ListObject * locals )
 {
     Word * word = 0 ;
-    if ( GetState ( _Compiler_, LC_ARG_PARSING ) ) word = Finder_Word_FindUsing (_Context_->Finder0, name, 0) ;
+    if ( GetState ( _Compiler_, LC_ARG_PARSING ) ) word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;
     else
     {
         if ( locals ) word = _Finder_FindWord_InOneNamespace ( _Finder_, locals, name ) ;
@@ -179,12 +180,12 @@ LC_FindWord ( byte * name, ListObject * locals )
                         LC_Print_LispNamespace ( ) ;
                     }
 #endif        
-                    word = Finder_Word_FindUsing (_Finder_, name, 0) ;
+                    word = Finder_Word_FindUsing ( _Finder_, name, 0 ) ;
                 }
             }
         }
     }
-    return word ;
+    return word ; 
 }
 
 Boolean
@@ -197,20 +198,6 @@ LO_strcat ( byte * buffer, byte * buffer2 )
     else strncat ( ( char* ) buffer, ( char* ) buffer2, BUFFER_IX_SIZE ) ;
     buffer2 [0] = 0 ;
     return true ;
-}
-
-ListObject *
-_LO_CopyOne ( ListObject * l0, uint64 allocType )
-{
-    ListObject * l1 = 0 ;
-    if ( l0 )
-    {
-        l1 = Word_Copy ( l0, allocType ) ;
-        // nb. since we are coping the car/cdr are the same as the original so we must clear them else when try to add to the list and remove first it will try to remove from a wrong list so ...
-        l1->S_Car = 0 ;
-        l1->S_Cdr = 0 ;
-    }
-    return l1 ;
 }
 
 void
@@ -228,7 +215,48 @@ LO_ListNode_New ( uint64 allocType )
     return l0 ;
 }
 
+ListObject *
+_LO_CopyOne ( ListObject * l0, uint64 allocType )
+{
+    ListObject * l1 = 0 ;
+    if ( l0 )
+    {
+        l1 = Word_Copy ( l0, allocType ) ;
+        // nb. since we are coping the car/cdr are the same as the original so we must clear them else when try to add to the list and remove first it will try to remove from a wrong list so ...
+        l1->S_Car = 0 ;
+        l1->S_Cdr = 0 ;
+    }
+    return l1 ;
+}
+
 // copy a whole list or a single node
+#if 0 // this seems more understandable but it crashes with gcc-10 -O3 ?
+
+ListObject *
+_LO_Copy ( ListObject * l0, uint64 allocType )
+{
+    ListObject * lnew = 0, *l1, *lnext, *lcopy ;
+    if ( l0 )
+    {
+        if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) )
+        {
+            lnew = LO_ListNode_New ( allocType ) ;
+            for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext )
+            {
+                lnext = _LO_Next ( l1 ) ;
+                lcopy = _LO_Copy ( l1, allocType ) ;
+                LO_AddToTail ( lnew, lcopy ) ;
+            }
+        }
+        else
+        {
+            lcopy = _LO_CopyOne ( l1, allocType ) ;
+            return lcopy ;
+        }
+    }
+    return lnew ;
+}
+#else
 
 ListObject *
 _LO_Copy ( ListObject * l0, uint64 allocType )
@@ -247,7 +275,7 @@ _LO_Copy ( ListObject * l0, uint64 allocType )
     }
     return lnew ;
 }
-
+#endif
 //===================================================================================================================
 //| LO_Repl
 //===================================================================================================================
@@ -256,13 +284,15 @@ void
 LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
 {
     ListObject * l1 ;
-    l1 = LO_Eval ( lc, l0 ) ;
+
+    l1 = LO_Eval ( l0 ) ;
     LO_Print ( l1 ) ;
     CSL_NewLine ( ) ;
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
     SetBuffersUnused ( 1 ) ;
-    _LC_->ParenLevel = 0 ;
-    Compiler_Init (_Context_->Compiler0, 0) ; // we could be compiling a csl word as in oldLisp.csl
+    lc->ParenLevel = 0 ;
+    lc->Sc_Word = 0 ;
+    Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a csl word as in oldLisp.csl
 }
 
 ListObject *
@@ -290,7 +320,7 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     if ( ! parenLevel ) CSL_InitSourceCode ( _CSL_ ) ;
     else CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 1 ) ;
     lc->ItemQuoteState = itemQuoteState ;
-    ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel ) ; 
+    ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel ) ;
     d0 ( if ( Is_DebugOn ) LO_PrintWithValue ( l0 ) ) ;
     LC_EvalPrint ( lc, l0 ) ;
     LC_ClearTempNamespace ( ) ;
@@ -325,7 +355,7 @@ LC_ReadInitFile ( byte * filename )
 }
 
 void
-LO_Repl ( )
+_LO_Repl ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     SetState ( compiler, LISP_MODE, true ) ;
@@ -334,6 +364,12 @@ LO_Repl ( )
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
     SetState ( compiler, LISP_MODE, false ) ;
     Printf ( "\nleaving csl lisp : returning to csl interpreter" ) ;
+}
+
+void
+LO_Repl ( )
+{
+    _CSL_Contex_NewRun_Block ( _CSL_, ( block ) _LO_Repl ) ;
 }
 
 //===================================================================================================================
@@ -354,7 +390,7 @@ LC_Eval ( )
     LambdaCalculus * lc = LC_Init_Runtime ( ) ;
     LC_LispNamespaceOn ( ) ;
     ListObject * l0 = ( ListObject * ) DataStack_Pop ( ), *l1 ;
-    l1 = LO_Eval ( lc, l0 ) ;
+    l1 = LO_Eval ( l0 ) ;
     DataStack_Push ( ( int64 ) l1 ) ;
 }
 
@@ -400,7 +436,7 @@ LC_FinishSourceCode ( )
 void
 _LC_ClearDefinesNamespace ( LambdaCalculus * lc )
 {
-    if ( lc ) _Namespace_Clear (lc->LispDefinesNamespace, 1) ;
+    if ( lc ) _Namespace_Clear ( lc->LispDefinesNamespace, 1 ) ;
 }
 
 void
@@ -428,7 +464,7 @@ LC_Print_LispNamespace ( )
 void
 _LC_ClearTempNamespace ( LambdaCalculus * lc )
 {
-    if ( lc ) _Namespace_Clear (lc->LispTempNamespace, 1) ;
+    if ( lc ) _Namespace_Clear ( lc->LispTempNamespace, 1 ) ;
 }
 
 void
@@ -443,7 +479,7 @@ LC_LispNamespacesOff ( )
     Namespace_SetAsNotUsing ( ( byte* ) "LispTemp" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "LispDefines" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "Lisp" ) ;
-    Context_ClearQualifyingNamespace () ;
+    Context_ClearQualifyingNamespace ( ) ;
 }
 
 void
@@ -493,14 +529,15 @@ _LC_Init ( LambdaCalculus * lc )
         int64 svsco = IsSourceCodeOn ;
         DebugShow_Off ;
         //CSL_DbgSourceCodeOff ( ) ;
-        lc->Nil = DataObject_New (T_LC_DEFINE, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, 0, - 1 ) ;
-        lc->True = DataObject_New (T_LC_DEFINE, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, 0, - 1 ) ;
+        lc->Nil = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, 0, - 1 ) ;
+        lc->True = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, 0, - 1 ) ;
         lc->buffer = Buffer_Data ( lc->PrintBuffer ) ;
         lc->outBuffer = Buffer_Data ( lc->OutBuffer ) ;
         SetState ( _CSL_, DEBUG_SOURCE_CODE_MODE, svsco ) ;
         SetState ( _CSL_, _DEBUG_SHOW_, svds ) ;
-        DLList_Recycle_WordList ( lc->Lambda_SC_WordList ) ; 
-       _LC_ = lc ;
+        DLList_Recycle_WordList ( lc->Lambda_SC_WordList ) ;
+        lc->Sc_Word = 0 ;
+        _LC_ = lc ;
     }
     return lc ;
 }

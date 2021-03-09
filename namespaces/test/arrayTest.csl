@@ -1,9 +1,9 @@
 5 
 : sp ; //stack pause ; sp
 
+lispOff
 #if _TestDone_ @ not // prevent including twice
 //dbgOff
-lispOff
 decimal
 Int Class DLLNode
 "DLLNodeAlloc" class :{ DLLNode nodes [ 32 ] ; };

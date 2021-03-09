@@ -432,9 +432,12 @@ Root
 'forStarters 0 const 
 '_doDemo 1 const
 '_doTest 1 const
+doLisp 1 =
+'doLispTest var 
+doLispTest 1 =
     
 dbgOff
-//dbgOn 
+dbgOn 
 //d: minc2
 // === controls ===
 
@@ -452,6 +455,11 @@ fload test.txt //pause
 
 #if _doTest
 tc
+#endif
+
+#if doLisp @
+lisp 
+pause
 #endif
 
 #if _doDemo 

@@ -157,14 +157,28 @@ _CSL_Contex_NewRun_2 ( CSL * csl, ContextFunction_2 contextFunction, byte *arg, 
 }
 
 void
+_CSL_Contex_NewRun_Block ( CSL * csl, block blk )
+{
+    if ( blk )
+    {
+        CSL_Context_PushNew ( csl ) ;
+        Block_Eval ( blk ) ;
+        CSL_Context_PopDelete ( csl ) ; // this could be coming back from wherever so the stack variables are gone
+    }
+}
+
+void
 _CSL_Contex_NewRun_Void ( CSL * csl, Word * word )
 {
+#if 0    
     if ( word )
     {
         CSL_Context_PushNew ( csl ) ;
         Block_Eval ( word->Definition ) ;
         CSL_Context_PopDelete ( csl ) ; // this could be coming back from wherever so the stack variables are gone
     }
+#endif    
+    _CSL_Contex_NewRun_Block ( _CSL_, word->Definition ) ;
 }
 
 void

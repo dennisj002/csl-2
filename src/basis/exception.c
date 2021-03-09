@@ -6,7 +6,7 @@
 // this block needs to be rethought but it may be ok for now
 
 void
-OVT_CheckThrowState ( int64 restartCondition )
+OVT_CheckThrowState (int64 signal, int64 restartCondition )
 {
     OVT_SetRestartCondition ( _O_, restartCondition ) ;
     if ( _O_->RestartCondition == COMPLETE_INITIAL_START )
@@ -15,8 +15,7 @@ OVT_CheckThrowState ( int64 restartCondition )
         _OVT_SigLongJump ( & _O_->JmpBuf0 ) ;
     }
     if ( GetState ( _O_, OVT_THROW ) ) CSL_FullRestartComplete ( ) ;
-    else if ( ! GetState ( _O_, OVT_FRC ) ) SetState ( _O_, OVT_THROW, true ) ;
-    //CSL_ShowInfo_Token (_Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
+    else if ( ( signal & ( SIGSEGV | SIGBUS ) ) ) SetState ( _O_, OVT_THROW, true ) ;
 }
 
 // OVT_Throw and related functions should be rethought and/or cleaned up
@@ -25,16 +24,15 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
 {
     sigjmp_buf * jb ;
     Word * eword ;
-    OVT_CheckThrowState ( restartCondition ) ;
+    OVT_CheckThrowState (signal, restartCondition ) ;
     if ( GetState ( _O_, OVT_FRC ) ) jb = & _O_->JmpBuf0 ;
     else
     {
         _OpenVmTil_ShowExceptionInfo ( ) ;
-        //OVT_SetRestartCondition ( _O_, restartCondition ) ;
         if ( signal )
         {
             if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) || ( signal == SIGSTOP ) || ( signal == SIGHUP ) ) OVT_Exit ( ) ;
-            else if ( signal && ( SIGSEGV | SIGBUS ) ) _O_->SigSegvs ++ ;
+            else if ( signal & ( SIGSEGV | SIGBUS ) ) _O_->SigSegvs ++ ;
             else if ( signal == SIGBUS )
             {
                 jb = & _O_->JmpBuf0 ;
@@ -81,7 +79,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     Word * word = _O_->ExceptionWord ;
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
-    CSL_ShowInfo_Token (_Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
+    if ( _Context_->CurrentlyRunningWord ) CSL_ShowInfo_Token (_Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
     if ( ! _O_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) Debugger_Stack ( debugger ) ;
     if ( ! word )
     {
@@ -321,7 +319,7 @@ OpenVmTil_Throw ( byte * excptMessage, byte * specialMessage, int64 restartCondi
     _O_->ExceptionSpecialMessage = specialMessage ;
 
     if ( infoFlag ) OpenVmTil_ShowExceptionInfo ( ) ;
-    OVT_Throw ( 0, restartCondition, 1 ) ;
+    OVT_Throw ( _O_->Signal, restartCondition, 1 ) ;
 }
 
 void
@@ -564,18 +562,18 @@ void
 _Error ( byte * msg, uint64 state )
 {
     AlertColors ;
-    CSL_ShowInfo_Token (_Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
-    if ( ( state ) & PAUSE )
+    if ( ( state ) <= PAUSE )
     {
         CSL_NewLine ( ) ;
         CSL_Location ( ) ;
         Printf ( msg ) ;
+        CSL_ShowInfo_Token (_Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
         Pause ( ) ;
         DebugColors ;
     }
     else
     {
-        if ( ( state ) >= QUIT )
+        if ( ( state ) > QUIT )
         {
             Throw ( msg, "", state ) ;
         }

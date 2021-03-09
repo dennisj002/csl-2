@@ -100,7 +100,7 @@ _CSL_Do_DynamicObject_ToReg ( DObject * dobject0, uint8 reg )
     }
     Compiler_Word_SCHCPUSCA ( dobject0, 0 ) ;
     if ( CompileMode ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) & dobject->W_Value, 0 ) ;
-    cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( dobject ) ; // do this elsewhere when needed
+    cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( dobject ) ; 
 
     return dobject ;
 }
@@ -110,7 +110,7 @@ CSL_Do_DynamicObject ( DObject * dobject0, Boolean reg )
 {
     DObject * dobject = _CSL_Do_DynamicObject_ToReg ( dobject0, reg ) ;
     if ( CompileMode ) _Word_CompileAndRecord_PushReg ( dobject0, reg, true ) ;
-    else DataStack_Push ( ( int64 ) & dobject->W_Value ) ; //& dobject->W_DObjectValue ) ; //dobject ) ;
+    else DataStack_Push ( ( int64 ) & dobject->W_Value ) ; 
     CSL_TypeStackPush ( dobject ) ;
 }
 
@@ -121,12 +121,11 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
     word->W_PtrToValue = & word->W_Value ; // lvalue
     if ( objType & BLOCK )
     {
-        word->Definition = ( block ) ( function ? function : ( byte* ) value ) ; //_OptimizeJumps ( ( byte* ) value ) ; // this comes to play (only(?)) with unoptimized code
+        word->Definition = ( block ) ( function ? function : ( byte* ) value ) ; 
         word->CodeStart = ( byte* ) word->Definition ;
-        if ( NamedByteArray_CheckAddress ( _O_CodeSpace, word->CodeStart ) ) word->S_CodeSize = Here - word->CodeStart ; // 1 : return - 'ret' - ins
+        if ( NamedByteArray_CheckAddress ( _O_CodeSpace, word->CodeStart ) ) word->S_CodeSize = Here - word->CodeStart ; 
         else word->S_CodeSize = 0 ;
         word->W_Value = ( uint64 ) word->Definition ; // rvalue
-        //if ( word->S_CodeSize ) word->S_CodeSize ++ ; // 1 : return - 'ret' - ins
     }
     else
     {
@@ -134,15 +133,12 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
         d0 ( Printf ( "\n_DObject_ValueDefinition_Init :" ) ) ;
         ByteArray * svcs = _O_CodeByteArray ;
         int64 sscm = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
-        //CSL_DbgSourceCodeOff ( ) ;
         _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->InternalObjectSpace, 1 * K ) ; 
         Word_SetCoding ( word, Here ) ;
         word->CodeStart = Here ;
         word->Definition = ( block ) Here ;
         if ( arg ) _DObject_C_StartupCompiledWords_DefInit ( function, arg ) ;
-        //else Compile_CallCFunctionWithParameter_TestAlignRSP ( ( byte* ) _DataObject_Run, word ) ;
         else Compile_CallCFunctionWithParameter_TestAlignRSP2 ( ( byte* ) _DataObject_Run, word ) ;
-        //else Compile_PushWord_Call_CSL_Function ( word, ( byte* ) _DataObject_Run ) ; 
         _Compile_Return ( ) ;
         //if ( Is_DebugOn ) Word_Disassemble ( word ) ; //_Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 64, 1 ) ;
         word->S_CodeSize = Here - word->CodeStart ; // for use by inline
@@ -191,7 +187,7 @@ _DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 
 // remember : Word = Namespace = DObject has a s_Symbol
 
 Word *
-_DObject_New ( byte * name, uint64 value, uint64 morphismType, uint64 objectType, uint64 lispType, uint64 functionType, byte * function, int64 arg,
+_DObject_New ( byte * name, int64 value, uint64 morphismType, uint64 objectType, uint64 lispType, uint64 functionType, byte * function, int64 arg,
     int64 addToInNs, Namespace * addToNs, uint64 allocType )
 {
     Word * word = _Word_New ( name, morphismType, objectType, lispType, addToInNs, addToNs, allocType ) ;

@@ -58,7 +58,7 @@ CSL_GreaterThanOrEqual ( ) // >
 }
 
 void
-CSL_Equals ( ) // == 
+CSL_Logic_Equals ( ) // == 
 {
     if ( CompileMode ) Compile_Equals ( _Context_->Compiler0 ) ;
     else
@@ -71,7 +71,7 @@ CSL_Equals ( ) // ==
 }
 
 void
-CSL_DoesNotEqual ( ) // !=
+CSL_Logic_DoesNotEqual ( ) // !=
 {
     if ( CompileMode ) Compile_DoesNotEqual ( _Context_->Compiler0 ) ;
     else

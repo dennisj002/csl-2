@@ -304,9 +304,9 @@ CSL_LocalVariablesBegin ( )
 // the slot address on the DataStack
 
 Namespace *
-_CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // stack variables flag
+_CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // svf : stack variables flag
 {
-    // number of stack variables, number of locals, stack variable flag
+    // number of stack variables, number of locals, svf : stack variable flag
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     Lexer * lexer = cntx->Lexer0 ;
@@ -324,13 +324,13 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
 
     if ( svf ) svff = 1 ;
     addWords = 1 ;
-    if ( lispMode ) args = ( ListObject * ) args->Lo_List->Head ;
+    if ( lispMode == 2 ) args = ( ListObject * ) args ;
+    else if ( lispMode ) args = ( ListObject * ) args->Lo_List->Head ;
 
-    while ( ( lispMode ? ( int64 ) _LO_Next ( args ) : 1 ) )
+    while ( ( lispMode ? ( int64 ) (args = _LO_Next ( args ))  : 1 ) )
     {
         if ( lispMode )
         {
-            args = _LO_Next ( args ) ;
             if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
             token = ( byte* ) args->Lo_Name ;
             CSL_AddStringToSourceCode ( _CSL_, token ) ;
@@ -399,6 +399,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
                     numberOfRegisterVariables ++ ;
                 }
                 word = DataObject_New ( objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                if ( lispMode ) dllist_AddNodeToTail ( localsNs->W_List, ( dlnode* ) word ) ;
                 if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables ++] = '_' ;
                 if ( regFlag == true )
                 {

@@ -43,7 +43,7 @@ _BigNum_New ( byte * token )
 {
     double bf ;
     long i, bi ;
-    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), (CompileMode ? INTERNAL_OBJECT_MEM : COMPILER_TEMP )) ; //OBJECT_MEM) ) ;
+    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), (CompileMode ? OBJECT_MEM : COMPILER_TEMP )) ; //OBJECT_MEM) ) ;
     if ( token )
     {
         for ( i = 0 ; token [i] ; i ++ )
@@ -361,12 +361,6 @@ BigNum_Cmp ( )
     return mpfr_cmp ( *op1, *op2 ) ;
 }
 
-void
-BigNum_Equal ( )
-{
-    DataStack_Push ( BigNum_Cmp ( ) == 0 ? 1 : 0 ) ;
-}
-
 // op1 < op2 => (op1 - op2 < 0 )
 
 void
@@ -404,6 +398,14 @@ BigNum_LogicalEquals ( )
 {
     DataStack_Push ( BigNum_Cmp ( ) == 0 ? 1 : 0 ) ;
 }
+
+#if 0
+void
+BigNum_Equal ( )
+{
+    DataStack_Push ( BigNum_Cmp ( ) == 0 ? 1 : 0 ) ;
+}
+#endif
 
 void
 BigNum_LogicalDoesNotEqual ( )

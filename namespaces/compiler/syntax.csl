@@ -81,6 +81,7 @@ C_Syntax
 //'thi42 find wdiss
 4 thi42 
 c_syntaxOff
+//pause
 0 ? "er" ps : "ok" ps   
 1 ? "ok" ps : "er" ps   
 //pause

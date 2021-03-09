@@ -78,7 +78,7 @@ OpenVmTil_CompilerTempObjectsSize ( )
 void
 OpenVmTil_ObjectsSize ( )
 {
-    DataStack_Push ( ( int64 ) & _O_->ObjectsSize ) ;
+    DataStack_Push ( ( int64 ) & _O_->ObjectSpaceSize ) ;
 }
 
 void

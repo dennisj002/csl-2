@@ -274,6 +274,8 @@ typedef struct _Identifier // _Symbol
 #define W_TypeAttributes S_WordAttributes
 #define W_NumberOfPrefixedArgs S_NumberOfPrefixedArgs 
 #define W_AllocType S_WAllocType
+#define W_Filename W_WordData->Filename
+#define W_LineNumber W_WordData->LineNumber
 #define CProp S_MorphismAttributes
 #define CProp2 S_ObjectAttributes
 #define LProp S_LispAttributes
@@ -378,6 +380,7 @@ typedef struct _WordData
     {
         dllist * LocalNamespaces ;
         Location * OurLocation ;
+        Word * CompiledAsPartOf ;
     } ;
     union
     {
@@ -450,6 +453,7 @@ typedef struct _WordData
 #define W_TypeSignatureString W_WordData->TypeSignature
 #define W_TypeObjectsNamespaces W_WordData->TypeObjectsNamespaces
 #define NamespaceStack W_WordData->WD_NamespaceStack
+#define W_MySourceCodeWord W_WordData->CompiledAsPartOf
 
 struct NamedByteArray ;
 typedef struct
@@ -841,6 +845,7 @@ typedef struct _LambdaCalculus
     Stack * QuoteStateStack ;
     uint64 * SaveStackPointer ;
     byte * LC_SourceCode ;
+    Word * Sc_Word ;
     Buffer *OutBuffer, *PrintBuffer ;
     byte * buffer, *outBuffer ;
     dllist * Lambda_SC_WordList ;
@@ -989,7 +994,7 @@ typedef struct
 
     // variables accessible from csl
     int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, ReAllocations, Dbi ;
-    int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectsSize, InternalObjectsSize, LispSize, ContextSize ;
+    int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectSpaceSize, InternalObjectsSize, LispSpaceSize, ContextSize ;
     int64 TempObjectsSize, CompilerTempObjectsSize, WordRecylingSize, SessionObjectsSize, DataStackSize, OpenVmTilSize ;
     int64 CSLSize, BufferSpaceSize, StringSpaceSize, Thrown ;
     Buffer *ThrowBuffer ;
