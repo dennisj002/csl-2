@@ -509,6 +509,7 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 Namespace *
 _Namespace_New ( byte * name, Namespace * containingNs )
 {
+    //Namespace * ns = _DObject_New ( name, 0, 0, NAMESPACE, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
     Namespace * ns = _DObject_New ( name, 0, IMMEDIATE, NAMESPACE, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
     ns->S_SymbolList =_dllist_New ( DICTIONARY ) ;
     return ns ;

@@ -144,9 +144,9 @@ udis :
 	sudo ldconfig
 	
 _gmp : 
-	wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.lz
-	tar -xvf gmp-6.2.0.tar.lz
-	cd gmp-6.2.0 && \
+	wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz
+	tar -xvf gmp-6.2.1.tar.lz
+	cd gmp-6.2.1 && \
 	./configure --enable-shared && \
 	make && \
 	sudo make install && \

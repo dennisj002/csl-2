@@ -59,7 +59,7 @@ LO_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean a
             //if ( _Is_DebugOn ) _LO_PrintWithValue ( l0, " : result l0 = ", "" ) ;
         }
     }
-    if ( _Is_DebugOn ) _LO_PrintWithValue ( l0, "\n_LO_EvalList : l0 = ", "" ) ;
+    //if ( _Is_DebugOn ) _LO_PrintWithValue ( l0, "\n_LO_EvalList : l0 = ", "" ) ;
     return l0 ;
 }
 
@@ -135,6 +135,7 @@ _LO_EvalList ( LambdaCalculus * lc, ListObject *lorig, ListObject *locals, Boole
         {
             lnext = _LO_Next ( lnode ) ;
             le = _LO_Eval ( lc, lnode, locals, applyFlag ) ;
+            //le = _LO_Eval ( lc, LO_CopyOne ( lnode ), locals, applyFlag ) ;
             LO_AddToTail ( lnew, LO_CopyOne ( le ) ) ;
             //if ( _Is_DebugOn )_LO_PrintWithValue ( lnode, "\n_LO_EvalList : lnode : = ", "" ), _LO_PrintWithValue ( le, "\n_LO_EvalList : le : =", " " ),  Printf (" : le->Name = %s", le->Name ), _LO_PrintWithValue ( le1, "\n_LO_EvalList : LO_CopyOne : le1 : ", "" ) ;
         }

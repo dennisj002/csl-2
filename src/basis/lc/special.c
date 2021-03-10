@@ -268,88 +268,30 @@ IFTRUE : LIST | ATOM
 CONDITIONAL : '(' COND IFTRUE ')' | ( COND IFTRUE )
 COND_FUNC : '(' 'cond' ( CONDITIONAL )+ ( IFTRUE | 'else' IFTRUE ) ? ')'
  */
-#if 0
-
-ListObject *
-LO_Cond ( ListObject * l0, ListObject * locals )
-{
-    LambdaCalculus * lc = _LC_ ;
-    ListObject *conditional, *conditional1, * condNode, *trueNode, * resultNode, * result ;
-    // 'cond' is first node ; skip it.
-    if ( conditional = _LO_Next ( l0 ) )
-    {
-        do
-        {
-            if ( conditional->W_LispAttributes & ( LIST | LIST_NODE ) ) condNode = _LO_First ( conditional ) ;
-            else condNode = conditional ;
-            trueNode = _LO_Next ( condNode ) ;
-            resultNode = _LO_Eval ( lc, LO_CopyOne ( condNode ), locals, 1 ) ;
-            resultNode = _LO_Eval ( lc, LO_CopyOne ( condNode ), locals, 1 ) ;
-            //if ( ( ( resultNode != nil ) && ( resultNode->Lo_Value ) ) || ( String_Equal ( condNode->Name, "else" ) ) )
-            {
-                if ( trueNode ) resultNode = trueNode ;
-                else resultNode = condNode ;
-                break ;
-            }
-            // nb we have to LO_CopyOne here else we return the whole rest of the list 
-            // and we can't remove it else it could break a LambdaBody, etc.
-            else conditional1 = _LO_Next ( conditional ) ;
-            if ( conditional1 )
-            {
-                if ( conditional->W_LispAttributes & ( LIST | LIST_NODE ) )
-                {
-                    condNode = _LO_First ( conditional ) ;
-                    if ( String_Equal ( condNode->Name, "else" ) )
-                    {
-                        resultNode = _LO_Next ( condNode ) ;
-                        if ( Is_DebugOn ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : else : resultNode = ", "" ) ;
-                        break ;
-                    }
-                    else conditional = conditional1 ;
-                }
-            }
-            else
-            {
-                if ( Is_DebugOn ) _LO_PrintWithValue ( conditional, "\nLO_Cond : conditional = ", "" ) ;
-                if ( Is_DebugOn ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : last resultNode = ", "" ) ;
-                if ( Is_DebugOn ) if ( locals ) _LO_PrintWithValue ( locals, "\nLO_Cond : locals = ", "" ) ;
-                Error ( "\nLO_Cond : no result condition", QUIT ) ;
-            }
-        }
-        while ( conditional ) ;
-        //if ( ( ! trueNode ) && ( ! resultNode ) ) resultNode = condNode ;
-        result = _LO_Eval ( lc, LO_CopyOne ( resultNode ), locals, 1 ) ; // last one, no need to copy
-        if ( Is_DebugOn ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "" ) ;
-        return result ;
-    }
-    return nil ;
-}
-#else
-
 ListObject *
 LO_Cond ( ListObject * l0, ListObject * locals )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *conditional, * testNode, *testNodeForElse = 0, *trueNode, * resultNode = nil, * result, *testTorF ;
     // 'cond' is first node ; skip it.
-    if ( Is_DebugOn ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "" ) ;
+    //if ( Is_DebugOn ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "" ) ;
     //if ( Is_DebugOn ) if ( locals ) _LO_PrintWithValue ( locals, "\nLO_Cond : locals = ", "" ) ;
     if ( conditional = _LO_Next ( l0 ) )
     {
         do
         {
-            if ( Is_DebugOn ) _LO_PrintWithValue ( conditional, "\nLO_Cond : conditional = ", "" ) ;
+            //if ( Is_DebugOn ) _LO_PrintWithValue ( conditional, "\nLO_Cond : conditional = ", "" ) ;
             testNode = _LO_First ( conditional ) ;
             if ( testNode->W_LispAttributes & ( LIST | LIST_NODE ) ) 
             {
                 testNodeForElse = _LO_First ( testNode ) ;
-                if ( Is_DebugOn && String_Equal ( testNodeForElse->Name, "else" )) Printf ("\ngot : else\n") ;
+                //if ( Is_DebugOn && String_Equal ( testNodeForElse->Name, "else" )) Printf ("\ngot : else\n") ;
             }
             else testNodeForElse = testNode ;
-            if ( Is_DebugOn ) _LO_PrintWithValue ( testNode, "\nLO_Cond : testNode = ", "" ) ;
+            //if ( Is_DebugOn ) _LO_PrintWithValue ( testNode, "\nLO_Cond : testNode = ", "" ) ;
             trueNode = _LO_Next ( testNode ) ;
             testTorF = _LO_Eval ( lc, testNode, locals, 1 ) ;
-            if ( Is_DebugOn ) _LO_PrintWithValue ( testTorF, "\nLO_Cond : testTorF = ", "" ) ;
+            //if ( Is_DebugOn ) _LO_PrintWithValue ( testTorF, "\nLO_Cond : testTorF = ", "" ) ;
             if ( ( ( testTorF != nil ) && ( testTorF->Lo_Value ) ) || ( String_Equal ( testNodeForElse->Name, "else" ) ) )
             {
                 if ( trueNode ) resultNode = trueNode ;
@@ -360,6 +302,7 @@ LO_Cond ( ListObject * l0, ListObject * locals )
                 // nb we have to LO_CopyOne here else we return the whole rest of the list 
                 // and we can't remove it else it could break a LambdaBody, etc.
             else conditional = _LO_Next ( conditional ) ;
+#if 0            
             if ( ! conditional )
             {
                 Printf ("\n\nError : no next conditional ") ;
@@ -371,18 +314,18 @@ LO_Cond ( ListObject * l0, ListObject * locals )
                 //Error ( "\nLO_Cond : no result condition", QUIT ) ;
                 break ; //return nil ;
             }
+#endif            
         }
         while ( conditional ) ;
         if ( ! resultNode ) resultNode = testNode ; //trueNode ? trueNode : testNode ;
-        if ( Is_DebugOn ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "" ) ;
+        //if ( Is_DebugOn ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "" ) ;
         //result = _LO_Eval ( lc, LO_CopyOne ( resultNode ), locals, 1 ) ; // last one, no need to copy
         result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
-        if ( Is_DebugOn ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "" ) ;
+        //if ( Is_DebugOn ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "" ) ;
         return result ;
     }
     return nil ;
 }
-#endif
 // lisp 'list' function
 // lfirst must be the first element of the list
 
@@ -427,7 +370,7 @@ LO_Begin ( ListObject * l0, ListObject * locals )
     SetState ( _LC_, LC_BEGIN_MODE, false ) ;
     return leval ;
 }
-
+#if 0
 ListObject *
 LO_Logic_Equals ( ListObject * l0, ListObject * locals )
 {
@@ -486,6 +429,7 @@ LO_Else ( ListObject * l0 )
     return LO_Eval ( LO_CopyOne ( lfirst ) ) ;
 }
 
+#endif
 ListObject *
 LO_Car ( ListObject * l0 )
 {

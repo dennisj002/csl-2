@@ -279,7 +279,7 @@ faccs3 (7) dup p 5040 _assert0 sp
 i4halt sp // code to exit interpret4
 c_syntaxOff
 #endif // <~ l.225
-
+//ihalt //interpret from interpreter.csl
 C
 sp
 c_syntaxOn

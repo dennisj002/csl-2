@@ -45,7 +45,7 @@ C
 : sp ; //stack pause ; sp
 #if 1 //doX64
 : basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 x64 ; //x64 ;
-//: basicT ppT sT bT cT mT aT loT locT fT oT cntT lT sysT interpT stT cST dT0 x64 ; //x64 ;
+//: basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST x64 ; //x64 ;
 #elif 1 //doTX64
 : basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT dT0 x64 ; //cST dT0 x64 ; //x64 ;
 #else

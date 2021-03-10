@@ -45,6 +45,7 @@ _CSL_Init_SessionCore ( CSL * csl, Boolean cntxDelFlag, Boolean promptFlag )
     if ( _LC_ ) LC_Init_Runtime ( ) ;
     CSL_RuntimeInit ( csl, cntxDelFlag ) ;
     if ( csl->InitSessionCoreTimes ++ ) OVT_RuntimeInit ( ) ;
+    BigNum_Init ( ) ;
     OVT_StartupMessage ( promptFlag && ( csl->InitSessionCoreTimes < 3 ) ) ;
     _OVT_Ok ( promptFlag ) ;
 }

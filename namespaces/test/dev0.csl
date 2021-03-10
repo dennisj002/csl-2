@@ -194,10 +194,11 @@ fibPTC2? (20) dup p 6765 _assert
 c_syntaxOff
 sp    
 
-#if 1
+#if doBigNum
 BigNum
 bnOn
-: tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn " : should be 9" ps
+#endif    
+d: : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn " : should be 9" ps
 // 9 _assert //_assert won't work here, it is not compiled with BigNum
 : fibBN ( n | svn fn fn1 fn2 ) 
     { svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -251,9 +252,11 @@ nl (+ 1 3 4 ,@x7)
 (alist)
 //pause
 
+#if doBigNum    
 BigNum
 bnInit ( 16, 2 )
 bnOn
+#endif    
 (define yfac45 (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
 (yfac45 yfac45 10) nl
 (define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
@@ -280,7 +283,7 @@ bnOn
 (yfacc yfacc 7) nl
 sp
 bnOff //pause
-Lisp
+lcOn
 //: sp s pause ; 
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 tick yfac find wdiss
@@ -389,8 +392,9 @@ sp
 //scOff
 sp
 Lisp
+#if doBigNum    
 bnOn
-BigNum
+#endif    
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 "\nyfac : 50 factorial = " ps (yfac yfac 50) 
 bnOff 
@@ -399,11 +403,14 @@ sp
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
-bnOn //BigNum
+Shell 
+#if doBigNum    
+bnOn
+#endif    
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 (yfac yfac 20) 
 bnOff 
-Lisp //pause
+Lisp pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl

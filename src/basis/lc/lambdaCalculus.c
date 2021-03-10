@@ -185,7 +185,7 @@ LC_FindWord ( byte * name, ListObject * locals )
             }
         }
     }
-    return word ; 
+    return word ;
 }
 
 Boolean
@@ -359,7 +359,7 @@ _LO_Repl ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     SetState ( compiler, LISP_MODE, true ) ;
-    Printf ( "\ncsl lisp : (type 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.csl'\n" ) ;
+    Printf ( "\ncsl lisp : (type 'x' or 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.csl'\n" ) ;
     LC_ReadInitFile ( ( byte* ) "./namespaces/compiler/lcinit.csl" ) ;
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
     SetState ( compiler, LISP_MODE, false ) ;
@@ -480,12 +480,14 @@ LC_LispNamespacesOff ( )
     Namespace_SetAsNotUsing ( ( byte* ) "LispDefines" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "Lisp" ) ;
     Context_ClearQualifyingNamespace ( ) ;
+    //CSL_TypeCheckOn ( ) ;
 }
 
 void
 LC_LispNamespaceOn ( )
 {
     Namespace_ActivateAsPrimary ( ( byte* ) "Lisp" ) ;
+    CSL_TypeCheckOff ( ) ;
 }
 
 LambdaCalculus *

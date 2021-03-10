@@ -1,43 +1,5 @@
 #include "../include/csl.h"
 
-#define BN_DBG_OFF 1
-#if BN_DBG_OFF
-#define d1m(x) 
-#endif
-#if 0
-mpfr_t *
-_BigNum_New ( byte * token )
-{
-    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), CompileMode ? DICTIONARY : OBJECT_MEM ) ;
-    double bf ;
-    long i, bi ;
-    if ( token )
-    {
-        for ( i = 0 ; token [i] ; i ++ )
-        {
-            if ( token [i] == '.' )
-            {
-                if ( sscanf ( ( char* ) token, "%lf", &bf ) )
-                {
-                    mpfr_init_set_d ( *bfr, bf, MPFR_RNDN ) ;
-                    goto retrn ;
-                }
-                else goto doDefaultZeroValue ;
-            }
-        }
-        if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init_set_si ( *bfr, bi, MPFR_RNDN ) ;
-            //if ( sscanf ( ( char* ) token, "%lf", &bf ) ) mpfr_set_d ( *bfr, bf, MPFR_RNDD ) ;
-            //else if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init2 ( *bfr, bi) ; //, MPFR_RNDN ) ;
-        else goto doDefaultZeroValue ;
-        goto retrn ;
-    }
-doDefaultZeroValue:
-    mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ;
-retrn:
-    return bfr ;
-}
-
-#else
 mpfr_t *
 _BigNum_New ( byte * token )
 {
@@ -64,7 +26,7 @@ _BigNum_New ( byte * token )
     else mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ;
     return bfr ;
 }
-#endif
+
 //"For a, A, e, E, f and F specifiers: this is the number of digits to be printed after the decimal point" 
 
 void
@@ -398,14 +360,6 @@ BigNum_LogicalEquals ( )
 {
     DataStack_Push ( BigNum_Cmp ( ) == 0 ? 1 : 0 ) ;
 }
-
-#if 0
-void
-BigNum_Equal ( )
-{
-    DataStack_Push ( BigNum_Cmp ( ) == 0 ? 1 : 0 ) ;
-}
-#endif
 
 void
 BigNum_LogicalDoesNotEqual ( )

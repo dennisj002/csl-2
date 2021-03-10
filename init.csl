@@ -432,16 +432,16 @@ Root
 'forStarters 0 const 
 '_doDemo 1 const
 '_doTest 1 const
-doLisp 1 =
-'doLispTest var 
-doLispTest 1 =
+doLisp 0 =
+'doLispTest var doLispTest 1 =
+'doBigNum 0 const // must be 0 if dbgOff else BigNum code crashes ???
     
 dbgOff
 dbgOn 
-//d: minc2
 // === controls ===
 
 #if Is_DebugOn forStarters ||
+'doBigNum 1 const
 
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
@@ -450,16 +450,18 @@ dbgOn
 
 System C
 sp
-fload test.txt //pause
+fload test.txt 
 //stack pause
 
 #if _doTest
 tc
 #endif
 
-#if doLisp @
+#if 0 //doLisp @
 lisp 
-pause
+lcOff    
+doLispTest 0 =
+//pause
 #endif
 
 #if _doDemo 
@@ -474,7 +476,6 @@ mem //pause
 : mct "namespaces/compiler/machineCode.csl" include ;
 
 #endif // Is_DebugOn
-
 bnOff
 Shell
 rtw
@@ -494,7 +495,3 @@ cOff
 #endif 
 #endif    
 2 + 7 assertStkChk // stack checking 
-// s
-//mem
-
-//d: minc
