@@ -487,7 +487,7 @@ void
 LC_LispNamespaceOn ( )
 {
     Namespace_ActivateAsPrimary ( ( byte* ) "Lisp" ) ;
-    CSL_TypeCheckOff ( ) ;
+    //CSL_TypeCheckOff ( ) ;
 }
 
 LambdaCalculus *

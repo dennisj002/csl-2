@@ -52,6 +52,7 @@ CSL_C_Syntax_On ( )
     Namespace_DoNamespace_Name ( ( byte* ) "C_Syntax" ) ;
     Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     Context_SetSpecialTokenDelimiters ( cntx, ( byte* ) " ,\n\r\t", CONTEXT ) ;
+    //CSL_TypeCheckOn ( ) ;
 }
 
 // switch to the default forth, postfix mode
@@ -162,7 +163,7 @@ CSL_DoWhile_PrefixCombinators ( )
     CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;
     // just assume 'while' is there 
     byte * token = //Lexer_ReadToken ( _Context_->Lexer0 ) ; // drop the "while" token
-        _Lexer_Next_NonDebugOrCommentTokenWord ( _Context_->Lexer0, 0, 1, 0 ) ; 
+        _Lexer_Next_NonDebugOrCommentTokenWord ( _Context_->Lexer0, 0, 1, 0 ) ;
     _Compiler_->TakesLParenAsBlock = true ;
     _Compiler_->BeginBlockFlag = false ;
     CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;

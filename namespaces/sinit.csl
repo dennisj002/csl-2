@@ -14,7 +14,7 @@ typecheckOn dbgTypecheckOn
 verbosity 1 = 
 Debug
 // higher debugLevel turns on more debugging
-: d: _dbgOn dbgSourceCodeOn ; immediate debugWord // use a possibly user set level : a debugWord has special behavior : doesn't interfere with optimization
+: d: _dbgOn debugLevel 0 = dbgSourceCodeOn ; immediate debugWord // use a possibly user set level : a debugWord has special behavior : doesn't interfere with optimization
 : d1: _dbgOn debugLevel 1 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
 : d2: _dbgOn debugLevel 2 = dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
 "OptimizeOn" variable
@@ -52,7 +52,7 @@ Io Int
 "nl" ' newline find alias keyword
 : _logWrite "csl.log" logWrite ;
 : _logAppend "csl.log" logAppend ;
-
+sp
 // aliases 
 User
 "const" ' constant find alias
@@ -109,7 +109,7 @@ User
 : mp ; //mem pause ;
 : sp ; //stack pause ;
 #endif
-
+sp
 Combinators
 "ix" ' call find alias immediate
 "qEval" ' call find alias immediate
@@ -146,7 +146,7 @@ DebugFlag 0 =
 : dbiOn dbi 1 = ;
 : DbiOn dbi 2 = ;
 : dbiOff dbi 0 = ;
-
+sp
 Compiler 
 // nb :: .'"[] :: these five characters - dot, tick, quote left bracket, right bracket - .'"[] - are character macros including the brackets they work at the char level in readline
 // set up some traditional Forth words from internal primitives
@@ -192,25 +192,24 @@ type Boolean ; Boolean.size = 1 ;
 type Pointer ; Pointer.size = 8 ;
 type block ; block.size = 8 ;
 c_syntaxOff
+sp
+System
+: bnInit1 ( width ) width @ bnInit ; 
+: bigNumOff "BigNum" notUsing ;
+: bigNumOn BigNum 16 bnInit1 ;
 
+'bnOn 'bigNumOn find alias
+'bnOff 'bigNumOff find alias
 BigNum
-: fprint space _fprint ;
+: fprint space _bfprint ;
 'p 'fprint find alias
-: eprint space _eprint ;
+: eprint space _beprint ;
 // pPrecision : this sets the number of digits to be printed after the decimal point" 
 // pWidth : sets the "Minimum number of characters to be printed. If the value to be printed is shorter than this number, 
 // the result is padded with blank spaces. The value is not truncated even if the result is larger."
-: bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
+//: bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
 //'bnInit find wdis 
-
-bnInit ( 16 16 )
-
-Root
-: bigNumOff "BigNum" notUsing ;
-
-'bnOff 'bigNumOff find alias
-: bnOn BigNum bnInit ( 16 16 ) ;
-
+bnOn
 : _bassert ( n m ) { n @ m @ != } { nl "error" ps _info pause } if ; 
 bnOff
 
@@ -380,7 +379,7 @@ vb3
 #endif
 Interpreter
 '_defined '_findUsing find alias 
-' defined '_findUsing find alias immediate 
+//' defined '_findUsing find alias immediate 
 C Compiler Int Lexer
 jcc8_Off
 : orpfile ( name | file input result )
@@ -411,7 +410,7 @@ Root
 // rtw : recycle some test/debug words 
 : rtw "test" purgeAll "hi" purge "hey" purge "heey" purgeAll "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
 : tCSL "namespaces/ninit.csl" include ; // namespaces init
-: tc lispOff tCSL rtw ;
+: tc 1 ti lispOff tCSL rtw 1 time ;
 : x64 "namespaces/compiler/x64.csl" include ; 
 : bx "namespaces/test/bigNum.test.csl" include ;
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
@@ -419,8 +418,8 @@ lispOff
 : mrm mem rdi mem ; 
 : mem2 verbosity 2 = mem verbosity 1 = ; 
 : typesInclude "namespaces/types.csl" include ;
-: minc stack _c_syntaxOn "/home/dennisj/csl-code/archive/maru-2.4/eval.c" include ;
-
+: minc vb2 _c_syntaxOn "/home/dennisj/csl-code/archive/maru-2.4/eval.c" include ;
+: minc2 vb2 cOn includesOnlyOn minc cOff includesOnlyOff ;
 // === controls ===
 Root 
 
@@ -432,12 +431,16 @@ Root
 'forStarters 0 const 
 '_doDemo 1 const
 '_doTest 1 const
+doLisp 0 =
+'doLispTest var doLispTest 1 =
+'doBigNum 0 const // must be 0 if dbgOff else BigNum code crashes ???
     
 dbgOff
 //dbgOn 
 // === controls ===
 
 #if Is_DebugOn forStarters ||
+'doBigNum 1 const
 
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
@@ -446,11 +449,18 @@ dbgOff
 
 System C
 sp
-fload test.txt //pause
+fload test.txt 
 //stack pause
 
 #if _doTest
-tc 
+tc
+#endif
+
+#if 0 //doLisp @
+lisp 
+lcOff    
+doLispTest 0 =
+//pause
 #endif
 
 #if _doDemo 
@@ -465,7 +475,6 @@ mem //pause
 : mct "namespaces/compiler/machineCode.csl" include ;
 
 #endif // Is_DebugOn
-
 bnOff
 Shell
 rtw
@@ -485,7 +494,3 @@ cOff
 #endif 
 #endif    
 2 + 7 assertStkChk // stack checking 
-// s
-//mem
-
-//d: minc

@@ -318,13 +318,15 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 Boolean
 Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
+    Boolean nwlp ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
+    else if ( ( nwlp = Lexer_IsNextWordLeftParen ( lexer ) ) &&  ( word->W_TypeAttributes & ( WT_PREFIXABLE ) ) ) return true ;
     else if ( ( ( ! word->Name || ( word->Name[0] == '(' ) ) ) || ( ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) && ( ( word->W_TypeAttributes & W_PREPROCESSOR ) ||
         ( ! ( word->W_MorphismAttributes & PREFIX ) ) && ( ! ( word->W_MorphismAttributes & CSL_WORD ) ) ) ) ) return false ;
     else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
         && ( ! ( GetState ( _Compiler_, DOING_RETURN ) ) ) ) )
     {
-        return Lexer_IsNextWordLeftParen ( lexer ) ;
+        return nwlp ;
     }
     else return false ;
 }

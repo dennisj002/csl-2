@@ -23,7 +23,7 @@ CSL_RuntimeInit ( CSL * csl, int64 cntxDelFlag )
     CSL_CheckInitDataStack ( ) ;
     _CSL_TypeStackReset ( ) ;
     CSL_RecycleInit_CSL_N_M_Node_WordList ( ) ;
-    Context_ClearQualifyingNamespace () ;
+    Context_ClearQualifyingNamespace ( ) ;
 }
 
 void
@@ -45,7 +45,7 @@ _CSL_Init_SessionCore ( CSL * csl, Boolean cntxDelFlag, Boolean promptFlag )
     if ( _LC_ ) LC_Init_Runtime ( ) ;
     CSL_RuntimeInit ( csl, cntxDelFlag ) ;
     if ( csl->InitSessionCoreTimes ++ ) OVT_RuntimeInit ( ) ;
-    BigNum_Init ( ) ;
+    _BigNum_Init ( 16 ) ;
     OVT_StartupMessage ( promptFlag && ( csl->InitSessionCoreTimes < 3 ) ) ;
     _OVT_Ok ( promptFlag ) ;
 }
@@ -125,9 +125,10 @@ _CSL_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opIns
     Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | morphismAttributes, objectAttributes, lispAttributes, 1, 0, DICTIONARY ) ;
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
     _CSL_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
-    if ( morphismAttributes & INFIXABLE ) word->W_TypeAttributes = WT_INFIXABLE ;
-    else if ( morphismAttributes & PREFIX ) word->W_TypeAttributes = WT_PREFIX ;
-    else if ( morphismAttributes & C_PREFIX_RTL_ARGS ) word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
+    if ( morphismAttributes & INFIXABLE ) word->W_TypeAttributes |= WT_INFIXABLE ;
+    else if ( morphismAttributes & PREFIX ) word->W_TypeAttributes |= WT_PREFIX ;
+    else if ( morphismAttributes & PREFIXABLE ) word->W_TypeAttributes |= WT_PREFIXABLE ;
+    else if ( morphismAttributes & C_PREFIX_RTL_ARGS ) word->W_TypeAttributes |= WT_C_PREFIX_RTL_ARGS ;
     else word->W_TypeAttributes = WT_POSTFIX ;
     if ( lispAttributes & W_COMMENT ) word->W_TypeAttributes = W_COMMENT ;
     if ( lispAttributes & W_PREPROCESSOR ) word->W_TypeAttributes = W_PREPROCESSOR ;

@@ -180,95 +180,6 @@ TSI_TypeCheckAndInfer ( TSI * tsi )
     return tsi->TypeErrorStatus ;
 }
 
-TSI *
-TSI_Init ( TSI *tsi, Word* opWord )
-{
-    tsi->TypeWordStack = _CSL_->TypeWordStack ;
-    tsi->OpWord = opWord ;
-    tsi->OpWordTypeSignature = opWord->W_TypeSignatureString ;
-    tsi->TypeStackDepth = Stack_Depth ( tsi->TypeWordStack ) ; //depth ;
-    tsi->TypeErrorStatus = false ;
-    tsi->WordBeingCompiled = Compiling ? _Context_->CurrentWordBeingCompiled : 0 ;
-    return tsi ;
-}
-
-TSI *
-TSI_New ( Word* opWord, uint64 allocType )
-{
-    TypeStatusInfo *tsi = ( TypeStatusInfo * ) Mem_Allocate ( sizeof (TypeStatusInfo ), allocType ) ;
-    tsi = TSI_Init ( tsi, opWord ) ;
-    return tsi ;
-}
-
-void
-CSL_Typecheck ( Word * opWord )
-{
-    //if ( ! GetState ( _Compiler_, C_INFIX_EQUAL ) )
-    {
-        if ( GetState ( _CSL_, ( TYPECHECK_ON | DBG_TYPECHECK_ON ) ) && ( opWord->W_TypeSignatureString[0] ) ) //&& ( depth = Stack_Depth ( CSL->TypeWordStack ) ) ) // 0 depth with a 
-        {
-            if ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) )
-            {
-                TSI * tsi = TSI_New ( opWord, COMPILER_TEMP ) ;
-                TSI_TypeCheckAndInfer ( tsi ) ;
-                if ( tsi->TypeErrorStatus ) TSI_ShowTypeErrorStatus ( tsi ) ;
-            }
-            //else if ( ( opWord->W_TypeSignatureString[0] == '.' ) && ( opWord->W_TypeSignatureString[0] != 'V' ) ) CSL_TypeStackPush ( Context_CurrentWord ( ) ) ;
-            if ( Word_DoesTypeSignatureShowAReturnValue ( opWord ) ) CSL_TypeStackPush ( opWord ) ; //Context_CurrentWord ( ) ) ;
-        }
-    }
-}
-
-void
-TSI_Debug_PreTypeStatus_Print ( TSI *tsi )
-{
-    Printf ( "\n%s.%s :: type expected : %s : at %s",
-        tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>", tsi->OpWord->Name,
-        Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), Context_Location ( ) ) ;
-}
-
-Boolean
-_TypeMismatch_CheckError_Print ( Word * lvalueWord, Word *rvalueWord, Boolean quitFlag )
-{
-    if ( GetState ( _Context_, C_SYNTAX ) )
-    {
-        int64 lvalueSize = lvalueWord->CompiledDataFieldByteSize, rvalueSize = rvalueWord->CompiledDataFieldByteSize ;
-        if ( ( lvalueSize > 0 ) && ( rvalueSize > lvalueSize ) ) // for C internal lvalue size may be 0
-        {
-            Printf ( "\nTypeError : Wrong data sizes :: lvalue : %s : size == %ld :: rvalue : %s : size == %ld",
-                lvalueWord->Name, lvalueSize, rvalueWord->Name, rvalueSize ) ;
-            if ( quitFlag ) Error ( "\nType Error", QUIT ) ;
-            return true ;
-        }
-    }
-    return false ;
-}
-
-void
-TSI_TypeStatus_Print ( TSI *tsi )
-{
-    //CSL_ShowInfo_Token (tsi->OpWord, "", _O_->RestartCondition, tsi->OpWord->Name, "" ) ;
-    if ( tsi->TypeErrorStatus & TSE_SIZE_MISMATCH ) _TypeMismatch_CheckError_Print ( tsi->StackWord1, tsi->StackWord0, 0 ) ; //TSI_TypeMismatchError_Print ( tsi ) ;
-    Printf ( "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
-        tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
-        tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
-    Printf ( "%s", CSL_PrepareDbgShowInfoString ( tsi->OpWord, tsi->OpWord->Name, 0 ) ) ;
-    if ( GetState ( _CSL_, DBG_TYPECHECK_ON ) )
-    {
-        CSL_TypeStackPrint ( ) ;
-        Pause ( ) ;
-    }
-}
-
-void
-TSI_ShowTypeErrorStatus ( TSI *tsi )
-{
-    byte * warning = "Apparent TypeMismatch : " ;
-    CSL_ShowInfo ( tsi->OpWord, warning, 0 ) ;
-    TSI_TypeStatus_Print ( tsi ) ;
-    CSL_TypeStackReset ( ) ;
-}
-
 void
 TSI_UpdateActualTypeStackRecordingBuffer ( TSI * tsi, Word * word, Boolean prefixWithSeparatorFlag )
 {
@@ -579,7 +490,7 @@ CSL_TypeStackPrint ( )
 void
 CSL_TypeStackReset ( )
 {
-    //if ( GetState ( CSL, TYPECHECK_ON ) ) 
+    //if ( GetState ( _CSL_, TYPECHECK_ON ) ) 
     _CSL_TypeStackReset ( ) ;
 }
 
@@ -593,15 +504,15 @@ CSL_TypeStackPush ( Word * word )
 void
 CSL_TypeStack_SetTop ( Word * word )
 {
-    //if ( GetState ( CSL, TYPECHECK_ON ) ) 
-    Stack_SetTop ( _CSL_->TypeWordStack, ( int64 ) word ) ;
+    if ( GetState ( _CSL_, TYPECHECK_ON ) )
+        Stack_SetTop ( _CSL_->TypeWordStack, ( int64 ) word ) ;
 }
 
 Word *
 CSL_TypeStack_Pop ( )
 {
-    //if ( GetState ( CSL, TYPECHECK_ON ) && Stack_Depth ( CSL->TypeWordStack ) )
-    if ( Stack_Depth ( _CSL_->TypeWordStack ) )
+    if ( GetState ( _CSL_, TYPECHECK_ON ) && Stack_Depth ( _CSL_->TypeWordStack ) )
+        //if ( Stack_Depth ( _CSL_->TypeWordStack ) )
     {
         Word * tword = ( Word * ) Stack_Pop ( _CSL_->TypeWordStack ) ;
         return tword ;
@@ -612,8 +523,8 @@ CSL_TypeStack_Pop ( )
 void
 CSL_TypeStack_Drop ( )
 {
-    //if ( GetState ( CSL, TYPECHECK_ON ) && Stack_Depth ( CSL->TypeWordStack ) )
-    if ( Stack_Depth ( _CSL_->TypeWordStack ) )
+    if ( GetState ( _CSL_, TYPECHECK_ON ) && Stack_Depth ( _CSL_->TypeWordStack ) )
+        //if ( Stack_Depth ( _CSL_->TypeWordStack ) )
     {
         _Stack_Drop ( _CSL_->TypeWordStack ) ;
     }
@@ -630,34 +541,9 @@ CSL_TypeStack_Dup ( )
 }
 
 void
-CSL_TypeCheckOn ( )
-{
-    SetState ( _CSL_, TYPECHECK_ON, true ) ;
-}
-
-void
-CSL_TypeCheckOff ( )
-{
-    CSL_TypeStackReset ( ) ;
-    SetState ( _CSL_, TYPECHECK_ON, false ) ;
-}
-
-void
-CSL_DbgTypecheckOff ( )
-{
-    SetState ( _CSL_, DBG_TYPECHECK_ON, false ) ;
-}
-
-void
-CSL_DbgTypecheckOn ( )
-{
-    SetState ( _CSL_, DBG_TYPECHECK_ON, true ) ;
-}
-
-void
 CSL_ShowTypeWordStack ( )
 {
-    //if ( GetState ( CSL, TYPECHECK_ON ) ) 
+    //if ( GetState ( _CSL_, TYPECHECK_ON ) ) 
     Stack_Print ( _CSL_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
     //else _Printf ( (byte*)"\ntypeChecking is off" ) ;
 }
@@ -713,6 +599,117 @@ CSL_Get_Namespace_SizeVar_Value ( Namespace * ns )
     if ( ! objectByteSize ) objectByteSize = ns->CompiledDataFieldByteSize ;
     //else ns->ObjectByteSize = objectByteSize ; // not here ??
     return objectByteSize ;
+}
+
+void
+CSL_TypeCheckOn ( )
+{
+    SetState ( _CSL_, TYPECHECK_ON, true ) ;
+}
+
+void
+CSL_TypeCheckOff ( )
+{
+    CSL_TypeStackReset ( ) ;
+    SetState ( _CSL_, TYPECHECK_ON, false ) ;
+}
+
+void
+CSL_DbgTypecheckOff ( )
+{
+    SetState ( _CSL_, DBG_TYPECHECK_ON, false ) ;
+}
+
+void
+CSL_DbgTypecheckOn ( )
+{
+    SetState ( _CSL_, DBG_TYPECHECK_ON, true ) ;
+}
+
+TSI *
+TSI_Init ( TSI *tsi, Word* opWord )
+{
+    tsi->TypeWordStack = _CSL_->TypeWordStack ;
+    tsi->OpWord = opWord ;
+    tsi->OpWordTypeSignature = opWord->W_TypeSignatureString ;
+    tsi->TypeStackDepth = Stack_Depth ( tsi->TypeWordStack ) ; //depth ;
+    tsi->TypeErrorStatus = false ;
+    tsi->WordBeingCompiled = Compiling ? _Context_->CurrentWordBeingCompiled : 0 ;
+    return tsi ;
+}
+
+TSI *
+TSI_New ( Word* opWord, uint64 allocType )
+{
+    TypeStatusInfo *tsi = ( TypeStatusInfo * ) Mem_Allocate ( sizeof (TypeStatusInfo ), allocType ) ;
+    tsi = TSI_Init ( tsi, opWord ) ;
+    return tsi ;
+}
+
+void
+CSL_Typecheck ( Word * opWord )
+{
+    if ( GetState ( _CSL_, ( TYPECHECK_ON | DBG_TYPECHECK_ON ) ) && ( opWord->W_TypeSignatureString[0] ) ) //&& ( depth = Stack_Depth ( _CSL_->TypeWordStack ) ) ) // 0 depth with a 
+    {
+        if ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) )
+        {
+            TSI * tsi = TSI_New ( opWord, COMPILER_TEMP ) ;
+            TSI_TypeCheckAndInfer ( tsi ) ;
+            if ( tsi->TypeErrorStatus ) TSI_ShowTypeErrorStatus ( tsi ) ;
+        }
+        //else if ( ( opWord->W_TypeSignatureString[0] == '.' ) && ( opWord->W_TypeSignatureString[0] != 'V' ) ) CSL_TypeStackPush ( Context_CurrentWord ( ) ) ;
+        if ( Word_DoesTypeSignatureShowAReturnValue ( opWord ) ) CSL_TypeStackPush ( opWord ) ; //Context_CurrentWord ( ) ) ;
+    }
+}
+
+void
+TSI_Debug_PreTypeStatus_Print ( TSI *tsi )
+{
+    Printf ( "\n%s.%s :: type expected : %s : at %s",
+        tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>", tsi->OpWord->Name,
+        Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), Context_Location ( ) ) ;
+}
+
+Boolean
+_TypeMismatch_CheckError_Print ( Word * lvalueWord, Word *rvalueWord, Boolean quitFlag )
+{
+    if ( GetState ( _Context_, C_SYNTAX ) )
+    {
+        int64 lvalueSize = lvalueWord->CompiledDataFieldByteSize, rvalueSize = rvalueWord->CompiledDataFieldByteSize ;
+        if ( ( lvalueSize > 0 ) && ( rvalueSize > lvalueSize ) ) // for C internal lvalue size may be 0
+        {
+            Printf ( "\nTypeError : Wrong data sizes :: lvalue : %s : size == %ld :: rvalue : %s : size == %ld",
+                lvalueWord->Name, lvalueSize, rvalueWord->Name, rvalueSize ) ;
+            if ( quitFlag ) Error ( "\nType Error", QUIT ) ;
+            return true ;
+        }
+    }
+    return false ;
+}
+
+void
+TSI_TypeStatus_Print ( TSI *tsi )
+{
+    //CSL_ShowInfo_Token (tsi->OpWord, "", _O_->RestartCondition, tsi->OpWord->Name, "" ) ;
+    if ( tsi->TypeErrorStatus & TSE_SIZE_MISMATCH ) _TypeMismatch_CheckError_Print ( tsi->StackWord1, tsi->StackWord0, 0 ) ; //TSI_TypeMismatchError_Print ( tsi ) ;
+    Printf ( "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
+        tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
+        tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
+    Printf ( "%s", CSL_PrepareDbgShowInfoString ( tsi->OpWord, tsi->OpWord->Name, 0 ) ) ;
+    if ( GetState ( _CSL_, DBG_TYPECHECK_ON ) )
+    {
+        CSL_TypeStackPrint ( ) ;
+        Pause ( ) ;
+    }
+}
+
+void
+TSI_ShowTypeErrorStatus ( TSI *tsi )
+{
+    byte * warning = "Apparent TypeMismatch : " ;
+    CSL_ShowInfo ( tsi->OpWord, warning, 0 ) ;
+    TSI_TypeStatus_Print ( tsi ) ;
+    CSL_TypeStackReset ( ) ;
 }
 
 #if 0

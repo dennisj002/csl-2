@@ -5,7 +5,7 @@ _BigNum_New ( byte * token )
 {
     double bf ;
     long i, bi ;
-    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), (CompileMode ? OBJECT_MEM : COMPILER_TEMP )) ; //OBJECT_MEM) ) ;
+    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), ( CompileMode ? OBJECT_MEM : COMPILER_TEMP ) ) ; //OBJECT_MEM) ) ;
     if ( token )
     {
         for ( i = 0 ; token [i] ; i ++ )
@@ -17,7 +17,11 @@ _BigNum_New ( byte * token )
                     mpfr_init_set_d ( *bfr, bf, MPFR_RNDN ) ;
                     return bfr ;
                 }
-                else { mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ; return bfr ; }
+                else
+                {
+                    mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ;
+                    return bfr ;
+                }
             }
         }
         if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init_set_si ( *bfr, bi, MPFR_RNDN ) ;
@@ -54,39 +58,46 @@ BigNum_GetAndPrint_BitPrecision ( )
     Printf ( "\nBigNum Internal Bit Precision = %ld", precision ) ;
 }
 
-// set from BigNum 
+// set from within BigNum namespace
 
 void
 BigNum_Set_PrintfWidth ( )
 {
-    mpfr_t * mpfwidth = ( mpfr_t* ) DataStack_Pop ( ) ;
-    long width = mpfr_get_si ( *mpfwidth, MPFR_RNDN ) ;
+    int64 width = DataStack_Pop ( ) ;
     _Context_->System0->BigNum_Printf_Width = width ;
-}
-
-// set from BigNum 
-
-void
-BN_SetDefaultBitPrecision ( long precision )
-{
-    mpfr_set_default_prec ( precision ) ; // "precision is the number of bits used to represent the significand of a floating-point number"
-    _Context_->System0->BigNum_Printf_Precision = precision ;
-}
-
-void
-_BigNum_SetDefaultBitPrecision ( mpfr_t * prec )
-{
-    long precision = mpfr_get_si ( *prec, MPFR_RNDN ) ;
-    mpfr_set_default_prec ( precision ) ; // "precision is the number of bits used to represent the significand of a floating-point number"
-    _Context_->System0->BigNum_Printf_Precision = precision ;
-    //BN_SetDefaultBitPrecision ( precision ) ;
 }
 
 void
 BigNum_Set_PrintfPrecision ( )
 {
-    mpfr_t * prec = ( mpfr_t* ) DataStack_Pop ( ) ; // number of decimal digits
-    _BigNum_SetDefaultBitPrecision ( prec ) ;
+    int64 precision = DataStack_Pop ( ) ;
+    _Context_->System0->BigNum_Printf_Precision = precision ;
+}
+
+// set from within BigNum namespace
+
+void
+BN_SetDefaultBitPrecision ( long precision )
+{
+    mpfr_set_default_prec ( precision ) ; // "precision is the number of [bignum internal] bits used to represent the significand of a floating-point number"
+}
+
+#if 0
+
+void
+_BigNum_SetDefaultBitPrecision ( int64 precision )
+{
+    //long precision = mpfr_get_si ( *prec, MPFR_RNDN ) ;
+    //mpfr_set_default_prec ( precision ) ; // "precision is the number of bits used to represent the significand of a floating-point number"
+    BN_SetDefaultBitPrecision ( precision ) ;
+}
+#endif
+
+void
+BigNum_Set_InternalBitPrecision ( )
+{
+    int64 precision = DataStack_Pop ( ) ; // number of decimal digits
+    BN_SetDefaultBitPrecision ( precision ) ;
 }
 
 void
@@ -95,20 +106,23 @@ BigNum_StateShow ( )
     BigNum_Info ( ) ;
     BigNum_GetAndPrint_BitPrecision ( ) ;
     Printf ( ( byte * ) "\nBigNum :: Width = %d : Precision = %d", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision ) ;
+}
 
+void
+_BigNum_Init ( int64 precision )
+{
+    mpfr_free_cache ( ) ;
+    _Context_->System0->BigNum_Printf_Width = 2 ;
+    _Context_->System0->BigNum_Printf_Precision = precision ; // default  mpfr precision
+    //BN_SetDefaultBitPrecision ( precision ) ;
 }
 
 void
 BigNum_Init ( )
 {
-#if 16    
-    mpfr_free_cache (); 
-    BN_SetDefaultBitPrecision ( 16 ) ;
-    _Context_->System0->BigNum_Printf_Width = 16 ;
-#else
-    BN_SetDefaultBitPrecision ( 0 ) ;
-    _Context_->System0->BigNum_Printf_Width = 0 ;
-#endif    
+    //int64 w = DataStack_Pop ( ) ;
+    int64 p = DataStack_Pop ( ) ;
+    _BigNum_Init ( p ) ;
 }
 #if 0
 
@@ -142,14 +156,13 @@ BigNum_Info ( )
 void
 _BigNum_FPrint ( mpfr_t * value )
 {
-    Context * cntx = _Context_ ;
     byte * format ;
     if ( _O_->Verbosity )
     {
-        if ( NUMBER_BASE_GET == 10 ) format = (byte*) "%*.*Rf" ;
-        else if ( NUMBER_BASE_GET == 2 ) format = (byte*) "%*.*Rb" ;
-        else if ( NUMBER_BASE_GET == 16 ) format = (byte*) "%*.*Rx" ;
-        mpfr_printf ( (char*) format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+        if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) "%*.*Rf" ;
+        else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) "%*.*Rb" ;
+        else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) "%*.*Rx" ;
+        mpfr_printf ( ( char* ) format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
     }
     fflush ( stdout ) ;
 }
@@ -276,7 +289,7 @@ BigNum_PlusPlus ( )
 {
     //Set_SCA ( 0 ) ; // this is not compiled
     mpfr_t *sum = _BigNum_New ( 0 ) ;
-    mpfr_t * op1 = ( mpfr_t* ) _DataStack_GetTop ( ), *op2 = ( mpfr_t* ) _BigNum_New ( (byte*) "1" ) ;
+    mpfr_t * op1 = ( mpfr_t* ) _DataStack_GetTop ( ), *op2 = ( mpfr_t* ) _BigNum_New ( ( byte* ) "1" ) ;
     mpfr_add ( *sum, *op1, *op2, MPFR_RNDN ) ;
     _DataStack_SetTop ( ( int64 ) sum ) ;
 }
@@ -286,7 +299,7 @@ BigNum_MinusMinus ( )
 {
     //Set_SCA ( 0 ) ; // this is not compiled
     mpfr_t *sum = _BigNum_New ( 0 ) ;
-    mpfr_t * op1 = ( mpfr_t* ) _DataStack_GetTop ( ), *op2 = ( mpfr_t* ) _BigNum_New ( (byte*) "1" ) ;
+    mpfr_t * op1 = ( mpfr_t* ) _DataStack_GetTop ( ), *op2 = ( mpfr_t* ) _BigNum_New ( ( byte* ) "1" ) ;
     mpfr_sub ( *sum, *op1, *op2, MPFR_RNDN ) ;
     _DataStack_SetTop ( ( int64 ) sum ) ;
 }

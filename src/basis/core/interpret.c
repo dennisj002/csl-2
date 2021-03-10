@@ -74,7 +74,7 @@ _Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     if ( GetState ( _Context_, C_SYNTAX ) && ( word->W_MorphismAttributes & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) )
     {
         if ( ( word->W_MorphismAttributes & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
-        token = Interpret_C_Until_NotIncluding_Token5 (interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) "}", ( byte* ) " \n\r\t", 0 , 1) ; // nb : delimiters parameter is necessary
+        token = Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) "}", ( byte* ) " \n\r\t", 0, 1 ) ; // nb : delimiters parameter is necessary
     }
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
@@ -85,7 +85,7 @@ _Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
 }
 
 Word *
-_Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
+_Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word, Boolean prefixFlag )
 {
     SetState ( cntx->Compiler0, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ), true ) ;
     word = Interpret_DoPrefixFunction_OrUntil_RParen ( interp, word ) ;
@@ -93,14 +93,17 @@ _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
     return word ;
 }
 
+#if 0
+
 Word *
 Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
-    if ( Lexer_IsNextWordLeftParen ( interp->Lexer0 ) ) word = _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
+    if ( Lexer_IsNextWordLeftParen ( interp->Lexer0 ) ) word = _Interpreter_DoPrefixWord ( cntx, interp, word, 0 ) ;
     else if ( word->W_MorphismAttributes & CATEGORY_OP_1_ARG ) word = _Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
     else _SyntaxError ( ( byte* ) "Attempting to call a prefix function without following parenthesized args", 1 ) ;
     return word ;
 }
+#endif
 
 Word *
 Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
@@ -115,15 +118,18 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
     if ( word )
     {
         Context * cntx = _Context_ ;
+        Boolean prefixFlag = 0 ;
         if ( word->W_TypeAttributes == WT_C_PREFIX_RTL_ARGS ) word = Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, ( INFIX_MODE | C_SYNTAX ) ) ) ) word = _Interpreter_DoInfixWord ( interp, word ) ;
             // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
-        else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) )
+        else if ( ( word->W_TypeAttributes & ( WT_PREFIX ) ) || ( prefixFlag = Lexer_IsWordPrefixing ( interp->Lexer0, word ) ) )
         {
             // with Lexer_IsWordPrefixing any postfix word that is not a keyword or a c_rtl arg word can now be used as a prefix function with parentheses (in PREFIX_MODE) - some 'syntactic sugar'
             // nb! : for this to work you must turn prefix mode on - 'prefixOn'
-            word = _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
+            word = _Interpreter_DoPrefixWord ( cntx, interp, word, prefixFlag ) ;
         }
+        //else if ( ( word->W_TypeAttributes & ( WT_PREFIXABLE ) ) && prefixFlag ) 
+        //    word = _Interpreter_DoPrefixWord ( cntx, interp, word, prefixFlag ) ;
         else return 0 ;
     }
     return word ;

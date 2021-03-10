@@ -395,7 +395,7 @@ typedef struct
 #define OBJECT_OPERATOR     ( (uint64) 1 << 22 ) 
 #define DOT                 OBJECT_OPERATOR              
 
-//#define SOURCE_CODE_WORD    ( (uint64) 1 << 23 ) 
+#define PREFIXABLE    ( (uint64) 1 << 23 ) 
 #define COMMENT             ( (uint64) 1 << 24 ) 
 #define NO_OP_WORD          ( (uint64) 1 << 25 ) 
 #define SYNTACTIC           ( (uint64) 1 << 26 ) 
@@ -511,6 +511,7 @@ typedef struct
 #define W_COMMENT                 ( (uint64) 1 <<  6 )
 #define W_PREPROCESSOR            ( (uint64) 1 <<  7 )
 #define WT_INIT                         ( (uint64) 1 << 8)
+#define WT_PREFIXABLE              ( (uint64) 1 <<  9 ) 
 
 // LType - lisp types
 #define T_LAMBDA ( (uint64) 1 << 11 )

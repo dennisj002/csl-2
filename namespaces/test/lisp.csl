@@ -106,9 +106,7 @@ sp
 #if 1
 "\nstarting BigNum\n" ddps
 sp
-BigNum
 bnOn
-bnInit ( 16 16 )
 Lisp
 lcReset
 (define g ( /\ (a b c) (a b c) ) )

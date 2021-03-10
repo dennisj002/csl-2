@@ -193,24 +193,23 @@ type Pointer ; Pointer.size = 8 ;
 type block ; block.size = 8 ;
 c_syntaxOff
 sp
+System
+//: bnInit1 ( width ) width @ bnInit ; 
+: bigNumOff "BigNum" notUsing ;
+: bigNumOn BigNum 8 bnInit ;
+
+'bnOn 'bigNumOn find alias
+'bnOff 'bigNumOff find alias
 BigNum
-: fprint space _fprint ;
+: fprint space _bfprint ;
 'p 'fprint find alias
-: eprint space _eprint ;
+: eprint space _beprint ;
 // pPrecision : this sets the number of digits to be printed after the decimal point" 
 // pWidth : sets the "Minimum number of characters to be printed. If the value to be printed is shorter than this number, 
 // the result is padded with blank spaces. The value is not truncated even if the result is larger."
-: bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
+//: bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
 //'bnInit find wdis 
-
-bnInit ( 16 16 )
-
-Root
-: bigNumOff "BigNum" notUsing ;
-
-'bnOff 'bigNumOff find alias
-: bnOn BigNum bnInit ( 16 16 ) ;
-
+bnOn
 : _bassert ( n m ) { n @ m @ != } { nl "error" ps _info pause } if ; 
 bnOff
 
@@ -434,14 +433,13 @@ Root
 '_doTest 1 const
 doLisp 0 =
 'doLispTest var doLispTest 1 =
-'doBigNum 0 const // must be 0 if dbgOff else BigNum code crashes ???
+'doBigNum 1 const 
     
 dbgOff
-dbgOn 
+//dbgOn 
 // === controls ===
 
 #if Is_DebugOn forStarters ||
-'doBigNum 1 const
 
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;

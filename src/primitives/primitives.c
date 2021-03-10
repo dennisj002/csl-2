@@ -175,9 +175,6 @@ CPrimitive CPrimitives [] = {
     { "[", 0, 0, 0, CSL_ArrayBegin, ( IMMEDIATE | OBJECT_OPERATOR ), COMPILER_LEFT_BRACKET, 0, "Class", "Root" },
     { ".", 0, 0, 0, CSL_Dot, ( IMMEDIATE | OBJECT_OPERATOR | NO_CODING ), 0, 0, "Class", "Root" },
 
-    { "pWidth", 0, 0, 0, BigNum_Set_PrintfWidth, 0, 0, 0, "BigNum", "Class" },
-    { "pPrecision", 0, 0, 0, BigNum_Set_PrintfPrecision, 0, 0, 0, "BigNum", "Class" },
-    { "bnState", 0, 0, 0, BigNum_StateShow, 0, 0, 0, "BigNum", "Class" },
 
     { "+", "NN.N", 0, 0, BigNum_Add, INFIXABLE, 0, 0, "BigNum", "Class" },
     { "-", "NN.N", 0, 0, BigNum_Subtract, INFIXABLE, 0, 0, "BigNum", "Class" },
@@ -201,8 +198,8 @@ CPrimitive CPrimitives [] = {
     { "pow", "NN.N", 0, 0, ( block ) BigNum_Power, INFIXABLE, 0, 0, "BigNum", "Class" },
     { "^", "NN.N", 0, 0, ( block ) BigNum_Power, INFIXABLE, 0, 0, "BigNum", "Class" },
     { "**", "NN.N", 0, 0, ( block ) BigNum_Power, INFIXABLE, 0, 0, "BigNum", "Class" },
-    { "_eprint", 0, 0, 0, BigNum_EPrint, 0, 0, 0, "BigNum", "Class" },
-    { "_fprint", 0, 0, 0, BigNum_FPrint, 0, 0, 0, "BigNum", "Class" },
+    { "_beprint", 0, 0, 0, BigNum_EPrint, 0, 0, 0, "BigNum", "Class" },
+    { "_bfprint", 0, 0, 0, BigNum_FPrint, 0, 0, 0, "BigNum", "Class" },
 
     { "||", 0, 1, OR, CSL_LogicalOr, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
     { "or", 0, 1, OR, CSL_LogicalOr, IMMEDIATE | KEYWORD | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
@@ -374,8 +371,13 @@ CPrimitive CPrimitives [] = {
     { "registers", 0, 0, 0, _Debugger_CpuState_Show, 0, 0, 0, "System", "Root" },
     { "lcOn", 0, 0, 0, ( block ) LC_On, 0, 0, 0, "System", "Root" },
     { "lcOff", 0, 0, 0, ( block ) LC_LispNamespacesOff, 0, 0, 0, "System", "Root" },
+    { "bnInit", 0, 0, 0, BigNum_Init, 0, 0, 0, "System", "Root"  },
+    { "pWidth", 0, 0, 0, BigNum_Set_PrintfWidth, 0, 0, 0, "System", "Root" },
+    { "pPrecision", 0, 0, 0, BigNum_Set_PrintfPrecision, 0, 0, 0, "System", "Root" },
+    { "internalBitPrecision", 0, 0, 0, BigNum_Set_InternalBitPrecision, 0, 0, 0, "System", "Root" },
+    { "bnState", 0, 0, 0, BigNum_StateShow, 0, 0, 0, "System", "Root" },
 
-    { "if", 0, 0, 0, CSL_If_ConditionalExpression, IMMEDIATE, 0, 0, "Shell", "Root" },
+    { "if", 0, 0, 0, CSL_If_ConditionalExpression, IMMEDIATE|PREFIXABLE, 0, 0, "Shell", "Root" },
     { "else", 0, 0, 0, CSL_Else, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "endif", 0, 0, 0, CSL_EndIf, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "_sh", 0, 0, 0, ShellEscape_Postfix, 0, 0, 0, "Shell", "Root" },

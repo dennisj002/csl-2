@@ -84,14 +84,14 @@ sp
 : itt { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2 ; 
 ' itt wdiss itt //pause
 #elif 0
-//"\ntest nested elif 0 - wrong\n" ps pause
+"\ntest nested elif 0 - wrong\n" ps pause
 #elif 0
-//"\ntest nested elif 0 - wrong\n" ps pause
+"\ntest nested elif 0 - wrong\n" ps pause
 #elif 1
 #if 0 // if 1
-//"\ntest nested if 0 - wrong \n" ps pause
-#elif 1 
-"\ntest nested elif 1 - correct \n" ps //pause
+"\ntest nested if 0 - wrong \n" ps pause
+#elif 0 
+"\ntest nested elif 1 - wrong \n" ps pause
 sp
 { doTest _TestDone_ @ not && } { basicT _TestDone_ ++ } if2  
 #elif 0
@@ -99,12 +99,22 @@ sp
 : shellOff "Shell" notUsing ;
 Shell
 doTest _TestDone_ @ not && 
-if 
-    basicT testX _TestDone_ ++  
-else 
+if
+    basicT _TestDone_ ++  
+//else 
 endif
 shellOff
-// stack pause
+stack pause
+#elif 1    
+"\ntest nested elif 1 - correct \n" ps //pause
+: shellOff "Shell" notUsing ;
+Shell
+if ( doTest _TestDone_ @ not && )
+    basicT _TestDone_ ++  
+//else 
+endif
+shellOff
+//stack //pause
 #endif // end if 1
 #endif // end if 0
 Interpreter

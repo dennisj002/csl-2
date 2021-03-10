@@ -182,7 +182,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     if ( _O_->Verbosity > 2 ) Printf ( "\nSystem Memory is being reallocated.  " ) ;
 
     csl->ContextStack = Stack_New ( 256, allocType ) ;
-    csl->TypeWordStack = Stack_New ( 1 * K, allocType ) ;
+    csl->TypeWordStack = Stack_New (  _O_->DataStackSize, allocType ) ;
     csl->CSL_N_M_Node_WordList = _dllist_New ( T_CSL ) ;
     
     _Context_ = csl->Context0 = _Context_New ( csl ) ;

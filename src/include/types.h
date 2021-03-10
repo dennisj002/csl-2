@@ -591,7 +591,7 @@ typedef struct Lexer
     byte( *NextChar ) ( ReadLiner * rl ), * TokenBuffer ;
     union
     {
-        int64 Literal ;
+        uint64 Literal ;
         byte * LiteralString ;
     } ;
     Word * TokenWord ;

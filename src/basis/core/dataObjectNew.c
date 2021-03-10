@@ -7,7 +7,7 @@
 
 Word *
 DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttributes, uint64 objectAttributes, uint64 lispAttributes,
-    int64 index, int64 value, Namespace * addToNs, int allocType, int64 tsrli, int64 scwi )
+    int64 index, uint64 value, Namespace * addToNs, int allocType, int64 tsrli, int64 scwi )
 {
     Context * cntx = _Context_ ;
     switch ( type )

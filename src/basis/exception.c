@@ -545,6 +545,7 @@ void
 CSL_FullRestart ( )
 {
     _O_->Signal = 0 ;
+    SetState ( _O_, OVT_THROW, false ) ;
     _OpenVmTil_LongJmp_WithMsg ( INITIAL_START, ( byte* ) "Full Initial Re-Start : ..." ) ;
 }
 
