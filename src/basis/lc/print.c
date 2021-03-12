@@ -74,7 +74,15 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
             else LC_sprintf_String ( lc->buffer, " \"%s\"", l0->Lo_String ) ;
         }
         else if ( l0->W_MorphismAttributes & BLOCK ) LC_snprintf2 ( lc->buffer, " %s:#<BLOCK>:0x%016lx", l0->Lo_Name, ( uint64 ) l0->Lo_UInteger ) ;
-        else if ( l0->W_ObjectAttributes & T_BIG_NUM ) _BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
+        else if ( l0->W_ObjectAttributes & T_BIG_NUM )
+        {
+            //if ( l0->Name[0] ) // where does this come from ?? fix it!!
+            {
+                if ( printSymbolValueFlag && l0->Name[0]) _BigNum_snfPrint2 ( lc->buffer, l0->Lo_Name, ( mpfr_t * ) l0->W_Value ) ; //_BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
+                else _BigNum_snfPrint2 ( lc->buffer, 0, ( mpfr_t * ) l0->W_Value ) ; //_BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
+                //else LC_sprintString ( lc->buffer, l0->Name ) ;
+            }
+        }
         else if ( l0->W_ObjectAttributes & T_INT )
         {
             if ( NUMBER_BASE_GET == 16 ) LC_snprintf1 ( lc->buffer, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;

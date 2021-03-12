@@ -321,7 +321,7 @@ typedef int64( *cMapFunction_1 ) ( Symbol * ) ;
 typedef ListObject* ( *ListFunction0 )( ) ;
 typedef ListObject* ( *ListFunction )( ListObject* ) ;
 typedef ListObject * ( *LispFunction2 ) ( ListObject*, ListObject* ) ;
-typedef ListObject * ( *LispFunction3 ) ( ListObject*, ListObject*, ListObject* ) ;
+typedef ListObject * ( *LispFunction3 ) ( ListObject*, ListObject*, int64 ) ;
 typedef int64( *MapFunction_Word_PtrInt ) ( ListObject *, Word *, int64 * ) ;
 typedef int64( *MapFunction ) ( Symbol * ) ;
 typedef int64( *MapFunction_1 ) ( Symbol *, int64 ) ;
@@ -849,6 +849,7 @@ typedef struct _LambdaCalculus
     Buffer *OutBuffer, *PrintBuffer ;
     byte * buffer, *outBuffer ;
     dllist * Lambda_SC_WordList ;
+    Boolean SavedTypeCheckState ;
 } LambdaCalculus ;
 typedef struct
 {

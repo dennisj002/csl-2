@@ -19,7 +19,7 @@ _LO_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean appl
         else if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) l1 = LO_EvalList ( lc, l0, locals, applyFlag ) ;
     }
     SetState ( lc, LC_EVAL, false ) ;
-    //if ( _Is_DebugOn ) _LO_PrintWithValue ( l1, "\n_LO_Eval : l1 = ", "" ) ;
+    if ( _Is_DebugOn ) _LO_PrintWithValue ( l1, "\n_LO_Eval : l1 = ", "" ) ;
     return l1 ;
 }
 
@@ -93,9 +93,13 @@ _LO_EvalSymbol ( LambdaCalculus * lc, ListObject *l0, ListObject *locals )
                 l1->W_MorphismAttributes |= w->W_MorphismAttributes ;
                 l1->W_ObjectAttributes |= w->W_ObjectAttributes ;
                 l1->W_LispAttributes |= w->W_LispAttributes ;
+                //w->W_SC_Index = l1->W_SC_Index ;
+                //w->W_RL_Index = l1->W_RL_Index ;
+                //w->State = l1->State ;
             }
             else
             {
+                //w->Lo_Value = l1->W_Value ;s
                 w->W_SC_Index = l1->W_SC_Index ;
                 w->W_RL_Index = l1->W_RL_Index ;
                 w->State = l1->State ;

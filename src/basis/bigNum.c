@@ -123,6 +123,7 @@ BigNum_Init ( )
     //int64 w = DataStack_Pop ( ) ;
     int64 p = DataStack_Pop ( ) ;
     _BigNum_Init ( p ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "BigNum" ) ;
 }
 #if 0
 
@@ -159,10 +160,34 @@ _BigNum_FPrint ( mpfr_t * value )
     byte * format ;
     if ( _O_->Verbosity )
     {
-        if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) "%*.*Rf" ;
-        else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) "%*.*Rb" ;
-        else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) "%*.*Rx" ;
+        if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %*.*Rf" ;
+        else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %*.*Rb" ;
+        else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %*.*Rx" ;
         mpfr_printf ( ( char* ) format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+    }
+    fflush ( stdout ) ;
+}
+
+void
+_BigNum_snfPrint2 ( char * buf, byte * name, mpfr_t * value )
+{
+    byte * format ;
+    if ( _O_->Verbosity )
+    {
+        if ( name )
+        {
+            if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %s = %*.*Rf" ;
+            else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %s = %*.*Rb" ;
+            else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %s = %*.*Rx" ;
+            mpfr_sprintf ( buf, format, name, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+        }
+        else
+        {
+            if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %*.*Rf" ;
+            else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %*.*Rb" ;
+            else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %*.*Rx" ;
+            mpfr_sprintf ( buf, format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+        }
     }
     fflush ( stdout ) ;
 }

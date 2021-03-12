@@ -66,7 +66,7 @@ Lexer_CheckMacroRepl ( Lexer * lexer )
 //===================================================================================================================
 
 ListObject *
-_LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
+_LO_New_RawStringOrLiteral (Lexer * lexer, byte * token, int64 value, int64 qidFlag, int64 tsrli, int64 scwi )
 {
     if ( GetState ( lexer, KNOWN_OBJECT ) )
     {
@@ -75,7 +75,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
         //_DObject_New ( byte * name, uint64 value, uint64 morphismType, uint64 objectType, uint64 lispType, uint64 functionType, byte * function, int64 arg,
         //    int64 addToInNs, Namespace * addToNs, uint64 allocType )
         int64 allocType = GetState ( _Compiler_, LC_ARG_PARSING ) ? DICTIONARY : LISP ;
-        Word * word = _DObject_New ( lexer->OriginalToken, lexer->Literal, IMMEDIATE | morphismAttributes,
+        Word * word = _DObject_New ( lexer->OriginalToken, value, IMMEDIATE | morphismAttributes,
             ( lexer->L_ObjectAttributes | LITERAL ), objectAttributes, lexer->L_ObjectAttributes | objectAttributes, ( byte* ) _DataObject_Run, 0, 0, 0, allocType ) ;
         if ( qidFlag ) word->W_ObjectAttributes &= ~ T_LISP_SYMBOL ;
         else if ( lexer->L_ObjectAttributes & ( T_RAW_STRING ) )
@@ -208,7 +208,7 @@ _LO_ListInit ( ListObject * l0, uint64 allocType )
 }
 
 ListObject *
-LO_ListNode_New ( uint64 allocType )
+LO_List_New ( uint64 allocType )
 {
     ListObject * l0 = LO_New ( LIST, 0 ) ;
     _LO_ListInit ( l0, allocType ) ;
@@ -240,7 +240,7 @@ _LO_Copy ( ListObject * l0, uint64 allocType )
     {
         if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) )
         {
-            lnew = LO_ListNode_New ( allocType ) ;
+            lnew = LO_List_New ( allocType ) ;
             for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext )
             {
                 lnext = _LO_Next ( l1 ) ;
@@ -264,7 +264,7 @@ _LO_Copy ( ListObject * l0, uint64 allocType )
     ListObject * lnew = 0, *l1, *lnext, *lcopy ;
     if ( l0 )
     {
-        if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) lnew = LO_ListNode_New ( allocType ) ;
+        if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) lnew = LO_List_New ( allocType ) ;
         for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext )
         {
             lnext = _LO_Next ( l1 ) ;
@@ -360,7 +360,11 @@ _LO_Repl ( )
     Compiler * compiler = _Context_->Compiler0 ;
     SetState ( compiler, LISP_MODE, true ) ;
     Printf ( "\ncsl lisp : (type 'x' or 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.csl'\n" ) ;
-    LC_ReadInitFile ( ( byte* ) "./namespaces/compiler/lcinit.csl" ) ;
+    LC_ReadInitFile ( ( byte* ) "./namespaces/lcinit.csl" ) ;
+#if 1    
+    Printf ( "\ncsl lisp : (type 'x' or 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.0.csl'\n" ) ;
+    LC_ReadInitFile ( ( byte* ) "./namespaces/lcinit.0.csl" ) ;
+#endif    
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
     SetState ( compiler, LISP_MODE, false ) ;
     Printf ( "\nleaving csl lisp : returning to csl interpreter" ) ;
@@ -480,14 +484,15 @@ LC_LispNamespacesOff ( )
     Namespace_SetAsNotUsing ( ( byte* ) "LispDefines" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "Lisp" ) ;
     Context_ClearQualifyingNamespace ( ) ;
-    //CSL_TypeCheckOn ( ) ;
+    if ( _LC_->SavedTypeCheckState && GetState ( _CSL_, TYPECHECK_ON ) ) CSL_TypeCheckOn ( ) ;
 }
 
 void
 LC_LispNamespaceOn ( )
 {
     Namespace_ActivateAsPrimary ( ( byte* ) "Lisp" ) ;
-    //CSL_TypeCheckOff ( ) ;
+    _LC_->SavedTypeCheckState = GetState ( _CSL_, TYPECHECK_ON ) ;
+    CSL_TypeCheckOff ( ) ; // too much LC stack sometimes and not needed
 }
 
 LambdaCalculus *
@@ -501,7 +506,7 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
     lc->ParenLevel = 0 ;
     lc->QuoteState = 0 ;
     lc->ItemQuoteState = 0 ;
-
+    DLList_Recycle_WordList ( lc->Lambda_SC_WordList ) ;
     LC_SaveStackPointer ( lc ) ;
     return lc ;
 }

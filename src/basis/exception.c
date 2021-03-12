@@ -595,8 +595,7 @@ _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
     //OVT_CheckThrowState ( ) ;
     byte * msg = ovt->ThrowBuffer->Data ;
     byte key, * instr = ".: (p)ause, e(x)it, <key> restart" ;
-    printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, ( ( ovt->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ), ovt->SigSegvs ) ;
-    fflush ( stdout ) ;
+    if ( ovt->SigSegvs < 3 ) printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, ( ( ovt->SigSegvs++ < 2 ) ? Context_Location ( ) : ( byte* ) "" ), ovt->SigSegvs ), fflush ( stdout ) ;
     key = Key ( ) ;
     if ( key == 'p' )
     {

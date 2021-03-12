@@ -14,7 +14,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
         interp->Token = token ;
         cntx->CurrentToken = token ;
         word = Lexer_ParseToken_ToWord ( interp->Lexer0, token, tsrli, scwi ) ;
-        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+        //Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         DEBUG_SETUP ( word, 1 ) ;
         cntx->CurrentTokenWord = word ; // dbg flag
         cntx->TokenDebugSetupWord = word ;
@@ -58,9 +58,9 @@ Interpreter_InterpretSelectedTokens ( Interpreter * interp, byte * target )
 Word *
 Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, int64 scwi )
 {
-    Word * word = Compiler_CopyDuplicatesAndPush ( word0, tsrli, scwi ) ;
+    Word * word = Compiler_CopyDuplicatesAndPush (word0, tsrli, scwi) ;
     interp->w_Word = word ;
-    Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+    //Word_SetTsrliScwi ( word, tsrli, scwi ) ;
     Word_Eval ( word ) ;
     return word ; //let callee know about actual word evaled here after Compiler_CopyDuplicatesAndPush
 }
@@ -148,7 +148,7 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
     Word * word1 ;
     if ( word && word->Name )
     {
-        Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
+        //Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
         interp->w_Word = word ;
         if ( ! ( word1 = Interpreter_DoInfixOrPrefixWord ( interp, word ) ) ) word1 = Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ;
         if ( word1 && ( ! ( word1->W_MorphismAttributes & DEBUG_WORD ) ) ) word = word1, interp->LastWord = word1 ;

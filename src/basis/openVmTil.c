@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.915.800" ) 
+#define VERSION ((byte*) "0.916.110" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -116,7 +116,7 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     ovt->MachineCodeSize = allocSize ;
     ovt->StringSpaceSize = allocSize ;
     ovt->DictionarySize = 1 * M ; //100 * K ;
-    ovt->CSLSize = ( 80 * K ) ;
+    ovt->CSLSize = ( 140 * K ) ;
     ovt->OpenVmTilSize = ( 6 * K ) ;
     ovt->DataStackSize = 8 * KB ;
     ovt->TempObjectsSize = 200 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;

@@ -187,7 +187,7 @@ sp
 ((q2 +) (q2 28) (q2 2)(q3 2) (q4 45))
 sp
 (( lambda ( x y ) ( + x y ) ) 3 4 ) 
-d: (define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1))) ) ) )
+d: (define yfac (lambda (yy n) (if (< n 2) (1) (* n (yy yy (- n 1))) ) ) )
 (yfac yfac 10) 
 sp
 (yfac yfac 7) 

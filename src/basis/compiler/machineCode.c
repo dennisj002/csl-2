@@ -21,7 +21,7 @@
 // bit fields :
 //  mod reg r/m 
 //   00 000 000
-// *if* insn has a mod/rm byte then ::
+// *if insn has a mod/rm byte then ::
 // #define RM( insnAddr )  (*( (byte*) insnAddr + 1) & 7 )   // binary : 00000111
 // #define REG( insnAddr ) (*( (byte*) insnAddr + 1) & 56 )  // binary : 00111000 
 // #define MOD( insnAddr ) (*( (byte*) insnAddr + 1) & 192 ) // binary : 11000000 

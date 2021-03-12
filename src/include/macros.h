@@ -209,7 +209,7 @@
 #define IS_NAMESPACE_RELATED_TYPE(word) (word->W_MorphismAttributes & NAMESPACE_RELATED_TYPE)
 #define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->W_ObjectAttributes & ( NON_MORPHISM_TYPE ) ) ) \
         && ( ! ( word->W_MorphismAttributes & ( DEBUG_WORD | OBJECT_OPERATOR ) ) ) \
-        && ( ! ( word->W_LispAttributes & (T_LISP_SYMBOL ) ) ) ) || ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK|T_LAMBDA ) ))
+        && ( ! ( word->W_LispAttributes & (T_LISP_SYMBOL ) ) ) ) || ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK ) )  || ( word->W_LispAttributes & ( T_LAMBDA ) ) )
 
 #define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->W_ObjectAttributes & (NAMESPACE_TYPE)) : 0 )
 #define Is_ValueType( w ) ( w ? NON_MORPHISM_TYPE (w) : 0 )
@@ -273,13 +273,14 @@
 #define SC_Global_On if ( GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
 #define SC_Global_Off SetState ( _CSL_, GLOBAL_SOURCE_CODE_MODE, false )
 #define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CSL_->CompilerWordList ) 
+#if 0
 #define Word_SetTsrliScwi( word, tsrli, scwi ) \
     if ( word )\
     {\
-        word->W_RL_Index = ( tsrli == - 1 ) ? _Lexer_->TokenStart_ReadLineIndex : tsrli ;\
-        word->W_SC_Index = ( scwi == - 1 ) ? _Lexer_->SC_Index : scwi ;\
+        word->W_RL_Index = word->W_RL_Index ? word->W_RL_Index : (( tsrli == - 1 ) ? _Lexer_->TokenStart_ReadLineIndex : tsrli) ;\
+        word->W_SC_Index = word->W_SC_Index ? word->W_SC_Index : (( scwi == - 1 ) ? _Lexer_->SC_Index : scwi );\
     }
-
+#endif
 #define Stringn_Equal( string1, string2, n ) (Strncmp ( (byte *) string1, (byte *) string2, n ) == 0 )
 #define Stringni_Equal( string1, string2, n ) (Strnicmp ( (byte *) string1, (byte *) string2, n ) == 0 )
 #define Stringi_Equal( string1, string2 ) (Stricmp ( (byte *) string1, (byte *) string2 ) == 0 )

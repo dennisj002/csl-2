@@ -33,21 +33,19 @@ c_syntaxOff
 pwi factorial
 7 factorial dup p 5040 _assert sp //pause
 sp
-8 bnInit
 Combinators
 #if 0
-BigNum 
-8 bnInit
-dlsym: mpfr_printf /usr/lib/x86_64-linux-gnu/libmpfr.so.6.0.2 ; void_return
+bnOn 
+dlsym: mpfr_printf /usr/lib/x86_64-linux-gnu/libmpfr.so.6.1.0 ; void_return
 : mpfrp ( value ) mpfr_printf ( "%*.*Rf", 16, 16, value ) ;
-: p mpfrp ;
+//: p mpfrp ;
 //: !! ( n) factorial (n) p nl ;;
 //d: !! (7) pause
-7 p pause
+7 mpfrp pause
 #endif
 
 
-BigNum 
+bnOn
 'x var
 : sp ; //stack pause ;
 
@@ -129,10 +127,15 @@ bnOff
 Int
 Lisp
 (define fibc2 ( lambda ( n ) ( ifElse ( < n 2 ) n ( + ( fibc2 ( - n 1 ) ) ( fibc2 ( - n 2 ) ) ) ) ) )
-// ' fibc2 find wdiss
+pwi fibc2 
 (fibc2 20)
-
-
+#if 0    
+(define ( fibc21  n ) ( if ( < n 2 ) n ( + ( fibc21 ( - n 1 ) ) ( fibc21 ( - n 2 ) ) ) ) )
+pwi fibc21 
+(fibc21 20)
+//pause
+#endif
+    
 (define fibbc (lambda (n ) (ifElse (< n 2) n (+ (fibbc (- n 1)) (fibbc (- n 2))))))
 // tick fibbc find wdiss
 (fibbc 20)
@@ -150,30 +153,30 @@ nl (+ 1 3 4 ,@x7)
 (alist)
 //pause
 
-#if doBigNum    
+#if 0 //doBigNum    
 bnOn
 #endif    
-(define yfac45 (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
+(define yfac45 (lambda (yy n) (if (< n 2) (1) (* n (yy yy (- n 1)))))) 
 (yfac45 yfac45 10) nl
-(define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
+(define yfacc (lambda (yyy n1) (if (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
-(yfacc yfacc 20) nl //pause
-(define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
+(yfacc yfacc 10) nl //pause
+(define yfac (lambda (yy n) (if (< n 2) (1) (* n (yy yy (- n 1)))))) 
 (yfac yfac 10) nl
-(define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
+(define yfacc (lambda (yyy n1) (if (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
-(yfacc yfacc 20) nl //pause
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
+(yfacc yfacc 10) nl //pause
+(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 //tick yfac find wdiss
-(yfac yfac 20) nl //pause
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
+(yfac yfac 10) nl //pause
+(define yfacc (lambda (yyy n1) (if (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
+(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 //tick yfac find wdiss
-(yfac yfac 20) nl 
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
+(yfac yfac 10) nl 
+(define yfacc (lambda (yyy n1) (if (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
@@ -181,17 +184,17 @@ sp
 bnOff //pause
 lcOn
 //: sp s pause ; 
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
+(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 tick yfac find wdiss
-(yfac yfac 20) nl //pause
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
+(yfac yfac 10) nl //pause
+(define yfacc (lambda (yyy n1) (if (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
+(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 //tick yfac find wdiss
-(yfac yfac 20) nl //pause
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
+(yfac yfac 10) nl //pause
+(define yfacc (lambda (yyy n1) (if (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
@@ -289,35 +292,35 @@ sp
 sp
 Lisp
 #if doBigNum    
-bnOn
-(define xyfac 50)
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-"\nyfac : 50 factorial = " ps (yfac yfac xyfac) 
+//bnOn
+(define xyfac 10)
+(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
+"\nyfac : 10 factorial = " ps (yfac yfac 10) 
 bnOff 
 #else
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-"\nyfac : 40 factorial = " ps (yfac yfac 40) 
+(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
+"\nyfac : 10 factorial = " ps (yfac yfac 10) 
 #endif    
 Lisp 
 sp
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
+(define yfacc (lambda (yyy n1) (if (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
 Shell 
 #if doBigNum    
-bnOn
+//bnOn
 #endif    
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-(yfac yfac 20) 
+(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
+(yfac yfac 10) 
 bnOff 
 Lisp //pause
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
+(define yfacc (lambda (yyy n1) (if (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
 (define fib (lambda (n) ( ifElse (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))))
 (define fib2 (lambda (n) (ifElse (< n 2) n (+ (fib2 (- n 1)) (fib2 (- n 2))))))
 sp
-(fib 20) (fib2 20)
+(fib 10) (fib2 10)
 sp
 (define x "let") (define a "the") // 'let' is a special word
 (define x1 'let) (define a1 the)

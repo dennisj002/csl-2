@@ -2,43 +2,78 @@
 //===================================================================================================================
 //| LO_SpecialFunction(s) 
 //===================================================================================================================
+#define TEST_NEW 0
+#define DEFINE_DBG _Is_DebugOn
+#if TEST_NEW 
+//#define DEFINE_DBG true
+#define NEW_DEFINE true
+#else
+//#define DEFINE_DBG 0
+#define NEW_DEFINE 0
+#endif
 
 ListObject *
 _LO_Define ( ListObject * l0, ListObject * locals0 )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject *value, *l1, *locals1 = 0 ;
-    Word * word, *idWord ;
+    ListObject *value, *l1, *locals1 = 0, *value1, *l2, *lnext ;
+    Word * word, *idLo ;
+    SetState ( _CSL_, _DEBUG_SHOW_, DEFINE_DBG ) ;
     if ( _Is_DebugOn ) _LO_PrintWithValue ( l0, "\n_LO_Define : l0 = ", "" ) ;
     if ( ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) ) // scheme 'define : ( define ( func args) funcBody )
     {
-        idWord = _LO_First ( l0 ) ;
-        locals1 = _CSL_Parse_LocalsAndStackVariables ( 1, 2, idWord, 0, 0 ) ;
-        locals1->W_LispAttributes |= ( LIST | LIST_NODE ) ;
-        value = _LO_Next ( l0 ) ;
+        idLo = _LO_First ( l0 ) ;
+#if NEW_DEFINE        
+        ListObject * value0, *lambda ;
+        value = LO_List_New ( LISP ) ;
+        value0 = _LO_Next ( l0 ) ;
+        LO_AddToHead ( value, value0 ) ; // body
+#endif
+        value1 = LO_List_New ( LISP ) ;
+        for ( l2 = _LO_Next ( idLo ) ; l2 ; l2 = lnext )
+        {
+            lnext = _LO_Next ( l2 ) ;
+            LO_AddToTail ( value1, l2 ) ;
+            l2->W_ObjectAttributes |= LOCAL_VARIABLE ;
+        }
+        value1->W_LispAttributes |= ( LIST | LIST_NODE ) ;
+        if ( _Is_DebugOn ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "" ) ;
+        locals1 = value1 ;
+#if NEW_DEFINE        
+        LO_AddToHead ( value, value1 ) ;
+        lambda = _LO_Read_DoToken ( _LC_, "lambda", 0, - 1, - 1 ) ;
+        LO_AddToHead ( value, lambda ) ;
+        if ( _Is_DebugOn ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "" ) ;
+        if ( _Is_DebugOn ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "" ) ;
+        if ( _Is_DebugOn ) _LO_PrintWithValue ( value0, "\n_LO_Define : value0 = ", "" ) ;
+        if ( _Is_DebugOn ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "" ) ;
+        //value->W_LispAttributes |= T_LAMBDA ;
+        locals1 = 0 ;
+#endif        
     }
-    else
-    {
-        idWord = l0 ;
-        value = _LO_Next ( l0 ) ;
-    }
-    idWord = idWord->Lo_CSLWord ;
-    word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) idWord->Name, 0,
-        NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, l0->W_RL_Index, l0->W_SC_Index ) ;
+#if NEW_DEFINE
+    else idLo = l0, value = _LO_Next ( l0 ) ;
+#else    
+    else idLo = l0 ;
+    value = _LO_Next ( l0 ) ;
+#endif    
+    idLo = idLo->Lo_CSLWord ;
+    word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) idLo->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, l0->W_RL_Index, l0->W_SC_Index ) ;
     CSL_WordList_Init ( word ) ;
     word->Definition = 0 ; // reset the definition from LO_Read
     _Context_->CurrentWordBeingCompiled = word ;
     word->Lo_CSLWord = word ;
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
     Namespace_DoAddWord ( locals0 ? locals0 : lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
+    if ( _Is_DebugOn ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "" ) ;
+    if ( _Is_DebugOn ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "" ) ;
     if ( locals1 )
     {
         word->Lo_LambdaFunctionParameters = _LO_Copy ( ( ListObject* ) locals1, LISP ) ;
         word->Lo_LambdaFunctionBody = _LO_Copy ( value, LISP ) ;
         word->W_LispAttributes |= T_LAMBDA ;
-        word->Lo_Value = ( uint64 ) value ; // used by eval
         if ( _Is_DebugOn ) _LO_PrintWithValue ( word->Lo_LambdaFunctionParameters, "\n_LO_Define : word->Lo_LambdaFunctionParameters = ", "" ) ;
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( word->Lo_LambdaFunctionBody, "\n_LO_Define : word->Lo_LambdaFunctionBody = ", "" ) ;
+        if ( _Is_DebugOn ) _LO_PrintWithValue ( word->Lo_LambdaFunctionBody, "\n_LO_Define : word->Lo_LambdaFunctionBody = ", "" ) ; //, Pause ( ) ;
     }
     else
     {
@@ -47,10 +82,13 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
         {
             value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
             value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
+            if ( _Is_DebugOn ) _LO_PrintWithValue ( value->Lo_LambdaFunctionParameters, "\n_LO_Define : value->Lo_LambdaFunctionParameters = ", "\n" ) ;
+            if ( _Is_DebugOn ) _LO_PrintWithValue ( value->Lo_LambdaFunctionBody, "\n_LO_Define : value->Lo_LambdaFunctionBody = ", "\n" ) ;
         }
-        else value = _LO_CopyOne ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
-        word->Lo_Value = ( uint64 ) value ; // used by eval
+        else value = _LO_Copy ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
     }
+    SetState ( _CSL_, _DEBUG_SHOW_, false ) ;
+    word->Lo_Value = ( uint64 ) value ; // used by eval
     word->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     word->State |= LC_DEFINED ;
 
@@ -130,7 +168,10 @@ LO_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
         }
         if ( lfirst && lfirst->Lo_CSLWord && IS_MORPHISM_TYPE ( lfirst->Lo_CSLWord ) )
         {
-            l0 = ( ( LispFunction2 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals ) ; // non macro special functions here
+            int64 tlf = (int64) (lfirst->Lo_CSLWord->W_LispAttributes & T_LISP_IF) ;
+            //if ( tlf ) 
+            l0 = ( ( LispFunction3 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals, tlf ) ;  // non macro special functions here
+            //else l0 = ( ( LispFunction3 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals ) ;  // non macro special functions here
         }
         else
         {
@@ -220,112 +261,317 @@ _LO_Cons ( ListObject *first, ListObject * second ) //, uint64 allocType )
     return l0 ;
 }
 
+#if 0
+
 ListObject *
 LO_If ( ListObject * l0, ListObject * locals )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject * tf, *test, *trueList, *elseList, *value ;
-    test = _LO_Next ( l0 ) ;
-    trueList = _LO_Next ( test ) ;
-    elseList = _LO_Next ( trueList ) ;
-    tf = _LO_Eval ( lc, test, locals, 1 ) ;
-    if ( ( *tf->Lo_PtrToValue ) && ( tf != nil ) ) value = _LO_Eval ( lc, trueList, locals, 1 ) ;
-    else value = _LO_Eval ( lc, elseList, locals, 1 ) ;
-
-    return value ;
-}
-
-ListObject *
-LO_Cond0 ( ListObject * l0, ListObject * locals )
-{
-    LambdaCalculus * lc = _LC_ ;
-    ListObject * tfTestNode, *trueNode, * elseNode = nil ;
+    ListObject * test, *testResult, *sequence, *result ;
     // 'cond' is first node ; skip it.
     l0 = _LO_First ( l0 ) ; // the 'cond' (maybe aliased)
-    tfTestNode = _LO_Next ( l0 ) ;
-    while ( ( trueNode = _LO_Next ( tfTestNode ) ) )
+    test = _LO_Next ( l0 ) ;
+    if ( Is_DebugOn ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "" ) ;
+    while ( ( sequence = _LO_Next ( test ) ) )
     {
-        tfTestNode = _LO_Eval ( lc, tfTestNode, locals, 1 ) ;
-        if ( ( tfTestNode != nil ) && ( *tfTestNode->Lo_PtrToValue ) )
+        if ( Is_DebugOn ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "" ) ;
+        if ( String_Equal ( test->Name, "else" ) )
         {
-            return _LO_Eval ( lc, LO_CopyOne ( trueNode ), locals, 1 ) ;
+            //if ( Is_DebugOn ) _LO_PrintWithValue ( sequence, "\nLO_Cond : sequence = ", "" ) ;
+            result = _LO_Eval ( lc, sequence, locals, 1 ) ;
+            break ;
         }
-            // nb we have to LO_CopyOne here else we return the whole rest of the list 
-            // and we can't remove it else it could break a LambdaBody, etc.
-        else
+        testResult = _LO_Eval ( lc, test, locals, 1 ) ;
+        if ( ( testResult->Lo_Value ) || ( String_Equal ( testResult->Name, "else" ) ) )
         {
-            tfTestNode = elseNode = _LO_Next ( trueNode ) ;
+            //if ( Is_DebugOn ) _LO_PrintWithValue ( sequence, "\nLO_Cond : sequence = ", "" ) ;
+            result = _LO_Eval ( lc, sequence, locals, 1 ) ;
+            break ;
         }
+        else test = _LO_Next ( sequence ) ;
     }
-    return _LO_Eval ( lc, LO_CopyOne ( elseNode ), locals, 1 ) ;
+    if ( ! sequence )
+    {
+        if ( Is_DebugOn ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "" ) ;
+        result = _LO_Eval ( lc, test, locals, 1 ) ;
+    }
+    if ( Is_DebugOn ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "" ) ;
+    return result ;
 }
+#else
+
+ListObject *
+LO_If ( ListObject * l0, ListObject * locals )
+{
+    return LO_Cond ( l0, locals, 1 ) ;
+
+}
+#endif
 
 /* not exactly but ...
 LIST:
 '(' ( LIST | ATOM ) + ')'
 COND : LIST | ATOM
 IFTRUE : LIST | ATOM
-CONDITIONAL : '(' COND IFTRUE ')' | ( COND IFTRUE )
+CONDITIONAL : ( cond ( <cond clause>+ )
 COND_FUNC : '(' 'cond' ( CONDITIONAL )+ ( IFTRUE | 'else' IFTRUE ) ? ')'
+ * r7r2 : formal syntax
+The following extensions to BNF are used to make the de-
+scription more concise: <thing>* means zero or more occur-
+rences of <thing>; and <thing>+ means at least one <thing>.
+<expression> : <identifier>
+    | <literal>
+    | <procedure call>
+    | <lambda expression>
+    | <conditional>
+    | <assignment>
+    | <derived expression>
+    | <macro use>
+    |<macro block>
+    | <includer>
+<conditional> : (if <test> <consequent> <alternate>)
+<test> : <expression>
+<test> : <expression> 
+<command> : <expression>
+<sequence> : <command>* <expression> 
+<cond clause> : (<test> <sequence>) | (<test>)
+<derived expression> : (cond <cond clause>+ ) | (cond <cond clause>* (else <sequence>)) | ...
  */
+#if 1
+#define IS_COND_MORPHISM_TYPE(word) ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK|T_LAMBDA ) || ( word->W_LispAttributes & ( T_LAMBDA ) ) )
 ListObject *
-LO_Cond ( ListObject * l0, ListObject * locals )
+LO_Cond ( ListObject * l0, ListObject * locals, int64 ifFlag )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject *conditional, * testNode, *testNodeForElse = 0, *trueNode, * resultNode = nil, * result, *testTorF ;
+    ListObject *condClause, * test, *testForElse = 0, *sequence, * resultNode = nil, * result, *testResult, *seqNext = 0 ;
+    Boolean timt = false, tilt = false ; // timt : test is morphism type ; tilt : test is list type
     // 'cond' is first node ; skip it.
-    //if ( Is_DebugOn ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "" ) ;
-    //if ( Is_DebugOn ) if ( locals ) _LO_PrintWithValue ( locals, "\nLO_Cond : locals = ", "" ) ;
-    if ( conditional = _LO_Next ( l0 ) )
+    if ( DEFINE_DBG ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "" ) ;
+    if ( condClause = _LO_Next ( l0 ) )
     {
         do
         {
-            //if ( Is_DebugOn ) _LO_PrintWithValue ( conditional, "\nLO_Cond : conditional = ", "" ) ;
-            testNode = _LO_First ( conditional ) ;
-            if ( testNode->W_LispAttributes & ( LIST | LIST_NODE ) ) 
+            if ( DEFINE_DBG ) _LO_PrintWithValue ( condClause, "\nLO_Cond : condClause = ", "" ) ;
+            test = _LO_First ( condClause ) ;
+            if ( DEFINE_DBG ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "" ) ;
+            if ( test->W_LispAttributes & ( LIST | LIST_NODE ) )
             {
-                testNodeForElse = _LO_First ( testNode ) ;
-                //if ( Is_DebugOn && String_Equal ( testNodeForElse->Name, "else" )) Printf ("\ngot : else\n") ;
+                tilt = true ;
+                testForElse = _LO_First ( test ) ;
+                if ( String_Equal ( testForElse->Name, "else" ) )
+                {
+                    resultNode = _LO_Next ( test ) ;
+                    break ;
+                }
             }
-            else testNodeForElse = testNode ;
-            //if ( Is_DebugOn ) _LO_PrintWithValue ( testNode, "\nLO_Cond : testNode = ", "" ) ;
-            trueNode = _LO_Next ( testNode ) ;
-            testTorF = _LO_Eval ( lc, testNode, locals, 1 ) ;
-            //if ( Is_DebugOn ) _LO_PrintWithValue ( testTorF, "\nLO_Cond : testTorF = ", "" ) ;
-            if ( ( ( testTorF != nil ) && ( testTorF->Lo_Value ) ) || ( String_Equal ( testNodeForElse->Name, "else" ) ) )
+            else if ( timt = IS_MORPHISM_TYPE ( test ) ) test = condClause, tilt = true ;
+            if ( DEFINE_DBG ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "" ) ;
+            sequence = _LO_Next ( test ) ;
+            if ( ! sequence )
             {
-                if ( trueNode ) resultNode = trueNode ;
-                else resultNode = testNode ;
-                //if ( Is_DebugOn && String_Equal ( testNodeForElse->Name, "else" ) ) Printf ("\nLO_Cond : testNode = else ") ;
+                if ( DEFINE_DBG ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "" ) ;
+                resultNode = test ; // where there is just a test with a sequence => a finally : the test is the finally
                 break ;
             }
-                // nb we have to LO_CopyOne here else we return the whole rest of the list 
-                // and we can't remove it else it could break a LambdaBody, etc.
-            else conditional = _LO_Next ( conditional ) ;
-#if 0            
-            if ( ! conditional )
+            testResult = _LO_Eval ( lc, test, locals, 1 ) ;
+            if ( testResult->Lo_Value || ( String_Equal ( test->Name, "else" ) ) )
             {
-                Printf ("\n\nError : no next conditional ") ;
-                if ( Is_DebugOn ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "" ) ;
-                if ( Is_DebugOn ) _LO_PrintWithValue ( testNode, "\nLO_Cond : testNode = ", "" ) ;
-                if ( Is_DebugOn ) _LO_PrintWithValue ( testTorF, "\nLO_Cond : testTorF = ", "" ) ;
-                if ( Is_DebugOn ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : last resultNode = ", "" ) ;
-                if ( Is_DebugOn ) if ( locals ) _LO_PrintWithValue ( locals, "\nLO_Cond : locals = ", "" ) ;
-                //Error ( "\nLO_Cond : no result condition", QUIT ) ;
-                break ; //return nil ;
+                resultNode = sequence ;
+                break ;
             }
-#endif            
+            else
+            {
+                if ( ifFlag )
+                {
+                    seqNext = _LO_Next ( sequence ) ;
+                    if ( seqNext ) condClause = seqNext ;
+                    else condClause = _LO_Next ( condClause ) ;
+                    resultNode = condClause ;
+                    break ;
+                }
+                Boolean silt = ( sequence->W_LispAttributes & ( LIST | LIST_NODE ) ) ;
+                if ( ( ! timt ) && ( ! tilt ) && ( ! silt ) )
+                {
+                    seqNext = _LO_Next ( sequence ) ;
+                    if ( seqNext ) condClause = seqNext ;
+                    else condClause = _LO_Next ( condClause ) ;
+                }
+                else condClause = _LO_Next ( condClause ) ;
+                if ( timt ) condClause = _LO_Next ( condClause ) ;
+            }
+            timt = false ;
+            tilt = false ;
         }
-        while ( conditional ) ;
-        if ( ! resultNode ) resultNode = testNode ; //trueNode ? trueNode : testNode ;
-        //if ( Is_DebugOn ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "" ) ;
-        //result = _LO_Eval ( lc, LO_CopyOne ( resultNode ), locals, 1 ) ; // last one, no need to copy
+        while ( condClause ) ;
+        if ( ! resultNode )
+            resultNode = test ; // where there is just a test with a sequence => a finally : the test is the finally
+        if ( DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "" ) ;
+        result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
+        if ( DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "" ) ;
+        return result ;
+    }
+    return nil ;
+}
+#elif 1 // backup working copy 0.915.920
+
+ListObject *
+LO_Cond ( ListObject * l0, ListObject * locals, 0 )
+{
+    LambdaCalculus * lc = _LC_ ;
+    ListObject *condClause, * test, *testForElse = 0, *sequence, * resultNode = nil, * result, *testResult ;
+    Boolean mt = false ;
+    // 'cond' is first node ; skip it.
+    if ( DEFINE_DBG ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "" ) ;
+    if ( condClause = _LO_Next ( l0 ) )
+    {
+        do
+        {
+            if ( DEFINE_DBG ) _LO_PrintWithValue ( condClause, "\nLO_Cond : condClause = ", "" ) ;
+            test = _LO_First ( condClause ) ;
+            if ( test->W_LispAttributes & ( LIST | LIST_NODE ) )
+            {
+                testForElse = _LO_First ( test ) ;
+                if ( String_Equal ( testForElse->Name, "else" ) )
+                {
+                    resultNode = _LO_Next ( test ) ;
+                    break ;
+                }
+            }
+            else if ( mt = IS_MORPHISM_TYPE ( test ) ) test = condClause ;
+            if ( DEFINE_DBG ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "" ) ;
+            testResult = _LO_Eval ( lc, test, locals, 1 ) ;
+            if ( ( ( testResult != nil ) && ( testResult->Lo_Value ) ) )
+            {
+                sequence = _LO_Next ( test ) ;
+                if ( sequence ) resultNode = sequence ;
+                else resultNode = test ;
+                break ;
+            }
+            else
+            {
+                condClause = _LO_Next ( condClause ) ;
+                if ( mt ) condClause = _LO_Next ( condClause ) ;
+                mt = false ;
+            }
+        }
+        while ( condClause ) ;
+        if ( ! resultNode ) resultNode = test ;
+        if ( DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "" ) ;
+        result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
+        if ( DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "" ) ;
+        return result ;
+    }
+    return nil ;
+}
+#elif 0
+
+ListObject *
+LO_ElseTest ( ListObject * elseNode )
+{
+    ListObject * resultNode = 0 ;
+    if ( elseNode )
+    {
+        while ( elseNode->W_LispAttributes & ( LIST | LIST_NODE ) )
+        {
+            elseNode = _LO_First ( elseNode ) ;
+        }
+        if ( String_Equal ( elseNode->Name, "else" ) ) resultNode = _LO_Next ( elseNode ) ;
+    }
+    return resultNode ;
+}
+
+ListObject *
+LO_Cond ( ListObject * l0, ListObject * locals, 0 )
+{
+    LambdaCalculus * lc = _LC_ ;
+    ListObject *condClause, *condClause1, * test, *elseNode = 0, *sequence, * resultNode = nil, * result, *testTorF ;
+    // 'cond' is first node ; skip it.
+    if ( Is_DebugOn ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "" ) ;
+    //if ( Is_DebugOn ) if ( locals ) _LO_PrintWithValue ( locals, "\nLO_Cond : locals = ", "" ) ;
+    if ( condClause = _LO_Next ( l0 ) )
+    {
+        do
+        {
+#if 0            
+            //if ( Is_DebugOn ) _LO_PrintWithValue ( condClause, "\nLO_Cond : condClause = ", "" ) ;
+            test = _LO_First ( condClause ) ;
+            if ( test->W_LispAttributes & ( LIST | LIST_NODE ) )
+            {
+                testForElse = _LO_First ( test ) ;
+                //if ( Is_DebugOn && String_Equal ( testForElse->Name, "else" )) Printf ("\ngot : else\n") ;
+            }
+            else testForElse = test ;
+            //if ( Is_DebugOn ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "" ) ;
+#endif      
+            // what is test? what is sequence?
+            //test = condClause ;
+            do
+            {
+                if ( IS_NON_MORPHISM_TYPE ( condClause ) )
+                {
+                    test = condClause ;
+                    break ;
+                }
+                else if ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) )
+                {
+                    condClause = _LO_First ( condClause ) ;
+                    if ( sequence = _LO_Next ( condClause1 ) )
+                    {
+                        if ( sequence->W_LispAttributes & ( LIST | LIST_NODE ) ) ;
+                    }
+                    //if ( Is_DebugOn && String_Equal ( testForElse->Name, "else" )) Printf ("\ngot : else\n") ;
+                }
+                else ;
+            }
+            while ( 1 ) ;
+            if ( Is_DebugOn ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "" ) ;
+            sequence = _LO_Next ( test ) ;
+            if ( resultNode = LO_ElseTest ( test ) ) break ;
+            if ( Is_DebugOn ) _LO_PrintWithValue ( sequence, "\nLO_Cond : sequence = ", "" ) ;
+            testTorF = _LO_Eval ( lc, test, locals, 1 ) ;
+            //if ( Is_DebugOn ) _LO_PrintWithValue ( testTorF, "\nLO_Cond : testTorF = ", "" ) ;
+            if ( ( ( testTorF != nil ) && ( testTorF->Lo_Value ) ) )
+            {
+                if ( sequence ) resultNode = sequence ;
+                else resultNode = test ;
+                //if ( Is_DebugOn && String_Equal ( testForElse->Name, "else" ) ) Printf ("\nLO_Cond : test = else ") ;
+                break ;
+            }
+            else if ( resultNode = LO_ElseTest ( sequence ) ) break ;
+            else condClause = _LO_Next ( sequence ) ;
+        }
+        while ( condClause ) ;
+        if ( ! resultNode ) resultNode = test ; //sequence ? sequence : test ;
+        if ( Is_DebugOn ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "" ) ;
         result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
         //if ( Is_DebugOn ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "" ) ;
         return result ;
     }
     return nil ;
 }
+#elif 0
+
+ListObject *
+LO_Cond ( ListObject * l0, ListObject * locals, 0 )
+{
+    LambdaCalculus * lc = _LC_ ;
+    ListObject *condClause, *testForElse, *resultNode = 0, * result, *testTorF ;
+    // 'cond' is first node ; skip it.
+    condClause = _LO_Next ( l0 ) ;
+    while ( condClause )
+    {
+        testForElse = _LO_First ( condClause ) ;
+        if ( testForElse->W_LispAttributes & ( LIST | LIST_NODE ) ) testForElse = _LO_First ( testForElse ) ;
+        resultNode = _LO_Next ( testForElse ) ;
+        if ( resultNode->W_LispAttributes & ( LIST | LIST_NODE ) ) resultNode = _LO_First ( resultNode ) ;
+        testTorF = _LO_Eval ( lc, testForElse, locals, 1 ) ;
+        if ( ( ( testTorF != nil ) && ( testTorF->Lo_Value ) ) || ( String_Equal ( testForElse->Name, "else" ) ) || ( String_Equal ( testTorF->Name, "else" ) ) ) break ;
+        else condClause = _LO_Next ( condClause ) ;
+    }
+    result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
+    return result ;
+}
+#endif
 // lisp 'list' function
 // lfirst must be the first element of the list
 
@@ -370,66 +616,7 @@ LO_Begin ( ListObject * l0, ListObject * locals )
     SetState ( _LC_, LC_BEGIN_MODE, false ) ;
     return leval ;
 }
-#if 0
-ListObject *
-LO_Logic_Equals ( ListObject * l0, ListObject * locals )
-{
-    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
-    lsecond = _LO_Next ( lfirst ) ;
-    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
-    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
-    DataStack_Push ( ( int64 ) ( lf->Lo_Value == ls->Lo_Value ) ) ;
-    lresult = LO_PrepareReturnObject ( ) ;
-    return lresult ;
-}
 
-ListObject *
-LO_Plus ( ListObject * l0, ListObject * locals )
-{
-    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
-    lsecond = _LO_Next ( lfirst ) ;
-    //lf = _LO_Eval ( _LC_, LO_CopyOne (lfirst), locals, 1 ) ;
-    //ls = _LO_Eval ( _LC_, LO_CopyOne (lsecond), locals, 1 ) ;
-    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
-    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
-    DataStack_Push ( ( int64 ) ( lf->Lo_Value + ls->Lo_Value ) ) ;
-    lresult = LO_PrepareReturnObject ( ) ;
-    return lresult ;
-}
-
-ListObject *
-LO_Minus ( ListObject * l0, ListObject * locals )
-{
-    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
-    lsecond = _LO_Next ( lfirst ) ;
-    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
-    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
-    DataStack_Push ( ( int64 ) ( lf->Lo_Value - ls->Lo_Value ) ) ;
-    lresult = LO_PrepareReturnObject ( ) ;
-    return lresult ;
-}
-
-ListObject *
-LO_LessThan ( ListObject * l0, ListObject * locals )
-{
-    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
-    lsecond = _LO_Next ( lfirst ) ;
-    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
-    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
-    DataStack_Push ( ( int64 ) ( lf->Lo_Value < ls->Lo_Value ) ) ;
-    lresult = LO_PrepareReturnObject ( ) ;
-    return lresult ;
-}
-
-ListObject *
-LO_Else ( ListObject * l0 )
-{
-    ListObject * lfirst = _LO_Next ( l0 ) ;
-    //if ( lfirst->W_LispAttributes & ( LIST_NODE | LIST ) ) return LO_CopyOne ( _LO_First ( lfirst ) ) ; //( ListObject * ) lfirst ;
-    return LO_Eval ( LO_CopyOne ( lfirst ) ) ;
-}
-
-#endif
 ListObject *
 LO_Car ( ListObject * l0 )
 {
@@ -583,4 +770,66 @@ _LO_CSL ( ListObject * lfirst )
     }
     return nil ;
 }
+
+#if 0
+
+ListObject *
+LO_Logic_Equals ( ListObject * l0, ListObject * locals )
+{
+    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
+    lsecond = _LO_Next ( lfirst ) ;
+    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
+    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
+    DataStack_Push ( ( int64 ) ( lf->Lo_Value == ls->Lo_Value ) ) ;
+    lresult = LO_PrepareReturnObject ( ) ;
+    return lresult ;
+}
+
+ListObject *
+LO_Plus ( ListObject * l0, ListObject * locals )
+{
+    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
+    lsecond = _LO_Next ( lfirst ) ;
+    //lf = _LO_Eval ( _LC_, LO_CopyOne (lfirst), locals, 1 ) ;
+    //ls = _LO_Eval ( _LC_, LO_CopyOne (lsecond), locals, 1 ) ;
+    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
+    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
+    DataStack_Push ( ( int64 ) ( lf->Lo_Value + ls->Lo_Value ) ) ;
+    lresult = LO_PrepareReturnObject ( ) ;
+    return lresult ;
+}
+
+ListObject *
+LO_Minus ( ListObject * l0, ListObject * locals )
+{
+    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
+    lsecond = _LO_Next ( lfirst ) ;
+    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
+    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
+    DataStack_Push ( ( int64 ) ( lf->Lo_Value - ls->Lo_Value ) ) ;
+    lresult = LO_PrepareReturnObject ( ) ;
+    return lresult ;
+}
+
+ListObject *
+LO_LessThan ( ListObject * l0, ListObject * locals )
+{
+    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
+    lsecond = _LO_Next ( lfirst ) ;
+    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
+    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
+    DataStack_Push ( ( int64 ) ( lf->Lo_Value < ls->Lo_Value ) ) ;
+    lresult = LO_PrepareReturnObject ( ) ;
+    return lresult ;
+}
+
+ListObject *
+LO_Else ( ListObject * l0 )
+{
+    ListObject * lfirst = _LO_Next ( l0 ) ;
+    //if ( lfirst->W_LispAttributes & ( LIST_NODE | LIST ) ) return LO_CopyOne ( _LO_First ( lfirst ) ) ; //( ListObject * ) lfirst ;
+    return LO_Eval ( LO_CopyOne ( lfirst ) ) ;
+}
+
+#endif
 

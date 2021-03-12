@@ -264,6 +264,8 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->ReturnLParenVariableWord = 0 ;
     compiler->ReturnLParenOperandWord = 0 ;
     compiler->Current_Word_New = 0 ;
+    CSL_NonCompilingNs_Clear ( compiler ) ; // for special syntax : we have a namespace but not while compiling
+    Compiler_FreeLocalsNamespaces ( compiler ) ;
     compiler->LocalsNamespace = 0 ;
     compiler->Current_Word_Create = 0 ;
     Stack_Init ( compiler->BlockStack ) ;
@@ -281,7 +283,6 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     //SetBuffersUnused ( 0 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
-    if ( compiler->NonCompilingNs != compiler->LocalsNamespace ) CSL_NonCompilingNs_Clear ( compiler ) ; // for special syntax : we have a namespace but not while compiling
     //CSL_AfterWordReset ( ) ;
 }
 

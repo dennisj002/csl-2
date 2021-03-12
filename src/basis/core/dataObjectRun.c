@@ -287,7 +287,7 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
             if ( token1 )
             {
                 Word * word0 = _Interpreter_TokenToWord ( interp, token1, - 1, - 1 ) ;
-                word = Compiler_CopyDuplicatesAndPush ( word0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
+                word = Compiler_CopyDuplicatesAndPush (word0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index) ;
                 if ( word )
                 {
                     word->ObjectByteSize = CSL_GetAndSet_ObjectByteSize ( word ) ;
@@ -300,9 +300,9 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
         {
             Ovt_AutoVarOn ( ) ;
             Namespace * ns = Compiler_LocalsNamespace_New ( _Compiler_ ) ;
-            word = Lexer_Do_MakeItAutoVar ( _Lexer_, token0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
+            word = Lexer_Do_MakeItAutoVar ( _Lexer_, token0, -1, -1 ) ;
             Compiler_Set_LHS ( word ) ;
-            Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+            Interpreter_DoWord ( interp, word, -1, -1 ) ;
             _Compile_C_TypeDeclaration ( ) ;
         }
         Ovt_AutoVarOff ( ) ;

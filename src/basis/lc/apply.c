@@ -311,7 +311,7 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
     ListObject *l1 = * pl1 ;
     Word * word = l1->Lo_CSLWord ;
     byte * here = Here ;
-    word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
+    word = Compiler_CopyDuplicatesAndPush (word, l1->W_RL_Index, l1->W_SC_Index) ;
     Word_Eval ( word ) ;
     Word *baseObject = _Context_->BaseObject ;
     if ( ( word->W_ObjectAttributes & OBJECT_TYPE ) )
@@ -353,7 +353,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
     else if ( ( l1->Name[0] == '[' ) ) _LO_Apply_ArrayArg ( pl1, i ) ;
     else
     {
-        word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
+        word = Compiler_CopyDuplicatesAndPush (word, l1->W_RL_Index, l1->W_SC_Index) ;
         DEBUG_SETUP ( word, 0 ) ;
         _Compile_Move_StackN_To_Reg ( RegParameterOrder ( ( *i ) ++ ), DSP, 0 ) ;
         _DEBUG_SHOW ( word, 1, 0 ) ;
@@ -386,7 +386,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         _Debugger_->SpecialPreHere = Here ;
         //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, i, CELL ) ;
-        word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
+        word = Compiler_CopyDuplicatesAndPush (word, word->W_RL_Index, word->W_SC_Index) ;
         Word_Eval ( word ) ;
         if ( word->W_MorphismAttributes & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
         if ( ! svcm )

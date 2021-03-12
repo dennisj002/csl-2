@@ -315,7 +315,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
     byte * svDelimiters = lexer->TokenDelimiters ;
     Word * word ;
     int64 objectAttributes = 0, lispAttributes = 0, numberOfRegisterVariables = 0, numberOfVariables = 0 ;
-    int64 svff = 0, addWords, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
+    int64 svff = 0, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
     Boolean regFlag = false ;
     byte *token ;
     Namespace *typeNamespace = 0, *objectTypeNamespace = 0, *saveInNs = _CSL_->InNamespace ;
@@ -323,11 +323,11 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
     if ( ! CompileMode ) Compiler_Init ( compiler, 0 ) ;
 
     if ( svf ) svff = 1 ;
-    addWords = 1 ;
+    if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, 1 ) ;
     if ( lispMode == 2 ) args = ( ListObject * ) args ;
     else if ( lispMode ) args = ( ListObject * ) args->Lo_List->Head ;
 
-    while ( ( lispMode ? ( int64 ) (args = _LO_Next ( args ))  : 1 ) )
+    while ( ( lispMode ? ( int64 ) ( args = _LO_Next ( args ) ) : 1 ) )
     {
         if ( lispMode )
         {
@@ -363,7 +363,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
                 if ( GetState ( _CSL_, OPTIMIZE_ON ) ) regFlag = true ;
                 continue ;
             }
-            if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( _String_EqualSingleCharString ( token, '{' ) ) || 
+            if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( _String_EqualSingleCharString ( token, '{' ) ) ||
                 ( _String_EqualSingleCharString ( token, ';' ) ) )
             {
                 //_Printf ( "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
@@ -380,48 +380,44 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
                     continue ;
                 }
             }
-            if ( addWords )
+            if ( svff )
             {
-                if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, 1 ) ;
-                if ( svff )
-                {
-                    objectAttributes |= PARAMETER_VARIABLE ; // aka an arg
-                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
-                }
-                else
-                {
-                    objectAttributes |= LOCAL_VARIABLE ;
-                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
-                }
-                if ( regFlag == true )
-                {
-                    objectAttributes |= REGISTER_VARIABLE ;
-                    numberOfRegisterVariables ++ ;
-                }
-                word = DataObject_New ( objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
-                if ( lispMode ) dllist_AddNodeToTail ( localsNs->W_List, ( dlnode* ) word ) ;
-                if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables ++] = '_' ;
-                if ( regFlag == true )
-                {
-                    word->RegToUse = RegParameterOrder ( regToUseIndex ++ ) ;
-                    if ( word->W_ObjectAttributes & PARAMETER_VARIABLE )
-                    {
-                        if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
-                        _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
-                    }
-                    regFlag = false ;
-                }
-                if ( objectTypeNamespace )
-                {
-                    Compiler_TypedObjectInit ( word, objectTypeNamespace ) ;
-                    Word_TypeChecking_SetSigInfoForAnObject ( word ) ;
-                }
-                else if ( typeNamespace ) word->CompiledDataFieldByteSize = typeNamespace->CompiledDataFieldByteSize ;
-                if ( String_Equal ( token, "this" ) ) word->W_ObjectAttributes |= THIS ;
-                typeNamespace = 0 ;
-                objectTypeNamespace = 0 ;
-                objectAttributes = 0 ;
+                objectAttributes |= PARAMETER_VARIABLE ; // aka an arg
+                if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
             }
+            else
+            {
+                objectAttributes |= LOCAL_VARIABLE ;
+                if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
+            }
+            if ( regFlag == true )
+            {
+                objectAttributes |= REGISTER_VARIABLE ;
+                numberOfRegisterVariables ++ ;
+            }
+            word = DataObject_New ( objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+            if ( lispMode ) dllist_AddNodeToTail ( localsNs->W_List, ( dlnode* ) word ) ;
+            if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables ++] = '_' ;
+            if ( regFlag == true )
+            {
+                word->RegToUse = RegParameterOrder ( regToUseIndex ++ ) ;
+                if ( word->W_ObjectAttributes & PARAMETER_VARIABLE )
+                {
+                    if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
+                    _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
+                }
+                regFlag = false ;
+            }
+            if ( objectTypeNamespace )
+            {
+                Compiler_TypedObjectInit ( word, objectTypeNamespace ) ;
+                Word_TypeChecking_SetSigInfoForAnObject ( word ) ;
+            }
+            else if ( typeNamespace ) word->CompiledDataFieldByteSize = typeNamespace->CompiledDataFieldByteSize ;
+            if ( String_Equal ( token, "this" ) ) word->W_ObjectAttributes |= THIS ;
+            typeNamespace = 0 ;
+            objectTypeNamespace = 0 ;
+            objectAttributes = 0 ;
         }
         else return 0 ; // Syntax Error or no local or parameter variables
     }

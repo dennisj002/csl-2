@@ -350,7 +350,6 @@ CSL_PP_Define ( )
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
-    ReadLiner * rl = cntx->ReadLiner0 ;
     Word * word ;
     SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
     CSL_Colon ( ) ;

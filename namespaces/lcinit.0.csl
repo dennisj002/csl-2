@@ -1,26 +1,57 @@
 verbosity 1 =
-typecheckOff
-Int Lisp
+//typecheckOff
+Int lcOn
 (( lambda ( x y ) ( + x y ) ) 3 4 ) 
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1))))))
+(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1))))))
 (yfac yfac 10) nl
-(define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
+(define yfacc (lambda (yyy n1) (if (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl //pause
 (yfacc yfacc 7) nl 
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+pwi fibc
 "\nfibc 20 = " ps
 (fibc 20)
-#if lcOff doLispTest @ lcOn
+#if 1    
+(define (fibc1 n ) (if (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2)))))
+pwi fibc1
+"\nfibc1 10 = " ps
+(fibc1 10) 
+//pause
+#endif    
+lcOff 
+#if doLispTest @ // from sicp
+lcOn
 //bnOn
-(define (abs n) (cond (( < n 0 ) (- 0 n)) n )) ( abs -9)
+bnInit ( 32 )
+(define (abs n) (cond (( < n 0 ) (- 0 n)) n )) 
+( abs -9)
+( abs 9)
 (define (square n) (* n n))
 (define (average x y) ( / (+ x y) 2 ))  
 (define (improve guess x) (average guess (/ x guess)))    
-(define (good-enough? guess x) ( < ( abs ( - (square guess) x)) 0.001))  
-(define (sq-iter guess x) (if* (good-enough? guess x) guess (sq-iter (improve guess x ) x )))    
+(define (good-enough? guess x) ( < ( abs ( - (square guess) x)) 0.00000000001))  
+(define (sq-iter guess x) (if (good-enough? guess x) guess (sq-iter (improve guess x ) x )))    
 ( define (sqrt x) ( sq-iter 1.0 x))
-//(sqrt 9) 
-//bnOff
+(sqrt 9) 
+(sqrt 2) 
+(sqrt (sqrt 9) ) 
+bnOff
+(define (fibsicp n)
+  (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+
+(fibsicp 40)           
 (define ( A x y) 
     (cond 
         (( = y 0 ) 0 )
@@ -77,6 +108,6 @@ Int Lisp
         ((= kinds-of-coins 4) 25)
         ((= kinds-of-coins 5) 50)))
 
-(count-change 100)
-            
+(count-change 100)            
+(fibsicp 40)           
 #endif

@@ -20,6 +20,7 @@ CSL_RuntimeInit ( CSL * csl, int64 cntxDelFlag )
     SetBuffersUnused ( 1 ) ;
     d0 ( Buffer_PrintBuffers ( ) ) ;
     DefaultColors ;
+    //LC_Reset ( ) ;
     CSL_CheckInitDataStack ( ) ;
     _CSL_TypeStackReset ( ) ;
     CSL_RecycleInit_CSL_N_M_Node_WordList ( ) ;
@@ -42,7 +43,7 @@ _CSL_Init_SessionCore ( CSL * csl, Boolean cntxDelFlag, Boolean promptFlag )
     Finder_Init ( cntx->Finder0 ) ;
     Compiler_Init ( cntx->Compiler0, 0 ) ;
     Interpreter_Init ( cntx->Interpreter0 ) ;
-    if ( _LC_ ) LC_Init_Runtime ( ) ;
+    LC_Init_Runtime ( ) ;
     CSL_RuntimeInit ( csl, cntxDelFlag ) ;
     if ( csl->InitSessionCoreTimes ++ ) OVT_RuntimeInit ( ) ;
     _BigNum_Init ( 16 ) ;
@@ -61,7 +62,7 @@ CSL_ResetAll_Init ( CSL * csl )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
     if ( ! GetState ( _O_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/csl/namespaces" ;
-    DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", 0, NAMESPACE_VARIABLE, 0, 0, ( int64 ) startDirectory, 0, 0, 0, - 1 ) ;
+    DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", 0, NAMESPACE_VARIABLE, 0, 0, ( int64 ) startDirectory, 0, 0, 0, 0 ) ;
     _CSL_Init_SessionCore ( csl, 1, 0 ) ;
     if ( ( _O_->RestartCondition >= RESET_ALL ) )
     {

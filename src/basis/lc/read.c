@@ -93,7 +93,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         Word_Eval ( word ) ;
         token1 = ( byte * ) DataStack_Pop ( ) ;
         SetState ( lc, ( LC_READ ), true ) ;
-        l0 = DataObject_New (T_LC_LITERAL, 0, token1, 0, LITERAL | word->W_ObjectAttributes, word->W_LispAttributes, 0, 0, 0, allocType, tsrli, scwi ) ;
+        l0 = DataObject_New (T_LC_LITERAL, 0, token1, 0, LITERAL | word->W_ObjectAttributes, word->W_LispAttributes, 0, _Lexer_->Literal, 0, allocType, tsrli, scwi ) ;
     }
     else
     {

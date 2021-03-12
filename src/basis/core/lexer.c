@@ -320,7 +320,7 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
     Boolean nwlp ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( nwlp = Lexer_IsNextWordLeftParen ( lexer ) ) &&  ( word->W_TypeAttributes & ( WT_PREFIXABLE ) ) ) return true ;
+    else if ( ( nwlp = Lexer_IsNextWordLeftParen ( lexer ) ) && ( word->W_TypeAttributes & ( WT_PREFIXABLE ) ) ) return true ;
     else if ( ( ( ! word->Name || ( word->Name[0] == '(' ) ) ) || ( ( GetState ( _Interpreter_, PREPROCESSOR_MODE ) ) && ( ( word->W_TypeAttributes & W_PREPROCESSOR ) ||
         ( ! ( word->W_MorphismAttributes & PREFIX ) ) && ( ! ( word->W_MorphismAttributes & CSL_WORD ) ) ) ) ) return false ;
     else if ( ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
@@ -336,11 +336,11 @@ byte *
 Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svReadIndexFlag )
 {
     ReadLiner * rl = _ReadLiner_ ;
-    int64 svReadIndex = rl->ReadIndex ;
+    int64 svReadIndex = rl->ReadIndex, svSC_Index = lexer->SC_Index, svTokenStart_ReadLineIndex = lexer->TokenStart_ReadLineIndex ;
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     CSL_PushToken_OnTokenList ( token ) ;
     if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
-
+    lexer->SC_Index = svSC_Index , lexer->TokenStart_ReadLineIndex = svTokenStart_ReadLineIndex  ; // this is peek so we want to keep actual values for debugger show words
     return token ;
 }
 
@@ -1145,15 +1145,5 @@ Lexer_ConvertLineIndexToFileIndex ( Lexer * lexer, int64 index )
 {
 
     return lexer->TokenStart_FileIndex = lexer->ReadLiner0->LineStartFileIndex + index ; //- lexer->Token_Length ;
-}
-
-void
-Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word, int64 tsrli, int64 scwi )
-{
-    if ( word )
-    {
-        word->W_RL_Index = ( tsrli != - 1 ) ? tsrli : lexer->TokenStart_ReadLineIndex ;
-        word->W_SC_Index = ( scwi != - 1 ) ? scwi : lexer->SC_Index ;
-    }
 }
 

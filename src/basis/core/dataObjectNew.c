@@ -24,7 +24,7 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttribute
         }
         case T_LC_LITERAL:
         {
-            word = _LO_New_RawStringOrLiteral ( _Context_->Lexer0, name, index, tsrli, scwi ) ;
+            word = _LO_New_RawStringOrLiteral ( _Context_->Lexer0, name, value, index, tsrli, scwi ) ;
             break ;
         }
         case CSL_WORD:
@@ -98,14 +98,17 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttribute
         case PARAMETER_VARIABLE: case LOCAL_VARIABLE: case (PARAMETER_VARIABLE | REGISTER_VARIABLE ): case (LOCAL_VARIABLE | REGISTER_VARIABLE ):
         {
             word = _Compiler_LocalWord_New ( _Compiler_, name, morphismAttributes, objectAttributes, lispAttributes, DICTIONARY ) ;
+            //Word_SetTsrliScwi ( word, tsrli, scwi ) ;
             break ;
         }
         default: case (T_LISP_SYMBOL | PARAMETER_VARIABLE ): case (T_LISP_SYMBOL | LOCAL_VARIABLE ): // REGISTER_VARIABLE combinations with others in this case
         {
             word = Compiler_LocalWord_New ( _Compiler_, name, type, objectAttributes, lispAttributes, DICTIONARY ) ;
+            //Word_SetTsrliScwi ( word, tsrli, scwi ) ;
             break ;
         }
     }
+    Word_SetTsrliScwi ( word, tsrli, scwi ) ;
     return word ;
 }
 
@@ -140,7 +143,7 @@ _Class_Object_Init ( Word * word, Namespace * ins )
         if ( ( initWord = _Finder_FindWord_InOneNamespace ( _Finder_, ns, ( byte* ) "init" ) ) )
         {
             _Stack_Push ( nsstack, ( int64 ) initWord ) ;
-             initWord->W_TypeAttributes |= WT_INIT ;
+            initWord->W_TypeAttributes |= WT_INIT ;
         }
         ns = ns->ContainingNamespace ;
     }
@@ -281,7 +284,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
         }
         name = lexer->OriginalToken ;
     }
-    word = _DObject_New ( name, uliteral, ( IMMEDIATE | lexer->L_MorphismAttributes ), 
+    word = _DObject_New ( name, uliteral, ( IMMEDIATE | lexer->L_MorphismAttributes ),
         ( LITERAL | CONSTANT | lexer->L_ObjectAttributes ), 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, COMPILER_TEMP ) ; //( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ; // literals are compiled directly into machine code
     return word ;
 }

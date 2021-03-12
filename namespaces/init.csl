@@ -436,6 +436,7 @@ doLisp 0 =
 'doBigNum 1 const 
     
 dbgOff
+//lisp
 //dbgOn 
 // === controls ===
 

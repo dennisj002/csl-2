@@ -452,3 +452,18 @@ Word_UnAlias ( Word * word )
     return word ;
 }
 
+void
+Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word, int64 tsrli, int64 scwi )
+{
+    if ( word )
+    {
+        word->W_RL_Index = ( tsrli != - 1 ) ? tsrli : lexer->TokenStart_ReadLineIndex ;
+        word->W_SC_Index = ( scwi != - 1 ) ? scwi : lexer->SC_Index ;
+    }
+}
+
+void
+Word_SetTsrliScwi ( Word * word, int64 tsrli, int64 scwi )
+{
+    Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, tsrli, scwi ) ;
+}
