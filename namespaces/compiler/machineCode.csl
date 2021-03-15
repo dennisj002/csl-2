@@ -519,7 +519,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
+        //Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         _Word_CompileAndRecord_PushReg ( CSL_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
@@ -585,7 +585,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             optInfo->Optimize_Mod = REG ;
             optInfo->Optimize_Rm = ACC ;
         }
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
+        //Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
         _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;

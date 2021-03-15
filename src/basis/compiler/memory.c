@@ -192,7 +192,7 @@ Compile_Poke ( Compiler * compiler, 0 ) // =
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
     else if ( optSetupFlag )
     {
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( compiler->OptInfo->opWord, 0 ) ;
+        //Compiler_Word_SCHCPUSCA ( compiler->OptInfo->opWord, 0 ) ;
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             // _Compile_MoveImm ( cell direction, cell rm, cell disp, cell imm, cell operandSize )

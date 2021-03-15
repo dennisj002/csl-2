@@ -268,7 +268,7 @@
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
 #define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( CSL, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
 #define Compiler_Word_SCHCPUSCA( word, clearFlag ) Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, clearFlag) 
-#define Compiler_WordStack_SCHCPUSCA( index, clearFlag ) Compiler_Word_SCHCPUSCA (CSL_WordList ( index ), clearFlag) 
+#define Compiler_WordStack_SCHCPUSCA( index, clearFlag ) Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (CSL_WordList ( index ), clearFlag) 
 #define _SC_Global_On SetState ( _CSL_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
 #define SC_Global_Off SetState ( _CSL_, GLOBAL_SOURCE_CODE_MODE, false )

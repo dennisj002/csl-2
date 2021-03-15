@@ -416,12 +416,12 @@ Debug_ExtraShow ( int64 size, Boolean force )
         if ( force || ( _O_->Verbosity > 4 ) )
         {
             Printf ( "\n\ndebugger->SaveCpuState" ) ;
-            _Debugger_Disassemble ( debugger, ( byte* ) debugger->SaveCpuState, 1000, 1 ) ; //137, 1 ) ;
+            _Debugger_Disassemble (debugger, 0, ( byte* ) debugger->SaveCpuState, 1000, 1 ) ; //137, 1 ) ;
             Printf ( "\n\ndebugger->RestoreCpuState" ) ;
-            _Debugger_Disassemble ( debugger, ( byte* ) debugger->RestoreCpuState, 1000, 2 ) ; //100, 0 ) ;
+            _Debugger_Disassemble (debugger, 0, ( byte* ) debugger->RestoreCpuState, 1000, 2 ) ; //100, 0 ) ;
         }
         Printf ( "\n\ndebugger->StepInstructionBA->BA_Data" ) ;
-        _Debugger_Disassemble ( debugger, ( byte* ) debugger->StepInstructionBA->BA_Data, size, 0 ) ;
+        _Debugger_Disassemble (debugger, 0, ( byte* ) debugger->StepInstructionBA->BA_Data, size, 0 ) ;
     }
 }
 

@@ -76,7 +76,7 @@ int64
 Key_Kbhit ( FILE * f )
 {
     int64 key = _Key ( f ) ;
-    if ( _O_ &&  ( ! _O_->SigSegvs ) && ( ! GetState ( _Debugger_, DBG_STEPPING ) ) ) Kbhit_Pause ( ) ;
+    if ( _O_ && ( ! _O_->SigSegvs ) && ( ! GetState ( _Debugger_, DBG_STEPPING ) ) ) Kbhit_Pause ( ) ;
     return key ;
 }
 
@@ -161,16 +161,14 @@ _Printf ( char *format, ... )
 void
 Printf_Log ( char *format, ... )
 {
-    va_list args ;
-#if 1
     if ( _O_->LogFlag )
     {
+        va_list args ;
         va_start ( args, ( char* ) format ) ;
         vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
         va_end ( args ) ;
         fflush ( _CSL_->LogFILE ) ;
     }
-#endif  
 }
 
 void

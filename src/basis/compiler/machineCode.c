@@ -85,7 +85,7 @@ _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Bool
     if ( _DBI || ( _O_->Dbi > 1 ) )
     {
         d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
-        d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
+        d0 ( _Debugger_Disassemble (_Debugger_, 0, ( byte* ) here, Here - here, 1 ) ) ;
     }
 }
 
@@ -534,14 +534,14 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
     if ( ( optInfo->OptimizeFlag & OPTIMIZE_IMM ) && optInfo->Optimize_Imm )
     {
         int64 imm = optInfo->Optimize_Imm ;
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 1) ;
+        //Compiler_Word_SCHCPUSCA (optInfo->opWord, 1) ;
         _Compile_X_Group1_Immediate ( op, optInfo->Optimize_Mod,
             optInfo->Optimize_Rm, optInfo->Optimize_Disp,
             optInfo->Optimize_Imm, ( imm >= 0x100000000 ) ? CELL : ( ( imm >= 0x100 ) ? 4 : 1 ) ) ;
     }
     else
     {
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 0) ;
+        //Compiler_Word_SCHCPUSCA (optInfo->opWord, 0) ;
         _Compile_X_Group1 ( op, optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
             optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0,
             optInfo->Optimize_Disp, CELL_SIZE ) ;
@@ -636,7 +636,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             optInfo->Optimize_Mod = REG ;
             optInfo->Optimize_Rm = ACC ;
         }
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
+        //Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
         _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
     else if ( one && one->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;

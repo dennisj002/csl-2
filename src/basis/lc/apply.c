@@ -30,6 +30,7 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
         l0 = LO_EvalList ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
     }
     else
+#if ! NEW_COND // older working x.300
     {
         //these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
         if ( ! largs ) l0 = lfunction ;
@@ -40,8 +41,25 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
         }
         SetState ( lc, LC_COMPILE_MODE, false ) ;
     }
+#else        
+        {
+            //these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
+            if ( ! largs )
+            {
+                l0 = LO_CopyOne ( lfunction ) ;
+                if ( CompileMode ) _LO_CompileOrInterpret_One ( lfunction, 0 ) ;
+            }
+            else
+            {
+                LO_AddToHead ( largs, lfunction ) ;
+                l0 = largs ;
+                SetState ( lc, LC_COMPILE_MODE, false ) ;
+            }
+        }
+#endif    
     SetState ( lc, LC_APPLY, false ) ;
     if ( Is_DebugOn ) Printf ( "\nLO_Apply : lfunction with args and result :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ), LO_PrintWithValue ( l0 ) ; //, Pause () ;
+    //if ( Is_DebugOn ) Printf ( "\nLO_Apply : lfunction with args :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ) ; //, Pause () ;
     return l0 ;
 }
 
@@ -156,7 +174,7 @@ LO_Substitute ( ListObject *lambdaParameters, ListObject * funcCallValues )
 {
     while ( lambdaParameters && funcCallValues )
     {
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "" ),  _LO_PrintWithValue ( funcCallValues, "\nLO_Substitute : funcCallValues = ", "" ) ;
+        if ( _Is_DebugOn ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "", 1 ), _LO_PrintWithValue ( funcCallValues, "\nLO_Substitute : funcCallValues = ", "", 0 ) ;
         // ?!? this may not be the right idea but we want it so that we can have transparent lists in the parameters, ie. 
         // no affect with a parenthesized list or just unparaenthesized parameters of the same number
         if ( lambdaParameters->W_LispAttributes & ( LIST | LIST_NODE ) )
@@ -207,6 +225,8 @@ LO_BeginBlock ( )
 {
     if ( ! Compiler_BlockLevel ( _Compiler_ ) ) _LC_->SavedCodeSpace = _O_CodeByteArray ;
     CSL_BeginBlock ( ) ;
+    if ( Is_DebugOn ) 
+        Stack_Print ( _Compiler_->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
 }
 
 void
@@ -224,6 +244,8 @@ LO_EndBlock ( )
         if ( ! Compiler_BlockLevel ( compiler ) ) Set_CompilerSpace ( _LC_->SavedCodeSpace ) ;
         bi->LogicCodeWord = _LC_->LastInterpretedWord ;
     }
+    if ( Is_DebugOn ) 
+        Stack_Print ( _Compiler_->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
 }
 
 void
@@ -258,21 +280,6 @@ _LO_CheckBeginBlock ( )
     return false ;
 }
 
-int32
-_LO_CheckBegunBlock ( )
-{
-    LambdaCalculus * lc = _LC_ ;
-    Compiler * compiler = _Context_->Compiler0 ;
-    int32 cii = Stack_Top ( compiler->CombinatorInfoStack ) ;
-    CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
-    ci.CI_i32_Info = cii ;
-    if ( ( GetState ( compiler, LISP_COMBINATOR_MODE ) ) && ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) > ci.BlockLevel ) )
-    {
-        return true ;
-    }
-    return false ;
-}
-
 int64
 LO_CheckBeginBlock ( )
 {
@@ -282,6 +289,17 @@ LO_CheckBeginBlock ( )
         return true ;
     }
     return false ;
+}
+
+void
+LC_InitForCombinator ( LambdaCalculus * lc )
+{
+    Compiler *compiler = _Context_->Compiler0 ;
+    SetState ( compiler, LISP_COMBINATOR_MODE, true ) ;
+    CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
+    ci.BlockLevel = Compiler_BlockLevel ( compiler ) ; //compiler->BlockLevel ;
+    ci.ParenLevel = lc->ParenLevel ;
+    _Stack_Push ( compiler->CombinatorInfoStack, ( int64 ) ci.CI_i32_Info ) ; // this stack idea works because we can only be in one combinator at a time
 }
 
 void
@@ -311,7 +329,7 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
     ListObject *l1 = * pl1 ;
     Word * word = l1->Lo_CSLWord ;
     byte * here = Here ;
-    word = Compiler_CopyDuplicatesAndPush (word, l1->W_RL_Index, l1->W_SC_Index) ;
+    word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
     Word_Eval ( word ) ;
     Word *baseObject = _Context_->BaseObject ;
     if ( ( word->W_ObjectAttributes & OBJECT_TYPE ) )
@@ -353,7 +371,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
     else if ( ( l1->Name[0] == '[' ) ) _LO_Apply_ArrayArg ( pl1, i ) ;
     else
     {
-        word = Compiler_CopyDuplicatesAndPush (word, l1->W_RL_Index, l1->W_SC_Index) ;
+        word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
         DEBUG_SETUP ( word, 0 ) ;
         _Compile_Move_StackN_To_Reg ( RegParameterOrder ( ( *i ) ++ ), DSP, 0 ) ;
         _DEBUG_SHOW ( word, 1, 0 ) ;
@@ -386,7 +404,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         _Debugger_->SpecialPreHere = Here ;
         //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, i, CELL ) ;
-        word = Compiler_CopyDuplicatesAndPush (word, word->W_RL_Index, word->W_SC_Index) ;
+        word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
         Word_Eval ( word ) ;
         if ( word->W_MorphismAttributes & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
         if ( ! svcm )

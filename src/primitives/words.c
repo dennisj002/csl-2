@@ -374,7 +374,7 @@ CSL_Prefix ( void )
     if ( word )
     {
         word->W_MorphismAttributes |= PREFIX ;
-        word->W_TypeAttributes = WT_PREFIX ;
+        word->W_TypeAttributes |= WT_PREFIX ;
     }
 }
 
@@ -386,7 +386,7 @@ CSL_NPrefix ( void )
     if ( word )
     {
         word->W_MorphismAttributes |= PREFIX ;
-        word->W_TypeAttributes = WT_PREFIX ;
+        word->W_TypeAttributes |= WT_PREFIX ;
         word->W_NumberOfPrefixedArgs = numberOfPrefixedArgs ;
     }
 }
@@ -398,7 +398,7 @@ CSL_C_Prefix ( void )
     if ( word )
     {
         word->W_MorphismAttributes |= C_PREFIX | C_PREFIX_RTL_ARGS ;
-        word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
+        word->W_TypeAttributes |= WT_C_PREFIX_RTL_ARGS ;
     }
 }
 
@@ -411,7 +411,7 @@ CSL_C_Return ( void )
     if ( word )
     {
         word->W_MorphismAttributes |= C_RETURN | C_PREFIX_RTL_ARGS ;
-        word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
+        word->T_WordAttributes |= WT_C_PREFIX_RTL_ARGS ;
     }
 }
 #endif
@@ -427,7 +427,7 @@ CSL_Void_Return ( void )
         if ( GetState ( _Context_, C_SYNTAX ) )
         {
             word->W_MorphismAttributes |= C_PREFIX_RTL_ARGS ;
-            word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
+            word->W_TypeAttributes |= WT_C_PREFIX_RTL_ARGS ;
         }
     }
 }

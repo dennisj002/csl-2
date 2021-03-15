@@ -37,7 +37,15 @@ JumpCallInstructionAddress ( byte * address )
     else
     {
         int8 offset8 = * ( byte* ) ( address + 1 ) ;
-        jcAddress = address + offset8 + 2 ;
+        if ( ( abs ( offset8 ) < 127 ) && GetState ( _CSL_, JCC8_ON ) )
+        {
+            jcAddress = address + offset8 + 2 ;
+        }
+        else 
+        {
+            int32 offset32 = * ( int32* ) ( address + 1 ) ; // 1 : 1 byte opCode
+            jcAddress = address + offset32 + 5 ; // 5 : sizeof jmp insn - includes 1 byte opcode
+        }
     }
     return jcAddress ;
 }
@@ -96,12 +104,12 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
             byte *containingNamespace = word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ;
             if ( ( byte* ) word->CodeStart == iaddress )
             {
-                snprintf ( ( char* ) buffer, 128, "%s< %s.%s : " UINT_FRMT "%s%s", 
+                snprintf ( ( char* ) buffer, 128, "%s< %s.%s : " UINT_FRMT "%s%s",
                     prePostfix, containingNamespace, name, ( uint64 ) iaddress, postfx, postfix ) ;
             }
             else
             {
-                snprintf ( ( char* ) buffer, 128, "%s< %s.%s+%ld%s", 
+                snprintf ( ( char* ) buffer, 128, "%s< %s.%s+%ld%s",
                     prePostfix, containingNamespace, name, iaddress - ( byte* ) word->CodeStart, postfx ) ; //, postfix ) ;
                 //strcat ( buffer, c_u ( " >" ) ) ;
             }

@@ -130,9 +130,9 @@ _CSL_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opIns
     else if ( morphismAttributes & PREFIX ) word->W_TypeAttributes |= WT_PREFIX ;
     else if ( morphismAttributes & PREFIXABLE ) word->W_TypeAttributes |= WT_PREFIXABLE ;
     else if ( morphismAttributes & C_PREFIX_RTL_ARGS ) word->W_TypeAttributes |= WT_C_PREFIX_RTL_ARGS ;
-    else word->W_TypeAttributes = WT_POSTFIX ;
-    if ( lispAttributes & W_COMMENT ) word->W_TypeAttributes = W_COMMENT ;
-    if ( lispAttributes & W_PREPROCESSOR ) word->W_TypeAttributes = W_PREPROCESSOR ;
+    else word->W_TypeAttributes |= WT_POSTFIX ;
+    if ( lispAttributes & W_COMMENT ) word->W_TypeAttributes |= W_COMMENT ;
+    if ( lispAttributes & W_PREPROCESSOR ) word->W_TypeAttributes |= W_PREPROCESSOR ;
     word->W_ObjectAttributes = objectAttributes ;
     word->W_OpInsnCode = opInsCode ;
     word->W_OpInsnGroup = opInsnGroup ;

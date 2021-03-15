@@ -330,7 +330,7 @@ CSL_C_ConditionalExpression ( )
     else
     {
         word = CSL_WordList ( 1 ) ;
-        Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
+        Compiler_Word_SCHCPUSCA ( word, 0 ) ;
         if ( word && word->StackPushRegisterCode )
         {
             // nb. there is only one block so don't use BlockInfo code ; we may have nested conditionals

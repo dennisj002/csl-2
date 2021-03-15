@@ -386,7 +386,7 @@ String_HighlightTokenInputLine ( byte * nvw, int64 lef, int64 leftBorder, int64 
 }
 
 byte *
-PSCS_Using_WordSC ( byte* il, byte* scs, byte * token, int64 index, int64 tvw ) // scs : source code string
+PSCS_Using_WordSC ( byte* scs, byte * token, int64 index, int64 tvw ) // scs : source code string
 {
     byte *nvw ;
     // ts : tokenStart ; tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
@@ -492,15 +492,22 @@ PSCS_Using_ReadlinerInputString ( byte* il, byte * token1, byte* token0, int64 s
 // ...source code source code TP source code source code ... EOL
 
 byte *
-DBG_PrepareShowInfoString ( Word * word, byte* token0, byte* il, int tvw, int rlIndex, Boolean useScFlag ) // otoken : original token; il : instruction line ; tvw text view window
+DBG_PrepareShowInfoString ( Word * scWord, Word * word, byte* token0, byte* il, int tvw, int rlIndex, Boolean useScFlag ) // otoken : original token; il : instruction line ; tvw text view window
 {
     // usingSC == 1 denotes il string is from word->W_SourceCode else il is copied from rl->InputLineString
     Debugger * debugger = _Debugger_ ;
     byte * cc_line = ( byte* ) "", *scs = 0 ;
-    Word * scWord = 0 ;
-    if ( ( _LC_ && _LC_->Sc_Word ) && ( word->W_MySourceCodeWord == _LC_->Sc_Word ) ) scWord = _LC_->Sc_Word ;
-    else if ( useScFlag ) scWord = Get_SourceCodeWord ( word ) ;
+    if ( ! scWord )
+    {
+        if ( ( _LC_ && _LC_->Sc_Word ) && ( word->W_MySourceCodeWord == _LC_->Sc_Word ) ) scWord = _LC_->Sc_Word ;
+    }
     scs = scWord ? scWord->W_SourceCode : 0 ;
+    if ( ( ! scs ) && useScFlag )
+    {
+        scWord = Get_SourceCodeWord ( word ) ;
+        scs = scWord ? scWord->W_SourceCode : 0 ;
+    }
+
 
     if ( ( word || token0 ) )
     {
@@ -518,7 +525,7 @@ DBG_PrepareShowInfoString ( Word * word, byte* token0, byte* il, int tvw, int rl
         if ( index != - 1 ) // did we find token in scs
         {
             // these two functions maybe should be integrated ; the whole series of 'ShowInfo' functions could be reworked
-            if ( scs ) cc_line = PSCS_Using_WordSC ( il, scs, token2, index, tvw ) ; // scs : source code string
+            if ( scs ) cc_line = PSCS_Using_WordSC ( scs, token2, index, tvw ) ; // scs : source code string
                 //else cc_line = PSCS_Using_ReadlinerInputString ( il, token2, token, scswci, tvw ) ; 
             else cc_line = PSCS_Using_ReadlinerInputString ( il, token2, token, index, tvw ) ;
         }
@@ -545,7 +552,7 @@ CSL_PrepareDbgShowInfoString ( Word * word, byte* token, int64 twAlreayUsed )
         fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
         //tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
         tvw = tw - ( ( twAlreayUsed > fel ) ? ( twAlreayUsed - fel ) : fel ) ; //subtract the formatting chars which don't add to visible length
-        cc_line = DBG_PrepareShowInfoString ( word, token, il, tvw, word ? word->W_RL_Index : _Lexer_->TokenStart_ReadLineIndex, 0 ) ; //tvw, tvw/2 ) ;// sc : source code ; scwi : source code word index
+        cc_line = DBG_PrepareShowInfoString ( 0, word, token, il, tvw, word ? word->W_RL_Index : _Lexer_->TokenStart_ReadLineIndex, 0 ) ; //tvw, tvw/2 ) ;// sc : source code ; scwi : source code word index
     }
     return cc_line ;
 }

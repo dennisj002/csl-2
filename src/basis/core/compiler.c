@@ -311,7 +311,6 @@ Compiler_Copy ( Compiler * compiler, uint64 allocType )
 {
     Compiler * compilerCopy = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), allocType ) ;
     memcpy ( compilerCopy, compiler, sizeof (Compiler ) ) ;
-
     return compilerCopy ;
 }
 
@@ -319,7 +318,6 @@ void
 Compiler_CalculateAndSetPreviousJmpOffset ( Compiler * compiler, byte * jmpToAddress )
 {
     // we now can not compile blocks (cf. _Compile_Block_WithLogicFlag ) if their logic is not called so depth check is necessary
-
     if ( _Stack_Depth ( compiler->PointerToOffsetStack ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( compiler->PointerToOffsetStack ), jmpToAddress, 0 ) ;
 }
 

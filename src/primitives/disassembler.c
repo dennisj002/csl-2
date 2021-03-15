@@ -12,7 +12,7 @@ Word_Disassemble ( Word * word )
         if ( ( word->W_MorphismAttributes & CPRIMITIVE ) && ( ! memcmp ( endbr64, word->CodeStart, 4 ) ) ) start += 4 ; //4: account for new intel insn used by gcc : endbr64 f3 0f 1e fa
         _Context_->CurrentDisassemblyWord = word ;
         _Debugger_->LastSourceCodeWord = 0 ;
-        int64 size = _Debugger_Disassemble ( _Debugger_, start, word->S_CodeSize ? word->S_CodeSize : 128, ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ) ;
+        int64 size = _Debugger_Disassemble (_Debugger_, word, start, word->S_CodeSize ? word->S_CodeSize : 128, ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ) ;
         //_Debugger_->LastSourceCodeWord = word ;
         if ( ( ! word->S_CodeSize ) && ( size > 0 ) ) word->S_CodeSize = size ;
         Printf ( "\nWord_Disassemble : word - \'%s\' :: codeSize = %d", word->Name, size ) ; // ? 1 : return - 'ret' - ins
@@ -56,7 +56,7 @@ CSL_Disassemble ( )
 {
     uint64 number = DataStack_Pop ( ) ;
     byte * address = ( byte* ) DataStack_Pop ( ) ;
-    _Debugger_Disassemble ( _Debugger_, address, number, 0 ) ;
+    _Debugger_Disassemble (_Debugger_, 0, address, number, 0 ) ;
 }
 
 void
@@ -64,7 +64,7 @@ CSL_Disassemble_Block ( )
 {
     //uint64 number = DataStack_Pop ( ) ;
     byte * address = ( byte* ) DataStack_Pop ( ) ;
-    _Debugger_Disassemble ( _Debugger_, address, K, 1 ) ;
+    _Debugger_Disassemble (_Debugger_, 0, address, K, 1 ) ;
 }
 
 

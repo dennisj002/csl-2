@@ -373,7 +373,9 @@ _LO_Repl ( )
 void
 LO_Repl ( )
 {
+    int64 * svDsp = _DSP_ ;
     _CSL_Contex_NewRun_Block ( _CSL_, ( block ) _LO_Repl ) ;
+    _Set_DataStackPointers ( svDsp ) ;
 }
 
 //===================================================================================================================

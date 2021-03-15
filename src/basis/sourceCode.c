@@ -33,7 +33,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
                             SetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION, true ) ;
                         }
                         token = GetState ( _Debugger_, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) ? ( byte* ) "=" : word->Name ;
-                        buffer = DBG_PrepareShowInfoString ( word, token, sourceCode, 0, 0, 1 ) ;
+                        buffer = DBG_PrepareShowInfoString (scWord, word, token, sourceCode, 0, 0, 1 ) ;
                         if ( buffer && buffer[0] ) Printf ( "\n%s", buffer ) ;
                         if ( storeFixed ) word->Name = ( byte* ) "store" ;
                         if ( _Debugger_ ) _Debugger_->LastSourceCodeWord = word ;

@@ -22,10 +22,14 @@ CPrimitive CPrimitives [] = {
     { "set", 0, 0, 0, ( block ) LO_Set, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "let", 0, 0, 0, ( block ) LO_Let, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "macro", 0, 0, 0, ( block ) _LO_Macro, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" }, // nb. too many clashes with other 'if's
+#if NEW_COND // COMBINATOR version
+    { "ifc", 0, 0, 0, ( block ) LO_If, COMBINATOR, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
+    { "condc", 0, 0, 0, ( block ) LO_Cond, COMBINATOR, 0, T_LISP_SPECIAL, "Lisp", "Root" },
+#endif
     { "if", 0, 0, 0, ( block ) LO_If, 0, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
+    { "cond", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     //{ "if", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },// compiles
     //{ ".if", 0, 0, 0, ( block ) LO_Cond0, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    { "cond", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     //{ "else", 0, 0, 0, ( block ) LO_Else, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "car", 0, 0, 0, (block) LO_Car, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "cdr", 0, 0, 0, ( block ) LO_Cdr, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },

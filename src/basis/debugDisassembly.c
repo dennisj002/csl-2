@@ -15,9 +15,9 @@ Debugger_Udis_GetInstructionSize ( Debugger * debugger )
 }
 
 int64
-_Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 cflag )
+_Debugger_Disassemble (Debugger * debugger, Word * word, byte* address, int64 number, int64 cflag )
 {
-    int64 size = _Udis_Disassemble ( Debugger_UdisInit ( debugger ), address, ( ( number > ( 3 * K ) ) ? ( 3 * K ) : number ), cflag ) ;
+    int64 size = _Udis_Disassemble (Debugger_UdisInit ( debugger ), word, address, ( ( number > ( 3 * K ) ) ? ( 3 * K ) : number ), cflag ) ;
     debugger->LastDisStart = address ;
     return size ; //+ 1 ; // ? 1 : return - 'ret' - ins
 }
@@ -26,7 +26,7 @@ void
 Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 cflag )
 {
     CSL_NewLine ( ) ;
-    int64 size = _Debugger_Disassemble ( debugger, address, number, cflag ) ;
+    int64 size = _Debugger_Disassemble (debugger, 0, address, number, cflag ) ;
     Printf ( ( byte * ) "\n%d bytes disassembled", size ) ;
 }
 
@@ -40,7 +40,7 @@ Debugger_Dis ( Debugger * debugger )
         Printf ( "\nDisassembly of : %s.%s", c_ud ( word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ), c_gd ( word->Name ) ) ;
         int64 codeSize = word->S_CodeSize ;
         SetState ( debugger, DBG_DISASM_ACC, true ) ;
-        _Debugger_Disassemble ( debugger, ( byte* ) word->CodeStart, codeSize ? codeSize : 64, ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ) ;
+        _Debugger_Disassemble (debugger, word, ( byte* ) word->CodeStart, codeSize ? codeSize : 64, ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0) ) ;
         SetState ( debugger, DBG_DISASM_ACC, false ) ;
 #if 0        
         if ( debugger->DebugAddress )
@@ -76,8 +76,8 @@ _Debugger_DisassembleWrittenCode ( Debugger * debugger )
             byte * csName = nba ? ( byte * ) c_gd ( nba->NBA_Name ) : ( byte* ) "" ;
             Printf ( "\nCode compiled to %s for word :> %s <: %4d bytes : at 0x%lx at %s", csName, 
                 c_gn ( String_CB ( word->Name ) ), codeSize, compiledToAddr, Context_Location ( ) ) ;
-            _Debugger_Disassemble ( debugger, compiledToAddr, codeSize, 
-                ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ) ;
+            _Debugger_Disassemble (debugger, word, compiledToAddr, codeSize, 
+                ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0) ) ;
         }
         //else Debugger_DisassembleAccumulated ( debugger ) ;
         debugger->PreHere = Here ;
@@ -95,7 +95,7 @@ Debugger_DisassembleAccumulated ( Debugger * debugger )
         if ( debugger->EntryWord ) Printf ( ( byte * ) "\nDisassembling %d bytes of code accumulated since start with word \'%s\' at : 0x%016lx ...",
             size, ( char* ) debugger->EntryWord->Name, debugger->StartHere ) ;
         SetState ( debugger, DBG_DISASM_ACC, true ) ;
-        if ( size > 0 ) _Debugger_Disassemble ( debugger, debugger->StartHere, size, 0 ) ;
+        if ( size > 0 ) _Debugger_Disassemble (debugger, debugger->EntryWord, debugger->StartHere, size, 0 ) ;
         SetState ( debugger, DBG_DISASM_ACC, false ) ;
     }
 }

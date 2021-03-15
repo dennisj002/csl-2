@@ -14,7 +14,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
         interp->Token = token ;
         cntx->CurrentToken = token ;
         word = Lexer_ParseToken_ToWord ( interp->Lexer0, token, tsrli, scwi ) ;
-        //Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         DEBUG_SETUP ( word, 1 ) ;
         cntx->CurrentTokenWord = word ; // dbg flag
         cntx->TokenDebugSetupWord = word ;
@@ -93,18 +93,6 @@ _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word, B
     return word ;
 }
 
-#if 0
-
-Word *
-Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
-{
-    if ( Lexer_IsNextWordLeftParen ( interp->Lexer0 ) ) word = _Interpreter_DoPrefixWord ( cntx, interp, word, 0 ) ;
-    else if ( word->W_MorphismAttributes & CATEGORY_OP_1_ARG ) word = _Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
-    else _SyntaxError ( ( byte* ) "Attempting to call a prefix function without following parenthesized args", 1 ) ;
-    return word ;
-}
-#endif
-
 Word *
 Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
 {
@@ -128,8 +116,6 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
             // nb! : for this to work you must turn prefix mode on - 'prefixOn'
             word = _Interpreter_DoPrefixWord ( cntx, interp, word, prefixFlag ) ;
         }
-        //else if ( ( word->W_TypeAttributes & ( WT_PREFIXABLE ) ) && prefixFlag ) 
-        //    word = _Interpreter_DoPrefixWord ( cntx, interp, word, prefixFlag ) ;
         else return 0 ;
     }
     return word ;

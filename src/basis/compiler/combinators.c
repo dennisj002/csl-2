@@ -300,7 +300,7 @@ void
 CSL_TrueFalseCombinator2 ( )
 {
     int64 testCondition = _Dsp_ [ - 2 ] ;
-    block trueBlock = ( block ) _Dsp_ [ - 1 ], falseBlock = ( block ) TOS ;
+    block trueBlock = ( block ) _Dsp_ [ - 1 ], elseBlock = ( block ) TOS ;
     DataStack_DropN ( 2 ) ;
     if ( CompileMode )
     {
@@ -310,14 +310,14 @@ CSL_TrueFalseCombinator2 ( )
         Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 1, 0, 0 ) ;
         CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        Block_CopyCompile ( ( byte* ) falseBlock, 0, 0, 0 ) ;
+        Block_CopyCompile ( ( byte* ) elseBlock, 0, 0, 0 ) ;
         CSL_EndIf ( ) ;
         CSL_EndCombinator ( 2, 1 ) ;
     }
     else
     {
         if ( testCondition ) Word_DbgBlock_Eval ( 0, trueBlock ) ;
-        else Word_DbgBlock_Eval ( 0, falseBlock ) ;
+        else Word_DbgBlock_Eval ( 0, elseBlock ) ;
     }
 }
 
@@ -327,7 +327,14 @@ CSL_TrueFalseCombinator2 ( )
 void
 CSL_TrueFalseCombinator3 ( )
 {
-    block testBlock = ( block ) Dsp ( 2 ), trueBlock = ( block ) Dsp ( 1 ), falseBlock = ( block ) Dsp ( 0 ) ;
+#if 0    
+    Compiler * compiler = _Context_->Compiler0 ;
+    Stack_Print ( compiler->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
+    //if ( Is_DebugOn ) 
+    Stack_Print ( compiler->BlockStack, c_d ( "compiler->BlockStack" ), 0 ) ;
+    CSL_PrintDataStack ( ) ;
+#endif    
+    block testBlock = ( block ) Dsp ( 2 ), trueBlock = ( block ) Dsp ( 1 ), elseBlock = ( block ) Dsp ( 0 ) ;
     DataStack_DropN ( 3 ) ;
     if ( CompileMode )
     {
@@ -336,7 +343,7 @@ CSL_TrueFalseCombinator3 ( )
         Block_CopyCompile ( ( byte* ) testBlock, 2, 1, 0 ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 1, 0, 0 ) ;
         CSL_Else ( ) ;
-        Block_CopyCompile ( ( byte* ) falseBlock, 0, 0, 0 ) ;
+        Block_CopyCompile ( ( byte* ) elseBlock, 0, 0, 0 ) ;
         CSL_EndIf ( ) ;
         CSL_EndCombinator ( 3, 1 ) ;
         //DBI_OFF ;
@@ -353,7 +360,7 @@ CSL_TrueFalseCombinator3 ( )
         else
         {
             //_Dsp_ = svDsp ;
-            Word_DbgBlock_Eval ( 0, falseBlock ) ;
+            Word_DbgBlock_Eval ( 0, elseBlock ) ;
         }
     }
 }
@@ -452,4 +459,103 @@ CSL_ForCombinator ( )
         while ( 1 ) ;
     }
 }
+
+#if NEW_COND
+
+void
+CSL_CondCombinator ( int64 numBlocks )
+{
+    Compiler * compiler = _Context_->Compiler0 ;
+    int64 blockIndex ;
+    BlockInfo *bi ;
+    byte * compiledAtAddress ;
+#if NEW_COND   
+    block testBlock = ( block ) Dsp ( 2 ), trueBlock = ( block ) Dsp ( 1 ), falseBlock = ( block ) Dsp ( 0 ) ;
+    Stack_Print ( compiler->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
+    //if ( Is_DebugOn ) 
+    Stack_Print ( compiler->BlockStack, c_d ( "compiler->BlockStack" ), 0 ) ;
+    CSL_PrintDataStack ( ) ;
+#endif    
+    if ( numBlocks )
+    {
+        //DBI_ON ;
+        CSL_BeginCombinator ( numBlocks ) ;
+        for ( blockIndex = numBlocks - 1 ; ( blockIndex - ( numBlocks % 2 ) ) > 0 ; )
+        {
+            Block_CopyCompile ( ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
+            compiledAtAddress = Compile_UninitializedJumpEqualZero ( ) ;
+            Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
+            bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, blockIndex ) ;
+            Block_OptimizeJCC ( bi, 1, 0 ) ;
+            //Printf ( ( byte* ) "\nCSL_CondCombinator : index = %d : bi = 0x%08lx", blockIndex, bi ) ;
+            blockIndex -- ;
+            //bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, blockIndex ) ;
+            //Printf ( ( byte* ) "\nCSL_CondCombinator : index = %d : bi = 0x%08lx", blockIndex, bi ) ;
+            Block_CopyCompile ( ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
+            byte * compiledAtAddress = Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
+            CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+            Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
+            blockIndex -- ;
+        }
+        if ( numBlocks % 2 )
+        {
+            //if ( ifFlag ) CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+            Block_CopyCompile ( ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
+        }
+        CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+        CSL_EndCombinator ( numBlocks, 1 ) ;
+        //DBI_OFF ;
+    }
+    DataStack_DropN ( numBlocks ) ;
+    //CSL_PrintDataStack ( ) ;
+}
+#elif 0
+
+void
+CSL_CondCombinator ( 0 ) //int64 numBlocks, Boolean ifFlag )
+{
+    Compiler * compiler = _Context_->Compiler0 ;
+    //if ( CompileMode )
+    {
+        Boolean ifFlag = String_Equal ( _Context_->CurrentlyRunningWord->Name, "if" ) ;
+        int64 numBlocks, dbs = Stack_Depth ( compiler->BlockStack ), dcifs = Stack_Depth ( compiler->CombinatorBlockInfoStack ) ;
+        numBlocks = ifFlag ? 3 : dcifs ;
+        if ( Is_DebugOn ) CSL_PrintDataStack ( ) ;
+        int64 blockIndex = numBlocks - 1 ; // 1 : 0 indexing for stack
+        CSL_BeginCombinator ( numBlocks ) ;
+        while ( blockIndex ) //< ( numBlocks - ( numBlocks % 2 ) ) )
+        {
+            byte * start = Here ;
+            Block_CopyCompile ( ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 1, 0 ) ; // 1 : jccFlag for this block
+            blockIndex -- ;
+            Block_CopyCompile ( ( byte* ) ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ; // 1 : jccFlag for this block
+            //byte * compiledAtAddress = Compile_UninitializedJumpEqualZero ( ) ;
+            //Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
+            blockIndex -- ;
+            //if ( blockIndex < ( numBlocks - ( numBlocks % 2 ) ) ) _Compile_JumpToAddress ( start, 0 ) ;
+            //CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+            if ( ( numBlocks % 2 ) && ( ! ifFlag ) ) Block_CopyCompile ( ( byte* ) ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
+        }
+        if ( ( numBlocks % 2 ) && ( ifFlag ) )Block_CopyCompile ( ( byte* ) ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
+        CSL_EndCombinator ( numBlocks, 1 ) ;
+        DataStack_DropN ( numBlocks ) ;
+        CSL_PrintDataStack ( ) ;
+#if 0
+        if ( CompileMode ) CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+        //LO_CheckBeginBlock ( ) ;
+        byte * start = Here ;
+        compiler->ContinuePoint = Here ;
+
+
+        d0 ( _CSL_SC_WordList_Show ( ( byte* ) "for combinator : before doPostBlock", 0, 0 ) ) ;
+        Block_CopyCompile ( ( byte* ) doPostBlock, 1, 0, 0 ) ;
+
+        _Compile_JumpToAddress ( start, 0 ) ;
+        CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+
+#endif        
+    }
+}
+#endif
+
 

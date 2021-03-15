@@ -584,7 +584,6 @@ String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot
         }
         else strncat ( ( char* ) str, ( char* ) data, BUFFER_IX_SIZE ) ;
     }
-
     else CSL_Exception ( BUFFER_OVERFLOW, 0, 1 ) ;
 }
 

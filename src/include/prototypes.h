@@ -258,6 +258,7 @@ BlockInfo *BlockInfo_New(void);
 /* src/basis/compiler/blocks.c */
 BlockInfo *BI_Block_Copy(BlockInfo *bi, byte *dstAddress, byte *srcAddress, int64 bsize, Boolean optSetupFlag);
 void Compile_BlockLogicTest(BlockInfo *bi);
+byte *Block_OptimizeJCC(BlockInfo *bi, Boolean jccFlag, byte *jmpToAddr);
 byte *Block_CopyCompile(byte *srcAddress, int64 bindex, Boolean jccFlag, byte *jmpToAddr);
 /* src/basis/core/conditionals.c */
 Boolean Match_MapFunction(dlnode *node, uint64 switchValue);
@@ -344,7 +345,7 @@ void _Udis_PrintInstruction(ud_t *ud, byte *address, byte *prefix, byte *postfix
 int64 _Udis_GetInstructionSize(ud_t *ud, byte *address);
 ud_t *_Udis_Init(ud_t *ud);
 int64 Debugger_UdisOneInstruction(Debugger *debugger, byte *address, byte *prefix, byte *postfix);
-int64 _Udis_Disassemble(ud_t *ud, byte *iaddress, int64 number, int64 cflag);
+int64 _Udis_Disassemble(ud_t *ud, Word *word, byte *iaddress, int64 number, int64 cflag);
 /* src/basis/compiler/arrays.c */
 int64 _CheckArrayDimensionForVariables_And_UpdateCompilerState(void);
 void Compile_ArrayDimensionOffset(Word *word, int64 dimSize, int64 objSize);
@@ -763,7 +764,6 @@ Boolean Lexer_IsTokenForwardDotted(Lexer *lexer);
 Boolean Lexer_IsTokenQualifiedID(Lexer *lexer);
 void CSL_LexerTables_Setup(CSL *csl);
 int64 Lexer_ConvertLineIndexToFileIndex(Lexer *lexer, int64 index);
-void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);
 /* src/basis/core/cstack.c */
 int64 _Stack_Overflow(Stack *stack);
 int64 _Stack_IsEmpty(Stack *stack);
@@ -826,9 +826,9 @@ int64 Debugger_TerminalLineWidth(Debugger *debugger);
 void Debugger_ShowStackChange(Debugger *debugger, Word *word, byte *insert, byte *achange, Boolean stepFlag);
 void Debugger_ShowChange(Debugger *debugger, Word *word, Boolean stepFlag, uint64 *dsp);
 byte *String_HighlightTokenInputLine(byte *nvw, int64 lef, int64 leftBorder, int64 ts, byte *token, byte *token0, int64 rightBorder, int64 ref);
-byte *PSCS_Using_WordSC(byte *il, byte *scs, byte *token, int64 index, int64 tvw);
+byte *PSCS_Using_WordSC(byte *scs, byte *token, int64 index, int64 tvw);
 byte *PSCS_Using_ReadlinerInputString(byte *il, byte *token1, byte *token0, int64 scswci, int64 tvw);
-byte *DBG_PrepareShowInfoString(Word *word, byte *token0, byte *il, int tvw, int rlIndex, Boolean useScFlag);
+byte *DBG_PrepareShowInfoString(Word *scWord, Word *word, byte *token0, byte *il, int tvw, int rlIndex, Boolean useScFlag);
 byte *CSL_PrepareDbgShowInfoString(Word *word, byte *token, int64 twAlreayUsed);
 void CSL_ShowInfo_Token(Word *word, byte *prompt, int64 signal, byte *token0, byte *signalAscii);
 void LO_Debug_ExtraShow(int64 showStackFlag, int64 verbosity, int64 wordList, byte *format, ...);
@@ -1081,6 +1081,7 @@ void Do_StringMacro(void);
 void _CSL_Macro(int64 mtype, byte *function);
 Word *Word_GetOriginalWord(Word *word);
 Word *Word_UnAlias(Word *word);
+void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);
 void Word_SetTsrliScwi(Word *word, int64 tsrli, int64 scwi);
 /* src/basis/core/readTable.c */
 void CSL_ReadTables_Setup(CSL *cfrl);
@@ -1592,7 +1593,7 @@ void List_Show_N_Word_Names(dllist *list, uint64 n, int64 showBeforeAfterFlag, i
 /* src/basis/debugDisassembly.c */
 ud_t *Debugger_UdisInit(Debugger *debugger);
 int64 Debugger_Udis_GetInstructionSize(Debugger *debugger);
-int64 _Debugger_Disassemble(Debugger *debugger, byte *address, int64 number, int64 cflag);
+int64 _Debugger_Disassemble(Debugger *debugger, Word *word, byte *address, int64 number, int64 cflag);
 void Debugger_Disassemble(Debugger *debugger, byte *address, int64 number, int64 cflag);
 void Debugger_Dis(Debugger *debugger);
 void _Debugger_DisassembleWrittenCode(Debugger *debugger);
@@ -1851,8 +1852,8 @@ void LO_BeginBlock(void);
 void LO_EndBlock(void);
 void LO_CheckEndBlock(void);
 int64 _LO_CheckBeginBlock(void);
-int32 _LO_CheckBegunBlock(void);
 int64 LO_CheckBeginBlock(void);
+void LC_InitForCombinator(LambdaCalculus *lc);
 void Arrays_DoArrayArgs_Lisp(Word **pl1, Word *l1, Word *arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean *variableFlag);
 void _LO_Apply_ArrayArg(ListObject **pl1, int64 *i);
 void _LO_Apply_NonMorphismArg(ListObject **pl1, int64 *i);
@@ -1886,7 +1887,7 @@ void _LO_PrintOneToString(LambdaCalculus *lc, ListObject *l0, int64 in_a_LambdaF
 void _LO_PrintListToString(LambdaCalculus *lc, ListObject *l0, int64 lambdaFlag, int64 printValueFlag);
 byte *LO_PrintListToString(LambdaCalculus *lc, ListObject *l0, int64 lambdaFlag, int64 printValueFlag);
 void _LO_Print(ListObject *l0, byte *prefix, byte *postfix, Boolean valueFlag);
-void _LO_PrintWithValue(ListObject *l0, byte *prefix, byte *postfix);
+void _LO_PrintWithValue(ListObject *l0, byte *prefix, byte *postfix, Boolean indentFlag);
 void LO_PrintWithValue(ListObject *l0);
 void LC_PrintWithValue(void);
 byte *_LO_PRINT_TO_STRING(ListObject *l0);

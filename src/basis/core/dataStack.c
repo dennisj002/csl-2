@@ -147,7 +147,7 @@ void
 SetDataStackPointer ( uint64 *sp )
 {
     _CSL_->DataStack->StackPointer = sp ;
-    _Dsp_ = _CSL_->DataStack->StackPointer ;
+    Set_DspReg ( sp ) ;
 }
 
 uint64 *

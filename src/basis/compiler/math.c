@@ -30,7 +30,7 @@ Compile_Multiply ( Compiler * compiler )
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
         //_Compile_IMUL ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, uint64 imm )
         //optInfo->Optimize_Reg = ACC ; // emulate MUL
-        Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 1 ) ;
+        Compiler_Word_SCHCPUSCA ( optInfo->opWord, 1 ) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
         else _Word_CompileAndRecord_PushReg ( CSL_WordList ( 0 ), optInfo->Optimize_Reg, true ) ;

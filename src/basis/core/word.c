@@ -90,7 +90,7 @@ _Word_Interpret ( Word * word )
 void
 _Word_Compile ( Word * word )
 {
-    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
+    Compiler_Word_SCHCPUSCA ( word, 0 ) ;
     if ( ! word->Definition ) CSL_SetupRecursiveCall ( ) ;
     else if ( ( GetState ( _CSL_, INLINE_ON ) ) && ( word->W_MorphismAttributes & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
     else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;
@@ -457,8 +457,8 @@ Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word, int64 tsrli, int64 scwi 
 {
     if ( word )
     {
-        word->W_RL_Index = ( tsrli != - 1 ) ? tsrli : lexer->TokenStart_ReadLineIndex ;
-        word->W_SC_Index = ( scwi != - 1 ) ? scwi : lexer->SC_Index ;
+        word->W_RL_Index = (( tsrli == - 1 ) ? lexer->TokenStart_ReadLineIndex : tsrli ) ;
+        word->W_SC_Index = (( scwi == - 1 ) ? lexer->SC_Index : scwi ) ;
     }
 }
 

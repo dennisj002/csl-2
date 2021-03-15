@@ -11,11 +11,13 @@ Int lcOn
 pwi fibc
 "\nfibc 20 = " ps
 (fibc 20)
-#if 1    
-(define (fibc1 n ) (if (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2)))))
+#if 0   
+//d: (define (fibc1 n ) (if (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2)))))
+//d: (define fibc1 ( lambda ( n ) (ifc (< n 2) (n) ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
+d: (define fibc1 ( lambda ( n ) (ifc (< n 2) n ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
 pwi fibc1
 "\nfibc1 10 = " ps
-(fibc1 10) 
+(fibc1 20) 
 //pause
 #endif    
 lcOff 
@@ -111,3 +113,5 @@ bnOff
 (count-change 100)            
 (fibsicp 40)           
 #endif
+"\ncsl : scheme/lisp : type \'x\' or \'exit\' or \'bye\' to exit ...\n" ps
+            

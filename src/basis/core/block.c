@@ -56,7 +56,7 @@ _CSL_BeginBlock0 ( )
     if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler ) ) )// first block
     {
         OVT_CheckCodeSpaceForRoom ( ) ;
-        _Context_->CurrentWordBeingCompiled = compiler->Current_Word_Create ;
+        if ( ! _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled = compiler->Current_Word_Create ;
         CSL_RecycleInit_CSL_N_M_Node_WordList ( ) ;
         CSL_TurnOnBlockCompiler ( ) ;
     }
@@ -93,6 +93,7 @@ _CSL_BeginBlock2 ( BlockInfo * bi )
     Compiler * compiler = _Context_->Compiler0 ;
     _Stack_Push ( compiler->BlockStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
     _Stack_Push ( compiler->CombinatorBlockInfoStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
+    //if ( Is_DebugOn ) Stack_Print ( compiler->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
 }
 
 void
@@ -158,6 +159,7 @@ CSL_EndBlock ( )
     bi->LogicCodeWord = CSL_WordList ( 1 ) ;
     _CSL_EndBlock1 ( bi ) ;
     _CSL_EndBlock2 ( bi ) ;
+    //if ( Is_DebugOn ) Stack_Print ( compiler->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
 }
 
 BlockInfo *
