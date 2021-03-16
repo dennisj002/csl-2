@@ -10,7 +10,10 @@
 #define DSP_IS_GLOBAL_REGISTER 1 
 #endif
 #define EXPERIMENTAL true
-#define NEW_COND 0
+#define _DEFINE_DBG 0
+#define LC_CONDC 1
+#define LC_DEFINE_DBG ( _DEFINE_DBG || Is_DebugOn )
+//#define DEFINE_DBG ( _DEFINE_DBG && Is_DebugOn )
 
 #if DEBUG 
 #define D( x ) x
@@ -21,7 +24,7 @@
 #else 
 #define d1( x ) x
 #define d0( x ) 
-#define D1( x ) if ( _Is_DebugOn ) x 
+#define D1( x ) if ( Is_DebugOn ) x 
 #define D0( x ) 
 #define dbi0( x )  
 #define dbi1( x ) if ( DBI ) x 
@@ -878,6 +881,7 @@ typedef struct
 #define LC_EVAL_APPLY           ( (uint64) 1 << 18 )
 #define LC_DONE                 ( (uint64) 1 << 19 )
 #define LC_BEGIN_MODE           ( (uint64) 1 << 20 )
+//#define COMBINATOR_MODE     ( (uint64) 1 << 21 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )

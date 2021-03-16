@@ -44,7 +44,7 @@ factoriali (7) ; dup p 5040 _assert //pause //sp
 #endif
 //vb (3) ;
 jcc8_On
-d: int factoriali2 ( int8 REG n | REG res )
+int factoriali2 ( int8 REG n | REG res )
 {
     res = 1;
     do 
@@ -54,7 +54,7 @@ d: int factoriali2 ( int8 REG n | REG res )
     while ( n >= 2 ) ;
     return res;
 } prefix
-d: pwi factoriali2 pause
+pwi factoriali2 //pause
 factoriali2 ( 7 ) ; p () ;
 factoriali2 (7) ; dup p 5040 _assert //pause //sp
 c_syntaxOff 

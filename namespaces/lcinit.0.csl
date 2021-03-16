@@ -7,17 +7,17 @@ Int lcOn
 (define yfacc (lambda (yyy n1) (if (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl //pause
 (yfacc yfacc 7) nl 
-(define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+(definec fibc (lambda ( n ) (ifc (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 pwi fibc
-"\nfibc 20 = " ps
-(fibc 20)
-#if 0   
+"\nfibc 30 = " ps
+(fibc 30)
+#if 1   
 //d: (define (fibc1 n ) (if (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2)))))
 //d: (define fibc1 ( lambda ( n ) (ifc (< n 2) (n) ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
-d: (define fibc1 ( lambda ( n ) (ifc (< n 2) n ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
+(definec fibc1 ( lambda ( n ) (ifc (< n 2) n ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
 pwi fibc1
-"\nfibc1 10 = " ps
-(fibc1 20) 
+"\nfibc1 30 = " ps
+(fibc1 30) 
 //pause
 #endif    
 lcOff 
@@ -25,7 +25,8 @@ lcOff
 lcOn
 //bnOn
 bnInit ( 32 )
-(define (abs n) (cond (( < n 0 ) (- 0 n)) n )) 
+//(define (abs n) (cond (( < n 0 ) (- 0 n)) n )) 
+(define (abs n) (cond ( < n 0 ) (- 0 n) n )) 
 ( abs -9)
 ( abs 9)
 (define (square n) (* n n))
@@ -36,24 +37,17 @@ bnInit ( 32 )
 ( define (sqrt x) ( sq-iter 1.0 x))
 (sqrt 9) 
 (sqrt 2) 
-(sqrt (sqrt 9) ) 
+(sqrt (sqrt (sqrt 9) ))
 bnOff
-(define (fibsicp n)
-  (fib-iter 1 0 0 1 n))
+(define (fib n)
+  (fib-iter 1 0 n))
 
-(define (fib-iter a b p q count)
-  (cond ((= count 0) b)
-        ((even? count)
-         (fib-iter a
-                   b
-                   (/ count 2)))
-        (else (fib-iter (+ (* b q) (* a q) (* a p))
-                        (+ (* b p) (* a q))
-                        p
-                        q
-                        (- count 1)))))
-
-(fibsicp 40)           
+(define (fib-iter a b count)
+  (if (= count 0)
+      b
+      (fib-iter (+ a b) a (- count 1))))
+//pwi fib-iter
+(fib 30)           
 (define ( A x y) 
     (cond 
         (( = y 0 ) 0 )
@@ -70,11 +64,7 @@ bnOff
         (else (A (- x 1)
                  (A x (- y 1))))))
 
-(A 1 10)
-
-(A 2 4)
-
-(A 3 3)
+(A 1 10) (A 2 4) (A 3 3)
 
 (define (f n) (A 0 n))
 
@@ -111,7 +101,28 @@ bnOff
         ((= kinds-of-coins 5) 50)))
 
 (count-change 100)            
-(fibsicp 40)           
+(fib 30)         
+#if 0
+(define (fib2 n)
+  (fib-iter2 1 0 0 1 n))
+
+(define (fib-iter2 a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   ;;;??FILL-THIS-IN?? ; compute p'
+                   ;;;??FILL-THIS-IN?? ; compute q'
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+
+(fib2 30)
+;;;SECTION 1.2.5
+#endif    
 #endif
 "\ncsl : scheme/lisp : type \'x\' or \'exit\' or \'bye\' to exit ...\n" ps
             

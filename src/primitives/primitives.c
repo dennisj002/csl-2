@@ -15,6 +15,7 @@ CPrimitive CPrimitives [] = {
     { ")", 0, 0, 0, CSL_C_Comma, IMMEDIATE | NO_OP_WORD | KEYWORD, 0, 0, "Lisp", "Root" },
     { "_Printf", 0, 0, 0, ( block ) Printf, 0, 0, LISP_C_RTL_ARGS | T_LISP_SPECIAL | LISP_VOID_RETURN, "Lisp", "Root" },
     { "define", 0, 0, 0, ( block ) LO_Define, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
+    { "definec", 0, 0, 0, ( block ) LO_Definec, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "compile", 0, 0, 0, ( block ) LO_CompileDefine, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "_lambda", 0, 0, 0, ( block ) LO_Lambda, IMMEDIATE, 0, T_LAMBDA | T_LISP_SPECIAL, "Lisp", "Root" },
     { "lambda", 0, 0, 0, ( block ) LO_Lambda, IMMEDIATE, 0, T_LAMBDA | T_LISP_SPECIAL, "Lisp", "Root" },
@@ -22,7 +23,7 @@ CPrimitive CPrimitives [] = {
     { "set", 0, 0, 0, ( block ) LO_Set, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "let", 0, 0, 0, ( block ) LO_Let, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "macro", 0, 0, 0, ( block ) _LO_Macro, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" }, // nb. too many clashes with other 'if's
-#if NEW_COND // COMBINATOR version
+#if LC_CONDC // COMBINATOR version
     { "ifc", 0, 0, 0, ( block ) LO_If, COMBINATOR, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
     { "condc", 0, 0, 0, ( block ) LO_Cond, COMBINATOR, 0, T_LISP_SPECIAL, "Lisp", "Root" },
 #endif
@@ -46,7 +47,7 @@ CPrimitive CPrimitives [] = {
     { "unquoteSplicing", 0, 0, 0, ( block ) LO_UnQuoteSplicing, 0, 0, T_LISP_UNQUOTE_SPLICING | T_LISP_READ_MACRO, "Lisp", "Root" },
     { ",@", 0, 0, 0, ( block ) LO_UnQuoteSplicing, 0, 0, T_LISP_UNQUOTE_SPLICING | T_LISP_READ_MACRO, "Lisp", "Root" },
     { "::", 0, 0, 0, ( block ) _LO_CSL, 0, 0, T_LISP_CSL | T_LISP_SPECIAL | T_LISP_IMMEDIATE, "Lisp", "Root" },
-    { "=", 0, 0, 0, ( block ) CSL_Logic_Equals, 0, 0, 0, "Lisp", "Root" },
+    { "=", 0, 0, 0, ( block ) CSL_Logic_Equals, CATEGORY_OP|KEYWORD, 0, 0, "Lisp", "Root" },
     //{ "+", 0, 0, 0, ( block ) LO_Plus, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     //{ "-", 0, 0, 0, ( block ) LO_Minus, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     //{ "<", 0, 0, 0, ( block ) LO_LessThan, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
@@ -54,6 +55,9 @@ CPrimitive CPrimitives [] = {
     { "lcClearDefines", 0, 0, 0, ( block ) LC_ClearDefinesNamespace, 0, 0, 0, "Lisp", "Root" },
     { "lcShowLispDefines", 0, 0, 0, ( block ) LC_Print_LispDefinesNamespace, 0, 0, 0, "Lisp", "Root" },
     { "lcShowLisp", 0, 0, 0, ( block ) LC_Print_LispNamespace, 0, 0, 0, "Lisp", "Root" },
+    //{ ";", 0, 0, 0, CSL_CommentToEndOfLine, IMMEDIATE | KEYWORD | COMMENT, 0, W_COMMENT, "Lisp", "Root" },
+    //{ ";;", 0, 0, 0, CSL_CommentToEndOfLine, IMMEDIATE | KEYWORD | COMMENT, 0, W_COMMENT, "Lisp", "Root" },
+    { ";;;", 0, 0, 0, CSL_CommentToEndOfLine, IMMEDIATE | KEYWORD | COMMENT, 0, W_COMMENT, "Lisp", "Root" },
 
     { "'", 0, 0, 0, CSL_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
     { "1,", 0, 0, 0, Compile_Int8, 0, 0, 0, "Forth", "Root" },

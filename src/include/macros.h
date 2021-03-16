@@ -67,6 +67,8 @@
 #define Set_CompileMode( tf ) SetState ( _Compiler_, (COMPILE_MODE), tf ) //; _LC_ ? SetState ( _LC_, LC_COMPILE_MODE, tf ) : 0 ; 
 #define Get_CompileMode() GetState ( _Compiler_, (COMPILE_MODE) )  //|| ( _LC_ ? GetState ( _LC_, LC_COMPILE_MODE ) : 0 ) ) 
 #define CompileMode GetState ( _Compiler_, (COMPILE_MODE) )  //|| ( _LC_ && GetState ( _LC_, ( LC_COMPILE_MODE ) ) ) ) : 0)
+#define CompileModeOff Set_CompileMode ( false ) 
+#define CompileModeOn Set_CompileMode ( true ) 
 #define Compiling CompileMode
 #define ImmediateWord( word) (word->W_MorphismAttributes & IMMEDIATE)
 #define CPrimitiveWord( word) (word->W_MorphismAttributes & CPRIMITIVE)
@@ -235,7 +237,6 @@
 #define DebugShow_On SetState ( _CSL_, _DEBUG_SHOW_, true ) 
 #define Is_DebugModeOn ( GetState ( _CSL_, DEBUG_MODE ) ) 
 #define Is_DebugShowOn ( GetState ( _CSL_, _DEBUG_SHOW_ ) ) 
-#define _Is_DebugOn GetState ( _CSL_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
 #define DEBUG_PRINTSTACK if ( GetState ( _CSL_, DEBUG_MODE )  ) CSL_PrintDataStack () ;
 #define DEBUG_SETUP_TOKEN( token, debugLevel ) _DEBUG_SETUP (0, token, 0, 0, debugLevel) ;

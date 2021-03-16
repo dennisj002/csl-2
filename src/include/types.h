@@ -322,6 +322,7 @@ typedef ListObject* ( *ListFunction0 )( ) ;
 typedef ListObject* ( *ListFunction )( ListObject* ) ;
 typedef ListObject * ( *LispFunction2 ) ( ListObject*, ListObject* ) ;
 typedef ListObject * ( *LispFunction3 ) ( ListObject*, ListObject*, int64 ) ;
+typedef ListObject * ( *LispFunction4 ) ( ListObject*, ListObject*, int64, ListObject* ) ;
 typedef int64( *MapFunction_Word_PtrInt ) ( ListObject *, Word *, int64 * ) ;
 typedef int64( *MapFunction ) ( Symbol * ) ;
 typedef int64( *MapFunction_1 ) ( Symbol *, int64 ) ;

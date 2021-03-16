@@ -30,7 +30,6 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
         l0 = LO_EvalList ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
     }
     else
-#if ! NEW_COND // older working x.300
     {
         //these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
         if ( ! largs ) l0 = lfunction ;
@@ -39,27 +38,12 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
             LO_AddToHead ( largs, lfunction ) ;
             l0 = largs ;
         }
-        SetState ( lc, LC_COMPILE_MODE, false ) ;
+        if ( ! ( lfunction->W_MorphismAttributes & COMBINATOR ) ) SetState ( lc, LC_COMPILE_MODE, false ) ;
     }
-#else        
-        {
-            //these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
-            if ( ! largs )
-            {
-                l0 = LO_CopyOne ( lfunction ) ;
-                if ( CompileMode ) _LO_CompileOrInterpret_One ( lfunction, 0 ) ;
-            }
-            else
-            {
-                LO_AddToHead ( largs, lfunction ) ;
-                l0 = largs ;
-                SetState ( lc, LC_COMPILE_MODE, false ) ;
-            }
-        }
-#endif    
     SetState ( lc, LC_APPLY, false ) ;
-    if ( Is_DebugOn ) Printf ( "\nLO_Apply : lfunction with args and result :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ), LO_PrintWithValue ( l0 ) ; //, Pause () ;
-    //if ( Is_DebugOn ) Printf ( "\nLO_Apply : lfunction with args :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ) ; //, Pause () ;
+    //if ( Is_DebugOn ) Printf ( "\nLO_Apply : lfunction with args and result :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ), LO_PrintWithValue ( l0 ) ; //, Pause () ;
+    ///if ( Is_DebugOn ) Printf ( "\nLO_Apply : lfunction with args :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ) ; //, Pause () ;
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLO_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( l0, " : result = ", "", 0 ) ;
     return l0 ;
 }
 
@@ -80,7 +64,11 @@ _LO_Apply ( ListObject *lfunction, ListObject *largs )
         }
         else rtn = _LO_Do_FunctionBlock ( lfunction, largs ) ;
     }
-    else if ( largs ) rtn = _LO_Do_FunctionBlock ( lfunction, largs ) ;
+    else if ( largs )
+    {
+        rtn = _LO_Do_FunctionBlock ( lfunction, largs ) ;
+        //SetState (lc, COMBINATOR_MODE, false ) ;
+    }
     else
     {
         lc->ParenLevel -- ;
@@ -174,7 +162,7 @@ LO_Substitute ( ListObject *lambdaParameters, ListObject * funcCallValues )
 {
     while ( lambdaParameters && funcCallValues )
     {
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "", 1 ), _LO_PrintWithValue ( funcCallValues, "\nLO_Substitute : funcCallValues = ", "", 0 ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "", 1 ), _LO_PrintWithValue ( funcCallValues, " : args = ", "", 0 ) ;
         // ?!? this may not be the right idea but we want it so that we can have transparent lists in the parameters, ie. 
         // no affect with a parenthesized list or just unparaenthesized parameters of the same number
         if ( lambdaParameters->W_LispAttributes & ( LIST | LIST_NODE ) )
@@ -192,9 +180,9 @@ LO_Substitute ( ListObject *lambdaParameters, ListObject * funcCallValues )
         // just preserve the name of the arg for the finder
         // so we now have the call values with the parameter names - parameter names are unchanged 
         // so when we eval/print these parameter names they will have the function calling values -- lambda calculus substitution - beta reduction
-        //if ( _Is_DebugOn ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "" ),  _LO_PrintWithValue ( funcCallValues, "\nLO_Substitute : funcCallValues = ", "" ) ;
+        //if ( DEFINE_DBG ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "" ),  _LO_PrintWithValue ( funcCallValues, "\nLO_Substitute : funcCallValues = ", "" ) ;
         funcCallValues->Lo_Name = lambdaParameters->Lo_Name ;
-        //if ( _Is_DebugOn ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "" ),  _LO_PrintWithValue ( funcCallValues, "\nLO_Substitute : funcCallValues = ", "" ) ;
+        //if ( DEFINE_DBG ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "" ),  _LO_PrintWithValue ( funcCallValues, "\nLO_Substitute : funcCallValues = ", "" ) ;
         lambdaParameters = _LO_Next ( lambdaParameters ) ;
         funcCallValues = _LO_Next ( funcCallValues ) ;
     }
@@ -225,8 +213,7 @@ LO_BeginBlock ( )
 {
     if ( ! Compiler_BlockLevel ( _Compiler_ ) ) _LC_->SavedCodeSpace = _O_CodeByteArray ;
     CSL_BeginBlock ( ) ;
-    if ( Is_DebugOn ) 
-        Stack_Print ( _Compiler_->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
+    //if ( Is_DebugOn ) Stack_Print ( _Compiler_->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
 }
 
 void
@@ -244,8 +231,7 @@ LO_EndBlock ( )
         if ( ! Compiler_BlockLevel ( compiler ) ) Set_CompilerSpace ( _LC_->SavedCodeSpace ) ;
         bi->LogicCodeWord = _LC_->LastInterpretedWord ;
     }
-    if ( Is_DebugOn ) 
-        Stack_Print ( _Compiler_->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
+    //if ( Is_DebugOn ) Stack_Print ( _Compiler_->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
 }
 
 void
@@ -273,7 +259,8 @@ _LO_CheckBeginBlock ( )
     int64 cii = Stack_Top ( compiler->CombinatorInfoStack ) ;
     CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
     ci.CI_i32_Info = cii ;
-    if ( ( GetState ( compiler, LISP_COMBINATOR_MODE ) ) && ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
+    //if ( ( GetState ( compiler, LISP_COMBINATOR_MODE ) ) && ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
+    if ( ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
     {
         return true ;
     }
@@ -480,7 +467,8 @@ CompileLispBlock ( ListObject *args, ListObject * body )
         LO_EndBlock ( ) ;
         code = ( block ) DataStack_Pop ( ) ;
     }
-    else // nb. LISP_COMPILE_MODE : this state can change with some functions that can't be compiled yet
+    //else // nb. LISP_COMPILE_MODE : this state can change with some functions that can't be compiled yet
+    if ( ( ! code ) || ( ! GetState ( lc, LC_COMPILE_MODE ) ) )
     {
         SetHere ( here, 1 ) ; //recover the unused code space
         code = 0 ;

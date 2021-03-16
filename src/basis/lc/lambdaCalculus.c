@@ -367,6 +367,7 @@ _LO_Repl ( )
 #endif    
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
     SetState ( compiler, LISP_MODE, false ) ;
+    LC_LispNamespacesOff ( ) ;
     Printf ( "\nleaving csl lisp : returning to csl interpreter" ) ;
 }
 

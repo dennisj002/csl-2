@@ -5,7 +5,7 @@
 #endif
 /* test comment */ 5  // for stack checking see last lines
 "\nclassTest.csl" ps sp //pause
-#if "_ClassTest_" defined not sp // prevent including this file twice
+#ifndef  _ClassTest_ sp // prevent including this file twice
 "_ClassTest_" /* testing comment ...
 testing comment */ var
 sp 

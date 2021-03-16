@@ -2,33 +2,22 @@
 //===================================================================================================================
 //| LO_SpecialFunction(s) 
 //===================================================================================================================
-#define NEW_DEFINE 0
-#define DEFINE_DBG _Is_DebugOn
-#if NEW_DEFINE 
-//#define DEFINE_DBG true
-#define NEW_DEFINE true
-#else
-//#define DEFINE_DBG 0
-#define NEW_DEFINE 0
-#endif
 
 ListObject *
-_LO_Define ( ListObject * l0, ListObject * locals0 )
+_LO_Definec ( ListObject * l0, ListObject * locals0 )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *value, *l1, *locals1 = 0, *value1, *l2, *lnext ;
     Word * word, *idLo ;
-    SetState ( _CSL_, _DEBUG_SHOW_, DEFINE_DBG ) ;
-    if ( _Is_DebugOn ) _LO_PrintWithValue ( l0, "\n_LO_Define : l0 = ", "", 1 ) ;
+    SetState ( _CSL_, _DEBUG_SHOW_, 1 ) ;
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( l0, "\n_LO_Define : l0 = ", "", 1 ) ;
     if ( ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) ) // scheme 'define : ( define ( func args) funcBody )
     {
         idLo = _LO_First ( l0 ) ;
-#if NEW_DEFINE        
         ListObject * value0, *lambda ;
         value = LO_List_New ( LISP ) ;
         value0 = _LO_Next ( l0 ) ;
         LO_AddToHead ( value, value0 ) ; // body
-#endif
         value1 = LO_List_New ( LISP ) ;
         for ( l2 = _LO_Next ( idLo ) ; l2 ; l2 = lnext )
         {
@@ -37,28 +26,18 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
             l2->W_ObjectAttributes |= LOCAL_VARIABLE ;
         }
         value1->W_LispAttributes |= ( LIST | LIST_NODE ) ;
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "", 1 ) ;
-#if ! NEW_DEFINE        
-        locals1 = value1 ;
-#endif        
-#if NEW_DEFINE        
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "", 1 ) ;
         LO_AddToHead ( value, value1 ) ;
         lambda = _LO_Read_DoToken ( _LC_, "lambda", 0, - 1, - 1 ) ;
         LO_AddToHead ( value, lambda ) ;
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "", 1 ) ;
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( value0, "\n_LO_Define : value0 = ", "", 1 ) ;
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "", 1 ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value0, "\n_LO_Define : value0 = ", "", 1 ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
         //value->W_LispAttributes |= T_LAMBDA ;
         locals1 = 0 ;
-#endif        
     }
-#if NEW_DEFINE
     else idLo = l0, value = _LO_Next ( l0 ) ;
-#else    
-    else idLo = l0 ;
-    value = _LO_Next ( l0 ) ;
-#endif    
     idLo = idLo->Lo_CSLWord ;
     word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) idLo->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, l0->W_RL_Index, l0->W_SC_Index ) ;
     CSL_WordList_Init ( word ) ;
@@ -67,27 +46,89 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
     word->Lo_CSLWord = word ;
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
     Namespace_DoAddWord ( locals0 ? locals0 : lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
-    if ( _Is_DebugOn ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
-    if ( _Is_DebugOn ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
-#if ! NEW_DEFINE        
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
+    value = _LO_Eval ( lc, value, 0, 0 ) ; // 0 : don't apply
+    if ( ( value && ( value->W_LispAttributes & T_LAMBDA ) ) )
+    {
+        value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
+        value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : function = ", "", 1 ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionParameters, "\n_LO_Define : value->Lo_LambdaFunctionParameters = ", "", 1 ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionBody, "\n_LO_Define : value->Lo_LambdaFunctionBody = ", "", 1 ) ;
+    }
+    else value = _LO_Copy ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
+    SetState ( _CSL_, _DEBUG_SHOW_, false ) ;
+    word->Lo_Value = ( uint64 ) value ; // used by eval
+    word->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
+    word->State |= LC_DEFINED ;
+
+    // the value was entered into the LISP memory, now we need a temporary carrier for LO_Print : yes, apparently, but why?
+    l1 = DataObject_New ( T_LC_NEW, 0, word->Name, word->W_MorphismAttributes,
+        word->W_ObjectAttributes, word->W_LispAttributes, 0, ( int64 ) value, 0, LISP, - 1, - 1 ) ; // all words are symbols
+    l1->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
+    l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
+    if ( GetState ( _LC_, LC_COMPILE_MODE ) ) l1->W_SC_WordList = word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
+    SetState ( lc, ( LC_COMPILE_MODE | LC_DEFINE_MODE ), false ) ;
+    _CSL_FinishWordDebugInfo ( l1 ) ;
+    _Word_Finish ( l1 ) ;
+    //word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
+    return l1 ;
+}
+
+ListObject *
+_LO_Define ( ListObject * l0, ListObject * locals0 )
+{
+    LambdaCalculus * lc = _LC_ ;
+    ListObject *value, *l1, *locals1 = 0, *value1, *l2, *lnext ;
+    Word * word, *idLo ;
+    SetState ( _CSL_, _DEBUG_SHOW_, LC_DEFINE_DBG ) ;
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( l0, "\n_LO_Define : l0 = ", "", 1 ) ;
+    if ( ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) ) // scheme 'define : ( define ( func args) funcBody )
+    {
+        idLo = _LO_First ( l0 ) ;
+        value1 = LO_List_New ( LISP ) ;
+        for ( l2 = _LO_Next ( idLo ) ; l2 ; l2 = lnext )
+        {
+            lnext = _LO_Next ( l2 ) ;
+            LO_AddToTail ( value1, l2 ) ;
+            l2->W_ObjectAttributes |= LOCAL_VARIABLE ;
+        }
+        value1->W_LispAttributes |= ( LIST | LIST_NODE ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "", 1 ) ;
+        locals1 = value1 ;
+    }
+    else idLo = l0 ;
+    value = _LO_Next ( l0 ) ;
+    idLo = idLo->Lo_CSLWord ;
+    word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) idLo->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, l0->W_RL_Index, l0->W_SC_Index ) ;
+    CSL_WordList_Init ( word ) ;
+    word->Definition = 0 ; // reset the definition from LO_Read
+    _Context_->CurrentWordBeingCompiled = word ;
+    word->Lo_CSLWord = word ;
+    SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
+    Namespace_DoAddWord ( locals0 ? locals0 : lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
     if ( locals1 )
     {
         word->Lo_LambdaFunctionParameters = _LO_Copy ( ( ListObject* ) locals1, LISP ) ;
         word->Lo_LambdaFunctionBody = _LO_Copy ( value, LISP ) ;
         word->W_LispAttributes |= T_LAMBDA ;
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( word->Lo_LambdaFunctionParameters, "\n_LO_Define : word->Lo_LambdaFunctionParameters = ", "", 1 ) ;
-        if ( _Is_DebugOn ) _LO_PrintWithValue ( word->Lo_LambdaFunctionBody, "\n_LO_Define : word->Lo_LambdaFunctionBody = ", "", 1 ) ; //, Pause ( ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : function = ", "", 1 ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionParameters, "\n_LO_Define : value->Lo_LambdaFunctionParameters = ", "", 1 ) ;
+        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionBody, "\n_LO_Define : value->Lo_LambdaFunctionBody = ", "", 1 ) ;
     }
     else
-#endif        
     {
         value = _LO_Eval ( lc, value, 0, 0 ) ; // 0 : don't apply
         if ( ( value && ( value->W_LispAttributes & T_LAMBDA ) ) )
         {
             value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
             value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
-            if ( _Is_DebugOn ) _LO_PrintWithValue ( value->Lo_LambdaFunctionParameters, "\n_LO_Define : value->Lo_LambdaFunctionParameters = ", "\n", 1 ) ;
-            if ( _Is_DebugOn ) _LO_PrintWithValue ( value->Lo_LambdaFunctionBody, "\n_LO_Define : value->Lo_LambdaFunctionBody = ", "\n", 1 ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : function = ", "", 1 ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionParameters, "\n_LO_Define : value->Lo_LambdaFunctionParameters = ", "", 1 ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionBody, "\n_LO_Define : value->Lo_LambdaFunctionBody = ", "", 1 ) ;
         }
         else value = _LO_Copy ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
     }
@@ -171,14 +212,13 @@ LO_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
             macro = 0 ;
             //if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : macro eval after : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "" ) ;
         }
-        //lfirst = LO_CopyOne (_LO_Eval ( lc, lfirst, locals, 0 ) ) ;
-        //lfirst = _LO_EvalSymbol ( lc, lfirst, locals ) ; //LO_CopyOne (_LO_Eval ( lc, lfirst, locals,  ) ) ;
         if ( lfirst && lfirst->Lo_CSLWord && IS_MORPHISM_TYPE ( lfirst->Lo_CSLWord ) )
         {
-            //Stack_Print ( _Compiler_->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
             if ( lfirst->W_MorphismAttributes & COMBINATOR ) LC_InitForCombinator ( lc ) ;
+            //else SetState ( lc, LC_COMPILE_MODE, false ), CompileModeOff ;
             int64 tlf = ( int64 ) ( lfirst->Lo_CSLWord->W_LispAttributes & T_LISP_IF ) ;
-            l0 = ( ( LispFunction3 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals, tlf ) ; // non macro special functions here
+            //l0 = ( ( LispFunction3 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals, tlf ) ; // non macro special functions here
+            l0 = ( ( LispFunction4 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals, tlf, l0 ) ; // ??? : does adding extra parameters to functions not defined with them mess up the the c runtime return stack
         }
         else
         {
@@ -226,9 +266,27 @@ LO_CompileDefine ( ListObject * l0 )
 }
 
 ListObject *
+LO_CompileDefinec ( ListObject * l0 )
+{
+    SetState ( _Context_->Compiler0, RETURN_TOS, true ) ;
+    SetState ( _LC_, LC_COMPILE_MODE, true ) ;
+    ListObject * idNode = _LO_Next ( l0 ) ;
+    l0 = _LO_Definec ( idNode, 0 ) ;
+    SetState ( _LC_, LC_COMPILE_MODE, false ) ;
+    return l0 ;
+}
+
+ListObject *
 LO_Define ( ListObject * l0 )
 {
     l0 = LO_CompileDefine ( l0 ) ;
+    return l0 ;
+}
+
+ListObject *
+LO_Definec ( ListObject * l0 )
+{
+    l0 = LO_CompileDefinec ( l0 ) ;
     return l0 ;
 }
 
@@ -268,51 +326,11 @@ _LO_Cons ( ListObject *first, ListObject * second ) //, uint64 allocType )
     return l0 ;
 }
 
-#if 0
-
 ListObject *
-LO_If ( ListObject * l0, ListObject * locals )
+LO_If ( ListObject * lfirst, ListObject * locals, int64 ifFlag, ListObject * l0 )
 {
-    LambdaCalculus * lc = _LC_ ;
-    ListObject * test, *testResult, *sequence, *result ;
-    // 'cond' is first node ; skip it.
-    l0 = _LO_First ( l0 ) ; // the 'cond' (maybe aliased)
-    test = _LO_Next ( l0 ) ;
-    if ( Is_DebugOn ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "", 1 ) ;
-    while ( ( sequence = _LO_Next ( test ) ) )
-    {
-        if ( Is_DebugOn ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "", 1 ) ;
-        if ( String_Equal ( test->Name, "else" ) )
-        {
-            //if ( Is_DebugOn ) _LO_PrintWithValue ( sequence, "\nLO_Cond : sequence = ", "" ) ;
-            result = _LO_Eval ( lc, sequence, locals, 1 ) ;
-            break ;
-        }
-        testResult = _LO_Eval ( lc, test, locals, 1 ) ;
-        if ( ( testResult->Lo_Value ) || ( String_Equal ( testResult->Name, "else" ) ) )
-        {
-            //if ( Is_DebugOn ) _LO_PrintWithValue ( sequence, "\nLO_Cond : sequence = ", "" ) ;
-            result = _LO_Eval ( lc, sequence, locals, 1 ) ;
-            break ;
-        }
-        else test = _LO_Next ( sequence ) ;
-    }
-    if ( ! sequence )
-    {
-        if ( Is_DebugOn ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "", 1 ) ;
-        result = _LO_Eval ( lc, test, locals, 1 ) ;
-    }
-    if ( Is_DebugOn ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "", 1 ) ;
-    return result ;
+    return LO_Cond ( lfirst, locals, ifFlag, l0 ) ;
 }
-#else
-
-ListObject *
-LO_If ( ListObject * l0, ListObject * locals )
-{
-    return LO_Cond ( l0, locals, 1 ) ;
-}
-#endif
 
 /* not exactly but ...
 LIST:
@@ -344,246 +362,118 @@ rences of <thing>; and <thing>+ means at least one <thing>.
 <derived expression> : (cond <cond clause>+ ) | (cond <cond clause>* (else <sequence>)) | ...
  */
 #define IS_COND_MORPHISM_TYPE(word) ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK|T_LAMBDA ) || ( word->W_LispAttributes & ( T_LAMBDA ) ) )
-#if ! NEW_COND
 ListObject *
-LO_Cond ( ListObject * l0, ListObject * locals, int64 ifFlag )
+LO_Cond ( ListObject * lfirst, ListObject * locals, int64 ifFlag, ListObject * l0 )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     LambdaCalculus * lc = _LC_ ;
-    ListObject *condClause, * test, *testForElse = 0, *sequence, * resultNode = nil, * result, *testResult, *seqNext = 0 ;
-    Boolean timt = false, tilt = false ; // timt : test is morphism type ; tilt : test is list type
-    //Stack_Init ( _Compiler_->PointerToOffsetStack ) ;
-    int64 numBlocks, d1, d0 = Stack_Depth ( compiler->CombinatorBlockInfoStack ) ;
-    //Set_CompileMode ( true ) ;
-    if ( DEFINE_DBG ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "", 1 ) ;
-    if ( condClause = _LO_Next ( l0 ) ) // 'cond' is first node ; skip it.
+    ListObject *condClause, *nextCondClause, * test, *sequence, * resultNode = nil, * result = nil, *testResult ;
+    int64 timt = 0 ; //, ccilt = 0 ; // timt : test is morphism type ; ccilt : condClause is list type
+    int64 numBlocks, d1, d0 = Stack_Depth ( compiler->CombinatorBlockInfoStack ), testValue ;
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "", 1 ) ;
+    ListObject * idLo = lfirst ;
+    if ( condClause = _LO_Next ( idLo ) ) // 'cond' is id node ; skip it.
     {
         do
         {
-            if ( DEFINE_DBG ) _LO_PrintWithValue ( condClause, "\nLO_Cond : condClause = ", "", 1 ) ;
-            test = _LO_First ( condClause ) ;
-            //if ( DEFINE_DBG ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "" ) ;
-            if ( test->W_LispAttributes & ( LIST | LIST_NODE ) )
+            // first determine test and sequence
+            //if ( DEFINE_DBG ) _LO_PrintWithValue ( condClause, "\nLO_Cond : condClause = ", "", 1 ) ;
+            if ( ! ( sequence = _LO_Next ( condClause ) ) )
             {
-                tilt = true ;
-                testForElse = _LO_First ( test ) ;
-                if ( String_Equal ( testForElse->Name, "else" ) )
+                if ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) )
                 {
-                    resultNode = _LO_Next ( test ) ;
-                    if ( CompileMode ) CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-                    result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
-                    break ;
-                }
-            }
-            else if ( timt = IS_COND_MORPHISM_TYPE ( test ) ) test = condClause, tilt = true ;
-            if ( DEFINE_DBG ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "", 1 ) ;
-            sequence = _LO_Next ( test ) ;
-            if ( ! sequence )
-            {
-                resultNode = test ; // where there is just a test with a sequence => a finally : the test is the finally
-                if ( CompileMode )
-                {
-                    CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-                    result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
-                }
-                break ;
-            }
-            testResult = _LO_Eval ( lc, test, locals, 1 ) ;
-            if ( testResult->Lo_Value || ( String_Equal ( test->Name, "else" ) ) )
-            {
-                resultNode = sequence ;
-                if ( CompileMode )
-                {
-                    CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-                    result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
-                }
-                break ;
-            }
-            else
-            {
-                if ( ifFlag )
-                {
-                    seqNext = _LO_Next ( sequence ) ;
-                    if ( seqNext ) condClause = seqNext ;
-                    else condClause = _LO_Next ( condClause ) ;
-                    resultNode = condClause ;
-                    if ( condClause && CompileMode )
+                    do
                     {
-                        CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-                        result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
-                        continue ;
+                        test = _LO_First ( condClause ) ;
+                        if ( sequence = _LO_Next ( test ) ) break ;
+                        else condClause = test ;
                     }
-                    else break ;
-                }
-                Boolean silt = ( sequence->W_LispAttributes & ( LIST | LIST_NODE ) ) ;
-                if ( ( ! timt ) && ( ! tilt ) && ( ! silt ) )
-                {
-                    seqNext = _LO_Next ( sequence ) ;
-                    if ( seqNext ) condClause = seqNext ;
-                    else condClause = _LO_Next ( condClause ) ;
-                }
-                else condClause = _LO_Next ( condClause ) ;
-                if ( timt ) condClause = _LO_Next ( condClause ) ;
-            }
-            timt = false ;
-            tilt = false ;
-        }
-        while ( condClause ) ;
-#if 0        
-        if ( l0->W_MorphismAttributes & COMBINATOR )
-        {
-            d1 = Stack_Depth ( compiler->CombinatorBlockInfoStack ) ;
-            numBlocks = d1 ; //- d0 ;
-            CSL_CondCombinator ( numBlocks ) ;
-        }
-        else
-#endif            
-        {
-            if ( DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "", 1 ) ;
-            result = _LO_Eval ( lc, resultNode, locals, 1 ) ;
-            if ( DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "", 1 ) ;
-            return result ;
-        }
-    }
-    return nil ;
-}
-#else
-ListObject *
-LO_Cond ( ListObject * l0, ListObject * locals, int64 ifFlag )
-{
-    Compiler * compiler = _Context_->Compiler0 ;
-    LambdaCalculus * lc = _LC_ ;
-    ListObject *condClause, *condClause0, *condClause1, * test, *test1, *testForElse = 0, *sequence, * resultNode = nil, * result, *testResult, *seqNext = 0 ;
-    int64 timt = 0, tilt = 0 ; // timt : test is morphism type ; tilt : test is list type
-    //Stack_Init ( _Compiler_->PointerToOffsetStack ) ;
-    int64 numBlocks, d1, d0 = Stack_Depth ( compiler->CombinatorBlockInfoStack ) ;
-    //Set_CompileMode ( true ) ;
-    if ( DEFINE_DBG ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "", 1 ) ;
-    if ( condClause = _LO_Next ( l0 ) ) // 'cond' is first node ; skip it.
-    {
-        do
-        {
-            if ( DEFINE_DBG ) _LO_PrintWithValue ( condClause, "\nLO_Cond : condClause = ", "", 1 ) ;
-#if 0
-            test = _LO_First ( condClause ) ;
-            if ( test->W_LispAttributes & ( LIST | LIST_NODE ) )
-            {
-                tilt = true ;
-                testForElse = _LO_First ( test ) ;
-                if ( String_Equal ( testForElse->Name, "else" ) )
-                {
-                    resultNode = _LO_Next ( test ) ;
-                    if ( CompileMode ) CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-                    result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
-                    break ;
-                }
-            }
-            else if ( timt = IS_COND_MORPHISM_TYPE ( test ) ) test = condClause, tilt = true ;
-#endif            
-            //test = _LO_First ( condClause ) ;
-            if ( ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) ) )
-            {
-                condClause1 = condClause0 = condClause ;
-                do
-                {
-                    condClause0 = condClause1 ;
-                    condClause1 = _LO_First ( condClause0 ) ;
-                }
-                while ( condClause1->W_LispAttributes & ( LIST | LIST_NODE ) ) ;
-                tilt = 1 ;
-                test = condClause0 ;
-                test1 = _LO_First ( condClause0 ) ;
-                if ( timt = IS_COND_MORPHISM_TYPE ( test1 ) )
-                {
-                    test = condClause0, tilt = 1 ;
-                    testForElse = _LO_First ( test ) ;
-                    if ( String_Equal ( testForElse->Name, "else" ) )
-                    {
-                        resultNode = _LO_Next ( test ) ;
-                        result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
-                        break ;
-                    }
+                    while ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) ) ;
                 }
                 else
                 {
-                    test = test1 ;
+                    resultNode = condClause ;
+                    if ( CompileMode ) result = _LO_Eval ( lc, resultNode, locals, 1 ) ;
+                    break ;
                 }
             }
-            else
+            else test = _LO_First ( condClause ) ;
+            if ( timt = IS_COND_MORPHISM_TYPE ( test ) ) test = condClause ;
+            if ( String_Equal ( test->Name, "else" ) )
             {
-                test = condClause ;
-            }
-            sequence = _LO_Next ( test ) ;
-            //test = condClause ; //_LO_First ( condClause ) ;
-            if ( DEFINE_DBG ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "", 1 ) ;
-            //if ( tilt ) 
-            if ( ! sequence )
-            {
-                resultNode = test ; // where there is just a test with a sequence => a finally : the test is the finally
-                if ( ! CompileMode ) break ;
-                result = _LO_Eval ( lc, resultNode, locals, 1 ) ; // last one, no need to copy
-                //break ;
-            }
-            testResult = _LO_Eval ( lc, test, locals, 1 ) ;
-            int64 testValue = ( testResult->Lo_Value ) ; //|| ( String_Equal ( test->Name, "else" ) ) ) ;
-            if ( ( ! CompileMode ) && testValue )
-            {
-                resultNode = sequence ;
+                resultNode = _LO_Next ( test ) ;
+                if ( CompileMode )
+                {
+                    result = _LO_Eval ( lc, resultNode, locals, 1 ) ;
+                    resultNode = 0 ;
+                }
                 break ;
             }
-            else
+            if ( sequence && ( ! ( sequence = _LO_Next ( test ) ) ) )
             {
-                _LO_Eval ( lc, sequence, locals, 1 ) ;
-                if ( ifFlag )
+                resultNode = test ;
+                if ( CompileMode ) result = _LO_Eval ( lc, resultNode, locals, 1 ) ;
+                else break ;
+            }
+
+            if ( ! ( nextCondClause = _LO_Next ( sequence ) ) )
+                nextCondClause = _LO_Next ( condClause ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( l0, "\nLO_Cond : l0 = ", "", 1 ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( condClause, "\nLO_Cond : condClause = ", "", 1 ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( sequence, "\nLO_Cond : sequence = ", "", 1 ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( nextCondClause, "\nLO_Cond : nextCondClause = ", "", 1 ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "", 1 ) ;
+            // we have determined test and sequence
+            // either return result or find next condClause
+            testResult = _LO_Eval ( lc, test, locals, 1 ) ;
+            testValue = ( testResult && ( testResult->Lo_Value ) ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( testResult, "\nLO_Cond : testResult = ", "", 1 ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( sequence, "\nLO_Cond : eval : sequence = ", "", 1 ) ;
+            if ( CompileMode ) result = _LO_Eval ( lc, sequence, locals, 1 ) ;
+            if ( testValue )
+            {
+                if ( ! CompileMode )
                 {
-                    seqNext = _LO_Next ( sequence ) ;
-                    if ( seqNext ) condClause = seqNext ;
-                    else condClause = _LO_Next ( condClause ) ;
-                    resultNode = condClause ;
-                    result = _LO_Eval ( lc, resultNode, locals, 1 ) ;
-                    if ( ! CompileMode ) return result ;
-                    else break ;
-                }
-                int64 silt = ( sequence->W_LispAttributes & ( LIST | LIST_NODE ) ) ;
-                //if ( ( ! timt ) && ( ! tilt ) && ( ! silt ) )
-                //if ( ( ! tilt ) && ( ! silt ) )
-                {
-                    seqNext = _LO_Next ( sequence ) ;
-                    if ( seqNext ) condClause = seqNext ;
-                    else condClause = _LO_Next ( condClause ) ;
-                }
-                //else if ( silt )
-                {
-                    //condClause = _LO_Next ( condClause ) ;
-                    //if ( timt && (!tilt)) condClause = _LO_Next ( condClause ) ;
-                    //if ( (!tilt)) 
-                    //condClause = _LO_Next ( condClause ) ;
+                    resultNode = sequence ;
+                    break ;
                 }
             }
-            timt = 0 ;
-            tilt = 0 ;
-            sequence = 0 ;
+            else
+            {
+                resultNode = nextCondClause ;
+                if ( CompileMode )
+                {
+                    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "", 1 ) ;
+                    result = _LO_Eval ( lc, resultNode, locals, 1 ) ;
+                }
+                //ccilt = condClause->W_LispAttributes & ( LIST | LIST_NODE ) ;
+                //if ( ( ! ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) ) ) || ( ifFlag ) ) break ; //{ resultNode = test ; break ; }
+                if ( ifFlag ) break ; //{ resultNode = test ; break ; }
+            }
+            //tilt = 0 ;
+            condClause = nextCondClause ;
         }
         while ( condClause ) ;
-#if NEW_COND        
-        if ( l0->W_MorphismAttributes & COMBINATOR )
+        if ( idLo->W_MorphismAttributes & COMBINATOR )
         {
             d1 = Stack_Depth ( compiler->CombinatorBlockInfoStack ) ;
             numBlocks = d1 - d0 ;
             CSL_CondCombinator ( numBlocks ) ;
         }
         else
-#endif            
         {
-            if ( DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "", 1 ) ;
-            result = _LO_Eval ( lc, resultNode, locals, 1 ) ;
-            if ( DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : result = ", "", 1 ) ;
-            return result ;
+            if ( resultNode )
+            {
+                if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : before eval : resultNode = ", "", 1 ) ;
+                result = _LO_Eval ( lc, resultNode, locals, 1 ) ;
+                if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : after eval : result = ", "\n", 1 ) ;
+            }
         }
     }
-    return nil ;
+    //return nil ;
+    return result ;
 }
-#endif
+
 // lisp 'list' function
 // lfirst must be the first element of the list
 
@@ -782,66 +672,4 @@ _LO_CSL ( ListObject * lfirst )
     }
     return nil ;
 }
-
-#if 0
-
-ListObject *
-LO_Logic_Equals ( ListObject * l0, ListObject * locals )
-{
-    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
-    lsecond = _LO_Next ( lfirst ) ;
-    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
-    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
-    DataStack_Push ( ( int64 ) ( lf->Lo_Value == ls->Lo_Value ) ) ;
-    lresult = LO_PrepareReturnObject ( ) ;
-    return lresult ;
-}
-
-ListObject *
-LO_Plus ( ListObject * l0, ListObject * locals )
-{
-    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
-    lsecond = _LO_Next ( lfirst ) ;
-    //lf = _LO_Eval ( _LC_, LO_CopyOne (lfirst), locals, 1 ) ;
-    //ls = _LO_Eval ( _LC_, LO_CopyOne (lsecond), locals, 1 ) ;
-    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
-    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
-    DataStack_Push ( ( int64 ) ( lf->Lo_Value + ls->Lo_Value ) ) ;
-    lresult = LO_PrepareReturnObject ( ) ;
-    return lresult ;
-}
-
-ListObject *
-LO_Minus ( ListObject * l0, ListObject * locals )
-{
-    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
-    lsecond = _LO_Next ( lfirst ) ;
-    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
-    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
-    DataStack_Push ( ( int64 ) ( lf->Lo_Value - ls->Lo_Value ) ) ;
-    lresult = LO_PrepareReturnObject ( ) ;
-    return lresult ;
-}
-
-ListObject *
-LO_LessThan ( ListObject * l0, ListObject * locals )
-{
-    ListObject * lfirst = _LO_Next ( l0 ), *lsecond, *lf, *ls, * lresult ;
-    lsecond = _LO_Next ( lfirst ) ;
-    lf = _LO_Eval ( _LC_, lfirst, locals, 1 ) ;
-    ls = _LO_Eval ( _LC_, lsecond, locals, 1 ) ;
-    DataStack_Push ( ( int64 ) ( lf->Lo_Value < ls->Lo_Value ) ) ;
-    lresult = LO_PrepareReturnObject ( ) ;
-    return lresult ;
-}
-
-ListObject *
-LO_Else ( ListObject * l0 )
-{
-    ListObject * lfirst = _LO_Next ( l0 ) ;
-    //if ( lfirst->W_LispAttributes & ( LIST_NODE | LIST ) ) return LO_CopyOne ( _LO_First ( lfirst ) ) ; //( ListObject * ) lfirst ;
-    return LO_Eval ( LO_CopyOne ( lfirst ) ) ;
-}
-
-#endif
 

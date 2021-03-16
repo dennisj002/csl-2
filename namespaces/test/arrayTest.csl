@@ -1,7 +1,7 @@
 5 
 : sp ; //stack pause ; sp
 
-lispOff
+lispOff bnOff
 #if _TestDone_ @ not // prevent including twice
 //dbgOff
 decimal

@@ -155,11 +155,17 @@ BigNum_Info ( )
 }
 
 void
+Error_LC_BigNum ()
+{
+    Printf ( "\nBigNum : Error : LC : value not a BigNum\n") ; 
+}
+void
 _BigNum_FPrint ( mpfr_t * value )
 {
     byte * format ;
     if ( _O_->Verbosity )
     {
+        if (_LC_ && ( (int64) (*value) < 0x7ffff0000000 ) ) Error_LC_BigNum () ;// could be true/false
         if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %*.*Rf" ;
         else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %*.*Rb" ;
         else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %*.*Rx" ;
@@ -174,6 +180,8 @@ _BigNum_snfPrint2 ( char * buf, byte * name, mpfr_t * value )
     byte * format ;
     if ( _O_->Verbosity )
     {
+        if (_LC_ && ( (int64) (*value) < 0x7ffff0000000 ) ) Error_LC_BigNum () ;// could be true/false
+        //if (( (int64) (*value) == 0 ) || ( (int64) (*value) == 1 )) return ; // true/false
         if ( name )
         {
             if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %s = %*.*Rf" ;
@@ -228,6 +236,7 @@ BigNum_EPrint ( )
 {
     //Set_SCA ( 0 ) ; // this is not compiled
     mpfr_t * value = ( mpfr_t* ) DataStack_Pop ( ) ;
+    if (_LC_ && ( (int64) (*value) < 0x7ffff0000000 ) ) Error_LC_BigNum () ;// could be true/false
     if ( _O_->Verbosity ) mpfr_printf ( "%*.*Re", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
     fflush ( stdout ) ;
 }

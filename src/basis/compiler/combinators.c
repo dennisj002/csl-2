@@ -27,7 +27,7 @@ CSL_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
     {
         _Stack_Pop ( compiler->CombinatorInfoStack ) ;
-        if ( ! Stack_Depth ( compiler->CombinatorInfoStack ) ) SetState ( compiler, LISP_COMBINATOR_MODE, false ) ;
+        //if ( ! Stack_Depth ( compiler->CombinatorInfoStack ) ) SetState ( compiler, LISP_COMBINATOR_MODE, false ) ;
     }
 }
 
@@ -460,7 +460,7 @@ CSL_ForCombinator ( )
     }
 }
 
-#if NEW_COND
+#if LC_CONDC
 
 void
 CSL_CondCombinator ( int64 numBlocks )
@@ -469,7 +469,7 @@ CSL_CondCombinator ( int64 numBlocks )
     int64 blockIndex ;
     BlockInfo *bi ;
     byte * compiledAtAddress ;
-#if NEW_COND   
+#if 0 //NEW_COND   
     block testBlock = ( block ) Dsp ( 2 ), trueBlock = ( block ) Dsp ( 1 ), falseBlock = ( block ) Dsp ( 0 ) ;
     Stack_Print ( compiler->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
     //if ( Is_DebugOn ) 
