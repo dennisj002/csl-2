@@ -239,7 +239,7 @@ LO_CheckEndBlock ( )
 {
     LambdaCalculus * lc = _LC_ ;
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
+    if ( GetState ( compiler, LC_COMBINATOR_MODE ) )
     {
         int64 cii = Stack_Top ( compiler->CombinatorInfoStack ) ;
         CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
@@ -259,7 +259,7 @@ _LO_CheckBeginBlock ( )
     int64 cii = Stack_Top ( compiler->CombinatorInfoStack ) ;
     CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
     ci.CI_i32_Info = cii ;
-    //if ( ( GetState ( compiler, LISP_COMBINATOR_MODE ) ) && ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
+    //if ( ( GetState ( compiler, LC_COMBINATOR_MODE ) ) && ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
     if ( ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
     {
         return true ;
@@ -282,7 +282,7 @@ void
 LC_InitForCombinator ( LambdaCalculus * lc )
 {
     Compiler *compiler = _Context_->Compiler0 ;
-    SetState ( compiler, LISP_COMBINATOR_MODE, true ) ;
+    SetState ( compiler, LC_COMBINATOR_MODE, true ) ;
     CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
     ci.BlockLevel = Compiler_BlockLevel ( compiler ) ; //compiler->BlockLevel ;
     ci.ParenLevel = lc->ParenLevel ;

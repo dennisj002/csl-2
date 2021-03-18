@@ -137,3 +137,35 @@ _LO_EvalList ( LambdaCalculus * lc, ListObject *lorig, ListObject *locals, Boole
     return lnew ;
 }
 
+ListObject *
+LO_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
+{
+    ListObject * lfirst, *macro = 0 ;
+    if ( lfirst = _LO_First ( l0 ) )
+    {
+        while ( lfirst && ( lfirst->W_LispAttributes & T_LISP_MACRO ) )
+        {
+            //if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : macro eval before : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "" ) ;
+            macro = lfirst ;
+            macro->W_LispAttributes &= ~ T_LISP_MACRO ; // prevent short recursive loop calling of this function thru LO_Eval below
+            l0 = _LO_Eval ( lc, l0, locals, 1 ) ;
+            macro->W_LispAttributes |= T_LISP_MACRO ; // restore to its true type
+            lfirst = _LO_First ( l0 ) ;
+            macro = 0 ;
+            //if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : macro eval after : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "" ) ;
+        }
+        if ( lfirst && lfirst->Lo_CSLWord && IS_MORPHISM_TYPE ( lfirst->Lo_CSLWord ) )
+        {
+            if ( lfirst->W_MorphismAttributes & COMBINATOR ) LC_InitForCombinator ( lc ) ;
+            l0 = ( ( LispFunction2 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals ) ; // ??? : does adding extra parameters to functions not defined with them mess up the the c runtime return stack
+        }
+        else
+        {
+            //if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : final eval before : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "nil" ) ;
+            l0 = _LO_Eval ( lc, l0, locals, 1 ) ;
+            //if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : final eval after : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "nil" ) ;
+        }
+    }
+    return l0 ;
+}
+

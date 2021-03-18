@@ -211,7 +211,8 @@
 #define IS_NAMESPACE_RELATED_TYPE(word) (word->W_MorphismAttributes & NAMESPACE_RELATED_TYPE)
 #define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->W_ObjectAttributes & ( NON_MORPHISM_TYPE ) ) ) \
         && ( ! ( word->W_MorphismAttributes & ( DEBUG_WORD | OBJECT_OPERATOR ) ) ) \
-        && ( ! ( word->W_LispAttributes & (T_LISP_SYMBOL ) ) ) ) || ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK ) )  || ( word->W_LispAttributes & ( T_LAMBDA ) ) )
+        && ( ! ( word->W_LispAttributes & (T_LISP_SYMBOL ) ) ) ) || ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK ) ) \
+        || ( word->W_LispAttributes & ( T_LAMBDA | LISP_C_RTL_ARGS | T_LISP_SPECIAL | LISP_VOID_RETURN ) ) )
 
 #define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->W_ObjectAttributes & (NAMESPACE_TYPE)) : 0 )
 #define Is_ValueType( w ) ( w ? NON_MORPHISM_TYPE (w) : 0 )
@@ -237,7 +238,8 @@
 #define DebugShow_On SetState ( _CSL_, _DEBUG_SHOW_, true ) 
 #define Is_DebugModeOn ( GetState ( _CSL_, DEBUG_MODE ) ) 
 #define Is_DebugShowOn ( GetState ( _CSL_, _DEBUG_SHOW_ ) ) 
-#define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
+#define _Is_DebugOn Is_DebugShowOn
+#define Is_DebugOn (_Is_DebugOn && Is_DebugModeOn)
 #define DEBUG_PRINTSTACK if ( GetState ( _CSL_, DEBUG_MODE )  ) CSL_PrintDataStack () ;
 #define DEBUG_SETUP_TOKEN( token, debugLevel ) _DEBUG_SETUP (0, token, 0, 0, debugLevel) ;
 #define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force, 0) ;

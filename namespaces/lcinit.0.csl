@@ -17,7 +17,7 @@ pwi fibc
 (definec fibc1 ( lambda ( n ) (ifc (< n 2) n ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
 pwi fibc1
 "\nfibc1 30 = " ps
-(fibc1 30) 
+d: (fibc1 3) 
 //pause
 #endif    
 lcOff 

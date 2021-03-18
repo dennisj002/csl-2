@@ -12,8 +12,8 @@
 #define EXPERIMENTAL true
 #define _DEFINE_DBG 0
 #define LC_CONDC 1
-#define LC_DEFINE_DBG ( _DEFINE_DBG || Is_DebugOn )
-//#define DEFINE_DBG ( _DEFINE_DBG && Is_DebugOn )
+#define LC_DEFINE_DBG ( _DEFINE_DBG || _Is_DebugOn )
+//#define LC_DEFINE_DBG ( _DEFINE_DBG && Is_DebugOn )
 
 #if DEBUG 
 #define D( x ) x
@@ -551,6 +551,7 @@ typedef struct
 #define T_LISP_COLON ( (uint64) 1 << 46 )
 #define T_LISP_IMMEDIATE ( (uint64) 1 << 48 )
 #define T_LISP_CSL_COMPILED ( (uint64) 1 << 49 )
+#define T_LC_COMPILED ( (uint64) 1 << 50 )
 
 //#define   ( (uint64) 1 <<  )
 #define NEW_RUN_COMPOSITE 0
@@ -777,7 +778,7 @@ typedef struct
 #define RETURN_NONE ( (uint64) 1 << 5 ) 
 #define RETURN_TOS ( (uint64) 1 << 6 )
 //#define RETURN_ACCUM ( (uint64) 1 << 7 ) 
-#define LISP_COMBINATOR_MODE ( (uint64) 1 << 8 )
+#define LC_COMBINATOR_MODE ( (uint64) 1 << 8 )
 #define LISP_MODE ( (uint64) 1 << 9 )
 #define INFIX_MODE ( (uint64) 1 << 10 )
 #define RETURN_VAR ( (uint64) 1 << 11 )

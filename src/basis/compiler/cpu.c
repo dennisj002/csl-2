@@ -149,6 +149,7 @@ _Compile_CpuState_Restore ( Cpu * cpu, int64 cStackRegFlag )
     _Compile_Get_FromCAddress_ToReg_ThruReg ( R12D, ( byte* ) & cpu->R12d, RDX ) ; // r12, r13, rsp, rbp : same problem
     _Compile_Get_FromCAddress_ToReg_ThruReg ( R13D, ( byte* ) & cpu->R13d, RDX ) ; // r12, r13, rsp, rbp : same problem
     _Compile_GetRValue_FromLValue_ToReg ( R14D, ( byte* ) & cpu->R14d ) ; // r14d
+    if ( cpu->R15d == 0 ) cpu->R15d = cpu->R14d ;
     _Compile_GetRValue_FromLValue_ToReg ( R15D, ( byte* ) & cpu->R15d ) ; // r15d
 
     _Compile_GetRValue_FromLValue_ToReg ( ACC, ( byte* ) & cpu->RFlags ) ;

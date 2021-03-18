@@ -154,24 +154,36 @@ BigNum_Info ( )
         MPFR_VERSION_MINOR, MPFR_VERSION_PATCHLEVEL ) ;
 }
 
-void
-Error_LC_BigNum ()
+int64
+Check_Error_BigNum ( uint64 value )
 {
-    Printf ( "\nBigNum : Error : LC : value not a BigNum\n") ; 
+    //if ( _O_->Verbosity > 1 )
+    {
+        if ( _LC_ && ( ( uint64 ) ( value ) < 0x700000000000 ) )
+        {
+            //Error_LC_BigNum ( (uint64) value ) ; // could be true/false
+            Printf ( "\nBigNum : Error : LC : value not a BigNum = " UINT_FRMT_0x08 "\n", value ) ;
+            return true ;
+        }
+    }
+    return false ;
 }
+
 void
 _BigNum_FPrint ( mpfr_t * value )
 {
     byte * format ;
     if ( _O_->Verbosity )
     {
-        if (_LC_ && ( (int64) (*value) < 0x7ffff0000000 ) ) Error_LC_BigNum () ;// could be true/false
-        if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %*.*Rf" ;
-        else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %*.*Rb" ;
-        else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %*.*Rx" ;
-        mpfr_printf ( ( char* ) format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+        if ( ! Check_Error_BigNum ( ( uint64 )value ) )
+        {
+            if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %*.*Rf" ;
+            else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %*.*Rb" ;
+            else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %*.*Rx" ;
+            mpfr_printf ( ( char* ) format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+            fflush ( stdout ) ;
+        }
     }
-    fflush ( stdout ) ;
 }
 
 void
@@ -180,30 +192,30 @@ _BigNum_snfPrint2 ( char * buf, byte * name, mpfr_t * value )
     byte * format ;
     if ( _O_->Verbosity )
     {
-        if (_LC_ && ( (int64) (*value) < 0x7ffff0000000 ) ) Error_LC_BigNum () ;// could be true/false
-        //if (( (int64) (*value) == 0 ) || ( (int64) (*value) == 1 )) return ; // true/false
-        if ( name )
+        if ( ! Check_Error_BigNum ( ( uint64 )value ) )
         {
-            if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %s = %*.*Rf" ;
-            else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %s = %*.*Rb" ;
-            else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %s = %*.*Rx" ;
-            mpfr_sprintf ( buf, format, name, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
-        }
-        else
-        {
-            if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %*.*Rf" ;
-            else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %*.*Rb" ;
-            else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %*.*Rx" ;
-            mpfr_sprintf ( buf, format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+            if ( name )
+            {
+                if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %s = %*.*Rf" ;
+                else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %s = %*.*Rb" ;
+                else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %s = %*.*Rx" ;
+                mpfr_sprintf ( buf, format, name, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+            }
+            else
+            {
+                if ( NUMBER_BASE_GET == 10 ) format = ( byte* ) " %*.*Rf" ;
+                else if ( NUMBER_BASE_GET == 2 ) format = ( byte* ) " %*.*Rb" ;
+                else if ( NUMBER_BASE_GET == 16 ) format = ( byte* ) " %*.*Rx" ;
+                mpfr_sprintf ( buf, format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+            }
+            fflush ( stdout ) ;
         }
     }
-    fflush ( stdout ) ;
 }
 
 void
 BigNum_FPrint ( )
 {
-    //Set_SCA ( 0 ) ; // this is not compiled
     _BigNum_FPrint ( ( mpfr_t* ) DataStack_Pop ( ) ) ;
 }
 
@@ -236,9 +248,11 @@ BigNum_EPrint ( )
 {
     //Set_SCA ( 0 ) ; // this is not compiled
     mpfr_t * value = ( mpfr_t* ) DataStack_Pop ( ) ;
-    if (_LC_ && ( (int64) (*value) < 0x7ffff0000000 ) ) Error_LC_BigNum () ;// could be true/false
-    if ( _O_->Verbosity ) mpfr_printf ( "%*.*Re", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
-    fflush ( stdout ) ;
+    if ( ! Check_Error_BigNum ( ( uint64 ) value ) )
+    {
+        if ( _O_->Verbosity ) mpfr_printf ( "%*.*Re", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+        fflush ( stdout ) ;
+    }
 }
 #endif
 

@@ -24,10 +24,10 @@ CSL_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     if ( moveFlag && Compiling ) BI_Block_Copy ( bi, bi->OriginalActualCodeStart,
         bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt, 1 ) ; // 0 : can't generally peephole optimize (arrayTest.csl problems) ??
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
-    if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
+    if ( GetState ( compiler, LC_COMBINATOR_MODE ) )
     {
         _Stack_Pop ( compiler->CombinatorInfoStack ) ;
-        //if ( ! Stack_Depth ( compiler->CombinatorInfoStack ) ) SetState ( compiler, LISP_COMBINATOR_MODE, false ) ;
+        //if ( ! Stack_Depth ( compiler->CombinatorInfoStack ) ) SetState ( compiler, LC_COMBINATOR_MODE, false ) ;
     }
 }
 

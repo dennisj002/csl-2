@@ -23,14 +23,10 @@ CPrimitive CPrimitives [] = {
     { "set", 0, 0, 0, ( block ) LO_Set, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "let", 0, 0, 0, ( block ) LO_Let, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "macro", 0, 0, 0, ( block ) _LO_Macro, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" }, // nb. too many clashes with other 'if's
-#if LC_CONDC // COMBINATOR version
-    { "ifc", 0, 0, 0, ( block ) LO_If, COMBINATOR, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
+    { "ifc", 0, 0, 0, ( block ) LO_Cond, COMBINATOR, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
     { "condc", 0, 0, 0, ( block ) LO_Cond, COMBINATOR, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-#endif
-    { "if", 0, 0, 0, ( block ) LO_If, 0, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
+    { "if", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
     { "cond", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    //{ "if", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },// compiles
-    //{ ".if", 0, 0, 0, ( block ) LO_Cond0, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     //{ "else", 0, 0, 0, ( block ) LO_Else, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "car", 0, 0, 0, (block) LO_Car, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "cdr", 0, 0, 0, ( block ) LO_Cdr, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
@@ -48,9 +44,6 @@ CPrimitive CPrimitives [] = {
     { ",@", 0, 0, 0, ( block ) LO_UnQuoteSplicing, 0, 0, T_LISP_UNQUOTE_SPLICING | T_LISP_READ_MACRO, "Lisp", "Root" },
     { "::", 0, 0, 0, ( block ) _LO_CSL, 0, 0, T_LISP_CSL | T_LISP_SPECIAL | T_LISP_IMMEDIATE, "Lisp", "Root" },
     { "=", 0, 0, 0, ( block ) CSL_Logic_Equals, CATEGORY_OP|KEYWORD, 0, 0, "Lisp", "Root" },
-    //{ "+", 0, 0, 0, ( block ) LO_Plus, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    //{ "-", 0, 0, 0, ( block ) LO_Minus, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    //{ "<", 0, 0, 0, ( block ) LO_LessThan, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "lcReset", 0, 0, 0, ( block ) LC_Reset, 0, 0, 0, "Lisp", "Root" },
     { "lcClearDefines", 0, 0, 0, ( block ) LC_ClearDefinesNamespace, 0, 0, 0, "Lisp", "Root" },
     { "lcShowLispDefines", 0, 0, 0, ( block ) LC_Print_LispDefinesNamespace, 0, 0, 0, "Lisp", "Root" },
