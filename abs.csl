@@ -1,0 +1,3 @@
+scOn
+: abs (n | r ) { n @ 0 > } { r n @ = } { r 0 n @ - = } ifElse return ( r @ ) d: ; 
+-9 d: abs p

@@ -322,6 +322,8 @@ CPrimitive CPrimitives [] = {
 
     { "_include", 0, 0, 0, CSL_IncludeFile, 0, 0, 0, "System", "Root" },
     { "reset", 0, 0, 0, CSL_WarmInit, 0, 0, 0, "System", "Root" },
+    { "init", 0, 0, 0, CSL_WarmInit, 0, 0, 0, "System", "Root" },
+    { "warmInit", 0, 0, 0, CSL_WarmInit, 0, 0, 0, "System", "Root" },
     { "stackInit", 0, 0, 0, CSL_DataStack_Init, 0, 0, 0, "System", "Root" },
     { "stackDepth", 0, 0, 0, CSL_DataStack_Size, 0, 0, 0, "System", "Root" },
     { "filename", 0, 0, 0, CSL_Filename, 0, 0, 0, "System", "Root" },
@@ -364,7 +366,6 @@ CPrimitive CPrimitives [] = {
     { "fullRestart", 0, 0, 0, CSL_FullRestart, 0, 0, 0, "System", "Root" },
     { "fr", 0, 0, 0, CSL_FullRestart, 0, 0, 0, "System", "Root" },
     { "frc", 0, 0, 0, CSL_FullRestartComplete, 0, 0, 0, "System", "Root" },
-    { "warmInit", 0, 0, 0, CSL_WarmInit, 0, 0, 0, "System", "Root" },
     { "ok", 0, 0, 0, OVT_Ok, 0, 0, 0, "System", "Root" },
     { "console", 0, 0, 0, Console, 0, 0, 0, "System", "Root" },
     { "cpuStateShow", 0, 0, 0, CSL_CpuState_CheckShow, 0, 0, 0, "System", "Root" },

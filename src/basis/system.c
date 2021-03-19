@@ -353,7 +353,7 @@ _CSL_Dump ( int64 dumpMod )
 Boolean
 _AtCommandLine ( )
 {
-    return ( ! _Context_->System0->IncludeFileStackNumber ) ;
+    return ( ! IS_INCLUDING_FILES ) ;
 }
 
 Boolean

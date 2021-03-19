@@ -235,8 +235,10 @@ Compiler_BlockLevel ( Compiler * compiler )
 void
 Compiler_FreeLocalsNamespaces ( Compiler * compiler )
 {
-    if ( compiler->NumberOfVariables ) Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, 1, 0 ) ;
-    if ( compiler->LocalsNamespace ) _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 1, 0 ) ;
+    //we may want to see the local variables with a debugger stepping thru
+    int64 clearFlag = 0 ; //! _AtCommandLine ( )  ;
+    if ( compiler->NumberOfVariables ) Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, clearFlag, 0 ) ;
+    if ( compiler->LocalsNamespace ) _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, clearFlag, 0 ) ;
     compiler->LocalsNamespace = 0 ;
 }
 

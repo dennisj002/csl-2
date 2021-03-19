@@ -41,7 +41,7 @@ _LO_Read ( LambdaCalculus * lc )
                 if ( lnew )
                 {
                     if ( ( l0->State & SPLICE ) || ( ( l0->State & UNQUOTE_SPLICE ) &&
-                        ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, LO_Eval ( l0 ) ) ;
+                        ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, _LC_Eval ( lc, l0, 0, 1 ) ) ;
                     else LO_AddToTail ( lnew, l0 ) ;
                 }
                 else lnew = l0 ;

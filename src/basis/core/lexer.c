@@ -115,6 +115,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
     byte inChar ;
     if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
     {
+        ResetOutputPrintBuffer () ;
         Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ; // preserve state across init ??
         lexer->State |= state ;
         lexer->SC_Index = _CSL_->SC_Index ;
@@ -340,7 +341,7 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     CSL_PushToken_OnTokenList ( token ) ;
     if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
-    lexer->SC_Index = svSC_Index , lexer->TokenStart_ReadLineIndex = svTokenStart_ReadLineIndex  ; // this is peek so we want to keep actual values for debugger show words
+    lexer->SC_Index = svSC_Index, lexer->TokenStart_ReadLineIndex = svTokenStart_ReadLineIndex ; // this is peek so we want to keep actual values for debugger show words
     return token ;
 }
 

@@ -170,7 +170,6 @@ ReadTable_EOF ( ReadLiner * rl ) // eof
 void
 ReadTable_ESC ( ReadLiner * rl ) // 27 - ESC '^'
 {
-
     rl->EscapeModeFlag = 1 ;
     ReadLine_ShowCharacter ( rl ) ; // does the escape action
 }

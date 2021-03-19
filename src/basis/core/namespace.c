@@ -425,6 +425,7 @@ Dllist_WordList_Clear ( dllist * list, Boolean recycleFlag )
         else DLList_RemoveWords ( list ) ; 
         //else DLList_RemoveWords ( list ) ; // if not recycle the words are just removed and still accessible by the debugger ;
         // but we need to put them on another list to be recycled when not needed ???
+        //if ( recycleFlag ) 
         _dllist_Init ( list ) ;
     }
 }
@@ -435,7 +436,7 @@ _Namespace_Clear ( Namespace * ns, Boolean recycleFlag )
     if ( ns )
     {
         //if ( recycleFlag ) DLList_Recycle_NamespaceList ( ns->W_List ) ;
-        //else DLList_RemoveWords ( ns->W_List ) ; // if not recycle the words are just removed and still accessible by the debugger ;
+        //else DLList_RemoveWords ( ns->W_List ) ; // if not recycled the words are just removed and still accessible by the debugger ;
         //// but we need to put them on another list to be recycled when not needed ???
         //_dllist_Init ( ns->W_List ) ;
         Dllist_WordList_Clear ( ns->W_List, recycleFlag ) ;
@@ -644,9 +645,7 @@ Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( Stack * stack, Boolean clea
         while ( n > 0 )
         {
             Namespace * ns = ( Namespace* ) _Stack_Pop ( stack ) ;
-            //if ( clearFlag ) 
             _Namespace_RemoveFromUsingList_ClearFlag ( ns, clearFlag, recycleFlag ) ;
-            //else _Namespace_SetState ( ns, NOT_USING ) ;
             n -- ;
         }
         Stack_Init ( stack ) ;

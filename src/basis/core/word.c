@@ -134,6 +134,7 @@ _Word_Finish ( Word * word )
     _CSL_->LastFinished_Word = word ;
     Compiler_Init ( _Compiler_, 0 ) ;
     CSL_AfterWordReset ( ) ;
+    if ( Is_DebugOn ) Word_Show_NamespaceStackWords ( word ) ;
 }
 
 void
@@ -457,8 +458,8 @@ Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word, int64 tsrli, int64 scwi 
 {
     if ( word )
     {
-        word->W_RL_Index = (( tsrli == - 1 ) ? lexer->TokenStart_ReadLineIndex : tsrli ) ;
-        word->W_SC_Index = (( scwi == - 1 ) ? lexer->SC_Index : scwi ) ;
+        word->W_RL_Index = ( ( tsrli == - 1 ) ? lexer->TokenStart_ReadLineIndex : tsrli ) ;
+        word->W_SC_Index = ( ( scwi == - 1 ) ? lexer->SC_Index : scwi ) ;
     }
 }
 

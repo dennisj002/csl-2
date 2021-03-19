@@ -338,10 +338,10 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
                 {
                     word->W_NumberOfVariables = compiler->NumberOfVariables ;
                     word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, WORD_RECYCLING ) ;
+                    if ( Is_DebugOn ) Word_Show_NamespaceStackWords ( word ) ;
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, 0, 0 ) ; // don't clear ; keep words for source code debugging, etc.
                     _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 0, 0 ) ;
                 }
-                Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
                 SetState ( word, DEBUG_INFO_SAVED, true ) ;
             }
         }
@@ -360,9 +360,7 @@ CSL_DeleteWordDebugInfo ( Word * word )
             {
                 if (( word->W_SC_WordList ) ) //&& (word != _Debugger_->w_Word)) 
                 {
-#if 0 // debugging                    
-                    SC_WordList_Show ( word->W_SC_WordList, word, 1, 0, ( byte* ) "CSL_DeleteWordDebugInfo" ) ; // debugging
-#endif                    
+                    //SC_WordList_Show ( word->W_SC_WordList, word, 1, 0, ( byte* ) "CSL_DeleteWordDebugInfo" ) ; // debugging
                     //if ( ! String_Equal (word->Name, "init" ) ) 
                     if ( ! (word->W_TypeAttributes &WT_INIT ))
                     {

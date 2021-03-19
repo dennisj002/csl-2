@@ -285,7 +285,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
 {
     ListObject * l1 ;
 
-    l1 = LO_Eval ( l0 ) ;
+    l1 = _LC_Eval ( lc, l0, 0, 1 ) ;
     LO_Print ( l1 ) ;
     CSL_NewLine ( ) ;
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
@@ -397,7 +397,7 @@ LC_Eval ( )
     LambdaCalculus * lc = LC_Init_Runtime ( ) ;
     LC_LispNamespaceOn ( ) ;
     ListObject * l0 = ( ListObject * ) DataStack_Pop ( ), *l1 ;
-    l1 = LO_Eval ( l0 ) ;
+    l1 = _LC_Eval ( lc, l0, 0, 1 ) ;
     DataStack_Push ( ( int64 ) l1 ) ;
 }
 

@@ -8,10 +8,10 @@
 #define NEW_LC_COMPILE 0
 
 ListObject *
-LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
+LC_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
 {
     SetState ( lc, LC_APPLY, true ) ;
-    //if ( Is_DebugOn ) Printf ( "\nLO_Apply : lfunction with args :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ) ; //, Pause () ;
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( largs, " : largs = ", "", 0 ) ;
     if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) )
         || ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD ) ) ) )
     {
@@ -21,13 +21,9 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
     else if ( lfunction && ( lfunction->W_LispAttributes & T_LAMBDA ) && lfunction->Lo_LambdaFunctionBody )
     {
         // LambdaArgs, the formal args, are not changed by LO_Substitute (locals - lvals are just essentially 'renamed') and thus don't need to be copied
-        //d1 ( LO_PrintWithValue ( lfunction ) ) ;
-        //d1 ( LO_PrintWithValue ( lfunction->Lo_LambdaFunctionBody ) ) ;
-        //d1 ( LO_PrintWithValue ( lfunction->Lo_LambdaFunctionParameters ) ) ;
-        //LO_Substitute ( _LO_First ( ( ListObject * ) lfunction->Lo_LambdaFunctionParameters ), _LO_First ( largs ) ) ;
         LO_Substitute ( ( ListObject * ) lfunction->Lo_LambdaFunctionParameters, largs ) ;
         lc->CurrentLambdaFunction = lfunction ;
-        l0 = LO_EvalList ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
+        l0 = LC_EvalList ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
     }
     else
     {
@@ -37,13 +33,14 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
         {
             LO_AddToHead ( largs, lfunction ) ;
             l0 = largs ;
+            //if ( LC_DEFINE_DBG ) Printf ("\nlfunction->Name = %s :: _Context_->CurrentWordBeingCompiled->Name = %s", lfunction->Name, _Context_->CurrentWordBeingCompiled->Name ) ;
+            //if (( lfunction->Name && ( ! String_Equal ( lfunction->Name, _Context_->CurrentWordBeingCompiled->Name )) ) )
+            //    SetState ( lc, LC_COMPILE_MODE, false ) ;
         }
         if ( ! ( lfunction->W_MorphismAttributes & COMBINATOR ) ) SetState ( lc, LC_COMPILE_MODE, false ) ;
     }
     SetState ( lc, LC_APPLY, false ) ;
-    //if ( Is_DebugOn ) Printf ( "\nLO_Apply : lfunction with args and result :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ), LO_PrintWithValue ( l0 ) ; //, Pause () ;
-    ///if ( Is_DebugOn ) Printf ( "\nLO_Apply : lfunction with args :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ) ; //, Pause () ;
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLO_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( l0, " : result = ", "", 0 ) ;
+    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( l0, " : result = ", "", 0 ) ;
     return l0 ;
 }
 
@@ -333,7 +330,7 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 *i )
 }
 
 void
-_LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
+_LC_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
@@ -345,7 +342,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
     if ( l1->W_LispAttributes & ( LIST | LIST_NODE ) )
     {
         Set_CompileMode ( false ) ;
-        l2 = LO_Eval ( l1 ) ;
+        l2 = _LC_Eval ( lc, l1, 0, 1 )  ;
         _Debugger_->SpecialPreHere = Here ;
         if ( ! l2 || ( l2->W_LispAttributes & T_NIL ) ) Compile_MoveImm_To_Reg ( RegParameterOrder ( ( *i ) ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         else Compile_MoveImm_To_Reg ( RegParameterOrder ( ( *i ) ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
@@ -371,7 +368,7 @@ done:
 // this is a little confusing : the args are LO_Read left to Right for C we want them right to left except qid word which remain left to right
 
 ListObject *
-_LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
+_LC_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 {
     Context * cntx = _Context_ ;
     ListObject *l1 ;
@@ -386,7 +383,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         if ( ! svcm ) CSL_BeginBlock ( ) ;
         if ( word->W_MorphismAttributes & ( DLSYM_WORD | C_PREFIX ) ) Set_CompileMode ( true ) ;
         //_Debugger_->PreHere = Here ;
-        for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) _LO_Apply_Arg ( lc, &l1, &i ) ;
+        for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) _LC_Apply_Arg ( lc, &l1, &i ) ;
         Set_CompileMode ( true ) ;
         _Debugger_->SpecialPreHere = Here ;
         //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
@@ -409,7 +406,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 }
 
 Word *
-LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
+Word_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
 {
     Namespace * backgroundNamespace = _CSL_Namespace_InNamespaceGet ( ) ;
     LambdaCalculus * lc = LC_Init_Runtime ( ) ;
@@ -437,7 +434,7 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         l0 = _LO_Read ( lc ) ;
         SetState ( _CSL_, _DEBUG_SHOW_, svDs ) ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
-        _LO_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
+        _LC_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
         LC_LispNamespacesOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
     }
@@ -461,7 +458,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     Namespace * locals = _CSL_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0 ) ;
     word->W_MorphismAttributes = BLOCK ;
     word->W_LispAttributes |= T_LISP_COMPILED_WORD ;
-    _LO_Eval ( lc, body, locals, 1 ) ;
+    _LC_Eval ( lc, body, locals, 1 ) ;
     if ( GetState ( lc, LC_COMPILE_MODE ) )
     {
         LO_EndBlock ( ) ;

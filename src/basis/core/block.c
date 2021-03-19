@@ -25,7 +25,6 @@ CSL_TurnOffBlockCompiler ( )
     Compiler * compiler = cntx->Compiler0 ;
     if ( ! GetState ( compiler, LISP_MODE ) ) CSL_LeftBracket ( ) ;
     _CSL_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
-    //CSL_SaveDebugInfo ( 0, 0 ) ;
     _CSL_FinishWordDebugInfo ( cntx->CurrentWordBeingCompiled ) ;
     CSL_NonCompilingNs_Clear ( compiler ) ;
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;

@@ -999,7 +999,7 @@ typedef struct
     int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectSpaceSize, InternalObjectsSize, LispSpaceSize, ContextSize ;
     int64 TempObjectsSize, CompilerTempObjectsSize, WordRecylingSize, SessionObjectsSize, DataStackSize, OpenVmTilSize ;
     int64 CSLSize, BufferSpaceSize, StringSpaceSize, Thrown ;
-    Buffer *ThrowBuffer ;
+    Buffer *ThrowBuffer, *PrintBuffer ;
     sigjmp_buf JmpBuf0 ;
     struct timespec Timer ;
 } OpenVmTil ;

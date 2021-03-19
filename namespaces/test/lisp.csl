@@ -192,7 +192,7 @@ tick fibc find wdiss //pause
 tick fibc1 find wdiss //pause
 "\nfibc 20 = " ps (fibc 20)
 "\nfibc1 20 = " ps (fibc1 20)
-//pause
+pause
 
 //syntatic experiments ...
 // causes as yet unresolved source code display problems

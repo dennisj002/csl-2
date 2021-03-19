@@ -64,7 +64,7 @@ System_Time ( System * system, uint64 timer, char * string, int64 tflag )
 {
     byte buffer [ 64 ] ;
     _System_Time ( system, timer, ( char* ) "%ld.%09ld", buffer ) ;
-    if ( tflag && ( _O_->Verbosity ) ) Printf ( "%s [ %d ] : elapsed time = %s seconds", string, timer, buffer ) ;
+    if ( tflag && ( _O_->Verbosity ) ) Printf ( "%s [ %d ] : elapsed time = %s seconds\n", string, timer, buffer ) ;
 }
 
 void

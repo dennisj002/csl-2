@@ -123,10 +123,8 @@ Emit ( byte c )
 void
 Context_DoPrompt ( Context * cntx )
 {
-    if ( ( ReadLiner_GetLastChar ( ) != '\n' ) || ( ! IS_INCLUDING_FILES ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) )
-    {
-        _CSL_PrintChar ( '\n' ) ; //_Printf ( "\n" ) ;
-    }
+    if ( ( ReadLiner_GetLastChar ( ) != '\n' ) && ( ( cntx->Lexer0->LastToken && strlen ( cntx->Lexer0->LastToken ) ) ) ) _CSL_PrintChar ( '\n' ) ;
+    if ( strlen ( Buffer_Data ( _O_->PrintBuffer ) ) && ( String_LastChar ( Buffer_Data ( _O_->PrintBuffer ) ) != ( byte ) '\n' ) ) _CSL_PrintChar ( '\n' ) ;
     Printf ( "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
 }
 
@@ -149,7 +147,6 @@ _Printf ( char *format, ... )
 #if 1
     if ( _O_->LogFlag )
     {
-
         va_start ( args, ( char* ) format ) ;
         vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
         va_end ( args ) ;
@@ -178,8 +175,14 @@ Printf ( char *format, ... )
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
     if ( _O_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
     {
+        int64 isIncludingFiles = IS_INCLUDING_FILES ;
         va_start ( args, ( char* ) format ) ;
-        vprintf ( ( char* ) format, args ) ;
+        if ( isIncludingFiles ) vprintf ( ( char* ) format, args ) ;
+        else
+        {
+            vsprintf ( Buffer_Data ( _O_->PrintBuffer ), ( char* ) format, args ) ;
+            printf ( "%s", Buffer_Data ( _O_->PrintBuffer ) ) ;
+        }
         va_end ( args ) ;
         fflush ( stdout ) ;
     }

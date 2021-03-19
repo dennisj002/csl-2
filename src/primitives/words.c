@@ -189,7 +189,7 @@ CSL_FindAlias ( )
 void
 CSL_Eval_C_Rtl_ArgList ( ) // C : x86 : ABI = 32 : protocol : right to left arguments from a list pushed on the stack
 {
-    LC_CompileRun_C_ArgList ( ( Word * ) DataStack_Pop ( ) ) ;
+    Word_CompileRun_C_ArgList ( ( Word * ) DataStack_Pop ( ) ) ;
 }
 #endif
 

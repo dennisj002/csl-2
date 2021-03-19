@@ -159,7 +159,7 @@ Check_Error_BigNum ( uint64 value )
 {
     //if ( _O_->Verbosity > 1 )
     {
-        if ( _LC_ && ( ( uint64 ) ( value ) < 0x700000000000 ) )
+        if ( _LC_ && ( ( uint64 ) ( value ) < 1000000000 ) )
         {
             //Error_LC_BigNum ( (uint64) value ) ; // could be true/false
             Printf ( "\nBigNum : Error : LC : value not a BigNum = " UINT_FRMT_0x08 "\n", value ) ;

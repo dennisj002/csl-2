@@ -47,6 +47,7 @@
 #define Dsp( n ) DataStack( n ) 
 #define Stack_Clear( stk ) Stack_Init ( stk )
 #define TWS( n ) ( (Word*) (_CSL_->TypeWordStack->StackPointer [(n)]) )
+#define ResetOutputPrintBuffer() Buffer_Data (_O_->PrintBuffer)[0]  = 0 
 
 #define Calculate_FrameSize( numberOfLocals )  ( ( numberOfLocals + 1 ) * CELL ) // 1 : space for fp
 

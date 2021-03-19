@@ -140,7 +140,7 @@ OVT_StartupMessage ( Boolean promptFlag )
         if ( promptFlag && ( _O_->Restarts < 2 ) )
         {
             System_Time ( _CSL_->Context0->System0, 0, ( char* ) "\nSystem Startup", 1 ) ;
-            OVT_Time ( ( char* ) "\nOVT Startup", 1 ) ;
+            OVT_Time ( ( char* ) "OVT Startup", 1 ) ;
 
             _CSL_Version ( promptFlag ) ;
         }

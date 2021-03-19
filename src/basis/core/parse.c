@@ -148,24 +148,28 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
         sscanf ( ( char* ) token, INT_FRMT, ( uint64* ) & lexer->Literal ) ||
         sscanf ( ( char* ) token, LISP_DECIMAL_FRMT, ( uint64* ) & lexer->Literal ) )
     {
-        if ( lexer->Literal < 256 )
+        // ??? this need to be fixed : small integers are not necessarily to be considered as less than 8 bytes ???
+        if ( lexer->Literal ) // promote '0 to 8 bytes // 
         {
-            lexer->L_ObjectAttributes = ( T_BYTE | KNOWN_OBJECT ) ;
-            lexer->Token_CompiledDataFieldByteSize = 1 ;
+            if ( abs (lexer->Literal) < 256 ) 
+                {
+                    lexer->L_ObjectAttributes = ( T_BYTE | KNOWN_OBJECT ) ;
+                    lexer->Token_CompiledDataFieldByteSize = 1 ;
+                }
+            else if ( abs (lexer->Literal) <= 65535 )
+            {
+                lexer->L_MorphismAttributes = ( KNOWN_OBJECT ) ;
+                lexer->L_ObjectAttributes |= ( T_INT16 ) ;
+                lexer->Token_CompiledDataFieldByteSize = 2 ;
+            }
+            else if ( abs (lexer->Literal) <= 2147483647 )
+            {
+                lexer->L_MorphismAttributes = ( KNOWN_OBJECT ) ;
+                lexer->L_ObjectAttributes = ( T_INT32 ) ;
+                lexer->Token_CompiledDataFieldByteSize = 4 ;
+            }
         }
-        else if ( lexer->Literal <= 65535 )
-        {
-            lexer->L_MorphismAttributes = ( KNOWN_OBJECT ) ;
-            lexer->L_ObjectAttributes |= ( T_INT16 ) ;
-            lexer->Token_CompiledDataFieldByteSize = 2 ;
-        }
-        else if ( lexer->Literal <= 2147483647 )
-        {
-            lexer->L_MorphismAttributes = ( KNOWN_OBJECT ) ;
-            lexer->L_ObjectAttributes = ( T_INT32 ) ;
-            lexer->Token_CompiledDataFieldByteSize = 4 ;
-        }
-        else
+        if ( lexer->L_ObjectAttributes )
         {
             lexer->L_ObjectAttributes = ( T_INT | KNOWN_OBJECT ) ;
             lexer->Token_CompiledDataFieldByteSize = 8 ;

@@ -58,7 +58,7 @@ Interpreter_InterpretSelectedTokens ( Interpreter * interp, byte * target )
 Word *
 Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, int64 scwi )
 {
-    Word * word = Compiler_CopyDuplicatesAndPush (word0, tsrli, scwi) ;
+    Word * word = Compiler_CopyDuplicatesAndPush ( word0, tsrli, scwi ) ;
     interp->w_Word = word ;
     //Word_SetTsrliScwi ( word, tsrli, scwi ) ;
     Word_Eval ( word ) ;
@@ -96,7 +96,7 @@ _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word, B
 Word *
 Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
 {
-    word = LC_CompileRun_C_ArgList ( word ) ;
+    word = Word_CompileRun_C_ArgList ( word ) ;
     return word ;
 }
 

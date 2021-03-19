@@ -87,6 +87,15 @@ String_IsThereADotSeparatorBackFromPosToLastNonDelmiter ( byte * s, int64 pos )
 }
 // reverse parsing
 
+byte
+String_LastChar ( byte * s )
+{
+    int64 i ; byte rtn ;
+    for ( i = 0 ; s[i] ; i ++ ) ;
+    rtn = s[( i <= 0 ) ? 0 : ( i - 1 )] ;
+    return rtn ;
+}
+
 int64
 String_LastCharOfLastToken_FromPos ( byte * s, int64 pos )
 {
@@ -594,7 +603,7 @@ String_RemoveFinalNewline ( byte * astring )
     int64 index = 1 ;
     do
     {
-        character = astring [ Strlen ( ( char* ) astring ) - (index++) ] ;
+        character = astring [ Strlen ( ( char* ) astring ) - ( index ++ ) ] ;
         if ( character == '\n' || character == '\r' || character == eof ) astring [ Strlen ( ( char* ) astring ) - 1 ] = 0 ;
         else break ;
     }

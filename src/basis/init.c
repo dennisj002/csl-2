@@ -34,6 +34,13 @@ OVT_RuntimeInit ( )
 }
 
 void
+CSL_Prompt ( CSL * csl, Boolean promptFlag )
+{
+    OVT_StartupMessage ( promptFlag && ( csl->InitSessionCoreTimes++ < 1 ) ) ;
+    _OVT_Ok ( promptFlag ) ;
+}
+
+void
 _CSL_Init_SessionCore ( CSL * csl, Boolean cntxDelFlag, Boolean promptFlag )
 {
     Context * cntx = csl->Context0 ;
@@ -45,10 +52,9 @@ _CSL_Init_SessionCore ( CSL * csl, Boolean cntxDelFlag, Boolean promptFlag )
     Interpreter_Init ( cntx->Interpreter0 ) ;
     LC_Init_Runtime ( ) ;
     CSL_RuntimeInit ( csl, cntxDelFlag ) ;
-    if ( csl->InitSessionCoreTimes ++ ) OVT_RuntimeInit ( ) ;
+    if ( csl->InitSessionCoreTimes ) OVT_RuntimeInit ( ) ;
     _BigNum_Init ( 16 ) ;
-    OVT_StartupMessage ( promptFlag && ( csl->InitSessionCoreTimes < 3 ) ) ;
-    _OVT_Ok ( promptFlag ) ;
+    CSL_Prompt ( csl, promptFlag ) ;
 }
 
 void

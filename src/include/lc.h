@@ -9,10 +9,9 @@
 #define LambdaVals( proc ) proc->p[2]
 #define LO_CopyOne( l0 ) _LO_CopyOne ( l0, LISP_TEMP )
 #define LO_Copy( l0 ) _LO_Copy ( l0, LISP_TEMP )
-#define LO_Eval( l0 ) _LO_Eval ( _LC_, l0, 0, 1 )
 #define nil (_LC_ ? _LC_->Nil : 0)
 #define LC_SaveStackPointer( lc ) _LC_SaveDsp ( lc )
-#define LC_RestoreStackPointer( lc ) _LC_ResetStack ( lc ) //{ if ( lc && lc->SaveStackPointer ) Dsp = lc->SaveStackPointer ; }
+#define LC_RestoreStackPointer( lc ) _LC_ResetStack ( lc ) 
 
 #define LC_snprintf2( buffer, format, value1, value2 ) snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, ((char*) (format)), value1, value2 ) 
 #define LC_snprintf1( buffer, format, value ) snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, ((char*) (format)), value ) 
