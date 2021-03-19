@@ -9,8 +9,7 @@ Context_PreWordRun_Init ( Context * cntx, Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         if ( ( GetState ( cntx->Compiler0, ( COMPILE_MODE | ASM_MODE ) ) ) ) Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         cntx->CurrentlyRunningWord = word ;
-        //if ( GetState ( _LC_, ( LC_DEFINE_MODE ) ) )
-        //    word->W_MySourceCodeWord = _Context_->CurrentWordBeingCompiled ; 
+        ResetOutputPrintBuffer () ;
     }
 }
 
