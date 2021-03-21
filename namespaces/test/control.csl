@@ -17,7 +17,9 @@ x 10 =
 'abrkcon find wdiss sp
 abrkcon
 : abrk0 ( x ) { { x @ 0 == } { break } { x @ p x 1 -= continue } ifElse 2 p } loop ;
-nl 10 abrk0 sp //pause
+pwi abrk0
+//pause
+nl 10 abrk0 sp 
 
 
 #if 0 // kbhit needs to be adjusted for these to work
@@ -57,7 +59,7 @@ sp
     label: leave 
     "ct0" n @ j @ leaving
 ;
-'ct0 find wdiss
+'ct0 find wdiss //pause
 17 ct0 
 sp
 : ct1 ( n | j ) 

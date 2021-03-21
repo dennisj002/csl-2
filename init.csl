@@ -312,7 +312,7 @@ dscOn
 : _assert1dbg ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
 : _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ; debugWord
 : ctloc do> locationPush does> locationPrint <does ; immediate // compile time location
-: _assert0 ( n m ) { n @ m @ != } { nl location nl hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
+: _assert0 ( n m ) { n @ m @ != } { nl location nl hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } if2 ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
 : _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ; 
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
 : assert0 ( n m ) { n @ m @ != } { nl "error" ps _info _pause } if ; 

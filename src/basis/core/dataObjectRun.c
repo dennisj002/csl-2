@@ -231,7 +231,7 @@ Compile_C_FunctionDeclaration ( byte * token1 )
                 break ;
             }
             else if ( token [ 0 ] == '{' ) break ; // take nothing else (would be Syntax Error ) -- we have already done CSL_BeginBlock
-            else _Lexer_ConsiderDebugAndCommentTokens ( token, 1 ) ;
+            else _Lexer_ConsiderDebugAndCommentTokens (token, 1 ) ;
         }
     }
     while ( token ) ;
@@ -316,8 +316,8 @@ _Namespace_Do_C_Type ( Namespace * ns )
     byte * token1, *token2 ;
     if ( ! Compiling ) _Namespace_ActivateAsPrimary ( ns ) ;
     SetState ( _Compiler_, DOING_C_TYPE_DECLARATION, true ) ;
-    token1 = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, 1, 0 ) ;
-    token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
+    token1 = _Lexer_Next_NonDebugOrCommentTokenWord (lexer, 0, 1, 0 ) ;
+    token2 = Lexer_Peek_Next_NonDebugTokenWord (lexer, 1, 0) ;
     if ( token2 && ( token2 [0] == '(' ) ) Compile_C_FunctionDeclaration ( token1 ) ;
     else
     {

@@ -22,26 +22,25 @@ CSL_PrintString ( )
 void
 CSL_NewLine ( )
 {
-    _CSL_PrintChar ( '\n' ) ;
-    //ReadLiner_SetLastChar ( '\n' ) ;
+    CSL_PrintChar ( '\n' ) ;
 }
 
 void
 CSL_CarriageReturn ( )
 {
-    _CSL_PrintChar ( '\r' ) ;
+    CSL_PrintChar ( '\r' ) ;
 }
 
 void
 CSL_SPACE ( ) // '.'
 {
-    _CSL_PrintChar ( ' ' ) ;
+    CSL_PrintChar ( ' ' ) ;
 }
 
 void
 CSL_TAB ( ) // '.'
 {
-    _CSL_PrintChar ( '\t' ) ;
+    CSL_PrintChar ( '\t' ) ;
 }
 
 void
@@ -136,8 +135,8 @@ void
 CSL_Emit ( )
 {
     int64 c = DataStack_Pop ( ) ;
-    if ( ( c >= 0 ) && ( c < 256 ) ) _CSL_PrintChar ( c ) ;
-    else _CSL_PrintChar ( c ) ; //_Printf ( "%c", ( ( CString ) c )[0] ) ;
+    if ( ( c >= 0 ) && ( c < 256 ) ) CSL_PrintChar ( c ) ;
+    else CSL_PrintChar ( c ) ; //_Printf ( "%c", ( ( CString ) c )[0] ) ;
 }
 
 void

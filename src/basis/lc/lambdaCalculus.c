@@ -392,25 +392,6 @@ LC_Read ( )
 }
 
 void
-LC_Eval ( )
-{
-    LambdaCalculus * lc = LC_Init_Runtime ( ) ;
-    LC_LispNamespaceOn ( ) ;
-    ListObject * l0 = ( ListObject * ) DataStack_Pop ( ), *l1 ;
-    l1 = _LC_Eval ( lc, l0, 0, 1 ) ;
-    DataStack_Push ( ( int64 ) l1 ) ;
-}
-
-void
-LC_DupList ( )
-{
-    LC_Init_Runtime ( ) ;
-    ListObject * l0 = ( ListObject * ) TOS, *l1 ;
-    l1 = LO_CopyOne ( l0 ) ;
-    DataStack_Push ( ( int64 ) l1 ) ;
-}
-
-void
 _LC_SaveDsp ( LambdaCalculus * lc )
 {
     if ( lc ) lc->SaveStackPointer = _Dsp_ ;

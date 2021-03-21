@@ -115,7 +115,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
     byte inChar ;
     if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
     {
-        ResetOutputPrintBuffer () ;
+        ResetOutputPrintBuffer ( ) ;
         Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ; // preserve state across init ??
         lexer->State |= state ;
         lexer->SC_Index = _CSL_->SC_Index ;
@@ -253,11 +253,14 @@ Lexer_Token_New ( byte * token )
     return tknSym ;
 }
 
+// ??? this word and it's callees needs to be improved ??? : not as functional as it could be
 int64
 _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag )
 {
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ;
     Word_SetTsrliScwi ( word, - 1, - 1 ) ;
+    //if ( word && ( word->W_MorphismAttributes & LEFT_PAREN ) && ignoreLParen ) return true ;
+    //else 
     if ( word && ( word->W_TypeAttributes & W_COMMENT ) )
     {
         Word_Eval ( word ) ;

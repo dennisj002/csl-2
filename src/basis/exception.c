@@ -62,7 +62,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         }
         //OVT_SetExceptionMessage ( _O_ ) ;
         eword = _Context_->CurrentTokenWord ; //_Context_->CurrentEvalWord ;
-        snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUFFER_IX_SIZE, "\n%s\n%s %s from %s : the current evalWord is %s.%s -> ...", _O_->ExceptionMessage,
+        snprintf ( Buffer_Data_Cleared ( _O_->PrintBuffer ), BUFFER_IX_SIZE, "\n%s\n%s %s from %s : the current evalWord is %s.%s -> ...", _O_->ExceptionMessage,
             ( jb == & _CSL_->JmpBuf0 ) ? "reseting csl" : "restarting OpenVmTil",
             ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ),
             ( eword ? ( eword->S_ContainingNamespace ? eword->S_ContainingNamespace->Name : ( byte* ) "" ) : ( byte* ) "" ), ( eword ? eword->Name : ( byte* ) "" ) ) ;
@@ -143,7 +143,7 @@ OVT_PauseInterpret ( Context * cntx, byte key )
     ReadLine_Init ( rl, _CSL_Key ) ;
     SetState ( cntx, AT_COMMAND_LINE, true ) ;
     if ( ( key <= ' ' ) || ( key == '\\' ) ) key = 0 ;
-    Printf ( "\nPause interpreter : hit <enter> or <esc> to exit" ) ;
+    Printf ( "\nPause interpreter : hit <enter> or <esc> to exit\n" ) ;
     do
     {
         svPrompt = ReadLine_GetPrompt ( rl ) ;
@@ -195,7 +195,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
 
             int64 key = Key ( ) ;
             _ReadLine_PrintfClearTerminalLine ( ) ;
-            Printf ( "\nPause : hit <enter> or <esc> to exit" ) ;
+            Printf ( "\nPause : press <enter> to exit" ) ;
             switch ( key )
             {
                 case 'x': case 'X':
@@ -593,7 +593,7 @@ byte
 _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
 {
     //OVT_CheckThrowState ( ) ;
-    byte * msg = ovt->ThrowBuffer->Data ;
+    byte * msg = Buffer_Data ( ovt->PrintBuffer ) ;
     byte key, * instr = ".: (p)ause, e(x)it, <key> restart" ;
     if ( ovt->SigSegvs < 3 ) printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, ( ( ovt->SigSegvs++ < 2 ) ? Context_Location ( ) : ( byte* ) "" ), ovt->SigSegvs ), fflush ( stdout ) ;
     key = Key ( ) ;

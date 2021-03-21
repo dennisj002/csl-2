@@ -126,7 +126,7 @@ Parse_TypeNamespace_CheckForPointer ( int64 t_type )
                 token = TDSCI_ReadToken ( ) ;
             }
         }
-        if ( ( token [0] == '*' ) || ( ( token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0, 0 ) ), ( token [0] == '*' ) ) )
+        if ( ( token [0] == '*' ) || ( ( token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 0, 0 ) ), ( token [0] == '*' ) ) )
         {
             if ( ( ! type0 ) && ( t_type == TD_TYPE_FIELD ) && ( ! tdsci->Tdsci_Field_Type_Namespace ) )
             {

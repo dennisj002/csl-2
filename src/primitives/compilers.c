@@ -143,14 +143,18 @@ CSL_Label_Prefix ( )
 
 // 'return' is a prefix word now C_SYNTAX or not
 // not satisfied yet with how 'return' works with blocks and locals ???
+
 void
 CSL_Return ( )
 {
-    Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
+    Word* wordr = CSL_WordList ( 0 ) ; // 'return
+    Compiler_Word_SCHCPUSCA ( wordr, 0 ) ;
+    compiler->ReturnWord = wordr ;
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
-    Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-    int64 tsrli = - 1, scwi = - 1 ;
-    Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+    Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ; 
+    Word_SetTsrliScwi ( word, -1, -1 ) ;
     SetState ( _Compiler_, DOING_RETURN, true ) ;
     CSL_DoReturnWord ( word ) ;
     SetState ( _Compiler_, DOING_RETURN, false ) ;
@@ -179,8 +183,8 @@ _CSL_Literal ( )
 {
     int64 value = DataStack_Pop ( ) ;
     Word * word = DataObject_New ( LITERAL, 0, ( byte* ) value, 0, LITERAL | CONSTANT, 0, 0, value, 0, STRING_MEMORY, - 1, - 1 ) ;
-    word->S_Value = (int64) word->Name ;
-    return word ; 
+    word->S_Value = ( int64 ) word->Name ;
+    return word ;
 }
 
 void

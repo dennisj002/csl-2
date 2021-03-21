@@ -257,7 +257,7 @@ _CSL_ContextNew_IncludeFile ( byte * filename )
 int64
 _Context_StringEqual_PeekNextToken ( Context * cntx, byte * check, Boolean evalFlag )
 {
-    byte *token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, evalFlag, 0 ) ;
+    byte *token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, evalFlag, 0 ) ;
     if ( token ) return String_Equal ( ( char* ) token, ( char* ) check ) ;
     else return 0 ;
 }

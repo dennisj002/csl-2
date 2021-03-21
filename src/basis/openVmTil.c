@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.916.910" ) 
+#define VERSION ((byte*) "0.916.950" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -82,7 +82,7 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
             "termios, verbosity and memory category allocation sizes preserved. verbosity = %d.", ovt->Verbosity ) ;
         OpenVmTil_Print_DataSizeofInfo ( 0 ) ;
     }
-    ovt->ThrowBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
+    //ovt->ThrowBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     ovt->PrintBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     _OpenVmTil_ColorsInit ( ovt ) ;
 }
@@ -149,6 +149,7 @@ OpenVmTil_Run ( int64 argc, char * argv [ ] )
         ovt->Verbosity = 1 ;
         ovt->Restarts = restarts ;
         if ( ovt->Restarts ) OVT_ExceptionState_Print ( ) ;
+        //CSL_NewLine ( ) ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) ) // nb. siglongjmp always comes to beginning of the block 
             CSL_Run ( ovt->OVT_CSL, ovt->RestartCondition ) ;
         restartCondition = ovt->RestartCondition ;

@@ -2,7 +2,7 @@
 #include "../../include/csl.h"
 
 BlockInfo *
-BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optSetupFlag )
+BI_Block_Copy (BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optimzeSpecial )
 {
     Compiler * compiler = _Compiler_ ;
     if ( ! bi ) bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
@@ -58,6 +58,11 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
                 dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustGotoJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
             }
             else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
+#if 0            
+            offset = * ( int32* ) ( srcAddress + 1 ) ; 
+            if (( offset == 0 ) && optimzeSpecial ) 
+                continue ;  //Printf ("") ; // ??? not yet ???  
+#endif            
         }
         //else if ( * srcAddress == JCC ) optimize for 8 bit jcc - rewrite op code
         if ( * srcAddress ) _CompileN ( srcAddress, isize ) ;
@@ -131,7 +136,7 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag, byte* jmpT
     byte * compiledAtAddress = 0 ;
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ;
-    BI_Block_Copy ( bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 1 ) ; //nb!! 0 : turns off peephole optimization ; peephole optimization will be done in CSL_EndCombinator
+    BI_Block_Copy (bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 0) ; //nb!! 0 : turns off peephole optimization ; peephole optimization will be done in CSL_EndCombinator
     if ( jccFlag ) compiledAtAddress = Block_OptimizeJCC ( bi, jccFlag, jmpToAddr ) ;
     return compiledAtAddress ;
 }

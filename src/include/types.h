@@ -726,7 +726,7 @@ typedef struct
     int64 * FrameSizeCellOffset, BlocksBegun ;
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
-    Word * ReturnVariableWord, * ReturnLParenVariableWord, * ReturnLParenOperandWord, * Current_Word_New, *Current_Word_Create, * LHS_Word ;
+    Word *ReturnWord, * ReturnVariableWord, * ReturnLParenVariableWord, * ReturnLParenOperandWord, * Current_Word_New, *Current_Word_Create, * LHS_Word ;
     Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *Qid_BackgroundNamespace, *LocalsNamespace, *AutoVarTypeNamespace, *NonCompilingNs ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentMatchList ;
@@ -999,7 +999,7 @@ typedef struct
     int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectSpaceSize, InternalObjectsSize, LispSpaceSize, ContextSize ;
     int64 TempObjectsSize, CompilerTempObjectsSize, WordRecylingSize, SessionObjectsSize, DataStackSize, OpenVmTilSize ;
     int64 CSLSize, BufferSpaceSize, StringSpaceSize, Thrown ;
-    Buffer *ThrowBuffer, *PrintBuffer ;
+    Buffer *PrintBuffer ;
     sigjmp_buf JmpBuf0 ;
     struct timespec Timer ;
 } OpenVmTil ;

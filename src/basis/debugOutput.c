@@ -44,33 +44,6 @@ _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // u
 }
 
 void
-_Word_Show_NamespaceStackWords ( Word * word, int64 flag )
-{
-    Word * localsWord ;
-    int64 n, i ;
-    Stack * stack = word->NamespaceStack ? word->NamespaceStack : _Compiler_->LocalsCompilingNamespacesStack ;
-    for ( i = 0, n = Stack_Depth ( stack ) ; i < n ; i ++ )
-    {
-        Namespace * ns = ( Namespace* ) _Stack_N ( stack, i ) ; //Stack_Pop ( stack ) ;
-        //_Namespace_PrintWords ( ns ) ;
-        dlnode * node, *prevNode ;
-        for ( node = dllist_Last ( ns->W_List ) ; node ; node = prevNode )
-        {
-            prevNode = dlnode_Previous ( node ) ;
-            localsWord = ( Word * ) node ;
-            if ( flag ) _Debugger_Locals_ShowALocal ( _Debugger_->cs_Cpu, localsWord, word ) ;
-            else Word_Print ( localsWord ) ;
-        }
-    }
-}
-
-void
-Word_Show_NamespaceStackWords ( Word * word )
-{
-    _Word_Show_NamespaceStackWords ( word, 0 ) ;
-}
-
-void
 _Debugger_Locals_Show_Loop ( Cpu * cpu, Word * scWord )
 {
     //if ( stack )

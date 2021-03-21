@@ -81,7 +81,6 @@ CSL_InterpretString ( )
 void
 CSL_Interpreter_EvalWord ( )
 {
-
     Interpreter_DoWord ( _Context_->Interpreter0, ( Word* ) DataStack_Pop ( ), - 1, - 1 ) ;
 }
 

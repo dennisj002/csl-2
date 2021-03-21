@@ -169,13 +169,6 @@ LO_PrintWithValue ( ListObject * l0 )
     _LO_PrintWithValue (l0, ( byte* ) "", ( byte* ) "" , 0) ;
 }
 
-void
-LC_PrintWithValue ( )
-{
-    ListObject * l0 = ( ListObject * ) DataStack_Pop ( ) ;
-    LO_PrintWithValue ( l0 ) ;
-}
-
 byte *
 _LO_PRINT_TO_STRING ( ListObject * l0 )
 {

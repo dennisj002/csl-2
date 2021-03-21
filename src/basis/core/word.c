@@ -133,7 +133,7 @@ _Word_Finish ( Word * word )
     _CSL_->LastFinished_Word = word ;
     Compiler_Init ( _Compiler_, 0 ) ;
     CSL_AfterWordReset ( ) ;
-    if ( Is_DebugOn ) Word_Show_NamespaceStackWords ( word ) ;
+    //if ( Is_DebugOn ) Word_Show_NamespaceStackWords ( word ) ;
 }
 
 void
@@ -467,3 +467,31 @@ Word_SetTsrliScwi ( Word * word, int64 tsrli, int64 scwi )
 {
     Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, tsrli, scwi ) ;
 }
+
+void
+_Word_Show_NamespaceStackWords ( Word * word, int64 flag )
+{
+    Word * localsWord ;
+    int64 n, i ;
+    Stack * stack = word->NamespaceStack ? word->NamespaceStack : _Compiler_->LocalsCompilingNamespacesStack ;
+    for ( i = 0, n = Stack_Depth ( stack ) ; i < n ; i ++ )
+    {
+        Namespace * ns = ( Namespace* ) _Stack_N ( stack, i ) ; //Stack_Pop ( stack ) ;
+        //_Namespace_PrintWords ( ns ) ;
+        dlnode * node, *prevNode ;
+        for ( node = dllist_Last ( ns->W_List ) ; node ; node = prevNode )
+        {
+            prevNode = dlnode_Previous ( node ) ;
+            localsWord = ( Word * ) node ;
+            if ( flag ) _Debugger_Locals_ShowALocal ( _Debugger_->cs_Cpu, localsWord, word ) ;
+            else Word_Print ( localsWord ) ;
+        }
+    }
+}
+
+void
+Word_Show_NamespaceStackWords ( Word * word )
+{
+    _Word_Show_NamespaceStackWords ( word, 0 ) ;
+}
+

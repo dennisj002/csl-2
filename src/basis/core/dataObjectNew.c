@@ -196,7 +196,7 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CSL_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
         wt->W_ObjectAttributes |= ( THIS ) ;
-        token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+        token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0, 0) ;
         if ( ( token[0] == '{' ) || ( token[1] == '{' ) || ( token[2] == '{' ) ) // consider "{", ":{" and +:{" tokens
         {
             if ( ! GetState ( _Compiler_, TDSCI_PARSING ) )

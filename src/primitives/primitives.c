@@ -10,8 +10,8 @@ CPrimitive CPrimitives [] = {
 
     { "(", 0, 0, 0, ( block ) LC_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD | LEFT_PAREN, 0, 0, "Lisp", "Root" },
     { "_(", 0, 0, 0, ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
-    { "eval", 0, 0, 0, ( block ) LC_Eval, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
-    { "print", 0, 0, 0, ( block ) LC_PrintWithValue, 0, 0, 0, "Lisp", "Root" },
+    { "eval", 0, 0, 0, ( block ) List_Eval, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
+    { "print", 0, 0, 0, ( block ) List_PrintWithValue, 0, 0, 0, "Lisp", "Root" },
     { ")", 0, 0, 0, CSL_C_Comma, IMMEDIATE | NO_OP_WORD | KEYWORD, 0, 0, "Lisp", "Root" },
     { "_Printf", 0, 0, 0, ( block ) Printf, 0, 0, LISP_C_RTL_ARGS | T_LISP_SPECIAL | LISP_VOID_RETURN, "Lisp", "Root" },
     { "define", 0, 0, 0, ( block ) LO_Define, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
@@ -473,9 +473,9 @@ CPrimitive CPrimitives [] = {
 
     { "lisp", 0, 0, 0, ( block ) LO_Repl, 0, 0, 0, "List", "Root" },
     { "_(", 0, 0, 0, ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "List", "Root" },
-    { "eval", 0, 0, 0, ( block ) LC_Eval, IMMEDIATE | KEYWORD, 0, 0, "List", "Root" },
-    { "printList", 0, 0, 0, ( block ) LC_PrintWithValue, 0, 0, 0, "List", "Root" },
-    { "dupList", 0, 0, 0, ( block ) LC_DupList, 0, 0, 0, "List", "Root" },
+    { "eval", 0, 0, 0, ( block ) List_Eval, IMMEDIATE | KEYWORD, 0, 0, "List", "Root" },
+    { "printList", 0, 0, 0, ( block ) List_PrintWithValue, 0, 0, 0, "List", "Root" },
+    { "dupList", 0, 0, 0, ( block ) List_DupList, 0, 0, 0, "List", "Root" },
     { "lcRestoreStack", 0, 0, 0, ( block ) LC_RestoreStack, 0, 0, 0, "List", "Root" },
 
     { "compileMode", 0, 0, 0, CSL_CompileMode, 0, 0, 0, "Interpreter", "Root" },
@@ -604,7 +604,7 @@ CPrimitive CPrimitives [] = {
     { "sourceCodeInit", 0, 0, 0, CSL_SourceCode_Init, 0, 0, 0, "Compiler", "Root" },
     { "sourceCodeOn", 0, 0, 0, CSL_Lexer_SourceCodeOn, 0, 0, 0, "Compiler", "Root" },
     //{ ")", 0, 0, 0, CSL_NoOp, IMMEDIATE | KEYWORD, NO_OP_WORD|RIGHT_PAREN, 0, "Compiler", "Root" },
-    { ")", 0, 0, 0, CSL_C_Comma, IMMEDIATE | KEYWORD | RIGHT_PAREN, 0, 0, "Compiler", "Root" },
+    { ")", 0, 0, 0, CSL_C_Comma, IMMEDIATE | KEYWORD |  SYNTACTIC | RIGHT_PAREN, 0, 0, "Compiler", "Root" },
 
     // this section can be implemented by lower level calls - internally
     { "word", 0, 0, 0, CSL_Word, 0, 0, 0, "Reserved", "Compiler" },

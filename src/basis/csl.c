@@ -338,7 +338,7 @@ CSL_SaveDebugInfo ( Word * word, uint64 allocType )
                 {
                     word->W_NumberOfVariables = compiler->NumberOfVariables ;
                     word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, WORD_RECYCLING ) ;
-                    if ( Is_DebugOn ) Word_Show_NamespaceStackWords ( word ) ;
+                    //if ( Is_DebugOn ) Word_Show_NamespaceStackWords ( word ) ;
                     Namespace_RemoveAndReInitNamespacesStack_ClearFlag ( compiler->LocalsCompilingNamespacesStack, 0, 0 ) ; // don't clear ; keep words for source code debugging, etc.
                     _Namespace_RemoveFromUsingList_ClearFlag ( compiler->LocalsNamespace, 0, 0 ) ;
                 }

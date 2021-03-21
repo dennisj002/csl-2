@@ -1,5 +1,7 @@
 5
 #if 0
+"sp" purge 
+Root
 : sp stack pause ; 
 #else
 : sp ; //stack pause ; 
