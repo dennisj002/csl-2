@@ -51,6 +51,8 @@ CPrimitive CPrimitives [] = {
     //{ ";", 0, 0, 0, CSL_CommentToEndOfLine, IMMEDIATE | KEYWORD | COMMENT, 0, W_COMMENT, "Lisp", "Root" },
     //{ ";;", 0, 0, 0, CSL_CommentToEndOfLine, IMMEDIATE | KEYWORD | COMMENT, 0, W_COMMENT, "Lisp", "Root" },
     { ";;;", 0, 0, 0, CSL_CommentToEndOfLine, IMMEDIATE | KEYWORD | COMMENT, 0, W_COMMENT, "Lisp", "Root" },
+    { "lcDbOn", 0, 0, 0, ( block ) LC_DebugOn, 0, 0, 0, "Lisp", "Root" },
+    { "lcDbOff", 0, 0, 0, ( block ) LC_DebugOff, 0, 0, 0, "Lisp", "Root" },
 
     { "'", 0, 0, 0, CSL_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
     { "1,", 0, 0, 0, Compile_Int8, 0, 0, 0, "Forth", "Root" },

@@ -218,6 +218,7 @@ CSL_DoReturnWord ( Word * word )
         {
             Compiler_Word_SCHCPUSCA ( word, 0 ) ;
             compiler->ReturnWord = Compiler_CopyDuplicatesAndPush ( compiler->ReturnWord, -1, -1 ) ; // want to have a copy because 'return may be responsible for another code output in Compiler_RemoveLocalFrame
+            Compiler_Word_SCHCPUSCA (  compiler->ReturnWord, 0 ) ;
             Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
         }
     }
@@ -251,7 +252,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
     if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     int64 parameterVarsSubAmount = 0 ;
-    Word * returnVariable = compiler->ReturnVariableWord ? compiler->ReturnVariableWord : compiler->ReturnLParenVariableWord ;
+    Word * returnVariable = compiler->ReturnVariableWord ? compiler->ReturnVariableWord : compiler->ReturnLParenVariableWord ; //?  compiler->ReturnLParenVariableWord :  compiler->ReturnWord ;
     Boolean returnValueFlag = GetState ( compiler, RETURN_TOS ) || returnVariable ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
     if ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs )
@@ -268,9 +269,10 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
     if ( returnValueFlag || IsWordRecursive )
     {
+        Compiler_Word_SCHCPUSCA ( returnVariable, 0 ) ;// compiler->ReturnWord, 0 ) ;
         if ( returnVariable )
         {
-            Compiler_Word_SCHCPUSCA ( returnVariable, 0 ) ;
+            //Compiler_Word_SCHCPUSCA ( returnVariable, 0 ) ;
             if ( returnVariable->W_ObjectAttributes & REGISTER_VARIABLE )
             {
                 _Compile_Move_Reg_To_StackN ( DSP, 0, returnVariable->RegToUse ) ;

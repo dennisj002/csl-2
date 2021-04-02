@@ -66,7 +66,7 @@ Lexer_CheckMacroRepl ( Lexer * lexer )
 //===================================================================================================================
 
 ListObject *
-_LO_New_RawStringOrLiteral (Lexer * lexer, byte * token, int64 value, int64 qidFlag, int64 tsrli, int64 scwi )
+_LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 value, int64 qidFlag, int64 tsrli, int64 scwi )
 {
     if ( GetState ( lexer, KNOWN_OBJECT ) )
     {
@@ -286,6 +286,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
     ListObject * l1 ;
 
     l1 = _LC_Eval ( lc, l0, 0, 1 ) ;
+    lc->L1 = l1 ;
     LO_Print ( l1 ) ;
     CSL_NewLine ( ) ;
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
@@ -309,24 +310,26 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     LambdaCalculus * lc = _LC_ ;
     Lexer * lexer = _Context_->Lexer0 ;
     Compiler * compiler = _Context_->Compiler0 ;
-    int64 typeCheckState = GetState ( _CSL_, DBG_TYPECHECK_ON ) ;
-    SetState ( _CSL_, DBG_TYPECHECK_ON, false ) ;
-    if ( lc && parenLevel ) lc->QuoteState = lc->ItemQuoteState ;
-    else lc = LC_Init_Runtime ( ) ;
-    LC_LispNamespaceOn ( ) ;
+    int64 svTypeCheckState = GetState ( _CSL_, DBG_TYPECHECK_ON ) ;
     byte *svDelimiters = lexer->TokenDelimiters ;
     SetState ( compiler, LISP_MODE, true ) ;
     compiler->InitHere = Here ;
     if ( ! parenLevel ) CSL_InitSourceCode ( _CSL_ ) ;
     else CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 1 ) ;
+    SetState ( _CSL_, DBG_TYPECHECK_ON, false ) ;
+
+    if ( lc && parenLevel ) lc->QuoteState = lc->ItemQuoteState ;
+    else lc = LC_Init_Runtime ( ) ;
+    LC_LispNamespaceOn ( ) ;
     lc->ItemQuoteState = itemQuoteState ;
     ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel ) ;
-    d0 ( if ( Is_DebugOn ) LO_PrintWithValue ( l0 ) ) ;
+    lc->L0 = l0 ;
     LC_EvalPrint ( lc, l0 ) ;
     LC_ClearTempNamespace ( ) ;
+
     if ( ! continueFlag ) Lexer_SetTokenDelimiters ( lexer, svDelimiters, 0 ) ;
     SetState ( compiler, LISP_MODE, false ) ;
-    SetState ( _CSL_, DBG_TYPECHECK_ON, typeCheckState ) ;
+    SetState ( _CSL_, DBG_TYPECHECK_ON, svTypeCheckState ) ;
 }
 
 void
@@ -587,5 +590,33 @@ LC_Init ( )
     if ( _LC_ ) lc = _LC_Init_Runtime ( _LC_ ) ;
     else lc = LC_New ( ) ;
     return lc ;
+}
+
+void
+LC_DebugOn ( )
+{
+    LambdaCalculus * lc ;
+    if ( lc = _LC_ ) SetState ( lc, LC_DEBUG_ON, true ) ;
+}
+
+void
+LC_DebugOff ( )
+{
+    LambdaCalculus * lc ;
+    if ( lc = _LC_ ) SetState ( lc, LC_DEBUG_ON, false ) ;
+}
+
+void
+LC_DEBUG_SETUP ( LambdaCalculus * lc, byte * lcFuncName )
+{
+    if ( GetState ( lc, LC_DEBUG_ON ) )
+    {
+        Debugger * debugger = _Debugger_ ;
+        Printf ( "\n%s : ", lcFuncName ) ;
+        debugger->Menu = "Debug Menu at : \n%s :\n" ;
+        DebugColors ;
+        Debugger_InterpreterLoop ( debugger ) ;
+        DefaultColors ;
+    }
 }
 

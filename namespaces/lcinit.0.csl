@@ -17,7 +17,7 @@ pwi fibc
 (definec fibc1 ( lambda ( n ) (ifc (< n 2) n ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
 pwi fibc1
 "\nfibc1 30 = " ps
-d: (fibc1 3) 
+(fibc1 3) 
 //pause
 #endif    
 lcOff 
@@ -33,7 +33,7 @@ bnInit ( 32 )
 (define (average x y) ( / (+ x y) 2 ))  
 (define (improve guess x) (average guess (/ x guess)))    
 (define (good-enough? guess x) ( < ( abs ( - (square guess) x)) 0.00000000001))  
-(define (sq-iter guess x) (if (good-enough? guess x) guess (sq-iter (improve guess x ) x )))    
+( ld: ) (define (sq-iter guess x) (if (good-enough? guess x) guess (sq-iter (improve guess x ) x )))    
 ( define (sqrt x) ( sq-iter 1.0 x))
 (sqrt 9) 
 (sqrt 2) 
@@ -115,7 +115,7 @@ bnOff
 
 (define (prime? n)
   (= n (smallest-divisor n)))
-d: (prime? 13)            
+(prime? 13)            
 (prime? 100)            
 #if 0
 (define (fib2 n)

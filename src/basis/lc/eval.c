@@ -26,7 +26,7 @@ _LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean appl
 ListObject *
 LC_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
-    ListObject *l1, *lfunction, *largs, *largs1, *largs2, *lfirst, *scw ;
+    ListObject *l1, *lfunction, *largs0, *largs1, *largs2, *lfirst, *scw ;
     if ( CompileMode )
     {
         LO_CheckEndBlock ( ) ;
@@ -34,7 +34,7 @@ LC_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean a
     }
     lc->ParenLevel ++ ;
     lfirst = _LO_First ( l0 ) ;
-    if ( lfirst )
+    if ( lc->Lfirst = lfirst )
     {
         if ( lfirst->W_LispAttributes & ( T_LISP_SPECIAL | T_LISP_MACRO ) )
         {
@@ -48,13 +48,16 @@ LC_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean a
         {
             //lfunction = _LO_Eval ( lc, LO_CopyOne ( lfirst ), locals, applyFlag ) ;
             lfunction = _LC_Eval ( lc, lfirst, locals, applyFlag ) ;
+            lc->LFunction = lfunction ;
             if ( scw = FindSourceCodeWord ( lfunction ) ) lc->Sc_Word = scw ;
-            largs = _LO_Next ( lfirst ) ;
+            largs0 = _LO_Next ( lfirst ) ;
+            lc->LArgs = largs0 ;
             //if ( DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLO_EvalList : lfunction = ", "" ),  _LO_PrintWithValue ( largs, "", "" ) ;
-            largs1 = _LC_EvalList ( lc, largs, locals, applyFlag ) ;
-            l1 = LC_Apply ( lc, l0, lfirst, lfunction, largs1, applyFlag ) ;
+            largs1 = _LC_EvalList ( lc, largs0, locals, applyFlag ) ;
+            lc->Largs1 = largs1 ;
+            l1 = LC_Apply (lc, lfirst, lfunction, largs1, applyFlag ) ;
             //largs2 = _LO_EvalList ( lc, largs1, locals, applyFlag ) ;
-            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLC_EvalList : lfunction = ", "", 1 ),  _LO_PrintWithValue ( largs, " : largs", "", 0 ),  _LO_PrintWithValue ( largs1, " : args1", "", 0 ) ;
+            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLC_EvalList : lfunction = ", "", 1 ),  _LO_PrintWithValue ( largs0, " : largs0", "", 0 ),  _LO_PrintWithValue ( largs1, " : largs1", "", 0 ) ;
             //if ( DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLO_EvalList : lfunction = ", "" ),  _LO_PrintWithValue ( largs1, "", "" ) ; //,  _LO_PrintWithValue ( largs2, "largs2", "" ) ;
             //if ( DEFINE_DBG ) _LO_PrintWithValue ( l0, " : result l0 = ", "" ) ;
         }
@@ -67,7 +70,7 @@ ListObject *
 _LC_EvalSymbol ( LambdaCalculus * lc, ListObject *l0, ListObject *locals )
 {
     Word *w ;
-    ListObject *l1 = l0 ;
+    ListObject *l1 = l0 ; // default 
     if ( l1 )
     {
         w = LC_FindWord ( l1->Name, locals ) ;

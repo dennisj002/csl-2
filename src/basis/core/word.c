@@ -53,7 +53,7 @@ Word_Eval ( Word * word )
                     Word_Morphism_Run ( word ) ;
                 }
                 else _Word_Compile ( word ) ;
-                _DEBUG_SHOW ( word, 0, 0 ) ;
+                DEBUG_SHOW ( word, 0, 0 ) ;
                 _Context_->CurrentEvalWord = 0 ;
                 _Context_->LastEvalWord = word ;
             }
@@ -69,11 +69,11 @@ Word_DbgBlock_Eval ( Word * word, block blck )
     if ( blck )
     {
         Context_PreWordRun_Init ( _Context_, word ) ;
-        _DEBUG_SETUP ( word, 0, ( byte* ) blck, 1, 0 ) ;
+        _Debug_Setup ( word, 0, ( byte* ) blck, 0, 1 ) ;
         if ( ! GetState ( _Debugger_->w_Word, STEPPED ) )
         {
             _Block_Eval ( blck ) ;
-            _DEBUG_SHOW ( word, 1, 0 ) ;
+            DEBUG_SHOW ( word, 0, 1 ) ;
         }
         SetState ( _Debugger_->w_Word, STEPPED, false ) ;
         Context_PostWordRun_Init ( _Context_, word ) ;

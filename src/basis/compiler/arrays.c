@@ -157,7 +157,6 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
     else Set_CompileMode ( false ) ;
     if ( word ) Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
     else Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
-    //DEBUG_SHOW ;
     Set_CompileMode ( saveCompileMode ) ;
 
     return 0 ;
@@ -226,7 +225,7 @@ _CSL_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
                 else _Word_CompileAndRecord_PushReg ( baseObject, ACC, true ) ;
             }
             else _CSL_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
-            _DEBUG_SHOW ( baseObject, 1, 0 ) ;
+            DEBUG_SHOW ( baseObject, 1, 0 ) ;
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         }
         if ( lispMode ) cntx->BaseObject = 0 ;

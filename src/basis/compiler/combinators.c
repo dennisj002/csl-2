@@ -365,8 +365,6 @@ CSL_ForCombinator ( )
     }
 }
 
-#if LC_CONDC
-
 void
 CSL_CondCombinator ( int64 numBlocks )
 {
@@ -414,5 +412,4 @@ CSL_CondCombinator ( int64 numBlocks )
     DataStack_DropN ( numBlocks ) ;
     //CSL_PrintDataStack ( ) ;
 }
-#endif
 

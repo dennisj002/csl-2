@@ -4,11 +4,14 @@
 void
 Debugger_Menu ( Debugger * debugger )
 {
+#if 0    
     Printf ( ( byte* )
         "\nDebug Menu at : \n%s :\n(m)enu, so(U)rce, dum(p), (e)val, (d)is, dis(a)ccum, dis(A)ccum, (r)egisters, (l)ocals, (v)ariables, (I)nfo, (W)dis, s(h)ow"
         "\n(R)eturnStack, sto(P), (S)tate, (c)ontinue, (s)tep, (o)ver, (i)nto, o(u)t, t(h)ru, s(t)ack, auto(z), (V)erbosity, (q)uit, a(B)ort"
         "\nusi(N)g, s(H)ow DebugWordList, sh(O)w CompilerWordList, Goto(L)ist_Print, T(y)peStackPrint, (w)diss, e(x)it"
         "\n'\\n' - escape, , '\\\' - <esc> - escape, ' ' - <space> - continue", c_gd ( Context_Location ( ) ) ) ;
+#endif    
+    Printf ( ( byte* ) debugger->Menu, c_gd ( Context_Location ( ) ) ) ;
     SetState ( debugger, DBG_MENU, false ) ;
 }
 
@@ -71,13 +74,24 @@ Debugger_Locals_Show ( Debugger * debugger )
         _Debugger_Locals_Show_Loop ( debugger->cs_Cpu, scWord ) ;
 }
 
-void
-_Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Boolean force, int64 debugLevel )
+Boolean
+_Debugger_ShouldWeShow ( Debugger * debugger, Word * word, Boolean stepFlag, int64 debugLevel, Boolean force )
 {
     uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _Dsp_ = debugger->cs_Cpu->R14d ) : _Dsp_ ;
     if ( ! dsp ) CSL_Exception ( STACK_ERROR, 0, QUIT ) ;
     if ( Is_DebugOn && ( _CSL_->DebugLevel >= debugLevel ) && ( force || stepFlag || ( word && ( word != debugger->LastShowEffectsWord ) ) ||
         ( debugger->PreHere && ( Here > debugger->PreHere ) ) ) )
+    {
+        return true ;
+    }
+    return false ;
+}
+
+void
+_Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, int64 debugLevel, Boolean force )
+{
+    uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _Dsp_ = debugger->cs_Cpu->R14d ) : _Dsp_ ;
+    if ( _Debugger_ShouldWeShow ( debugger, word, stepFlag, debugLevel, force ) )
     {
         DebugColors ;
         if ( word && ( word->W_ObjectAttributes & OBJECT_FIELD ) ) Word_PrintOffset ( word, 0, 0 ) ;

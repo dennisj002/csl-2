@@ -53,7 +53,7 @@
 
 #define _GetState( aState, state ) ( (aState) & (state) ) 
 #define GetState( obj, state ) ((obj) && _GetState( (obj)->State, (state) )) 
-#define GetState_TrueFalse( obj, _true, _false )  (obj) ? ( ( (obj)->State & (_true) ) && ( ! ( (obj)->State & (_false) ) ) ) : 0
+#define GetState_TrueFalse( obj, _true, _false )  (obj) ? ( ( _GetState( (obj)->State, (_true) ) ) && ( ! _GetState( (obj)->State, (_false) ))  ) : 0
 #define _SetStateVar( state, newState, flag ) ( ( (flag) > 0 ) ? ( (state) |= (newState) ) : ( (state) &= ~ (newState) ) ) 
 #define SetState_TrueFalse( obj, _true, _false )  (obj) ? ( ( (obj)->State |= (_true) ), ( (obj)->State &= ~ (_false) ) ) : 0
 #define SetState( obj, state, flag ) (obj) ? _SetStateVar ( ((obj)->State), (state), flag ) : 0
@@ -242,11 +242,11 @@
 #define _Is_DebugOn Is_DebugShowOn
 #define Is_DebugOn (_Is_DebugOn && Is_DebugModeOn)
 #define DEBUG_PRINTSTACK if ( GetState ( _CSL_, DEBUG_MODE )  ) CSL_PrintDataStack () ;
-#define DEBUG_SETUP_TOKEN( token, debugLevel ) _DEBUG_SETUP (0, token, 0, 0, debugLevel) ;
+#define DEBUG_SETUP_TOKEN( token, debugLevel ) _Debug_Setup (0, token, 0, 0, debugLevel) ;
 #define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force, 0) ;
-#define DEBUG_SETUP( word, debugLevel ) _DEBUG_SETUP (word, 0, 0, 0, debugLevel)
-#define _DEBUG_SHOW( word, force, debugLevel ) _Debugger_PostShow (_Debugger_, word, force, debugLevel) ; //, token, word ) ;
-#define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) 
+#define DEBUG_SETUP( word, debugLevel ) _Debug_Setup (word, 0, 0, 0, debugLevel)
+#define DEBUG_SHOW( word, debugLevel, force ) _Debugger_PostShow (_Debugger_, word, debugLevel, force) ; //, token, word ) ;
+//#define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) 
 #define DEBUG_ASM_SHOW_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 
 #define DEBUG_ASM_SHOW_OFF SetState ( _Debugger_, DBG_ASM_SHOW_ON, false ) 
 #define _DBI GetState ( _Debugger_, DBG_ASM_SHOW_ON ) 

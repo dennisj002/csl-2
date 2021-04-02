@@ -20,15 +20,15 @@ sp
 sp
 C
 : t* ( a b ) a @ b @ * return tos ; 3 4 t* 12 _assert sp
-: t+ ( a b ) a @ b @ + return tos ; 3 4 t+ 7 _assert sp
+: t2+ ( a b ) a @ b @ + return tos ; 3 4 t2+ 7 _assert sp
 
 : t* ( a b c d ) a @ b @ c @ d @ * * * return tos ;  
 ' t* find wdiss 
 1 2 3 4 t* 24 _assert
 sp
-: t+ ( a b c d ) a @ b @ c @ d @ + + + return tos ;  
-//' t+ find wdiss 
-1 2 3 4 t+ 10 _assert
+: t4+ ( a b c d ) a @ b @ c @ d @ + + + return tos ;  
+//' t4+ find wdiss 
+1 2 3 4 t4+ 10 _assert
 sp
 : hi ( n ) n @ 2 / 2 / 2 / 2 / return tos ; 32 hi  
 2 _assert

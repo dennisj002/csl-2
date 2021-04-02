@@ -11,9 +11,9 @@
 #endif
 #define EXPERIMENTAL true
 #define _DEFINE_DBG 0
-#define LC_CONDC 1
 #define LC_DEFINE_DBG ( _DEFINE_DBG || _Is_DebugOn )
 //#define LC_DEFINE_DBG ( _DEFINE_DBG && Is_DebugOn )
+//#define LC_CONDC 1
 
 #if DEBUG 
 #define D( x ) x
@@ -883,7 +883,7 @@ typedef struct
 #define LC_EVAL_APPLY           ( (uint64) 1 << 18 )
 #define LC_DONE                 ( (uint64) 1 << 19 )
 #define LC_BEGIN_MODE           ( (uint64) 1 << 20 )
-//#define COMBINATOR_MODE     ( (uint64) 1 << 21 )
+#define LC_DEBUG_ON     ( (uint64) 1 << 21 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )

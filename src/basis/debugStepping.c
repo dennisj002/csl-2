@@ -41,7 +41,7 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     _Debugger_StepOneInstruction ( debugger ) ;
     if ( showExtraFlag ) Debug_ExtraShow ( Here - svHere, 0 ) ; //showExtraFlag ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) && ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
-    else _Debugger_ShowEffects (debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag , 0) ;
+    else _Debugger_ShowEffects (debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), 0, showExtraFlag ) ;
     if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     if ( Compiling ) _Debugger_DisassembleWrittenCode ( debugger ) ;
     debugger->DebugAddress = nextInsn ;
@@ -160,7 +160,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 DebugOn ; // so debug is on for Word_Eval and we can step thru it
                 SetState ( _Debugger_, DBG_INFIX_PREFIX, false ) ;
                 Word_DbgBlock_Eval ( word, word->Definition ) ;
-                _DEBUG_SHOW ( word, 0, 0 ) ;
+                DEBUG_SHOW ( word, 0, 0 ) ;
                 SetState ( word, STEPPED, true ) ;
                 SetState ( debugger, ( DBG_STEPPED | DBG_STEPPING ), false ) ; // no longjmp needed at end of Interpreter_Loop
                 _Set_DataStackPointers ( svDsp ) ;

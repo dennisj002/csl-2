@@ -187,11 +187,17 @@ sp
 (yfac yfac 10) 
 (yfac yfac 7) 
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
-(define fibc1 (lambda ( n ) (if (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+#if 0    
+(vb2)(lcDbOn)
+#endif
+(define fibc1 (lambda ( n ) (ifc (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2))))))
+(definec ( fibc2 n ) (ifc (< n 2) n (+ (fibc2 (- n 1)) (fibc2 (- n 2))))))
 tick fibc find wdiss //pause
 tick fibc1 find wdiss //pause
+tick fibc2 find wdiss //pause
 "\nfibc 20 = " ps (fibc 20)
 "\nfibc1 20 = " ps (fibc1 20)
+"\nfibc2 20 = " ps (fibc2 20)
 pause
 
 //syntatic experiments ...

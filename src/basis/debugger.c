@@ -105,7 +105,7 @@ Debugger_Interpret ( Debugger * debugger, Word * word, byte * token, byte * addr
 }
 
 Boolean
-DBG_SHOULD_WE_DO_SETUP ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean force, int64 debugLevel )
+Dbg_ShouldWeSetup ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean force, int64 debugLevel )
 {
     Boolean rtn = ( ( _CSL_->DebugLevel >= debugLevel ) && ( force || GetState ( _Compiler_, LC_ARG_PARSING ) || address || token
         || ( word && ( ( word != debugger->LastPreSetupWord )
@@ -119,7 +119,7 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
     Boolean rtn = false ;
     if ( Is_DebugModeOn && Is_DebugShowOn )
     {
-        if ( DBG_SHOULD_WE_DO_SETUP ( debugger, word, token, address, force, debugLevel ) )
+        if ( Dbg_ShouldWeSetup ( debugger, word, token, address, force, debugLevel ) )
         {
             if ( ( ! word ) && ( ! token ) ) word = Context_CurrentWord ( ) ;
             if ( force || ( word && word->Name[0] ) || token )
@@ -134,21 +134,15 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
 }
 
 void
-_DEBUG_SETUP ( Word * word, byte * token, byte * address, Boolean force, int64 debugLevel )
+_Debug_Setup ( Word * word, byte * token, byte * address, Boolean force, int64 debugLevel )
 {
     Debugger_PreSetup ( _Debugger_, word, token, address, force, debugLevel ) ;
 }
 
 void
-_Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force, int64 debugLevel )
+_Debugger_PostShow (Debugger * debugger, Word * word, int64 debugLevel , Boolean force)
 {
-    _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force, debugLevel ) ;
-}
-
-void
-Debugger_PostShow ( Debugger * debugger )
-{
-    _Debugger_PostShow ( debugger, debugger->w_Word, 0, 0 ) ;
+    _Debugger_ShowEffects (debugger, word, GetState ( debugger, DBG_STEPPING ), debugLevel , force) ;
 }
 
 void
@@ -220,6 +214,10 @@ Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
             debugger->w_Word = word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
         }
     }
+    debugger->Menu =    "\nDebug Menu at : \n%s :\n(m)enu, so(U)rce, dum(p), (e)val, (d)is, dis(a)ccum, dis(A)ccum, (r)egisters, (l)ocals, (v)ariables, (I)nfo, (W)dis, s(h)ow"
+        "\n(R)eturnStack, sto(P), (S)tate, (c)ontinue, (s)tep, (o)ver, (i)nto, o(u)t, t(h)ru, s(t)ack, auto(z), (V)erbosity, (q)uit, a(B)ort"
+        "\nusi(N)g, s(H)ow DebugWordList, sh(O)w CompilerWordList, Goto(L)ist_Print, T(y)peStackPrint, (w)diss, e(x)it"
+        "\n'\\n' - escape, , '\\\' - <esc> - escape, ' ' - <space> - continue" ; 
 }
 
 void

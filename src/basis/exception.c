@@ -6,7 +6,7 @@
 // this block needs to be rethought but it may be ok for now
 
 void
-OVT_CheckThrowState (int64 signal, int64 restartCondition )
+OVT_CheckThrowState ( int64 signal, int64 restartCondition )
 {
     OVT_SetRestartCondition ( _O_, restartCondition ) ;
     if ( _O_->RestartCondition == COMPLETE_INITIAL_START )
@@ -19,12 +19,13 @@ OVT_CheckThrowState (int64 signal, int64 restartCondition )
 }
 
 // OVT_Throw and related functions should be rethought and/or cleaned up
+
 void
 OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
 {
     sigjmp_buf * jb ;
     Word * eword ;
-    OVT_CheckThrowState (signal, restartCondition ) ;
+    OVT_CheckThrowState ( signal, restartCondition ) ;
     if ( GetState ( _O_, OVT_FRC ) ) jb = & _O_->JmpBuf0 ;
     else
     {
@@ -79,7 +80,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     Word * word = _O_->ExceptionWord ;
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
-    if ( _Context_->CurrentlyRunningWord ) CSL_ShowInfo_Token (_Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
+    if ( _Context_->CurrentlyRunningWord ) CSL_ShowInfo_Token ( _Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
     if ( ! _O_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) Debugger_Stack ( debugger ) ;
     if ( ! word )
     {
@@ -236,6 +237,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 }
                 case '\n':
                 case '\r':
+                case ' ':
                 {
                     goto done ;
                 }
@@ -568,7 +570,7 @@ _Error ( byte * msg, uint64 state )
         CSL_NewLine ( ) ;
         CSL_Location ( ) ;
         Printf ( msg ) ;
-        CSL_ShowInfo_Token (_Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
+        CSL_ShowInfo_Token ( _Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
         Pause ( ) ;
         DebugColors ;
     }
@@ -595,7 +597,7 @@ _OVT_SimpleFinal_Key_Pause ( OpenVmTil * ovt )
     //OVT_CheckThrowState ( ) ;
     byte * msg = Buffer_Data ( ovt->PrintBuffer ) ;
     byte key, * instr = ".: (p)ause, e(x)it, <key> restart" ;
-    if ( ovt->SigSegvs < 3 ) printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, ( ( ovt->SigSegvs++ < 2 ) ? Context_Location ( ) : ( byte* ) "" ), ovt->SigSegvs ), fflush ( stdout ) ;
+    if ( ovt->SigSegvs < 3 ) printf ( "%s\n%s : at %s : (SIGSEGVs == %ld)", msg, instr, ( ( ovt->SigSegvs ++ < 2 ) ? Context_Location ( ) : ( byte* ) "" ), ovt->SigSegvs ), fflush ( stdout ) ;
     key = Key ( ) ;
     if ( key == 'p' )
     {

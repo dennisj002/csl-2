@@ -767,7 +767,7 @@ typedef struct _Debugger
     int64 TerminalLineWidth, RL_ReadIndex, SaveTOS, SaveStackDepth, Key, SaveKey, LastScwi, Esi, Edi ;
     Word * w_Word, *w_Alias, *w_AliasOf, *EntryWord, *LastShowInfoWord, *LastShowEffectsWord, *NextEvalWord ;
     Word *LocalsNamespace, *LastPreSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord, *SubstitutedWord ;
-    byte * Token, *DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress, * PreHere, *SpecialPreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
+    byte *Menu, * Token, *DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress, * PreHere, *SpecialPreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
     block SaveCpuState, RestoreCpuState ;
     Stack *ReturnStack, *LocalsCompilingNamespacesStack ;
     Cpu * cs_Cpu ;
@@ -776,7 +776,6 @@ typedef struct _Debugger
     DebuggerFunction CharacterFunctionTable [ 40 ] ;
     ud_t * Udis ;
     dllist * DebugWordList ;
-    //sigjmp_buf DbgJmpBuf0 ;
 } Debugger ;
 typedef struct
 {
@@ -838,7 +837,7 @@ typedef struct _LambdaCalculus
     uint64 State ;
     int64 DontCopyFlag, Loop, ParenLevel ;
     Namespace *LispNamespace, *LispDefinesNamespace, *LispTempNamespace, *BackgroundNamespace ;
-    ListObject *lFunction, *lArgs, * Nil, *True ;
+    ListObject *L0, *L1, *Lfirst, *LFunction, *Locals, *LArgs, *Largs1, * Nil, *True ;
     ListObject *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
@@ -850,7 +849,7 @@ typedef struct _LambdaCalculus
     Buffer *OutBuffer, *PrintBuffer ;
     byte * buffer, *outBuffer ;
     dllist * Lambda_SC_WordList ;
-    Boolean SavedTypeCheckState, IndentDbgPrint ;
+    Boolean ApplyFlag, SavedTypeCheckState, IndentDbgPrint ;
 } LambdaCalculus ;
 typedef struct
 {
