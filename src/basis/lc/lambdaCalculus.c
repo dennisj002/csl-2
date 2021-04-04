@@ -285,6 +285,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
 {
     ListObject * l1 ;
 
+    LC_Init_Variables ( lc ) ;
     l1 = _LC_Eval ( lc, l0, 0, 1 ) ;
     lc->L1 = l1 ;
     LO_Print ( l1 ) ;
@@ -482,6 +483,19 @@ LC_LispNamespaceOn ( )
     CSL_TypeCheckOff ( ) ; // too much LC stack sometimes and not needed
 }
 
+void
+LC_Init_Variables ( LambdaCalculus * lc )
+{
+    //ListObject *L0, *L1, *Lfirst, *LFunction, *Locals, *LArgs, *Largs1, * Nil, *True ;
+    lc->L0 = 0 ;
+    lc->L1 = 0 ;
+    lc->Lfirst = 0 ;
+    lc->Lfunction = 0 ;
+    lc->Locals = 0 ;
+    lc->Largs = 0 ;
+    lc->Largs1 = 0 ;
+}
+
 LambdaCalculus *
 _LC_Init_Runtime ( LambdaCalculus * lc )
 {
@@ -495,6 +509,7 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
     lc->ItemQuoteState = 0 ;
     DLList_Recycle_WordList ( lc->Lambda_SC_WordList ) ;
     LC_SaveStackPointer ( lc ) ;
+    LC_Init_Variables ( lc ) ;
     return lc ;
 }
 
@@ -607,14 +622,47 @@ LC_DebugOff ( )
 }
 
 void
-LC_DEBUG_SETUP ( LambdaCalculus * lc, byte * lcFuncName )
+LC_DebugSetup ( LambdaCalculus * lc, byte * lcFuncName, int64 state )
 {
     if ( GetState ( lc, LC_DEBUG_ON ) )
     {
         Debugger * debugger = _Debugger_ ;
         Printf ( "\n%s : ", lcFuncName ) ;
-        debugger->Menu = "Debug Menu at : \n%s :\n" ;
+        //debugger->Menu = "Debug Menu at : \n%s :\n" ;
         DebugColors ;
+        switch ( state )
+        {
+            case LC_APPLY : 
+            {
+                _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ) ;
+                break ;
+            }
+            
+        }
+        Debugger_InterpreterLoop ( debugger ) ;
+        DefaultColors ;
+    }
+}
+
+void
+LC_DebugShow ( LambdaCalculus * lc, byte * lcFuncName, int64 state )
+{
+    if ( GetState ( lc, LC_DEBUG_ON ) )
+    {
+        Debugger * debugger = _Debugger_ ;
+        Printf ( "\n%s : ", lcFuncName ) ;
+        //debugger->Menu = "Debug Menu at : \n%s :\n" ;
+        DebugColors ;
+        switch ( state )
+        {
+            case LC_APPLY : 
+            {
+                //_LO_PrintWithValue ( lc->Lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ) ;
+                _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( lc->L1, " : result = ", "", 0 ) ;
+                break ;
+            }
+            
+        }
         Debugger_InterpreterLoop ( debugger ) ;
         DefaultColors ;
     }

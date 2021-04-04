@@ -12,14 +12,15 @@ LC_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListO
 {
     ListObject * l1 ;
     SetState ( lc, LC_APPLY, true ) ;
-    if ( LC_DEFINE_DBG || GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( largs, " : largs = ", "", 0 ) ;
+    //if ( LC_DEFINE_DBG || GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( largs, " : largs = ", "", 0 ) ;
     //if ( GetState ( lc, LC_DEBUG_ON ) ) Pause ( ) ;
-    LC_DEBUG_SETUP ( lc, "LC_Apply" ) ; 
+    LC_DebugSetup ( lc, "LC_Apply", LC_APPLY ) ; 
     if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) )
-        || ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD ) ) ) )
+        || ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) ) ) )
     {
-        if ( GetState ( lc, LC_DEFINE_MODE ) && ( ! CompileMode ) ) return lfirst ;
-        else l1 = _LO_Apply (lc, lfunction, largs ) ;
+        //if ( GetState ( lc, LC_DEFINE_MODE ) && ( ! CompileMode ) ) return lfirst ; // shouldn't happen
+        //else 
+        l1 = _LO_Apply (lc, lfunction, largs ) ; 
     }
     else if ( lfunction && ( lfunction->W_LispAttributes & T_LAMBDA ) && lfunction->Lo_LambdaFunctionBody )
     {
@@ -44,9 +45,7 @@ LC_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListO
         if ( ! ( lfunction->W_MorphismAttributes & COMBINATOR ) ) SetState ( lc, LC_COMPILE_MODE, false ) ;
     }
     SetState ( lc, LC_APPLY, false ) ;
-    if ( LC_DEFINE_DBG || GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( l1, " : result = ", "", 0 ) ;
-    if ( GetState ( lc, LC_DEBUG_ON ) ) Pause ( ) ;
-    //DEBUG_SHOW ( lfunction, 0, 0 ) ;
+    if ( applyFlag ) LC_DebugShow ( lc, "LC_Apply", LC_APPLY ) ; 
     lc->L1 = l1 ;
     return l1 ;
 }
@@ -59,7 +58,8 @@ _LO_Apply (LambdaCalculus * lc, ListObject *lfunction, ListObject *largs )
     ListObject *l1 = nil ;
     //if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte * ) "\n_LO_Apply : \n\tl0 =%s", _LO_PRINT_TO_STRING ( lfunction ) ) ;
     //if ( Is_DebugOn ) Printf ( "\n_LO_Apply : lfunction with args :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ) ; //, Pause () ;
-    if ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) // this case is hypothetical for now
+    //if ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) // this case is hypothetical for now
+    if ( ( lfunction->W_MorphismAttributes & ( CSL_WORD ) ) || ( lfunction->W_LispAttributes & ( T_LC_IMMEDIATE ) ) ) 
     {
         if ( ( ! largs ) || ( lfunction->W_LispAttributes & T_LISP_CSL_COMPILED ) )
         {

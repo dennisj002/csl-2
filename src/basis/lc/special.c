@@ -337,7 +337,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
     int64 timt = 0 ; //, ccilt = 0 ; // timt : test is morphism type ; ccilt : condClause is list type
     int64 ifFlag = ( int64 ) ( lfirst->Lo_CSLWord->W_LispAttributes & T_LISP_IF ) ;
     int64 numBlocks, d1, d0 = Stack_Depth ( compiler->CombinatorBlockInfoStack ), testValue ;
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfirst, "\nLO_Cond : lfirst = ", "", 1 ) ;
+    //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfirst, "\nLO_Cond : lfirst = ", "", 1 ) ;
     ListObject * idLo = lfirst ;
     if ( condClause = _LO_Next ( idLo ) ) // 'cond' is id node ; skip it.
     {
@@ -360,7 +360,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
                 else
                 {
                     resultNode = condClause ;
-                    if ( CompileMode ) result = _LC_Eval ( lc, resultNode, locals, 1 ) ;
+                    if ( CompileMode ) result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
                     break ;
                 }
             }
@@ -371,7 +371,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
                 resultNode = _LO_Next ( test ) ;
                 if ( CompileMode )
                 {
-                    result = _LC_Eval ( lc, resultNode, locals, 1 ) ;
+                    result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
                     resultNode = 0 ;
                 }
                 break ;
@@ -379,24 +379,26 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
             if ( sequence && ( ! ( sequence = _LO_Next ( test ) ) ) )
             {
                 resultNode = test ;
-                if ( CompileMode ) result = _LC_Eval ( lc, resultNode, locals, 1 ) ;
+                if ( CompileMode ) result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
                 else break ;
             }
 
             if ( ! ( nextCondClause = _LO_Next ( sequence ) ) )
                 nextCondClause = _LO_Next ( condClause ) ;
+#if 0            
             if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfirst, "\nLO_Cond : l0 = ", "", 1 ) ;
             if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( condClause, "\nLO_Cond : condClause = ", "", 1 ) ;
             if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( sequence, "\nLO_Cond : sequence = ", "", 1 ) ;
             if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( nextCondClause, "\nLO_Cond : nextCondClause = ", "", 1 ) ;
             if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( test, "\nLO_Cond : test = ", "", 1 ) ;
+#endif            
             // we have determined test and sequence
             // either return result or find next condClause
             testResult = _LC_Eval ( lc, test, locals, 1 ) ;
             testValue = ( testResult && ( testResult->Lo_Value ) ) ;
-            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( testResult, "\nLO_Cond : testResult = ", "", 1 ) ;
-            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( sequence, "\nLO_Cond : eval : sequence = ", "", 1 ) ;
-            if ( CompileMode ) result = _LC_Eval ( lc, sequence, locals, 1 ) ;
+            //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( testResult, "\nLO_Cond : testResult = ", "", 1 ) ;
+            //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( sequence, "\nLO_Cond : eval : sequence = ", "", 1 ) ;
+            if ( CompileMode ) result = _LC_Eval ( lc, sequence, locals, lc->ApplyFlag ) ;
             if ( testValue )
             {
                 if ( ! CompileMode )
@@ -410,8 +412,8 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
                 resultNode = nextCondClause ;
                 if ( CompileMode )
                 {
-                    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "", 1 ) ;
-                    result = _LC_Eval ( lc, resultNode, locals, 1 ) ;
+                    //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "", 1 ) ;
+                    result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
                 }
                 //ccilt = condClause->W_LispAttributes & ( LIST | LIST_NODE ) ;
                 //if ( ( ! ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) ) ) || ( ifFlag ) ) break ; //{ resultNode = test ; break ; }
@@ -431,9 +433,9 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
         {
             if ( resultNode )
             {
-                if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : before eval : resultNode = ", "", 1 ) ;
-                result = _LC_Eval ( lc, resultNode, locals, 1 ) ;
-                if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : after eval : result = ", "\n", 1 ) ;
+                //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : before eval : resultNode = ", "", 1 ) ;
+                result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
+                //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : after eval : result = ", "\n", 1 ) ;
             }
         }
     }

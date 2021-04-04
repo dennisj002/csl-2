@@ -9,6 +9,7 @@ LO_IsQuoted ( ListObject *l0 )
 ListObject *
 _LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
+    lc->ApplyFlag = applyFlag ;
     if ( LC_DEFINE_DBG ) _LO_PrintWithValue (l0, "\n_LC_Eval : l0 = ", "" , 1) ;
     ListObject *l1 = l0 ;
     SetState ( lc, LC_EVAL, true ) ;
@@ -48,10 +49,10 @@ LC_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean a
         {
             //lfunction = _LO_Eval ( lc, LO_CopyOne ( lfirst ), locals, applyFlag ) ;
             lfunction = _LC_Eval ( lc, lfirst, locals, applyFlag ) ;
-            lc->LFunction = lfunction ;
+            lc->Lfunction = lfunction ;
             if ( scw = FindSourceCodeWord ( lfunction ) ) lc->Sc_Word = scw ;
             largs0 = _LO_Next ( lfirst ) ;
-            lc->LArgs = largs0 ;
+            lc->Largs = largs0 ;
             //if ( DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLO_EvalList : lfunction = ", "" ),  _LO_PrintWithValue ( largs, "", "" ) ;
             largs1 = _LC_EvalList ( lc, largs0, locals, applyFlag ) ;
             lc->Largs1 = largs1 ;

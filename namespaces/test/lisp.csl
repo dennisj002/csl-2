@@ -187,9 +187,9 @@ sp
 (yfac yfac 10) 
 (yfac yfac 7) 
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
-#if 0    
-(vb2)(lcDbOn)
-#endif
+   
+//(vb2) (lcDbOn)
+
 (define fibc1 (lambda ( n ) (ifc (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2))))))
 (definec ( fibc2 n ) (ifc (< n 2) n (+ (fibc2 (- n 1)) (fibc2 (- n 2))))))
 tick fibc find wdiss //pause

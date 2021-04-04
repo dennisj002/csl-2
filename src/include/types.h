@@ -837,7 +837,7 @@ typedef struct _LambdaCalculus
     uint64 State ;
     int64 DontCopyFlag, Loop, ParenLevel ;
     Namespace *LispNamespace, *LispDefinesNamespace, *LispTempNamespace, *BackgroundNamespace ;
-    ListObject *L0, *L1, *Lfirst, *LFunction, *Locals, *LArgs, *Largs1, * Nil, *True ;
+    ListObject *L0, *L1, *Lfirst, *Lfunction, *Locals, *Largs, *Largs1, * Nil, *True ;
     ListObject *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;

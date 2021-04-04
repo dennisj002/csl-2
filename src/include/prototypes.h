@@ -1837,6 +1837,7 @@ void _LC_ClearTempNamespace(LambdaCalculus *lc);
 void LC_ClearTempNamespace(void);
 void LC_LispNamespacesOff(void);
 void LC_LispNamespaceOn(void);
+void LC_Init_Variables(LambdaCalculus *lc);
 LambdaCalculus *_LC_Init_Runtime(LambdaCalculus *lc);
 LambdaCalculus *LC_Init_Runtime(void);
 LambdaCalculus *_LC_Init(LambdaCalculus *lc);
@@ -1848,7 +1849,8 @@ LambdaCalculus *LC_Reset(void);
 LambdaCalculus *LC_Init(void);
 void LC_DebugOn(void);
 void LC_DebugOff(void);
-void LC_DEBUG_SETUP(LambdaCalculus *lc, byte *lcFuncName);
+void LC_DebugSetup(LambdaCalculus *lc, byte *lcFuncName, int64 state);
+void LC_DebugShow(LambdaCalculus *lc, byte *lcFuncName, int64 state);
 /* src/basis/lc/apply.c */
 ListObject *LC_Apply(LambdaCalculus *lc, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag);
 ListObject *_LO_Apply(LambdaCalculus *lc, ListObject *lfunction, ListObject *largs);

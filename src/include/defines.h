@@ -552,6 +552,7 @@ typedef struct
 #define T_LISP_IMMEDIATE ( (uint64) 1 << 48 )
 #define T_LISP_CSL_COMPILED ( (uint64) 1 << 49 )
 #define T_LC_COMPILED ( (uint64) 1 << 50 )
+#define T_LC_IMMEDIATE ( (uint64) 1 << 51 )
 
 //#define   ( (uint64) 1 <<  )
 #define NEW_RUN_COMPOSITE 0
