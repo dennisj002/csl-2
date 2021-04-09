@@ -155,14 +155,14 @@ OVT_StartupMessage ( Boolean promptFlag )
 }
 
 void
-_OVT_Ok ( Boolean promptFlag )
+_OVT_Ok ( Boolean control )
 {
     if ( _O_->Verbosity > 3 )
     {
         _CSL_SystemState_Print ( 0 ) ;
         Printf ( "\n<Esc> - break, <Ctrl-C> - quit, <Ctrl-D> - restart, \'bye\'/\'exit\' - leave." ) ;
     }
-    _Context_Prompt ( _O_->Verbosity && promptFlag ) ;
+    _Context_Prompt (_O_->OVT_CSL->Context0, control) ;
 }
 
 void
@@ -171,16 +171,4 @@ OVT_Ok ( )
     _OVT_Ok ( 1 ) ;
     //_CSL_Prompt ( _O_->Verbosity && ( ( _O_->RestartCondition < RESET_ALL ) || _O_->StartTimes > 1 ) ) ;
 }
-
-#if 0 // not used
-
-void
-OVT_Prompt ( )
-{
-    if ( GetState ( _Context_->System0, DO_PROMPT ) ) // && ( ( _Context->OutputLineCharacterNumber == 0 ) || ( _Context->OutputLineCharacterNumber > 3 ) ) )
-    {
-        _Context_Prompt ( 1 ) ;
-    }
-}
-#endif
 

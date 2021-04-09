@@ -879,12 +879,14 @@ typedef struct
 #define LC_PRINT                ( (uint64) 1 << 13 )
 #define LC_READ_MACRO_OFF       ( (uint64) 1 << 14 )
 #define LC_READ_ONLY            ( (uint64) 1 << 15 )
-#define LC_READ_LAMBDA_LOCALS   ( (uint64) 1 << 16 )
+#define LC_READ_LAMBDA_LOCALS       ( (uint64) 1 << 16 )
 #define LC_LAMBDA_COMPILE_MODE  ( (uint64) 1 << 17 )
 #define LC_EVAL_APPLY           ( (uint64) 1 << 18 )
 #define LC_DONE                 ( (uint64) 1 << 19 )
 #define LC_BEGIN_MODE           ( (uint64) 1 << 20 )
 #define LC_DEBUG_ON     ( (uint64) 1 << 21 )
+#define LC_EVAL_LIST                          ( (uint64) 1 << 22 )
+#define LC_SUBSTITUTE                       ( (uint64) 1 << 23 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )

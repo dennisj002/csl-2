@@ -837,11 +837,10 @@ typedef struct _LambdaCalculus
     uint64 State ;
     int64 DontCopyFlag, Loop, ParenLevel ;
     Namespace *LispNamespace, *LispDefinesNamespace, *LispTempNamespace, *BackgroundNamespace ;
-    ListObject *L0, *L1, *Lfirst, *Lfunction, *Locals, *Largs, *Largs1, * Nil, *True ;
+    ListObject *L0, *L1, *Lfirst, *Lfunction, *Locals, *Largs, *Largs1, * Nil, *True, *LambdaParameters, *FunctionCallValues ;
     ListObject *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
-    struct _CSL * OurCSL ;
     Stack * QuoteStateStack ;
     uint64 * SaveStackPointer ;
     byte * LC_SourceCode ;
@@ -850,6 +849,7 @@ typedef struct _LambdaCalculus
     byte * buffer, *outBuffer ;
     dllist * Lambda_SC_WordList ;
     Boolean ApplyFlag, SavedTypeCheckState, IndentDbgPrint ;
+    struct _CSL * OurCSL ;
 } LambdaCalculus ;
 typedef struct
 {

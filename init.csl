@@ -437,10 +437,10 @@ doLisp 0 =
 'doLispTest var doLispTest 1 =
 'doBigNum 1 const 
     
+// === controls ===
 dbgOff
 //lisp
 //dbgOn 
-// === controls ===
 
 #if Is_DebugOn forStarters ||
 
@@ -495,4 +495,4 @@ pwi fac5
 cOff
 #endif 
 #endif    
-2 + 7 assertStkChk // stack checking 
+2 + 7 assertStkChk //d: // stack checking 

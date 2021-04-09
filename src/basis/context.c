@@ -2,9 +2,9 @@
 #include "../include/csl.h"
 
 void
-_Context_Prompt ( int64 control )
+_Context_Prompt (Context * cntx, int64 control )
 {
-    if ( ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) ) CSL_DoPrompt ( ) ;
+    if ( _O_->Verbosity && ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) ) Context_DoPrompt (cntx, control ) ;
 }
 
 byte *

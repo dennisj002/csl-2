@@ -11,21 +11,20 @@ ListObject *
 LC_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
 {
     ListObject * l1 ;
+    lc->ApplyFlag = applyFlag ;
     SetState ( lc, LC_APPLY, true ) ;
-    //if ( LC_DEFINE_DBG || GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( largs, " : largs = ", "", 0 ) ;
-    //if ( GetState ( lc, LC_DEBUG_ON ) ) Pause ( ) ;
-    LC_DebugSetup ( lc, "LC_Apply", LC_APPLY ) ; 
+    LC_Debug ( lc, "LC_Apply", LC_APPLY, 1 ) ;
     if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) )
         || ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) ) ) )
     {
         //if ( GetState ( lc, LC_DEFINE_MODE ) && ( ! CompileMode ) ) return lfirst ; // shouldn't happen
         //else 
-        l1 = _LO_Apply (lc, lfunction, largs ) ; 
+        l1 = _LO_Apply ( lc, lfunction, largs ) ;
     }
     else if ( lfunction && ( lfunction->W_LispAttributes & T_LAMBDA ) && lfunction->Lo_LambdaFunctionBody )
     {
         // LambdaArgs, the formal args, are not changed by LO_Substitute (locals - lvals are just essentially 'renamed') and thus don't need to be copied
-        LO_Substitute ( ( ListObject * ) lfunction->Lo_LambdaFunctionParameters, largs ) ;
+        LO_Substitute (lc, ( ListObject * ) lfunction->Lo_LambdaFunctionParameters, largs ) ;
         lc->CurrentLambdaFunction = lfunction ;
         lc->Locals = largs ;
         l1 = LC_EvalList ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
@@ -44,14 +43,14 @@ LC_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListO
         }
         if ( ! ( lfunction->W_MorphismAttributes & COMBINATOR ) ) SetState ( lc, LC_COMPILE_MODE, false ) ;
     }
-    SetState ( lc, LC_APPLY, false ) ;
-    if ( applyFlag ) LC_DebugShow ( lc, "LC_Apply", LC_APPLY ) ; 
+    if ( applyFlag ) LC_Debug ( lc, "LC_Apply", LC_APPLY, 0 ) ;
     lc->L1 = l1 ;
+    SetState ( lc, LC_APPLY, false ) ;
     return l1 ;
 }
 
 ListObject *
-_LO_Apply (LambdaCalculus * lc, ListObject *lfunction, ListObject *largs )
+_LO_Apply ( LambdaCalculus * lc, ListObject *lfunction, ListObject *largs )
 {
     //LambdaCalculus *lc = _O_->OVT_LC ;
     SetState ( lc, LC_APPLY, true ) ;
@@ -59,7 +58,7 @@ _LO_Apply (LambdaCalculus * lc, ListObject *lfunction, ListObject *largs )
     //if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte * ) "\n_LO_Apply : \n\tl0 =%s", _LO_PRINT_TO_STRING ( lfunction ) ) ;
     //if ( Is_DebugOn ) Printf ( "\n_LO_Apply : lfunction with args :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ) ; //, Pause () ;
     //if ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) // this case is hypothetical for now
-    if ( ( lfunction->W_MorphismAttributes & ( CSL_WORD ) ) || ( lfunction->W_LispAttributes & ( T_LC_IMMEDIATE ) ) ) 
+    if ( ( lfunction->W_MorphismAttributes & ( CSL_WORD ) ) || ( lfunction->W_LispAttributes & ( T_LC_IMMEDIATE ) ) )
     {
         if ( ( ! largs ) || ( lfunction->W_LispAttributes & T_LISP_CSL_COMPILED ) )
         {
@@ -162,11 +161,13 @@ _LO_Do_FunctionBlock ( ListObject *lfunction, ListObject *largs )
 }
 
 void
-LO_Substitute ( ListObject *lambdaParameters, ListObject * funcCallValues )
+LO_Substitute (LambdaCalculus * lc, ListObject *lambdaParameters, ListObject * funcCallValues )
 {
+    lc->LambdaParameters = lambdaParameters, lc->FunctionCallValues = funcCallValues ;
+    LC_Debug ( lc, "LO_Substitute", LC_SUBSTITUTE, 0 ) ;
     while ( lambdaParameters && funcCallValues )
     {
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "", 1 ), _LO_PrintWithValue ( funcCallValues, " : args = ", "", 0 ) ;
+        //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "", 1 ), _LO_PrintWithValue ( funcCallValues, " : args = ", "", 0 ) ;
         // ?!? this may not be the right idea but we want it so that we can have transparent lists in the parameters, ie. 
         // no affect with a parenthesized list or just unparaenthesized parameters of the same number
         if ( lambdaParameters->W_LispAttributes & ( LIST | LIST_NODE ) )

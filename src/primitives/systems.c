@@ -196,7 +196,7 @@ shell ( )
     byte * svPrompt = ReadLine_GetPrompt ( rl ) ;
     ReadLine_SetPrompt ( rl, "$ " ) ;
     Printf ( "\n type \'exit\' to exit" ) ;
-    Context_DoPrompt ( cntx ) ;
+    Context_DoPrompt (cntx, 0) ;
     while ( 1 )
     {
         _ReadLine_GetLine ( rl, 0 ) ; 

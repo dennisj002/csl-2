@@ -9,10 +9,10 @@ LO_IsQuoted ( ListObject *l0 )
 ListObject *
 _LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
-    lc->ApplyFlag = applyFlag ;
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue (l0, "\n_LC_Eval : l0 = ", "" , 1) ;
     ListObject *l1 = l0 ;
+    lc->ApplyFlag = applyFlag ;
     SetState ( lc, LC_EVAL, true ) ;
+    LC_Debug ( lc, "LC_Eval", LC_EVAL, 1 ) ;
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
     if ( l0 && ( ! LO_IsQuoted ( l0 ) ) )
     {
@@ -20,7 +20,8 @@ _LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean appl
         else if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) l1 = LC_EvalList ( lc, l0, locals, applyFlag ) ;
     }
     SetState ( lc, LC_EVAL, false ) ;
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue (l1, "\n_LC_Eval : l1 = ", "" , 1) ;
+    lc->L1 = l1 ;
+    LC_Debug ( lc, "LC_Eval", LC_EVAL, 0 ) ;
     return l1 ;
 }
 
@@ -58,12 +59,13 @@ LC_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean a
             lc->Largs1 = largs1 ;
             l1 = LC_Apply (lc, lfirst, lfunction, largs1, applyFlag ) ;
             //largs2 = _LO_EvalList ( lc, largs1, locals, applyFlag ) ;
-            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLC_EvalList : lfunction = ", "", 1 ),  _LO_PrintWithValue ( largs0, " : largs0", "", 0 ),  _LO_PrintWithValue ( largs1, " : largs1", "", 0 ) ;
+            //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLC_EvalList : lfunction = ", "", 1 ),  _LO_PrintWithValue ( largs0, " : largs0", "", 0 ),  _LO_PrintWithValue ( largs1, " : largs1", "", 0 ) ;
             //if ( DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLO_EvalList : lfunction = ", "" ),  _LO_PrintWithValue ( largs1, "", "" ) ; //,  _LO_PrintWithValue ( largs2, "largs2", "" ) ;
             //if ( DEFINE_DBG ) _LO_PrintWithValue ( l0, " : result l0 = ", "" ) ;
         }
     }
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( l1, "\nLC_EvalList : l1 = ", "", 1 ) ;
+    lc->L1 = l1 ;
+    LC_Debug ( lc, "LC_EvalList", LC_EVAL_LIST, 0 ) ;
     return l1 ;
 }
 

@@ -149,7 +149,7 @@ OVT_PauseInterpret ( Context * cntx, byte key )
     {
         svPrompt = ReadLine_GetPrompt ( rl ) ;
         ReadLine_SetPrompt ( rl, "=> " ) ;
-        Context_DoPrompt ( cntx ) ;
+        Context_DoPrompt (cntx, 0) ;
         _ReadLine_GetLine ( rl, key ) ;
         if ( ReadLine_PeekNextChar ( rl ) < ' ' ) break ; // '\n', <esc>, etc.
         Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
@@ -276,7 +276,6 @@ _OpenVmTil_Pause ( byte * msg )
 void
 OpenVmTil_Pause ( )
 {
-
     DebugColors ;
     _OpenVmTil_Pause ( Context_Location ( ) ) ;
 }

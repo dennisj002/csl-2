@@ -21,7 +21,7 @@ Interpret_C_Until_NotIncluding_Token5 ( Interpreter * interp, byte * end1, byte 
             if ( ( token[0] == end1[0] ) || ( token[0] == end2[0] ) || ( token[0] == end3[0] ) || ( token[0] == end4[0] ) || ( token[0] == end5[0] ) ) break ;
         }
         else if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) || String_Equal ( token, end5 ) ) break ;
-        if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) &&  ( token[0] == ')' ) )
+        if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && ( token[0] == ')' ) )
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
             token = 0 ;
@@ -179,10 +179,11 @@ Interpret_String ( byte *str )
 void
 _CSL_Interpret ( CSL * csl )
 {
+    int loopTimes = 0 ;
     do
     {
         if ( ! _AtCommandLine ( ) ) _CSL_Init_SessionCore ( csl, 1, 1 ) ;
-        else  CSL_Prompt ( csl, 1 ) ; 
+        else CSL_Prompt ( csl, ( ! loopTimes ) ? 1 : 2 ) ;
         Context_Interpret ( csl->Context0 ) ;
     }
     while ( GetState ( csl, CSL_RUN ) ) ;

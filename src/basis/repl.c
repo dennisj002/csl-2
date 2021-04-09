@@ -18,7 +18,7 @@ _Repl ( block repl )
         {
             uint64 * svDsp = _Dsp_ ;
             //Printf ( "<= " ) ;
-            Context_DoPrompt ( _Context_ ) ;
+            Context_DoPrompt (_Context_, 0) ;
             //LC_SaveStack ( ) ; // ?!? maybe we should do this stuff differently : literals are pushed on the stack by the interpreter
             ReadLine_GetLine ( rl ) ;
             if ( strstr ( ( char* ) rl->InputLineString, ".." ) || strstr ( ( char* ) rl->InputLineString, "bye" ) || strstr ( ( char* ) rl->InputLineString, "exit" )  || strstr ( ( char* ) rl->InputLineString, "x" ) ) 

@@ -121,18 +121,12 @@ Emit ( byte c )
 }
 
 void
-Context_DoPrompt ( Context * cntx )
+Context_DoPrompt ( Context * cntx, int control )
 {
-    if ( ( ReadLiner_GetLastChar ( ) != '\n' ) && ( Strlen ( cntx->Lexer0->LastToken ) ) ) CSL_PrintChar ( '\n' ) ;
+    if ( ( control == 2 ) || ( ( ReadLiner_GetLastChar ( ) != '\n' ) && ( Strlen ( cntx->Lexer0->LastToken ) ) ) ) CSL_PrintChar ( '\n' ) ;
     else if ( strlen ( Buffer_Data ( _O_->PrintBuffer ) ) && ( String_LastChar ( Buffer_Data ( _O_->PrintBuffer ) ) != ( byte ) '\n' ) ) CSL_PrintChar ( '\n' ) ;
-    else if ( GetState ( _Debugger_, DBG_COMMAND_LINE )  || GetState ( cntx, PAUSE_INTERPRET)  )  CSL_PrintChar ( '\n' ) ;
+    else if ( GetState ( _Debugger_, DBG_COMMAND_LINE ) || GetState ( cntx, PAUSE_INTERPRET ) ) CSL_PrintChar ( '\n' ) ;
     Printf ( "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
-}
-
-void
-CSL_DoPrompt ( )
-{
-    Context_DoPrompt ( _Context_ ) ;
 }
 
 // all output comes thru here
@@ -176,7 +170,7 @@ Printf ( char *format, ... )
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
     if ( _O_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
     {
-        int64 isIncludingFiles = (_Context_ && _Context_->System0 )? _Context_->System0->IncludeFileStackNumber : 0 ;
+        int64 isIncludingFiles = ( _Context_ && _Context_->System0 ) ? _Context_->System0->IncludeFileStackNumber : 0 ;
         va_start ( args, ( char* ) format ) ;
         if ( isIncludingFiles ) vprintf ( ( char* ) format, args ) ;
         else

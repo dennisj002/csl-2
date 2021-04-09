@@ -1,5 +1,6 @@
 
 #include "../../include/csl.h"
+// old docs
 //LambdaCalculus * _LC_ ;
 // --------------------------------------------------------
 // LC  : an abstract core of a prefix language related to Lambda Calculus with list objects
@@ -38,28 +39,6 @@
 // so we create a new ListObject with a pointer to the word for its values/properties
 
 // can we just use the 'word' instead of this
-
-#if 0
-
-void
-Lexer_DoReplMacro ( Lexer * lexer )
-{
-    //ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // let the repl re-get the char 
-    Lexer_FinishTokenHere ( lexer ) ;
-    LC_ReadEvalPrint ( ) ;
-    SetState ( lexer, LEXER_RETURN_NULL_TOKEN, true ) ;
-}
-
-void
-Lexer_CheckMacroRepl ( Lexer * lexer )
-{
-    byte nextChar = ReadLine_PeekNextNonWhitespaceChar ( lexer->ReadLiner0 ) ;
-    if ( ( nextChar == '(' ) ) //|| ( nextChar == ',' ) )
-    {
-        Lexer_DoReplMacro ( lexer ) ;
-    }
-}
-#endif
 
 //===================================================================================================================
 //| LO Misc : _LO_FindWord _LO_New _LO_Copy
@@ -622,49 +601,90 @@ LC_DebugOff ( )
 }
 
 void
-LC_DebugSetup ( LambdaCalculus * lc, byte * lcFuncName, int64 state )
+LC_Debug ( LambdaCalculus * lc, byte * lcFuncName, int64 state, Boolean setupFlag )
 {
     if ( GetState ( lc, LC_DEBUG_ON ) )
     {
         Debugger * debugger = _Debugger_ ;
-        Printf ( "\n%s : ", lcFuncName ) ;
+        Printf ( "\nLC_Debug :: %s : ", lcFuncName ) ;
         //debugger->Menu = "Debug Menu at : \n%s :\n" ;
         DebugColors ;
-        switch ( state )
-        {
-            case LC_APPLY : 
-            {
-                _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ) ;
-                break ;
-            }
-            
-        }
+        if ( lc->ApplyFlag ) LC_Debug_Output ( lc, state, setupFlag ) ;
         Debugger_InterpreterLoop ( debugger ) ;
         DefaultColors ;
     }
 }
 
 void
-LC_DebugShow ( LambdaCalculus * lc, byte * lcFuncName, int64 state )
+LC_Debug_Output ( LambdaCalculus * lc, int64 state, Boolean setupFlag )
 {
-    if ( GetState ( lc, LC_DEBUG_ON ) )
+    if ( setupFlag )
     {
-        Debugger * debugger = _Debugger_ ;
-        Printf ( "\n%s : ", lcFuncName ) ;
-        //debugger->Menu = "Debug Menu at : \n%s :\n" ;
-        DebugColors ;
         switch ( state )
         {
-            case LC_APPLY : 
+            case LC_APPLY:
+            {
+                _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ) ;
+                break ;
+            }
+            case LC_EVAL:
+            {
+                _LO_PrintWithValue ( lc->L0, "\n_LC_Eval : l0 = ", "", 1 ) ;
+                break ;
+            }
+            default: break ;
+        }
+    }
+    else
+    {
+        switch ( state )
+        {
+            case LC_APPLY:
             {
                 //_LO_PrintWithValue ( lc->Lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ) ;
+                //SetState ( debugger, DBG_MENU, true ) ;
                 _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( lc->L1, " : result = ", "", 0 ) ;
                 break ;
             }
-            
+            case LC_EVAL:
+            {
+                _LO_PrintWithValue ( lc->L1, "\n_LC_Eval : l1 = ", "", 1 ) ;
+                break ;
+            }
+            case LC_EVAL_LIST:
+            {
+                //_LO_PrintWithValue ( lc->L1, "\nLC_EvalList : l1 = ", "", 1 ) ;
+                _LO_PrintWithValue ( lc->Lfunction, "\nLC_EvalList : lfunction = ", "", 1 ),  _LO_PrintWithValue ( lc->Largs, " : largs0 = ", "", 0 ),  _LO_PrintWithValue ( lc->Largs1, " : largs1 = ", "", 0 ) ;
+                break ;
+            }
+            case LC_SUBSTITUTE:
+            {
+                _LO_PrintWithValue ( lc->LambdaParameters, "\nLO_Substitute : lambdaParameters = ", "", 1 ),  _LO_PrintWithValue ( lc->FunctionCallValues, " : funcCallValues = ", "", 0 ) ;
+                break ;
+            }
+            default: break ;
         }
-        Debugger_InterpreterLoop ( debugger ) ;
-        DefaultColors ;
     }
 }
+#if 0
+
+void
+Lexer_DoReplMacro ( Lexer * lexer )
+{
+    //ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // let the repl re-get the char 
+    Lexer_FinishTokenHere ( lexer ) ;
+    LC_ReadEvalPrint ( ) ;
+    SetState ( lexer, LEXER_RETURN_NULL_TOKEN, true ) ;
+}
+
+void
+Lexer_CheckMacroRepl ( Lexer * lexer )
+{
+    byte nextChar = ReadLine_PeekNextNonWhitespaceChar ( lexer->ReadLiner0 ) ;
+    if ( ( nextChar == '(' ) ) //|| ( nextChar == ',' ) )
+    {
+        Lexer_DoReplMacro ( lexer ) ;
+    }
+}
+#endif
 
