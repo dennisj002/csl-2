@@ -48,10 +48,13 @@ _Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi 
     Word * word = 0 ;
     Lexer_ParseObject ( lexer, token ) ;
     lexer->ParsedToken = token ;
-    if ( ( lexer->L_ObjectAttributes & T_RAW_STRING ) && ( GetState ( _O_, AUTO_VAR )
-        && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) ) )
-        word = Lexer_Do_MakeItAutoVar ( lexer, token, tsrli, scwi ) ;
-    else word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, lexer->Literal, 0, 0, tsrli, scwi ) ;
+    if ( lexer->L_ObjectAttributes & T_RAW_STRING ) 
+    {
+        if ( ( GetState ( _O_, AUTO_VAR ) && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) ) )
+            word = Lexer_Do_MakeItAutoVar ( lexer, token, tsrli, scwi ) ;
+        else Printf ( "\nWarning : word \'%s\' not found! Pushing \'%s\' onto the stack\n", token, token ) ;
+    }
+    if ( ! word ) word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, lexer->Literal, 0, 0, tsrli, scwi ) ;
     if ( word )
     {
         Word_SetTypeNamespace ( word, lexer->L_ObjectAttributes ) ;
@@ -81,7 +84,10 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
             }
         }
         else word = lword ;
-        if ( ! word ) word = _Lexer_ParseToken_ToWord ( lexer, token, - 1, - 1 ) ;
+        if ( ! word ) 
+        {
+            word = _Lexer_ParseToken_ToWord ( lexer, token, - 1, - 1 ) ;
+        }
         lexer->TokenWord = word ;
     }
     return word ;

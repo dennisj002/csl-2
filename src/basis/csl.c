@@ -187,7 +187,7 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     
     _Context_ = csl->Context0 = _Context_New ( csl ) ;
 
-    csl->Debugger0 = _Debugger_New ( allocType ) ;
+    csl->Debugger0 = Debugger_New ( allocType ) ;
     csl->cs_Cpu = CpuState_New ( allocType ) ;
     csl->cs_Cpu2 = CpuState_New ( allocType ) ;
     csl->PeekPokeByteArray = ByteArray_AllocateNew ( 32, allocType ) ;
@@ -403,5 +403,21 @@ void
 CSL_PP_IncludeFileOnly_Off ()
 {
     SetState ( _CSL_, PP_INCLUDE_FILES_ONLY, false ) ;
+}
+
+void
+CSL_LC_DebugOn ( )
+{
+    LambdaCalculus * lc ;
+    if ( lc = _LC_ ) SetState ( lc, LC_DEBUG_ON, true ) ;
+    CSL_DebugOn ( ) ;
+}
+
+void
+CSL_LC_DebugOff ( )
+{
+    LambdaCalculus * lc ;
+    if ( lc = _LC_ ) SetState ( lc, LC_DEBUG_ON, false ) ;
+    CSL_DebugOff ( ) ;
 }
 

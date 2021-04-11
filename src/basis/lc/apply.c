@@ -24,7 +24,7 @@ LC_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListO
     else if ( lfunction && ( lfunction->W_LispAttributes & T_LAMBDA ) && lfunction->Lo_LambdaFunctionBody )
     {
         // LambdaArgs, the formal args, are not changed by LO_Substitute (locals - lvals are just essentially 'renamed') and thus don't need to be copied
-        LO_Substitute (lc, ( ListObject * ) lfunction->Lo_LambdaFunctionParameters, largs ) ;
+        LC_Substitute (lc, ( ListObject * ) lfunction->Lo_LambdaFunctionParameters, largs ) ;
         lc->CurrentLambdaFunction = lfunction ;
         lc->Locals = largs ;
         l1 = LC_EvalList ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
@@ -161,13 +161,12 @@ _LO_Do_FunctionBlock ( ListObject *lfunction, ListObject *largs )
 }
 
 void
-LO_Substitute (LambdaCalculus * lc, ListObject *lambdaParameters, ListObject * funcCallValues )
+LC_Substitute (LambdaCalculus * lc, ListObject *lambdaParameters, ListObject * funcCallValues )
 {
     lc->LambdaParameters = lambdaParameters, lc->FunctionCallValues = funcCallValues ;
     LC_Debug ( lc, "LO_Substitute", LC_SUBSTITUTE, 0 ) ;
     while ( lambdaParameters && funcCallValues )
     {
-        //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "", 1 ), _LO_PrintWithValue ( funcCallValues, " : args = ", "", 0 ) ;
         // ?!? this may not be the right idea but we want it so that we can have transparent lists in the parameters, ie. 
         // no affect with a parenthesized list or just unparaenthesized parameters of the same number
         if ( lambdaParameters->W_LispAttributes & ( LIST | LIST_NODE ) )
@@ -185,9 +184,7 @@ LO_Substitute (LambdaCalculus * lc, ListObject *lambdaParameters, ListObject * f
         // just preserve the name of the arg for the finder
         // so we now have the call values with the parameter names - parameter names are unchanged 
         // so when we eval/print these parameter names they will have the function calling values -- lambda calculus substitution - beta reduction
-        //if ( DEFINE_DBG ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "" ),  _LO_PrintWithValue ( funcCallValues, "\nLO_Substitute : funcCallValues = ", "" ) ;
         funcCallValues->Lo_Name = lambdaParameters->Lo_Name ;
-        //if ( DEFINE_DBG ) _LO_PrintWithValue ( lambdaParameters, "\nLO_Substitute : lambdaParameters = ", "" ),  _LO_PrintWithValue ( funcCallValues, "\nLO_Substitute : funcCallValues = ", "" ) ;
         lambdaParameters = _LO_Next ( lambdaParameters ) ;
         funcCallValues = _LO_Next ( funcCallValues ) ;
     }

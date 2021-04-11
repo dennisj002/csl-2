@@ -41,8 +41,6 @@ LC_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean a
         if ( lfirst->W_LispAttributes & ( T_LISP_SPECIAL | T_LISP_MACRO ) )
         {
             if ( LO_IsQuoted ( lfirst ) ) return lfirst ;
-            //if ( DEFINE_DBG ) _LO_PrintWithValue ( l0, "\nLC_EvalList : special function = ", "" ) ;
-            //if ( DEFINE_DBG ) _LO_PrintWithValue ( locals, "\nLC_EvalList : locals = ", "" ) ;
             l1 = LC_SpecialFunction ( lc, l0, locals ) ;
             lc->ParenLevel -- ;
         }
@@ -91,7 +89,7 @@ _LC_EvalSymbol ( LambdaCalculus * lc, ListObject *l0, ListObject *locals )
                 l1 = ( ListObject * ) w->Lo_Value ;
             }
             else if ( ( w->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) )
-                || ( w->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
+                || ( w->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | NAMESPACE_VARIABLE ) )
                 || ( w->W_LispAttributes & ( T_LISP_COMPILED_WORD ) ) )
             {
                 l1->Lo_Value = w->W_Value ;
@@ -146,14 +144,16 @@ _LC_EvalList ( LambdaCalculus * lc, ListObject *lorig, ListObject *locals, Boole
 ListObject *
 LC_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
 {
-    ListObject * lfirst, *macro = 0 ;
+    ListObject * lfirst, *macro = 0, *l1 = l0 ;
+    lc->Locals = locals ;
+    LC_Debug ( lc, "LC_SpecialFunction", LC_SPECIAL_FUNCTION, 1 ) ;
     if ( lfirst = _LO_First ( l0 ) )
     {
         while ( lfirst && ( lfirst->W_LispAttributes & T_LISP_MACRO ) )
         {
             macro = lfirst ;
             macro->W_LispAttributes &= ~ T_LISP_MACRO ; // prevent short recursive loop calling of this function thru LO_Eval below
-            l0 = _LC_Eval ( lc, l0, locals, 1 ) ;
+            l1 = _LC_Eval ( lc, l0, locals, 1 ) ;
             macro->W_LispAttributes |= T_LISP_MACRO ; // restore to its true type
             lfirst = _LO_First ( l0 ) ;
             macro = 0 ;
@@ -161,13 +161,13 @@ LC_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
         if ( lfirst && lfirst->Lo_CSLWord && IS_MORPHISM_TYPE ( lfirst->Lo_CSLWord ) )
         {
             if ( lfirst->W_MorphismAttributes & COMBINATOR ) LC_InitForCombinator ( lc ) ;
-            l0 = ( ( LispFunction2 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals ) ; // ??? : does adding extra parameters to functions not defined with them mess up the the c runtime return stack
+            l1 = ( ( LispFunction2 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals ) ; // ??? : does adding extra parameters to functions not defined with them mess up the the c runtime return stack
         }
         else
         {
-            l0 = _LC_Eval ( lc, l0, locals, 1 ) ;
+            l1 = _LC_Eval ( lc, l0, locals, 1 ) ;
         }
     }
-    return l0 ;
+    return l1 ;
 }
 

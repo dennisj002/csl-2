@@ -14,6 +14,26 @@ _LO_Print_Lambda_ToString ( LambdaCalculus * lc, ListObject * l0, int64 printVal
 }
 
 void
+LO_PrintLiteralToString ( LambdaCalculus * lc, ListObject * l0 )
+{
+    if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) _BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
+    else if ( ( l0->Lo_Integer < 0 ) || ( NUMBER_BASE_GET == 16 ) )
+        LC_snprintf1 ( lc->buffer, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
+    else LC_snprintf1 ( lc->buffer, ( ( l0->Lo_Integer < 0 ) ? " 0x%016lx" : " %ld" ), l0->Lo_Integer ) ;
+}
+
+void
+LO_PrintValueToString ( LambdaCalculus * lc, ListObject * l0 )
+{
+     //LC_sprintName ( lc->buffer, l0 ) ;
+     //LO_strcat ( lc->outBuffer, lc->buffer ) ;
+     Word_Morphism_Run ( l0->Lo_CSLWord ) ;
+     int64 * tos = (int64*) DataStack_Pop ( ) ;
+     l0->Lo_Value = * tos ;
+     LO_PrintLiteralToString ( lc, l0 ) ;
+}
+
+void
 _LO_Print_NonLambdaSymbol_ToString ( LambdaCalculus * lc, ListObject * l0, int64 printValueFlag )
 {
     lc->buffer [0] = 0 ;
@@ -25,6 +45,10 @@ _LO_Print_NonLambdaSymbol_ToString ( LambdaCalculus * lc, ListObject * l0, int64
             {
                 if ( _O_->Verbosity > 2 ) LC_snprintf2 ( lc->buffer, " %s = 0x%016lx", l0->Lo_CSLWord->Lo_Name, ( int64 ) l0->Lo_CSLWord ) ;
                 else LC_sprintName ( lc->buffer, l0 ) ;
+            }
+            else if ( ( l0->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) ) && (!( l0->Lo_CSLWord->W_LispAttributes & T_LISP_SYMBOL )) )
+            {
+                LO_PrintValueToString ( lc, l0 ) ;
             }
             else if ( l0->W_LispAttributes & ( T_RAW_STRING ) ) LC_sprintString ( lc->buffer, *l0->Lo_PtrToValue ) ;
             else LC_sprintName ( lc->buffer, l0 ) ;
@@ -64,8 +88,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
         else if ( l0->W_LispAttributes & T_LISP_SYMBOL )
         {
             if ( LO_IsQuoted ( l0 ) ) LC_sprintName ( lc->buffer, l0 ) ;
-            else if ( ( ! in_a_LambdaFlag ) && l0->Lo_CSLWord && ( l0->W_LispAttributes & T_LAMBDA ) )
-                _LO_Print_Lambda_ToString ( lc, l0, printSymbolValueFlag ) ;
+            else if ( ( ! in_a_LambdaFlag ) && l0->Lo_CSLWord && ( l0->W_LispAttributes & T_LAMBDA ) ) _LO_Print_Lambda_ToString ( lc, l0, printSymbolValueFlag ) ;
             else _LO_Print_NonLambdaSymbol_ToString ( lc, l0, printSymbolValueFlag ) ;
         }
         else if ( ( l0->W_ObjectAttributes & ( T_STRING | T_RAW_STRING | T_LISP_SYMBOL ) ) ) //||( l0->W_LispAttributes & (T_LISP_SYMBOL) ))
@@ -78,7 +101,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
         {
             //if ( l0->Name[0] ) // where does this come from ?? fix it!!
             {
-                if ( printSymbolValueFlag && l0->Name[0]) _BigNum_snfPrint2 ( lc->buffer, l0->Lo_Name, ( mpfr_t * ) l0->W_Value ) ; //_BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
+                if ( printSymbolValueFlag && l0->Name[0] ) _BigNum_snfPrint2 ( lc->buffer, l0->Lo_Name, ( mpfr_t * ) l0->W_Value ) ; //_BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
                 else _BigNum_snfPrint2 ( lc->buffer, 0, ( mpfr_t * ) l0->W_Value ) ; //_BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
                 //else LC_sprintString ( lc->buffer, l0->Name ) ;
             }
@@ -88,13 +111,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
             if ( NUMBER_BASE_GET == 16 ) LC_snprintf1 ( lc->buffer, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
             else LC_snprintf1 ( lc->buffer, ( l0->Lo_Integer < 0 ) ? " 0x%016lx" : " %ld", l0->Lo_Integer ) ;
         }
-        else if ( l0->W_ObjectAttributes & LITERAL )
-        {
-            if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) _BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
-            else if ( ( l0->Lo_Integer < 0 ) || ( NUMBER_BASE_GET == 16 ) )
-                LC_snprintf1 ( lc->buffer, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
-            else LC_snprintf1 ( lc->buffer, ( ( l0->Lo_Integer < 0 ) ? " 0x%016lx" : " %ld" ), l0->Lo_Integer ) ;
-        }
+        else if ( l0->W_ObjectAttributes & LITERAL )  LO_PrintLiteralToString ( lc, l0 ) ;
         else if ( l0->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) LC_sprintName ( lc->buffer, l0 ) ;
         else if ( l0->W_LispAttributes & ( T_HEAD | T_TAIL ) ) ;
         else
@@ -148,16 +165,16 @@ _LO_Print ( ListObject * l0, byte * prefix, byte * postfix, Boolean valueFlag )
 }
 
 void
-_LO_PrintWithValue (ListObject * l0, byte * prefix, byte * postfix , Boolean indentFlag)
+_LO_PrintWithValue ( ListObject * l0, byte * prefix, byte * postfix, Boolean indentFlag )
 {
     //if ( _LC_->IndentDbgPrint && _LC_->ParenLevel ) 
-    if ( indentFlag && _LC_->ParenLevel ) 
+    if ( indentFlag && _LC_->ParenLevel )
     {
         int64 i ;
         byte * b = Buffer_DataCleared ( _CSL_->StringInsertB3 ) ;
-        strncat ( b, "\n", BUFFER_IX_SIZE  ) ;
-        for ( i =0 ; i < _LC_->ParenLevel; i ++ )  strncat ( b, "  ", BUFFER_IX_SIZE  ) ;
-        strncat ( b, &prefix[ prefix[0]== '\n' ? 1 : 0 ], BUFFER_IX_SIZE ) ; // after '\n'
+        strncat ( b, "\n", BUFFER_IX_SIZE ) ;
+        for ( i = 0 ; i < _LC_->ParenLevel ; i ++ ) strncat ( b, "  ", BUFFER_IX_SIZE ) ;
+        strncat ( b, &prefix[ prefix[0] == '\n' ? 1 : 0 ], BUFFER_IX_SIZE ) ; // after '\n'
         prefix = b ;
     }
     _LO_Print ( l0, prefix, postfix, 1 ) ;
@@ -166,7 +183,7 @@ _LO_PrintWithValue (ListObject * l0, byte * prefix, byte * postfix , Boolean ind
 void
 LO_PrintWithValue ( ListObject * l0 )
 {
-    _LO_PrintWithValue (l0, ( byte* ) "", ( byte* ) "" , 0) ;
+    _LO_PrintWithValue ( l0, ( byte* ) "", ( byte* ) "", 0 ) ;
 }
 
 byte *

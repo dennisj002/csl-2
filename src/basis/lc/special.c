@@ -195,7 +195,6 @@ _LO_MakeLambda ( ListObject * l0 )
     return lambda ;
 }
 
-
 ListObject *
 LO_Lambda ( ListObject * l0 )
 {
@@ -259,7 +258,7 @@ LO_Definec ( ListObject * l0 )
 // setq
 
 ListObject *
-LO_Set ( ListObject * lfirst )
+LO_Set (ListObject * lfirst)
 {
     ListObject *l1, * lsymbol, *value, *lset ;
     // lfirst is the 'set' signature
@@ -268,7 +267,19 @@ LO_Set ( ListObject * lfirst )
         value = _LO_Next ( lsymbol ) ;
         if ( value )
         {
-            lset = _LO_Define ( lsymbol, 0 ) ;
+            if ( _LC_->LetFlag ) lset = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->Locals, lsymbol->Name ) ;
+            else if ( lset = LC_FindWord ( lsymbol->Name, _LC_->Locals ) )
+            {
+                if ( lset->W_ObjectAttributes & NAMESPACE_VARIABLE )
+                {
+                    Word_Morphism_Run ( lset->Lo_CSLWord ) ;   
+                    DataStack_Push ( value->Lo_Value  ) ;
+                    CSL_Poke () ;
+                    //continue ;
+                }
+            }
+            if ( ! lset ) lset = _LO_Define ( lsymbol, 0 ) ;
+            lset->Lo_Value = value->Lo_Value ;
             LO_Print ( lset ) ;
         }
         else break ;
@@ -279,7 +290,10 @@ LO_Set ( ListObject * lfirst )
 ListObject *
 LO_Let ( ListObject * lfirst, ListObject * locals )
 {
-    return LO_Set ( lfirst ) ;
+    _LC_->LetFlag = 1 ;
+    ListObject * l1 = LO_Set (lfirst) ;
+    _LC_->LetFlag = 0 ;
+    return l1 ;
 }
 
 ListObject *
@@ -293,9 +307,9 @@ _LO_Cons ( ListObject *first, ListObject * second ) //, uint64 allocType )
 }
 
 ListObject *
-LO_If ( ListObject * lfirst, ListObject * locals) //, int64 ifFlag, ListObject * l0 )
+LO_If ( ListObject * lfirst, ListObject * locals ) //, int64 ifFlag, ListObject * l0 )
 {
-    return LO_Cond ( lfirst, locals) ;//, ifFlag, l0 ) ;
+    return LO_Cond ( lfirst, locals ) ; //, ifFlag, l0 ) ;
 }
 
 /* not exactly but ...
@@ -328,6 +342,7 @@ rences of <thing>; and <thing>+ means at least one <thing>.
 <derived expression> : (cond <cond clause>+ ) | (cond <cond clause>* (else <sequence>)) | ...
  */
 #define IS_COND_MORPHISM_TYPE(word) ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK|T_LAMBDA ) || ( word->W_LispAttributes & ( T_LAMBDA ) ) )
+
 ListObject *
 LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject * l0 )
 {
@@ -507,7 +522,7 @@ ListObject *
 LO_Eval ( ListObject * lfirst )
 {
     ListObject * l1 = _LO_Next ( lfirst ) ;
-    return _LC_Eval ( _LC_, l1, 0, 1 ) ; 
+    return _LC_Eval ( _LC_, l1, 0, 1 ) ;
 }
 
 void

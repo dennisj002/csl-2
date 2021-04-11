@@ -669,7 +669,7 @@ Debugger_Delete ( Debugger * debugger )
 }
 
 Debugger *
-_Debugger_New ( uint64 type )
+Debugger_New ( uint64 type )
 {
     Debugger * debugger = ( Debugger * ) Mem_Allocate ( sizeof (Debugger ), type ) ;
     debugger->cs_Cpu = CpuState_New ( type ) ;

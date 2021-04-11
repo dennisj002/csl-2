@@ -848,7 +848,7 @@ typedef struct _LambdaCalculus
     Buffer *OutBuffer, *PrintBuffer ;
     byte * buffer, *outBuffer ;
     dllist * Lambda_SC_WordList ;
-    Boolean ApplyFlag, SavedTypeCheckState, IndentDbgPrint ;
+    Boolean ApplyFlag, LetFlag, SavedTypeCheckState, IndentDbgPrint ;
     struct _CSL * OurCSL ;
 } LambdaCalculus ;
 typedef struct

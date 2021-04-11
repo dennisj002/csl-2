@@ -41,7 +41,8 @@ DataStack_DropN ( int64 n )
 void
 DataStack_Drop ( )
 {
-    _Dsp_ -- ;
+    //_Dsp_ -- ;
+    _DataStack_Drop ;
     CSL_TypeStack_Drop ( ) ;
     //_DSP_ = _Dsp_ ;
 }

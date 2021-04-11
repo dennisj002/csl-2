@@ -67,7 +67,7 @@ CSL_Interpret ( )
 void
 CSL_InterpretPromptedLine ( )
 {
-    Context_DoPrompt (0, 0) ;
+    Context_DoPrompt (_Context_, 0) ;
     //Context_Interpret ( CSL->Context0 ) ;
     Interpret_ToEndOfLine ( _Interpreter_ ) ;
 }

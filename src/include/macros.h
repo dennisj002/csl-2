@@ -42,6 +42,7 @@
 #define DataStack_SetTop( v ) { if ( _Dsp_ ) { _DataStack_SetTop( v ) } else { CSL_Exception (STACK_ERROR, 0, QUIT ) ; } }
 #define _GetTop( ) TOS
 #define _SetTop( v ) (TOS = v)
+#define _DataStack_Drop (_Dsp_ -- )
 #define Stack() CSL_PrintDataStack ( )
 #define DataStack( n ) _Dsp_ [ - (n) ] 
 #define Dsp( n ) DataStack( n ) 

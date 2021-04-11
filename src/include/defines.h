@@ -504,6 +504,7 @@ typedef struct
 #define CLASS_FIELD         ( (uint64) 1 << 60 ) 
 #define T_POINTER           ( (uint64) 1 << 61 ) 
 #define MEMORY_SPACE           ( (uint64) 1 << 62 )
+//#define LC_EVAL_SYMBOL           ( (uint64) 1 << 63 )
 
 // WAttribute for interpreter word types : added in primitives.c in th LAttribute field
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 
@@ -887,6 +888,7 @@ typedef struct
 #define LC_DEBUG_ON     ( (uint64) 1 << 21 )
 #define LC_EVAL_LIST                          ( (uint64) 1 << 22 )
 #define LC_SUBSTITUTE                       ( (uint64) 1 << 23 )
+#define LC_SPECIAL_FUNCTION            ( (uint64) 1 << 24 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )
