@@ -24,7 +24,7 @@ LC_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListO
     else if ( lfunction && ( lfunction->W_LispAttributes & T_LAMBDA ) && lfunction->Lo_LambdaFunctionBody )
     {
         // LambdaArgs, the formal args, are not changed by LO_Substitute (locals - lvals are just essentially 'renamed') and thus don't need to be copied
-        LC_Substitute (lc, ( ListObject * ) lfunction->Lo_LambdaFunctionParameters, largs ) ;
+        LC_Substitute ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionParameters, largs ) ;
         lc->CurrentLambdaFunction = lfunction ;
         lc->Locals = largs ;
         l1 = LC_EvalList ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
@@ -71,7 +71,7 @@ _LO_Apply ( LambdaCalculus * lc, ListObject *lfunction, ListObject *largs )
     else
     {
         lc->ParenLevel -- ;
-        if ( CompileMode ) LO_CheckEndBlock ( ) ;
+        LO_CheckEndBlock ( ) ;
         SetState ( lc, LC_COMPILE_MODE, false ) ;
         l1 = lfunction ;
     }
@@ -107,7 +107,7 @@ LO_CompileOrInterpretArgs ( ListObject *largs )
     ListObject * arg ;
     for ( arg = _LO_First ( largs ) ; arg ; arg = _LO_Next ( arg ) )
     {
-        if ( GetState ( _O_->OVT_LC, LC_INTERP_DONE ) ) return ; // i don't remember why this is here ??
+        if ( GetState ( _O_->OVT_LC, LC_INTERP_DONE ) ) return ; // for LO_CSL
         _LO_CompileOrInterpret_One ( arg, 0 ) ; // research : how does CAttribute get set to T_NIL?
     }
 }
@@ -151,7 +151,7 @@ _LO_Do_FunctionBlock ( ListObject *lfunction, ListObject *largs )
     // this is necessary in "lisp" mode : eg. if user hits return but needs to be clarified, refactored, maybe renamed, etc.
     if ( ! GetState ( lc, LC_INTERP_DONE ) )
     {
-        if ( CompileMode ) LO_CheckEndBlock ( ) ;
+        LO_CheckEndBlock ( ) ;
         //if ( dsp > _Dsp_ ) 
         _Compiler_->ReturnVariableWord = lfunction ;
         vReturn = LO_PrepareReturnObject ( ) ;
@@ -161,7 +161,7 @@ _LO_Do_FunctionBlock ( ListObject *lfunction, ListObject *largs )
 }
 
 void
-LC_Substitute (LambdaCalculus * lc, ListObject *lambdaParameters, ListObject * funcCallValues )
+LC_Substitute ( LambdaCalculus * lc, ListObject *lambdaParameters, ListObject * funcCallValues )
 {
     lc->LambdaParameters = lambdaParameters, lc->FunctionCallValues = funcCallValues ;
     LC_Debug ( lc, "LO_Substitute", LC_SUBSTITUTE, 0 ) ;
@@ -195,19 +195,14 @@ LO_PrepareReturnObject ( )
 {
     uint64 type = 0 ;
     int64 value ;
-    byte * name ;
-    ListObject * l0 ;
-    Namespace * ns ;
+    ListObject * l0 = nil ;
     if ( ! CompileMode )
     {
-        ns = CSL_In_Namespace ( ) ;
-        name = ns->Name ;
         if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) type = T_BIG_NUM ;
         value = DataStack_Pop ( ) ;
         l0 = DataObject_New ( T_LC_NEW, 0, 0, 0, LITERAL | type, LITERAL | type, 0, value, 0, 0, 0, - 1 ) ;
-        return l0 ;
     }
-    else return nil ;
+    return l0 ;
 }
 
 void
@@ -226,7 +221,7 @@ LO_EndBlock ( )
     {
         BlockInfo * bi = ( BlockInfo * ) Stack_Top ( compiler->BlockStack ) ;
         CSL_EndBlock ( ) ;
-        if ( ! GetState ( _LC_, LC_COMPILE_MODE ) )
+        if ( ! LC_CompileMode )
         {
             CSL_BlockRun ( ) ;
         }
@@ -239,16 +234,23 @@ LO_EndBlock ( )
 void
 LO_CheckEndBlock ( )
 {
-    LambdaCalculus * lc = _LC_ ;
-    Compiler * compiler = _Context_->Compiler0 ;
-    if ( GetState ( compiler, LC_COMBINATOR_MODE ) )
+    if ( CompileMode )
     {
-        int64 cii = Stack_Top ( compiler->CombinatorInfoStack ) ;
-        CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
-        ci.CI_i32_Info = cii ;
-        if ( ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) > ci.BlockLevel ) )
+        LambdaCalculus * lc = _LC_ ;
+        Compiler * compiler = _Context_->Compiler0 ;
+        if ( GetState ( compiler, LC_COMBINATOR_MODE ) )
         {
-            LO_EndBlock ( ) ;
+            int64 sdcifs = Stack_Depth ( lc->CombinatorInfoStack ) ;
+            if ( sdcifs )
+            {
+                int64 cii = Stack_Top ( lc->CombinatorInfoStack ) ;
+                CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
+                ci.CI_i32_Info = cii ;
+                if ( ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) > ci.BlockLevel ) )
+                {
+                    LO_EndBlock ( ) ;
+                }
+            }
         }
     }
 }
@@ -256,15 +258,22 @@ LO_CheckEndBlock ( )
 int64
 _LO_CheckBeginBlock ( )
 {
-    LambdaCalculus * lc = _LC_ ;
-    Compiler * compiler = _Context_->Compiler0 ;
-    int64 cii = Stack_Top ( compiler->CombinatorInfoStack ) ;
-    CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
-    ci.CI_i32_Info = cii ;
-    //if ( ( GetState ( compiler, LC_COMBINATOR_MODE ) ) && ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
-    if ( ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
+    if ( CompileMode )
     {
-        return true ;
+        LambdaCalculus * lc = _LC_ ;
+        Compiler * compiler = _Context_->Compiler0 ;
+        int64 cii = Stack_Top ( lc->CombinatorInfoStack ) ;
+        int64 sdcifs = Stack_Depth ( lc->CombinatorInfoStack ) ;
+        if ( sdcifs )
+        {
+            int64 cii = Stack_Top ( lc->CombinatorInfoStack ) ;
+            CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
+            ci.CI_i32_Info = cii ;
+            if ( ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
+            {
+                return true ;
+            }
+        }
     }
     return false ;
 }
@@ -288,7 +297,7 @@ LC_InitForCombinator ( LambdaCalculus * lc )
     CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
     ci.BlockLevel = Compiler_BlockLevel ( compiler ) ; //compiler->BlockLevel ;
     ci.ParenLevel = lc->ParenLevel ;
-    _Stack_Push ( compiler->CombinatorInfoStack, ( int64 ) ci.CI_i32_Info ) ; // this stack idea works because we can only be in one combinator at a time
+    _Stack_Push ( lc->CombinatorInfoStack, ( int64 ) ci.CI_i32_Info ) ; // this stack idea works because we can only be in one combinator at a time
 }
 
 void
@@ -347,7 +356,7 @@ _LC_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
     if ( l1->W_LispAttributes & ( LIST | LIST_NODE ) )
     {
         Set_CompileMode ( false ) ;
-        l2 = _LC_Eval ( lc, l1, 0, 1 ) ;
+        l2 = LC_Eval ( lc, l1, 0, 1 ) ;
         _Debugger_->SpecialPreHere = Here ;
         if ( ! l2 || ( l2->W_LispAttributes & T_NIL ) ) Compile_MoveImm_To_Reg ( RegParameterOrder ( ( *i ) ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         else Compile_MoveImm_To_Reg ( RegParameterOrder ( ( *i ) ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
@@ -463,8 +472,8 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     Namespace * locals = _CSL_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0 ) ;
     word->W_MorphismAttributes = BLOCK ;
     word->W_LispAttributes |= T_LISP_COMPILED_WORD ;
-    _LC_Eval ( lc, body, locals, 1 ) ;
-    if ( GetState ( lc, LC_COMPILE_MODE ) )
+    LC_Eval ( lc, body, locals, 1 ) ;
+    if ( _LC_CompileMode (lc) )
     {
         LO_EndBlock ( ) ;
         code = ( block ) DataStack_Pop ( ) ;

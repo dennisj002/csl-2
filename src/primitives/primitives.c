@@ -31,7 +31,7 @@ CPrimitive CPrimitives [] = {
     { "car", 0, 0, 0, (block) LO_Car, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "cdr", 0, 0, 0, ( block ) LO_Cdr, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "quote", 0, 0, 0, ( block ) LO_Quote, 0, 0, T_LISP_READ_MACRO, "Lisp", "Root" },
-    { "eval", 0, 0, 0, ( block ) _LC_Eval, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
+    { "eval", 0, 0, 0, ( block ) LC_Eval, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "list", 0, 0, 0, ( block ) LO_List, 0, 0, LIST_FUNCTION | T_LISP_SPECIAL, "Lisp", "Root" },
     { "load", 0, 0, 0, ( block ) CSL_IncludeFile, 0, 0, 0, "Lisp", "Root" },
     { "'", 0, 0, 0, ( block ) LO_Quote, KEYWORD, 0, T_LISP_READ_MACRO, "Lisp", "Root" },

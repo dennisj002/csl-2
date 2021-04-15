@@ -7,7 +7,7 @@ LC_Debug ( LambdaCalculus * lc, byte * lcFuncName, int64 state, Boolean setupFla
     if ( GetState ( lc, LC_DEBUG_ON ) )
     {
         Debugger * debugger = _Debugger_ ;
-        Printf ( "\nLC_Debug :: %s : ", lcFuncName ) ;
+        //Printf ( "\nLC_Debug :: %s : ", lcFuncName ) ;
         //debugger->Menu = "Debug Menu at : \n%s :\n" ;
         DebugColors ;
         if ( lc->ApplyFlag ) LC_Debug_Output ( lc, state, setupFlag ) ;
@@ -30,7 +30,7 @@ LC_Debug_Output ( LambdaCalculus * lc, int64 state, Boolean setupFlag )
             }
             case LC_EVAL:
             {
-                _LO_PrintWithValue ( lc->L0, "\n_LC_Eval : l0 = ", "", 1 ) ;
+                _LO_PrintWithValue ( lc->L0, "\nLC_Eval : l0 = ", "", 1 ) ;
                 break ;
             }
             case LC_SPECIAL_FUNCTION:
@@ -49,18 +49,18 @@ LC_Debug_Output ( LambdaCalculus * lc, int64 state, Boolean setupFlag )
             {
                 //_LO_PrintWithValue ( lc->Lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ) ;
                 //SetState ( debugger, DBG_MENU, true ) ;
-                _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( lc->L1, " : result = ", "", 0 ) ;
+                _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ), Compiling ? Printf ( " : Compiled" ) : _LO_PrintWithValue ( lc->L1, " : result = ", "", 0 ) ;
                 break ;
             }
             case LC_EVAL:
             {
-                _LO_PrintWithValue ( lc->L1, "\n_LC_Eval : l1 = ", "", 1 ) ;
+                _LO_PrintWithValue ( lc->L1, "\nLC_Eval : l1 = ", "", 1 ), Compiling ? Printf ( " : Compiled" ) : 0 ;
                 break ;
             }
             case LC_EVAL_LIST:
             {
                 //_LO_PrintWithValue ( lc->L1, "\nLC_EvalList : l1 = ", "", 1 ) ;
-                _LO_PrintWithValue ( lc->Lfunction, "\nLC_EvalList : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs0 = ", "", 0 ), _LO_PrintWithValue ( lc->Largs1, " : largs1 = ", "", 0 ) ;
+                _LO_PrintWithValue ( lc->Lfunction, "\nLC_EvalList : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( lc->Locals, " : locals = ", "", 0 ) ;
                 break ;
             }
             case LC_SUBSTITUTE:

@@ -82,7 +82,7 @@ _LO_New ( uint64 lispAttributes, uint64 morphismAttributes, uint64 objectAttribu
 {
     //_DObject_New ( byte * name, uint64 value, uint64 morphismType, uint64 objectType, uint64 lispType, uint64 functionType, byte * function, int64 arg,
     //    int64 addToInNs, Namespace * addToNs, uint64 allocType )
-    ListObject * l0 = _DObject_New ( word ? word->Name : name ? name : ( byte* ) "", ( uint64 ) value, morphismAttributes, (objectAttributes), lispAttributes,
+    ListObject * l0 = _DObject_New ( word ? word->Name : name ? name : ( byte* ) "", ( uint64 ) value, morphismAttributes, ( objectAttributes ), lispAttributes,
         ( lispAttributes & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, addToNs, LISP ) ; //addToNs, LISP ) ;
     if ( lispAttributes & LIST ) _LO_ListInit ( l0, allocType ) ;
     else if ( lispAttributes & LIST_NODE ) l0->S_SymbolList = ( dllist* ) value ;
@@ -265,7 +265,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
     ListObject * l1 ;
 
     LC_Init_Variables ( lc ) ;
-    l1 = _LC_Eval ( lc, l0, 0, 1 ) ;
+    l1 = LC_Eval ( lc, l0, 0, 1 ) ;
     lc->L1 = l1 ;
     LO_Print ( l1 ) ;
     CSL_NewLine ( ) ;
@@ -298,7 +298,8 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     else CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 1 ) ;
     SetState ( _CSL_, DBG_TYPECHECK_ON, false ) ;
 
-    if ( lc && parenLevel ) lc->QuoteState = lc->ItemQuoteState ;
+    if ( lc && parenLevel ) 
+        lc->QuoteState = lc->ItemQuoteState ;
     else lc = LC_Init_Runtime ( ) ;
     LC_LispNamespaceOn ( ) ;
     lc->ItemQuoteState = itemQuoteState ;
@@ -473,6 +474,7 @@ LC_Init_Variables ( LambdaCalculus * lc )
     lc->Locals = 0 ;
     lc->Largs = 0 ;
     lc->Largs1 = 0 ;
+    lc->Code = 0 ;
 }
 
 LambdaCalculus *
@@ -489,6 +491,7 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
     DLList_Recycle_WordList ( lc->Lambda_SC_WordList ) ;
     LC_SaveStackPointer ( lc ) ;
     LC_Init_Variables ( lc ) ;
+    Stack_Init ( lc->CombinatorInfoStack ) ;
     return lc ;
 }
 
@@ -550,6 +553,7 @@ _LC_Create ( )
     lc->QuoteStateStack = Stack_New ( 256, LISP ) ; // LISP_TEMP : is recycled by OVT_FreeTempMem in _CSL_Init_SessionCore called by _CSL_Interpret
     lc->PrintBuffer = Buffer_NewLocked ( BUFFER_SIZE ) ;
     lc->OutBuffer = Buffer_NewLocked ( BUFFER_SIZE ) ;
+    lc->CombinatorInfoStack = _Stack_New ( 64, LISP ) ;
     return lc ;
 }
 

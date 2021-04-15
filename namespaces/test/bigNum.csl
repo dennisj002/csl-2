@@ -138,6 +138,7 @@ pwi fibc21
 //pause
 #endif
     
+//(ld:) 
 (define fibbc (lambda (n ) (ifElse (< n 2) n (+ (fibbc (- n 1)) (fibbc (- n 2))))))
 // tick fibbc find wdiss
 (fibbc 20)

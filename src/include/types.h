@@ -733,7 +733,6 @@ typedef struct
     dllist * RegisterParameterList ;
     CompileOptimizeInfo * OptInfo ;
     dllist *PostfixLists ;
-    Stack * CombinatorInfoStack ;
     Stack * PointerToOffsetStack ;
     Stack * LocalsCompilingNamespacesStack ;
     Stack * CombinatorBlockInfoStack ;
@@ -842,11 +841,13 @@ typedef struct _LambdaCalculus
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
     Stack * QuoteStateStack ;
+    Stack * CombinatorInfoStack ;
     uint64 * SaveStackPointer ;
     byte * LC_SourceCode ;
     Word * Sc_Word ;
     Buffer *OutBuffer, *PrintBuffer ;
     byte * buffer, *outBuffer ;
+    block Code ;
     dllist * Lambda_SC_WordList ;
     Boolean ApplyFlag, LetFlag, SavedTypeCheckState, IndentDbgPrint ;
     struct _CSL * OurCSL ;

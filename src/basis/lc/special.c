@@ -7,7 +7,7 @@ ListObject *
 _LO_Definec ( ListObject * l0, ListObject * locals0 )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject *value, *l1, *locals1 = 0, *value1, *l2, *lnext ;
+    ListObject *value, *l1, *value1, *l2, *lnext ;
     Word * word, *idLo ;
     SetState ( _CSL_, _DEBUG_SHOW_, 1 ) ;
     if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( l0, "\n_LO_Define : l0 = ", "", 1 ) ;
@@ -26,16 +26,14 @@ _LO_Definec ( ListObject * l0, ListObject * locals0 )
             l2->W_ObjectAttributes |= LOCAL_VARIABLE ;
         }
         value1->W_LispAttributes |= ( LIST | LIST_NODE ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "", 1 ) ;
         LO_AddToHead ( value, value1 ) ;
         lambda = _LO_Read_DoToken ( _LC_, "lambda", 0, - 1, - 1 ) ;
         LO_AddToHead ( value, lambda ) ;
         if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "", 1 ) ;
         if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value0, "\n_LO_Define : value0 = ", "", 1 ) ;
         if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
         //value->W_LispAttributes |= T_LAMBDA ;
-        locals1 = 0 ;
+        //locals1 = 0 ;
     }
     else idLo = l0, value = _LO_Next ( l0 ) ;
     idLo = idLo->Lo_CSLWord ;
@@ -48,7 +46,7 @@ _LO_Definec ( ListObject * l0, ListObject * locals0 )
     Namespace_DoAddWord ( locals0 ? locals0 : lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
     if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
     if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
-    value = _LC_Eval ( lc, value, 0, 0 ) ; // 0 : don't apply
+    value = LC_Eval ( lc, value, 0, 0 ) ; // 0 : don't apply
     if ( ( value && ( value->W_LispAttributes & T_LAMBDA ) ) )
     {
         value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
@@ -68,8 +66,8 @@ _LO_Definec ( ListObject * l0, ListObject * locals0 )
         word->W_ObjectAttributes, word->W_LispAttributes, 0, ( int64 ) value, 0, LISP, - 1, - 1 ) ; // all words are symbols
     l1->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
-    if ( GetState ( _LC_, LC_COMPILE_MODE ) ) l1->W_SC_WordList = word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
-    SetState ( lc, ( LC_COMPILE_MODE | LC_DEFINE_MODE ), false ) ;
+    if ( LC_CompileMode ) l1->W_SC_WordList = word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
+    SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     _CSL_FinishWordDebugInfo ( l1 ) ;
     _Word_Finish ( l1 ) ;
     //word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
@@ -121,7 +119,7 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
     }
     else
     {
-        value = _LC_Eval ( lc, value, 0, 0 ) ; // 0 : don't apply
+        value = LC_Eval ( lc, value, 0, 0 ) ; // 0 : don't apply
         if ( ( value && ( value->W_LispAttributes & T_LAMBDA ) ) )
         {
             value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
@@ -142,8 +140,8 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
         word->W_ObjectAttributes, word->W_LispAttributes, 0, ( int64 ) value, 0, LISP, - 1, - 1 ) ; // all words are symbols
     l1->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
-    if ( GetState ( _LC_, LC_COMPILE_MODE ) ) l1->W_SC_WordList = word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
-    SetState ( lc, ( LC_COMPILE_MODE | LC_DEFINE_MODE ), false ) ;
+    if ( LC_CompileMode ) l1->W_SC_WordList = word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
+    SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     _CSL_FinishWordDebugInfo ( l1 ) ;
     _Word_Finish ( l1 ) ;
     //word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
@@ -182,9 +180,10 @@ _LO_MakeLambda ( ListObject * l0 )
         SetState ( _LC_, LC_LAMBDA_MODE, true ) ;
         block codeBlk = CompileLispBlock ( args, body ) ;
         SetState ( _LC_, LC_LAMBDA_MODE, false ) ;
-        *lambda->W_PtrToValue = ( uint64 ) codeBlk ;
+        //*lambda->W_PtrToValue = ( uint64 ) codeBlk ;
+        lambda->W_Value = ( uint64 ) codeBlk ;
     }
-    if ( ! GetState ( _LC_, LC_COMPILE_MODE ) ) // nb! this needs to be 'if' not 'else' or else if' because the state is sometimes changed by CompileLispBlock, eg. for function parameters
+    if ( ! LC_CompileMode ) // nb! this needs to be 'if' not 'else' or else if' because the state is sometimes changed by CompileLispBlock, eg. for function parameters
     {
         lambda->Lo_CSLWord = lambda ;
         lambda->Lo_LambdaFunctionParameters = args ;
@@ -313,8 +312,7 @@ LO_If ( ListObject * lfirst, ListObject * locals ) //, int64 ifFlag, ListObject 
 }
 
 /* not exactly but ...
-LIST:
-'(' ( LIST | ATOM ) + ')'
+LIST: '(' ( LIST | ATOM ) + ')'
 COND : LIST | ATOM
 IFTRUE : LIST | ATOM
 CONDITIONAL : ( cond ( <cond clause>+ )
@@ -375,7 +373,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
                 else
                 {
                     resultNode = condClause ;
-                    if ( CompileMode ) result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
+                    if ( CompileMode ) result = LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
                     break ;
                 }
             }
@@ -386,7 +384,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
                 resultNode = _LO_Next ( test ) ;
                 if ( CompileMode )
                 {
-                    result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
+                    result = LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
                     resultNode = 0 ;
                 }
                 break ;
@@ -394,7 +392,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
             if ( sequence && ( ! ( sequence = _LO_Next ( test ) ) ) )
             {
                 resultNode = test ;
-                if ( CompileMode ) result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
+                if ( CompileMode ) result = LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
                 else break ;
             }
 
@@ -409,11 +407,11 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
 #endif            
             // we have determined test and sequence
             // either return result or find next condClause
-            testResult = _LC_Eval ( lc, test, locals, 1 ) ;
+            testResult = LC_Eval ( lc, test, locals, 1 ) ;
             testValue = ( testResult && ( testResult->Lo_Value ) ) ;
             //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( testResult, "\nLO_Cond : testResult = ", "", 1 ) ;
             //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( sequence, "\nLO_Cond : eval : sequence = ", "", 1 ) ;
-            if ( CompileMode ) result = _LC_Eval ( lc, sequence, locals, lc->ApplyFlag ) ;
+            if ( CompileMode ) result = LC_Eval ( lc, sequence, locals, lc->ApplyFlag ) ;
             if ( testValue )
             {
                 if ( ! CompileMode )
@@ -428,7 +426,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
                 if ( CompileMode )
                 {
                     //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : resultNode = ", "", 1 ) ;
-                    result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
+                    result = LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
                 }
                 //ccilt = condClause->W_LispAttributes & ( LIST | LIST_NODE ) ;
                 //if ( ( ! ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) ) ) || ( ifFlag ) ) break ; //{ resultNode = test ; break ; }
@@ -449,7 +447,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
             if ( resultNode )
             {
                 //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( resultNode, "\nLO_Cond : before eval : resultNode = ", "", 1 ) ;
-                result = _LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
+                result = LC_Eval ( lc, resultNode, locals, lc->ApplyFlag ) ;
                 //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : after eval : result = ", "\n", 1 ) ;
             }
         }
@@ -469,7 +467,7 @@ _LC_List ( LambdaCalculus * lc, ListObject * lfirst )
     {
         lnext = _LO_Next ( l1 ) ;
         if ( l1->W_LispAttributes & ( LIST | LIST_NODE ) ) l1 = _LC_List ( lc, _LO_First ( l1 ) ) ;
-        else l1 = _LC_Eval ( lc, LO_CopyOne ( l1 ), 0, 1 ) ;
+        else l1 = LC_Eval ( lc, LO_CopyOne ( l1 ), 0, 1 ) ;
         LO_AddToTail ( lnew, l1 ) ;
     }
     return lnew ;
@@ -494,7 +492,7 @@ LO_Begin ( ListObject * lfirst, ListObject * locals )
     {
         for ( lfirst = _LO_Next ( lfirst ) ; lfirst ; lfirst = _LO_Next ( lfirst ) )
         {
-            leval = _LC_Eval ( lc, lfirst, locals, 1 ) ;
+            leval = LC_Eval ( lc, lfirst, locals, 1 ) ;
         }
     }
     else leval = 0 ;
@@ -522,7 +520,7 @@ ListObject *
 LO_Eval ( ListObject * lfirst )
 {
     ListObject * l1 = _LO_Next ( lfirst ) ;
-    return _LC_Eval ( _LC_, l1, 0, 1 ) ;
+    return LC_Eval ( _LC_, l1, 0, 1 ) ;
 }
 
 void

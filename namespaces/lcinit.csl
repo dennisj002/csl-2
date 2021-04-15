@@ -1,4 +1,4 @@
-bnOff lcOn
+bnOff lcOn //(ld:)
 ( if 1 7 0 )
 ( if 0 0 7 )
 ( if ( + 1 1 ) (+ 1 6 ) (+ 1 2 ) )

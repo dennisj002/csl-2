@@ -798,6 +798,7 @@ int64 Stack_Depth(Stack *stack);
 void Stack_InitQuick(Stack *stack);
 void _Stack_Init(Stack *stack, int64 slots);
 void Stack_Init(Stack *stack);
+Stack *_Stack_New(int64 slots, uint64 allocType);
 Stack *Stack_New(int64 slots, uint64 allocType);
 Stack *Stack_Copy(Stack *stack, uint64 type);
 void Stack_Print_AValue(uint64 *stackPointer, int64 i, byte *stackName, byte *buffer, Boolean isWordAlreadyFlag);
@@ -1876,7 +1877,7 @@ Word *Word_CompileRun_C_ArgList(Word *word);
 block CompileLispBlock(ListObject *args, ListObject *body);
 /* src/basis/lc/eval.c */
 Boolean LO_IsQuoted(ListObject *l0);
-ListObject *_LC_Eval(LambdaCalculus *lc, ListObject *l0, ListObject *locals, Boolean applyFlag);
+ListObject *LC_Eval(LambdaCalculus *lc, ListObject *l0, ListObject *locals, Boolean applyFlag);
 ListObject *LC_EvalList(LambdaCalculus *lc, ListObject *l0, ListObject *locals, Boolean applyFlag);
 ListObject *_LC_EvalSymbol(LambdaCalculus *lc, ListObject *l0, ListObject *locals);
 ListObject *_LC_EvalList(LambdaCalculus *lc, ListObject *lorig, ListObject *locals, Boolean applyFlag);

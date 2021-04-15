@@ -242,9 +242,17 @@ Stack_Init ( Stack * stack )
 }
 
 Stack *
-Stack_New ( int64 slots, uint64 allocType )
+_Stack_New ( int64 slots, uint64 allocType )
 {
     Stack * stack = ( Stack* ) Mem_Allocate ( sizeof ( Stack ) + ( slots * sizeof (int64 ) ), allocType ) ;
+    stack->StackSize = slots ;
+    return stack ;
+}
+
+Stack *
+Stack_New ( int64 slots, uint64 allocType )
+{
+    Stack * stack = _Stack_New ( slots, allocType ) ;
     _Stack_Init ( stack, slots ) ;
     return stack ;
 }

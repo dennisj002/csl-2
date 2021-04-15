@@ -273,11 +273,11 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     Stack_Init ( compiler->BlockStack ) ;
     Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
     Stack_Init ( compiler->PointerToOffsetStack ) ;
-    Stack_Init ( compiler->CombinatorInfoStack ) ;
     Stack_Init ( compiler->InfixOperatorStack ) ;
     Stack_Init ( compiler->TDSCI_StructUnionStack ) ;
-    //if ( compiler->LocalsCompilingNamespacesStack ) Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
-    compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, WORD_RECYCLING ) ; // allow recycling across contexts
+    //if ( compiler->LocalsCompilingNamespacesStack ) 
+    Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+    //compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, WORD_RECYCLING ) ; // allow recycling across contexts
     _dllist_Init ( compiler->GotoList ) ;
     _dllist_Init ( compiler->CurrentMatchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
@@ -292,13 +292,12 @@ Compiler *
 Compiler_New ( uint64 allocType )
 {
     Compiler * compiler = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), allocType ) ;
-    compiler->BlockStack = Stack_New ( 64, allocType ) ;
-    compiler->CombinatorInfoStack = Stack_New ( 64, allocType ) ;
-    compiler->InfixOperatorStack = Stack_New ( 64, allocType ) ;
-    compiler->TDSCI_StructUnionStack = Stack_New ( 64, allocType ) ;
-    compiler->PointerToOffsetStack = Stack_New ( 64, allocType ) ;
-    compiler->CombinatorBlockInfoStack = Stack_New ( 64, allocType ) ;
-    compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, WORD_RECYCLING ) ; // allow recycling across contexts
+    compiler->BlockStack = _Stack_New ( 64, allocType ) ;
+    compiler->InfixOperatorStack = _Stack_New ( 64, allocType ) ;
+    compiler->TDSCI_StructUnionStack = _Stack_New ( 64, allocType ) ;
+    compiler->PointerToOffsetStack = _Stack_New ( 64, allocType ) ;
+    compiler->CombinatorBlockInfoStack = _Stack_New ( 64, allocType ) ;
+    compiler->LocalsCompilingNamespacesStack = _Stack_New ( 64, allocType ) ; // allow recycling across contexts
     compiler->InternalNamespacesStack = Stack_New ( 64, allocType ) ; //initialized when using
     compiler->PostfixLists = _dllist_New ( allocType ) ;
     compiler->GotoList = _dllist_New ( allocType ) ;

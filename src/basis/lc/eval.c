@@ -7,7 +7,7 @@ LO_IsQuoted ( ListObject *l0 )
 }
 
 ListObject *
-_LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean applyFlag )
+LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
     ListObject *l1 = l0 ;
     lc->ApplyFlag = applyFlag ;
@@ -28,12 +28,9 @@ _LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean appl
 ListObject *
 LC_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
-    ListObject *l1, *lfunction, *largs0, *largs1, *largs2, *lfirst, *scw ;
-    if ( CompileMode )
-    {
-        LO_CheckEndBlock ( ) ;
-        LO_CheckBeginBlock ( ) ;
-    }
+    ListObject *l1, *lfunction, *largs0, *largs, *largs2, *lfirst, *scw ;
+    LO_CheckEndBlock ( ) ;
+    LO_CheckBeginBlock ( ) ;
     lc->ParenLevel ++ ;
     lfirst = _LO_First ( l0 ) ;
     if ( lc->Lfirst = lfirst )
@@ -47,21 +44,22 @@ LC_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean a
         else
         {
             //lfunction = _LO_Eval ( lc, LO_CopyOne ( lfirst ), locals, applyFlag ) ;
-            lfunction = _LC_Eval ( lc, lfirst, locals, applyFlag ) ;
+            lfunction = LC_Eval ( lc, lfirst, locals, applyFlag ) ;
             lc->Lfunction = lfunction ;
             if ( scw = FindSourceCodeWord ( lfunction ) ) lc->Sc_Word = scw ;
             largs0 = _LO_Next ( lfirst ) ;
             lc->Largs = largs0 ;
             //if ( DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLO_EvalList : lfunction = ", "" ),  _LO_PrintWithValue ( largs, "", "" ) ;
-            largs1 = _LC_EvalList ( lc, largs0, locals, applyFlag ) ;
-            lc->Largs1 = largs1 ;
-            l1 = LC_Apply (lc, lfirst, lfunction, largs1, applyFlag ) ;
+            largs = _LC_EvalList ( lc, largs0, locals, applyFlag ) ;
+            lc->Largs = largs ;
+            l1 = LC_Apply ( lc, lfirst, lfunction, largs, applyFlag ) ;
             //largs2 = _LO_EvalList ( lc, largs1, locals, applyFlag ) ;
             //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLC_EvalList : lfunction = ", "", 1 ),  _LO_PrintWithValue ( largs0, " : largs0", "", 0 ),  _LO_PrintWithValue ( largs1, " : largs1", "", 0 ) ;
             //if ( DEFINE_DBG ) _LO_PrintWithValue ( lfunction, "\nLO_EvalList : lfunction = ", "" ),  _LO_PrintWithValue ( largs1, "", "" ) ; //,  _LO_PrintWithValue ( largs2, "largs2", "" ) ;
             //if ( DEFINE_DBG ) _LO_PrintWithValue ( l0, " : result l0 = ", "" ) ;
         }
     }
+    //lc->ParenLevel -- ;
     lc->L1 = l1 ;
     LC_Debug ( lc, "LC_EvalList", LC_EVAL_LIST, 0 ) ;
     return l1 ;
@@ -97,7 +95,7 @@ _LC_EvalSymbol ( LambdaCalculus * lc, ListObject *l0, ListObject *locals )
                 l1->W_MorphismAttributes |= w->W_MorphismAttributes ;
                 l1->W_ObjectAttributes |= w->W_ObjectAttributes ;
                 l1->W_LispAttributes |= w->W_LispAttributes ;
-                 //w->State = l1->State ;
+                //w->State = l1->State ;
             }
             else
             {
@@ -105,9 +103,10 @@ _LC_EvalSymbol ( LambdaCalculus * lc, ListObject *l0, ListObject *locals )
                 w->State = l1->State ;
                 l1 = w ;
             }
-            if ( ( CompileMode ) && LO_CheckBeginBlock ( ) ) 
+            if ( ( CompileMode ) && LO_CheckBeginBlock ( ) )
+                //if ( ( LC_CompileMode ) && LO_CheckBeginBlock ( ) ) 
                 _LO_CompileOrInterpret_One ( l1, 0 ) ;
-            if ( w->W_MorphismAttributes & COMBINATOR ) 
+            if ( w->W_MorphismAttributes & COMBINATOR )
                 LC_InitForCombinator ( lc ) ;
         }
     }
@@ -132,7 +131,7 @@ _LC_EvalList ( LambdaCalculus * lc, ListObject *lorig, ListObject *locals, Boole
         for ( lnode = lorig ; lnode ; lnode = lnext )
         {
             lnext = _LO_Next ( lnode ) ;
-            le = _LC_Eval ( lc, lnode, locals, applyFlag ) ;
+            le = LC_Eval ( lc, lnode, locals, applyFlag ) ;
             //le = _LO_Eval ( lc, LO_CopyOne ( lnode ), locals, applyFlag ) ;
             LO_AddToTail ( lnew, LO_CopyOne ( le ) ) ;
             //if ( DEFINE_DBG )_LO_PrintWithValue ( lnode, "\n_LO_EvalList : lnode : = ", "" ), _LO_PrintWithValue ( le, "\n_LO_EvalList : le : =", " " ),  Printf (" : le->Name = %s", le->Name ), _LO_PrintWithValue ( le1, "\n_LO_EvalList : LO_CopyOne : le1 : ", "" ) ;
@@ -153,7 +152,7 @@ LC_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
         {
             macro = lfirst ;
             macro->W_LispAttributes &= ~ T_LISP_MACRO ; // prevent short recursive loop calling of this function thru LO_Eval below
-            l1 = _LC_Eval ( lc, l0, locals, 1 ) ;
+            l1 = LC_Eval ( lc, l0, locals, 1 ) ;
             macro->W_LispAttributes |= T_LISP_MACRO ; // restore to its true type
             lfirst = _LO_First ( l0 ) ;
             macro = 0 ;
@@ -165,7 +164,7 @@ LC_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
         }
         else
         {
-            l1 = _LC_Eval ( lc, l0, locals, 1 ) ;
+            l1 = LC_Eval ( lc, l0, locals, 1 ) ;
         }
     }
     return l1 ;

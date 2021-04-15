@@ -3,6 +3,7 @@
 
 // these functions are part of the C vm and can't be compiled
 // ! they are should only be called in C functions !
+
 uint64
 DataStack_Pop ( )
 {
@@ -141,7 +142,7 @@ Set_DataStackPointer_FromDspReg ( )
 void
 Set_DspReg_FromDataStackPointer ( )
 {
-    _Dsp_ = _CSL_->DataStack->StackPointer ;
+    Set_DspReg ( _CSL_->DataStack->StackPointer ) ;
 }
 
 void
@@ -154,7 +155,7 @@ SetDataStackPointer ( uint64 *sp )
 uint64 *
 GetDataStackPointer ( )
 {
-   //_CSL_->DataStack->StackPointer = _Dsp_ ;
+    //_CSL_->DataStack->StackPointer = _Dsp_ ;
     return _Dsp_ ;
 }
 

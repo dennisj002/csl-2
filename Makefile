@@ -11,7 +11,7 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/basis/core/word.c src/basis/core/readTable.c src/basis/bigNum.c src/basis/core/_readline.c src/basis/core/array.c\
 	src/basis/core/compiler.c src/basis/core/dllnodes.c src/basis/core/finder.c src/basis/core/typedef.c\
 	src/basis/interpreters.c src/basis/tabCompletion.c src/basis/colors.c src/basis/sourceCode.c src/basis/debugStepping.c\
-	src/basis/core/string.c src/basis/openVmTil.c src/basis/core/dobject.c src/basis/core/preprocessor.c\
+	src/basis/core/string.c src/basis/core/dobject.c src/basis/core/preprocessor.c\
 	src/basis/lists.c src/basis/debugDisassembly.c src/basis/typeCheck.c\
 	src/basis/linux.c src/basis/exception.c src/basis/compiler/locals.c\
 	src/basis/debugger.c src/basis/interpreter.c src/basis/_debug.c src/basis/lc/lambdaCalculus.c src/basis/lc/lcDebug.c\
@@ -20,7 +20,7 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/primitives/ios.c src/primitives/parsers.c src/primitives/interpreters.c src/primitives/namespaces.c src/primitives/systems.c\
 	src/primitives/compilers.c src/primitives/words.c  src/primitives/file.c src/primitives/stacks.c\
 	src/primitives/debuggers.c src/primitives/memorys.c src/primitives/primitives.c src/primitives/contexts.c\
-	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c  #src/basis/x.c
+	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c 
 
 INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
 	src/include/csl.h src/include/macros.h src/include/lc.h\
@@ -178,10 +178,10 @@ cproto :
 	sudo apt-get install cproto
 	
 tar.xz :	
-	tar -c --xz --exclude=lib --exclude=archive --exclude=nbproject --exclude=objects --exclude=archive--exclude=mpfr* --exclude=.git --exclude=*.png --exclude=*-gdb  --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * *.*
+	tar -c --xz --exclude=lib --exclude=archive --exclude=nbproject --exclude=objects --exclude=archive--exclude=mpfr* --exclude=.git --exclude=*.png --exclude=*-gdb  --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * 
 
 all.tar.xz :	
-	tar -c --xz --exclude=nbproject --exclude=objects  --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=*-gdb --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * *.*
+	tar -c --xz --exclude=nbproject --exclude=objects  --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=*-gdb --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * 
 
 xz : 
 	-rm ~/csl/core

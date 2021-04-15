@@ -26,7 +26,7 @@ CSL_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
     if ( GetState ( compiler, LC_COMBINATOR_MODE ) )
     {
-        _Stack_Pop ( compiler->CombinatorInfoStack ) ;
+        _Stack_Pop ( _LC_->CombinatorInfoStack ) ;
         //if ( ! Stack_Depth ( compiler->CombinatorInfoStack ) ) SetState ( compiler, LC_COMBINATOR_MODE, false ) ;
     }
 }
@@ -372,18 +372,12 @@ CSL_CondCombinator ( int64 numBlocks )
     int64 blockIndex ;
     BlockInfo *bi ;
     byte * compiledAtAddress ;
-#if 0 //NEW_COND   
-    block testBlock = ( block ) Dsp ( 2 ), trueBlock = ( block ) Dsp ( 1 ), falseBlock = ( block ) Dsp ( 0 ) ;
-    Stack_Print ( compiler->CombinatorBlockInfoStack, c_d ( "compiler->CombinatorBlockInfoStack" ), 0 ) ;
-    //if ( Is_DebugOn ) 
-    Stack_Print ( compiler->BlockStack, c_d ( "compiler->BlockStack" ), 0 ) ;
-    CSL_PrintDataStack ( ) ;
-#endif    
     if ( numBlocks )
     {
         //DBI_ON ;
         CSL_BeginCombinator ( numBlocks ) ;
-        for ( blockIndex = numBlocks - 1 ; ( blockIndex - ( numBlocks % 2 ) ) > 0 ; )
+        //for ( blockIndex = numBlocks - 1 ; ( blockIndex - ( numBlocks % 2 ) ) > 0 ; )
+        for ( blockIndex = numBlocks - 1 ; blockIndex > 0 ; )
         {
             Block_CopyCompile ( ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
             compiledAtAddress = Compile_UninitializedJumpEqualZero ( ) ;
@@ -404,6 +398,7 @@ CSL_CondCombinator ( int64 numBlocks )
         {
             //if ( ifFlag ) CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
             Block_CopyCompile ( ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
+            //blockIndex -- ;
         }
         CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CSL_EndCombinator ( numBlocks, 1 ) ;
