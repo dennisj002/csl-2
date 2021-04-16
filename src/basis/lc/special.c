@@ -407,6 +407,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
 #endif            
             // we have determined test and sequence
             // either return result or find next condClause
+            if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_ShowInfo_Token ( test, "LC_Debug : ", 0, test->Name, "" ) ;
             testResult = LC_Eval ( lc, test, locals, 1 ) ;
             testValue = ( testResult && ( testResult->Lo_Value ) ) ;
             //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( testResult, "\nLO_Cond : testResult = ", "", 1 ) ;

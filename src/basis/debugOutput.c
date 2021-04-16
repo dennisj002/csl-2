@@ -260,6 +260,8 @@ Debugger_DoState ( Debugger * debugger )
     {
         Debugger_Menu ( debugger ) ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, false ) ;
+        if ( GetState ( debugger, DBG_NEWLINE ) ) CSL_NewLine ( ), SetState ( debugger, DBG_NEWLINE, false ) ;
+        //if ( GetState ( debugger, DBG_PROMPT ) ) 
     }
     if ( GetState ( debugger, DBG_INFO ) ) Debugger_ShowInfo ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg", 0 ) ;
     else if ( GetState ( debugger, DBG_PROMPT ) ) Debugger_ShowState ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ;
@@ -497,7 +499,7 @@ DBG_PrepareShowInfoString ( Word * scWord, Word * word, byte* token0, byte* il, 
     byte * cc_line = ( byte* ) "", *scs = 0 ;
     if ( ! scWord )
     {
-        if ( ( _LC_ && _LC_->Sc_Word ) && ( word->W_MySourceCodeWord == _LC_->Sc_Word ) ) scWord = _LC_->Sc_Word ;
+        if ( ( _LC_ && _LC_->Sc_Word ) && word && ( word->W_MySourceCodeWord == _LC_->Sc_Word ) ) scWord = _LC_->Sc_Word ;
     }
     scs = scWord ? scWord->W_SourceCode : 0 ;
     if ( ( ! scs ) && useScFlag )

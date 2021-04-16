@@ -431,7 +431,7 @@ Root
 'doScript 1 const
 'doScript2 1 const
 'forStarters 0 const 
-'_doDemo 0 const
+'_doDemo 1 const
 '_doTest 1 const
 doLisp 0 =
 'doLispTest var doLispTest 1 =
@@ -440,7 +440,7 @@ doLisp 0 =
 // === controls ===
 dbgOff
 //lisp
-//dbgOn 
+dbgOn 
 
 #if Is_DebugOn forStarters ||
 

@@ -84,13 +84,10 @@ _LO_Apply ( LambdaCalculus * lc, ListObject *lfunction, ListObject *largs )
 void
 _Interpreter_LC_InterpretWord ( Interpreter *interp, ListObject *l0 )
 {
-    Word * word ;
-    {
-        word = l0->Lo_CSLWord ;
-        if ( ! word ) word = l0 ;
-        //if ( kbhit ( ) ) CSL_Quit ( ) ;
-        Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-    }
+    Word * word = l0->Lo_CSLWord ;
+    if ( ! word ) word = l0 ;
+    //if ( kbhit ( ) ) CSL_Quit ( ) ;
+    Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
 }
 
 void
@@ -236,10 +233,10 @@ LO_CheckEndBlock ( )
 {
     if ( CompileMode )
     {
-        LambdaCalculus * lc = _LC_ ;
         Compiler * compiler = _Context_->Compiler0 ;
         if ( GetState ( compiler, LC_COMBINATOR_MODE ) )
         {
+            LambdaCalculus * lc = _LC_ ;
             int64 sdcifs = Stack_Depth ( lc->CombinatorInfoStack ) ;
             if ( sdcifs )
             {
@@ -262,7 +259,6 @@ _LO_CheckBeginBlock ( )
     {
         LambdaCalculus * lc = _LC_ ;
         Compiler * compiler = _Context_->Compiler0 ;
-        int64 cii = Stack_Top ( lc->CombinatorInfoStack ) ;
         int64 sdcifs = Stack_Depth ( lc->CombinatorInfoStack ) ;
         if ( sdcifs )
         {
@@ -473,7 +469,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     word->W_MorphismAttributes = BLOCK ;
     word->W_LispAttributes |= T_LISP_COMPILED_WORD ;
     LC_Eval ( lc, body, locals, 1 ) ;
-    if ( _LC_CompileMode (lc) )
+    if ( _LC_CompileMode ( lc ) )
     {
         LO_EndBlock ( ) ;
         code = ( block ) DataStack_Pop ( ) ;

@@ -11,6 +11,7 @@ LC_Debug ( LambdaCalculus * lc, byte * lcFuncName, int64 state, Boolean setupFla
         //debugger->Menu = "Debug Menu at : \n%s :\n" ;
         DebugColors ;
         if ( lc->ApplyFlag ) LC_Debug_Output ( lc, state, setupFlag ) ;
+        SetState_TrueFalse ( debugger, DBG_NEWLINE, (DBG_INFO|DBG_PROMPT) ) ;
         Debugger_InterpreterLoop ( debugger ) ;
         DefaultColors ;
     }
@@ -26,6 +27,7 @@ LC_Debug_Output ( LambdaCalculus * lc, int64 state, Boolean setupFlag )
             case LC_APPLY:
             {
                 _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ) ;
+                CSL_ShowInfo_Token ( lc->Lfunction, "LC_Debug : ", 0, lc->Lfunction->Name, "" ) ;
                 break ;
             }
             case LC_EVAL:
@@ -50,6 +52,7 @@ LC_Debug_Output ( LambdaCalculus * lc, int64 state, Boolean setupFlag )
                 //_LO_PrintWithValue ( lc->Lfunction, "\nLC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ) ;
                 //SetState ( debugger, DBG_MENU, true ) ;
                 _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ), Compiling ? Printf ( " : Compiled" ) : _LO_PrintWithValue ( lc->L1, " : result = ", "", 0 ) ;
+                CSL_ShowInfo_Token ( lc->Lfunction, "LC_Debug : ", 0, lc->Lfunction->Name, "" ) ;
                 break ;
             }
             case LC_EVAL:

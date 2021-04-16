@@ -18,6 +18,7 @@ LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean apply
     {
         if ( l0->W_LispAttributes & T_LISP_SYMBOL ) l1 = _LC_EvalSymbol ( lc, l0, locals ) ;
         else if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) l1 = LC_EvalList ( lc, l0, locals, applyFlag ) ;
+        else if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_ShowInfo_Token ( l0, "LC_Debug : ", 0, l0->Name, "" ) ;
     }
     SetState ( lc, LC_EVAL, false ) ;
     lc->L1 = l1 ;
@@ -72,6 +73,7 @@ _LC_EvalSymbol ( LambdaCalculus * lc, ListObject *l0, ListObject *locals )
     ListObject *l1 = l0 ; // default 
     if ( l1 )
     {
+        if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_ShowInfo_Token ( l0, "LC_Debug : ", 0, l0->Name, "" ) ;
         w = LC_FindWord ( l1->Name, locals ) ;
         if ( w )
         {
@@ -143,19 +145,21 @@ _LC_EvalList ( LambdaCalculus * lc, ListObject *lorig, ListObject *locals, Boole
 ListObject *
 LC_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
 {
-    ListObject * lfirst, *macro = 0, *l1 = l0 ;
+    ListObject * lfirst, *macro, *l1 = l0 ;
     lc->Locals = locals ;
     LC_Debug ( lc, "LC_SpecialFunction", LC_SPECIAL_FUNCTION, 1 ) ;
     if ( lfirst = _LO_First ( l0 ) )
     {
+        if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_ShowInfo_Token ( lfirst, "LC_Debug : ", 0, lfirst->Name, "" ) ;
         while ( lfirst && ( lfirst->W_LispAttributes & T_LISP_MACRO ) )
         {
             macro = lfirst ;
             macro->W_LispAttributes &= ~ T_LISP_MACRO ; // prevent short recursive loop calling of this function thru LO_Eval below
+            if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_ShowInfo_Token ( l0, "LC_Debug : ", 0, l0->Name, "" ) ;
             l1 = LC_Eval ( lc, l0, locals, 1 ) ;
             macro->W_LispAttributes |= T_LISP_MACRO ; // restore to its true type
             lfirst = _LO_First ( l0 ) ;
-            macro = 0 ;
+            //macro = 0 ;
         }
         if ( lfirst && lfirst->Lo_CSLWord && IS_MORPHISM_TYPE ( lfirst->Lo_CSLWord ) )
         {
