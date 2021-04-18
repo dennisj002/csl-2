@@ -1,6 +1,6 @@
 5
 #if 0
-"sp" purge 
+//"sp" purge 
 Root
 : sp stack pause ; 
 #else
@@ -323,6 +323,7 @@ Lisp //pause
 sp
 (fib 10) (fib2 10)
 sp
+//(ld: )
 (define x "let") (define a "the") // 'let' is a special word
 (define x1 'let) (define a1 the)
 ( Its 'a beautiful day don\'t 'let it get away )

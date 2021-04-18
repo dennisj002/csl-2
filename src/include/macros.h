@@ -11,7 +11,7 @@
 #define _Finder_ _Context_->Finder0
 #define _DataStack_ _CSL_->DataStack
 #define _DataStackPointer_ _DataStack_->StackPointer
-#define _DSP_ _DataStackPointer_ 
+#define _DSP_C_PTR_ _DataStackPointer_ 
 #define _ReturnStack_ _CSL_->ReturnStack
 #define _ReturnStack_ _CSL_->ReturnStack
 #define _ReturnStackPointer_ _ReturnStack_->StackPointer
@@ -32,19 +32,19 @@
 #define Get_CompilerSpace( ) _O_CodeByteArray
 
 //#define abs( x ) ((int64) (((x) >= 0) ? (x) : (-x))) 
-#define TOS (_Dsp_[0]) // top of stack
-#define NOS (_Dsp_[-1]) // next on stack
-#define _TOS_ ( _Dsp_ ? _Dsp_ [ 0 ] : CSL_Exception (STACK_ERROR, 0, QUIT ), (uint64)-1 )
+#define TOS (_DspReg_[0]) // top of stack
+#define NOS (_DspReg_[-1]) // next on stack
+#define _TOS_ ( _DspReg_ ? _DspReg_ [ 0 ] : CSL_Exception (STACK_ERROR, 0, QUIT ), (uint64)-1 )
 #define DSP_Top( ) TOS 
 #define _DataStack_Top( ) TOS 
 #define _DataStack_GetTop( ) TOS
-#define _DataStack_SetTop( v ) _Dsp_ [ 0 ] = v ;
-#define DataStack_SetTop( v ) { if ( _Dsp_ ) { _DataStack_SetTop( v ) } else { CSL_Exception (STACK_ERROR, 0, QUIT ) ; } }
+#define _DataStack_SetTop( v ) _DspReg_ [ 0 ] = v ;
+#define DataStack_SetTop( v ) { if ( _DspReg_ ) { _DataStack_SetTop( v ) } else { CSL_Exception (STACK_ERROR, 0, QUIT ) ; } }
 #define _GetTop( ) TOS
 #define _SetTop( v ) (TOS = v)
-#define _DataStack_Drop (_Dsp_ -- )
+#define _DataStack_Drop (_DspReg_ -- )
 #define Stack() CSL_PrintDataStack ( )
-#define DataStack( n ) _Dsp_ [ - (n) ] 
+#define DataStack( n ) _DspReg_ [ - (n) ] 
 #define Dsp( n ) DataStack( n ) 
 #define Stack_Clear( stk ) Stack_Init ( stk )
 #define TWS( n ) ( (Word*) (_CSL_->TypeWordStack->StackPointer [(n)]) )

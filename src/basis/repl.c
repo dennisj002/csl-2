@@ -3,20 +3,29 @@
 void
 _Repl ( block repl )
 {
-    ReadLiner * rl = _Context_->ReadLiner0 ;
+    Lexer * lexer = _Context_->Lexer0 ;
+    ReadLiner * rl = lexer->ReadLiner0 ;
 
     byte * snp = rl->NormalPrompt, *sap = rl->AltPrompt ;
     SetState ( _LC_, LC_REPL, true ) ;
-    rl->NormalPrompt = ( byte* ) "<= " ;
-    rl->AltPrompt = ( byte* ) "=> " ;
+    if ( _LC_ )
+    {
+        rl->AltPrompt = ( byte* ) "lc< " ;
+        rl->NormalPrompt = ( byte* ) "lc> " ;
+    }
+    else
+    {
+        rl->AltPrompt = ( byte* ) "==< " ;
+        rl->NormalPrompt = ( byte* ) "==> " ;
+    }
     //SetState ( _O_->psi_PrintStateInfo, PSI_NEWLINE, true ) ;
     SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
     start:
     while ( ! setjmp ( _Context_->JmpBuf0 ) )
     {
-        while ( 1 )
+        while ( ! GetState ( lexer, END_OF_FILE|END_OF_STRING) )
         {
-            uint64 * svDsp = _Dsp_ ;
+            uint64 * svDsp = _DspReg_ ;
             //Printf ( "<= " ) ;
             Context_DoPrompt (_Context_, 0) ;
             //LC_SaveStack ( ) ; // ?!? maybe we should do this stuff differently : literals are pushed on the stack by the interpreter
@@ -28,7 +37,7 @@ _Repl ( block repl )
             }
             repl ( ) ;
             //Printf ( "\n" ) ;
-            _Dsp_ = svDsp ;
+            _DspReg_ = svDsp ;
        }
     }
     {

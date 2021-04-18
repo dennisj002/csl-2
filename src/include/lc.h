@@ -7,8 +7,9 @@
 #define LambdaArgs( proc ) proc->p[0]
 #define LambdaProcedureBody( proc ) proc->p[1]
 #define LambdaVals( proc ) proc->p[2]
-#define LO_CopyOne( l0 ) _LO_CopyOne ( l0, LISP_TEMP )
-#define LO_Copy( l0 ) _LO_Copy ( l0, LISP_TEMP )
+#define LISP_ALLOC (_LC_ ? (GetState (_LC_, (LC_DEFINE_MODE|LC_READ)) ? LISP : LISP_TEMP) : LISP)
+#define LO_CopyOne( l0 ) _LO_CopyOne ( l0, LISP_ALLOC )
+#define LO_Copy( l0 ) _LO_Copy ( l0, LISP_ALLOC )
 #define nil (_LC_ ? _LC_->Nil : 0)
 #define LC_SaveStackPointer( lc ) _LC_SaveDsp ( lc )
 #define LC_RestoreStackPointer( lc ) _LC_ResetStack ( lc ) 

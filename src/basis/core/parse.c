@@ -169,11 +169,13 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
                 lexer->Token_CompiledDataFieldByteSize = 4 ;
             }
         }
+#if 0        
         if ( lexer->L_ObjectAttributes )
         {
             lexer->L_ObjectAttributes = ( T_INT | KNOWN_OBJECT ) ;
             lexer->Token_CompiledDataFieldByteSize = 8 ;
         }
+#endif        
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }

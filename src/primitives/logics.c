@@ -96,7 +96,7 @@ CSL_LogicalAnd ( ) // and
     if ( CompileMode ) Compile_LogicalAnd ( _Context_->Compiler0 ) ;
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] && TOS ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ - 1 ] && TOS ;
         DataStack_Drop ( ) ;
     }
 }
@@ -107,7 +107,7 @@ CSL_LogicalOr ( ) // or
     if ( CompileMode ) Compile_Logical_X ( _Context_->Compiler0, OR, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ;
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] || TOS ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ - 1 ] || TOS ;
         DataStack_Drop ( ) ;
     }
 }
@@ -118,7 +118,7 @@ CSL_LogicalXor ( ) // xor
     if ( CompileMode ) Compile_Logical_X ( _Context_->Compiler0, XOR, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ;
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] ^ TOS ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ - 1 ] ^ TOS ;
         DataStack_Drop ( ) ;
     }
 }

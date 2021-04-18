@@ -11,7 +11,7 @@ CSL_Plus ( ) // +
     }
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ 0 ] + _Dsp_ [ - 1 ] ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ 0 ] + _DspReg_ [ - 1 ] ;
         DataStack_Drop ( ) ;
     }
 }
@@ -26,7 +26,7 @@ CSL_Minus ( )
     }
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] - _Dsp_ [ 0 ] ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ - 1 ] - _DspReg_ [ 0 ] ;
         DataStack_Drop ( ) ;
     }
 }
@@ -129,7 +129,7 @@ CSL_Multiply ( ) // *
     else
     {
 
-        _Dsp_ [ - 1 ] = _Dsp_ [ 0 ] * _Dsp_ [ - 1 ] ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ 0 ] * _DspReg_ [ - 1 ] ;
         DataStack_Drop ( ) ;
     }
 }

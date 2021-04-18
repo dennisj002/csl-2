@@ -144,16 +144,10 @@ ReadTable_Newline ( ReadLiner * rl ) // '\n'
 void
 ReadTable_Zero ( ReadLiner * rl ) // eof
 {
-    if ( _LC_ && GetState ( _LC_, LC_REPL ) )
-    {
-        ReadLine_Init ( _Context_->ReadLiner0, _CSL_Key ) ;
-    }
-    else
-    {
-        _ReadLine_NullDelimitInputBuffer ( rl ) ;
-        ReadLiner_Done ( rl ) ;
-        SetState ( rl, END_OF_STRING, true ) ;
-    }
+    //_ReadLine_NullDelimitInputBuffer ( rl ) ;
+    _ReadLine_AppendCharacter_Actual ( rl ) ;
+    ReadLiner_Done ( rl ) ;
+    SetState ( rl, END_OF_STRING, true ) ;
 }
 
 //ReadTable_0 255:
@@ -161,7 +155,6 @@ ReadTable_Zero ( ReadLiner * rl ) // eof
 void
 ReadTable_EOF ( ReadLiner * rl ) // eof
 {
-
     _ReadLine_AppendCharacter_Actual ( rl ) ;
     ReadLiner_Done ( rl ) ;
     SetState ( rl, END_OF_FILE, true ) ;

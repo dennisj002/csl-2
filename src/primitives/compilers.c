@@ -95,7 +95,7 @@ GotoInfo_New ( byte * lname, uint64 type )
 void
 _CSL_CompileCallGoto ( byte * name, uint64 type )
 {
-    if ( type == GI_RECURSE )
+    if ( ( type == GI_RECURSE ) ) // && (! GetState ( _Context_, C_SYNTAX | PREFIX_MODE | INFIX_MODE ) ) ) // tail call recursion??
     {
         _Compile_UninitializedCall ( ) ;
     }

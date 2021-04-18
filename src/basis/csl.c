@@ -117,8 +117,8 @@ void
 _CSL_DataStack_Init ( CSL * csl )
 {
     _Stack_Init ( _CSL_->DataStack, _O_->DataStackSize ) ;
-    _Dsp_ = _CSL_->DataStack->StackPointer ;
-    csl->SaveDsp = _Dsp_ ;
+    _DspReg_ = _CSL_->DataStack->StackPointer ;
+    csl->SaveDsp = _DspReg_ ;
 }
 
 void
@@ -195,12 +195,12 @@ _CSL_Init ( CSL * csl, Namespace * nss )
     if ( nss ) csl->Namespaces = nss ;
     else _CSL_NamespacesInit ( csl ) ;
     // with _O_->RestartCondition = STOP from Debugger_Stop
-    if ( csl->SaveDsp && csl->DataStack ) _Dsp_ = csl->SaveDsp ;
+    if ( csl->SaveDsp && csl->DataStack ) _DspReg_ = csl->SaveDsp ;
     else
     {
         csl->DataStack = Stack_New ( _O_->DataStackSize, T_CSL ) ;
-        _Dsp_ = csl->DataStack->StackPointer ;
-        csl->SaveDsp = _Dsp_ ;
+        _DspReg_ = csl->DataStack->StackPointer ;
+        csl->SaveDsp = _DspReg_ ;
     }
     CSL_MachineCodePrimitive_AddWords ( csl ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
     csl->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;

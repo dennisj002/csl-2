@@ -63,7 +63,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 value, int64 qid
             word->W_LispAttributes |= ( T_LISP_SYMBOL | T_RAW_STRING ) ;
             word->Lo_Value = ( int64 ) word->Lo_Name ;
         }
-        word->Lo_CSLWord = word ;
+        word->Lo_CSL_Word = word ;
         if ( qidFlag ) word->W_MorphismAttributes &= ~ T_LISP_SYMBOL ;
         word->W_SC_Index = scwi ;
         word->W_RL_Index = tsrli ;
@@ -89,8 +89,8 @@ _LO_New ( uint64 lispAttributes, uint64 morphismAttributes, uint64 objectAttribu
     else if ( word )
     {
         //Word * word = Compiler_CopyDuplicatesAndPush ( word0, tsrli, scwi ) ;
-        l0->Lo_CSLWord = word ;
-        word->Lo_CSLWord = word ;
+        l0->Lo_CSL_Word = word ;
+        word->Lo_CSL_Word = word ;
         l0->W_SourceCode = word->W_SourceCode ;
         word->W_SC_Index = scwi ;
         word->W_RL_Index = tsrli ;
@@ -265,22 +265,26 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
     ListObject * l1 ;
 
     LC_Init_Variables ( lc ) ;
+    lc->L0 = l0 ;
     l1 = LC_Eval ( lc, l0, 0, 1 ) ;
     lc->L1 = l1 ;
-    LO_Print ( l1 ) ;
-    CSL_NewLine ( ) ;
-    SetState ( lc, LC_PRINT_ENTERED, false ) ;
-    SetBuffersUnused ( 1 ) ;
-    lc->ParenLevel = 0 ;
-    lc->Sc_Word = 0 ;
+    if ( lc = _LC_ ) // lambda calculus can be turned off by eval
+    {
+        LO_Print ( l1 ) ;
+        CSL_NewLine ( ) ;
+        SetState ( lc, LC_PRINT_ENTERED, false ) ;
+        SetBuffersUnused ( 1 ) ;
+        lc->ParenLevel = 0 ;
+        lc->Sc_Word = 0 ;
+    }
     Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a csl word as in oldLisp.csl
 }
 
 ListObject *
-_LC_Read_ListObject ( LambdaCalculus * lc, int64 parenLevel )
+_LC_Read_ListObject ( LambdaCalculus * lc, int64 parenLevel, int64 startReadIndex )
 {
     lc->ParenLevel = parenLevel ;
-    ListObject * l0 = _LO_Read ( lc ) ;
+    ListObject * l0 = LC_Read ( lc, startReadIndex ) ;
     return l0 ;
 }
 
@@ -298,15 +302,19 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     else CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 1 ) ;
     SetState ( _CSL_, DBG_TYPECHECK_ON, false ) ;
 
-    if ( lc && parenLevel ) 
+    if ( lc && parenLevel )
         lc->QuoteState = lc->ItemQuoteState ;
     else lc = LC_Init_Runtime ( ) ;
+    SetState ( lc, LC_INTERP_DONE, false ) ;
     LC_LispNamespaceOn ( ) ;
     lc->ItemQuoteState = itemQuoteState ;
-    ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel ) ;
-    lc->L0 = l0 ;
+    int64 * svDsp = _DspReg_ ;
+    ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel, 0 ) ;
+    lc->L00 = l0 ;
+    if ( GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lc->L00, "\n_LC_ReadEvalPrint_ListObject : lc->L00 = ", "", 1 ) ;
     LC_EvalPrint ( lc, l0 ) ;
     LC_ClearTempNamespace ( ) ;
+    _DspReg_ = svDsp ;
 
     if ( ! continueFlag ) Lexer_SetTokenDelimiters ( lexer, svDelimiters, 0 ) ;
     SetState ( compiler, LISP_MODE, false ) ;
@@ -335,7 +343,7 @@ LC_ReadEvalPrint ( )
 void
 LC_ReadInitFile ( byte * filename )
 {
-    _CSL_ContextNew_IncludeFile ( filename ) ;
+    CSL_ContextNew_IncludeFile ( filename ) ;
 }
 
 void
@@ -345,10 +353,9 @@ _LO_Repl ( )
     SetState ( compiler, LISP_MODE, true ) ;
     Printf ( "\ncsl lisp : (type 'x' or 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.csl'\n" ) ;
     LC_ReadInitFile ( ( byte* ) "./namespaces/lcinit.csl" ) ;
-#if 1    
     Printf ( "\ncsl lisp : (type 'x' or 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.0.csl'\n" ) ;
     LC_ReadInitFile ( ( byte* ) "./namespaces/lcinit.0.csl" ) ;
-#endif    
+    SetState ( _Context_, AT_COMMAND_LINE, true ) ;
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
     SetState ( compiler, LISP_MODE, false ) ;
     LC_LispNamespacesOff ( ) ;
@@ -358,7 +365,7 @@ _LO_Repl ( )
 void
 LO_Repl ( )
 {
-    int64 * svDsp = _DSP_ ;
+    int64 * svDsp = _DspReg_ ;
     _CSL_Contex_NewRun_Block ( _CSL_, ( block ) _LO_Repl ) ;
     _Set_DataStackPointers ( svDsp ) ;
 }
@@ -368,23 +375,23 @@ LO_Repl ( )
 //===================================================================================================================
 
 void
-LC_Read ( )
+LC_ReadList ( )
 {
     LambdaCalculus * lc = LC_Init_Runtime ( ) ;
-    ListObject * l0 = _LC_Read_ListObject ( lc, 1 ) ;
+    ListObject * l0 = _LC_Read_ListObject ( lc, 1, 0 ) ;
     DataStack_Push ( ( int64 ) l0 ) ;
 }
 
 void
 _LC_SaveDsp ( LambdaCalculus * lc )
 {
-    if ( lc ) lc->SaveStackPointer = _Dsp_ ;
+    if ( lc ) lc->SaveStackPointer = _DspReg_ ;
 }
 
 void
 _LC_ResetStack ( LambdaCalculus * lc )
 {
-    if ( lc && ( lc->SaveStackPointer ) ) _Dsp_ = lc->SaveStackPointer ;
+    if ( lc && ( lc->SaveStackPointer ) ) _DspReg_ = lc->SaveStackPointer ;
 }
 
 void
@@ -437,6 +444,7 @@ void
 _LC_ClearTempNamespace ( LambdaCalculus * lc )
 {
     if ( lc ) _Namespace_Clear ( lc->LispTempNamespace, 1 ) ;
+    OVT_MemListFree_LispTemp ( ) ;
 }
 
 void
@@ -448,11 +456,15 @@ LC_ClearTempNamespace ( )
 void
 LC_LispNamespacesOff ( )
 {
-    Namespace_SetAsNotUsing ( ( byte* ) "LispTemp" ) ;
-    Namespace_SetAsNotUsing ( ( byte* ) "LispDefines" ) ;
-    Namespace_SetAsNotUsing ( ( byte* ) "Lisp" ) ;
-    Context_ClearQualifyingNamespace ( ) ;
-    if ( _LC_->SavedTypeCheckState && GetState ( _CSL_, TYPECHECK_ON ) ) CSL_TypeCheckOn ( ) ;
+    if ( _LC_ )
+    {
+        Namespace_SetAsNotUsing ( ( byte* ) "LispTemp" ) ;
+        Namespace_SetAsNotUsing ( ( byte* ) "LispDefines" ) ;
+        Namespace_SetAsNotUsing ( ( byte* ) "Lisp" ) ;
+        Context_ClearQualifyingNamespace ( ) ;
+        if ( _LC_->SavedTypeCheckState && GetState ( _CSL_, TYPECHECK_ON ) ) CSL_TypeCheckOn ( ) ;
+        SetState ( _LC_, LC_DEBUG_ON, false ) ;
+    }
 }
 
 void
@@ -534,16 +546,22 @@ _LC_Init ( LambdaCalculus * lc )
 }
 
 void
-LC_Delete ( LambdaCalculus * lc )
+_LC_Delete ( LambdaCalculus * lc )
 {
     if ( lc )
     {
         LC_ClearTempNamespace ( ) ;
         LC_ClearDefinesNamespace ( ) ;
         OVT_MemListFree_LispTemp ( ) ;
-        OVT_MemListFree_LispSpace ( ) ;
+        _OVT_MemListFree_LispSpace ( ) ;
     }
     _LC_ = 0 ;
+}
+
+void
+CSL_LC_Delete ( )
+{
+    _LC_Delete ( _LC_ ) ;
 }
 
 LambdaCalculus *
@@ -561,7 +579,7 @@ LambdaCalculus *
 LC_New ( )
 {
     LambdaCalculus * lc = _LC_ ;
-    if ( lc ) LC_Delete ( lc ) ; //LC_ClearDefinesNamespace ( ) ;
+    if ( lc ) _LC_Delete ( lc ) ; //LC_ClearDefinesNamespace ( ) ;
     lc = _LC_Create ( ) ;
     lc = _LC_Init ( lc ) ;
     _LC_ = lc ;

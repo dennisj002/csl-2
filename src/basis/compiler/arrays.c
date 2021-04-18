@@ -189,7 +189,7 @@ _CSL_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
     if ( lispMode )
     {
         l1 = * pl1 ;
-        arrayBaseObject = ( ( Word * ) ( LO_Previous ( l1 ) ) )->Lo_CSLWord ;
+        arrayBaseObject = ( ( Word * ) ( LO_Previous ( l1 ) ) )->Lo_CSL_Word ;
         token = l1->Name ;
     }
     else

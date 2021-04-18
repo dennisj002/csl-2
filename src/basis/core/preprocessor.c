@@ -209,7 +209,7 @@ SkipPreprocessorCode ( Boolean skipControl )
         int64 inChar = ReadLine_PeekNextChar ( cntx->ReadLiner0 ) ;
         if ( ( inChar == - 1 ) || ( inChar == eof ) )
         {
-            SetState ( lexer, LEXER_END_OF_LINE, true ) ;
+            SetState ( lexer, END_OF_LINE, true ) ;
             goto done ;
         }
         token = Lexer_ReadToken ( lexer ) ;
@@ -438,7 +438,7 @@ CSL_C_Include_PreProcessor ( )
                 _CSL_Contex_NewRun_2 ( _CSL_, _Context_IncludeFile, afn, 2 ) ;
             }
         }
-        else _CSL_ContextNew_IncludeFile ( afn ) ;
+        else CSL_ContextNew_IncludeFile ( afn ) ;
         SetDataStackPointer ( svStackPointer ) ;
     }
 }

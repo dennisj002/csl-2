@@ -3,7 +3,7 @@
 void
 CSL_Dsp ( )
 {
-    DataStack_Push ( ( int64 ) _Dsp_ ) ;
+    DataStack_Push ( ( int64 ) _DspReg_ ) ;
 }
 
 void
@@ -69,11 +69,11 @@ void
 CSL_NDup ( )
 {
     int64 n = TOS ;
-    int64 value = * -- _Dsp_ ; // -1 : n now occupies 1 to be also used slot
+    int64 value = * -- _DspReg_ ; // -1 : n now occupies 1 to be also used slot
     while ( n -- )
     {
 
-        * ++ _Dsp_ = value ;
+        * ++ _DspReg_ = value ;
     }
     //CSL->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
@@ -94,7 +94,7 @@ CSL_Pick ( ) // pick
     {
         //* Dsp = ( * ( Dsp - * ( Dsp ) - 1 ) ) ;
         //int64 top = Dsp [0] ;
-        _Dsp_ [0] = _Dsp_ [ - ( _Dsp_ [0] + 1 ) ] ;
+        _DspReg_ [0] = _DspReg_ [ - ( _DspReg_ [0] + 1 ) ] ;
     }
 }
 
@@ -108,8 +108,8 @@ CSL_Swap ( )
     else
     {
         int64 a = TOS ;
-        TOS = _Dsp_ [ - 1 ] ;
-        _Dsp_ [ - 1 ] = a ;
+        TOS = _DspReg_ [ - 1 ] ;
+        _DspReg_ [ - 1 ] = a ;
     }
 }
 

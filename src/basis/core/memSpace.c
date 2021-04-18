@@ -422,7 +422,8 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
             nba->NBA_DataSize += ( ( ( ++ nba->Allocations ) * size ) + ( 100 * K ) ) ;
             //nba->NBA_DataSize =  ((nba->NBA_DataSize > (100 * K) ? nba->NBA_DataSize : (100 * K) ) * (++nba->Allocations) ) + size ;
 #endif            
-            if ( _O_->Verbosity > 3 ) NBA_PrintInfo ( nba ) ;
+            if ( _O_->Verbosity > 1 )
+                NBA_PrintInfo ( nba ) ;
             ba = _NamedByteArray_AddNewByteArray ( nba, nba->NBA_DataSize ) ;
         }
     }
@@ -566,9 +567,15 @@ OVT_MemListFree_Objects ( )
 }
 
 void
-OVT_MemListFree_LispSpace ( )
+_OVT_MemListFree_LispSpace ( )
 {
     OVT_MemList_FreeNBAMemory ( ( byte* ) "LispSpace", 1 * M, 1 ) ;
+}
+
+void
+OVT_MemListFree_LispSpace ( )
+{
+    _LC_Delete ( _LC_ ) ;
 }
 
 void
@@ -593,6 +600,11 @@ void
 OVT_MemListFree_LispTemp ( )
 {
     OVT_MemList_FreeNBAMemory ( ( byte* ) "LispTempSpace", 2 * M, 1 ) ;
+    if ( _LC_ )
+    {
+        _dllist_Init ( _LC_->LispTempNamespace->W_List ) ;
+        LC_Init_Variables ( _LC_ ) ;
+    }
 }
 
 void
@@ -847,7 +859,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     Printf ( "\nNBA ReAllocations                       = %9d", _O_->ReAllocations ) ;
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
     Printf ( "\nRecycledWordCount ::%5d x %3d bytes : = %9d", _O_->MemorySpace0->RecycledWordCount, wordSize, _O_->MemorySpace0->RecycledWordCount * wordSize ) ;
-    Printf ( "\nWordsInRecycling :: %5d x %3d bytes : = %9d", _O_->MemorySpace0->WordsInRecycling, wordSize, _O_->MemorySpace0->WordsInRecycling * wordSize ) ;
+    Printf ( "\nWordsInRecycling :: %5d x %3d bytes : = %9d\n", _O_->MemorySpace0->WordsInRecycling, wordSize, _O_->MemorySpace0->WordsInRecycling * wordSize ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
@@ -925,8 +937,9 @@ dbg_new ( Word * w )
 }
 
 void
-_CheckRecycleWord ( Word * w )
+_CheckRecycleWord ( Node * node )
 {
+    Word * w = ( Word * ) node ;
     if ( w && ( w->W_ObjectAttributes & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) )
     {
         if ( _O_->Verbosity > 2 ) _Printf ( "\n_CheckRecycleWord : recycling : %s%s%s",
@@ -935,17 +948,11 @@ _CheckRecycleWord ( Word * w )
     }
 }
 
-void
-CheckRecycleNamespaceWord ( Node * node )
-{
-    _CheckRecycleWord ( ( Word * ) node ) ;
-}
-
 // check a compiler word list for recycleable words and add them to the recycled word list : _O_->MemorySpace0->RecycledWordList
 
 void
 DLList_Recycle_NamespaceList ( dllist * list )
 {
-    dllist_Map ( list, ( MapFunction0 ) CheckRecycleNamespaceWord ) ;
+    dllist_Map ( list, ( MapFunction0 ) _CheckRecycleWord ) ;
 }
 

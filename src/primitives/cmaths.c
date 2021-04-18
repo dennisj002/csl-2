@@ -4,12 +4,12 @@
 void
 CSL_Power_03 ( ) // **
 {
-    int64 pow = _Dsp_ [ 0 ], base = _Dsp_ [ -1 ], n ;
+    int64 pow = _DspReg_ [ 0 ], base = _DspReg_ [ -1 ], n ;
     for ( n = base ; -- pow ; )
     {
         n *= base ;
     }
-    _Dsp_ [ -1 ] = n ;
+    _DspReg_ [ -1 ] = n ;
     DataStack_Drop ( ) ;
 }
 
@@ -97,13 +97,13 @@ CFib ( )
 void
 CSL_Power ( ) // **
 {
-    int64 pow = _Dsp_ [ 0 ], base = _Dsp_ [ - 1 ], n ;
+    int64 pow = _DspReg_ [ 0 ], base = _DspReg_ [ - 1 ], n ;
     for ( n = base ; -- pow ; )
     {
 
         n *= base ;
     }
-    _Dsp_ [ - 1 ] = n ;
+    _DspReg_ [ - 1 ] = n ;
     DataStack_Drop ( ) ;
 }
 

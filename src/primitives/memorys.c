@@ -124,7 +124,7 @@ CSL_Poke ( ) // =
         else
         {
             _CSL_Move ( ( int64 * ) NOS, TOS, lvalueSize ) ;
-            _Dsp_ -= 2 ;
+            _DspReg_ -= 2 ;
         }
     }
 }
@@ -141,7 +141,7 @@ CSL_AtEqual ( ) // !
         else
         {
             _CSL_Move ( ( int64 * ) NOS, * ( int64* ) TOS, lvalueSize ) ;
-            _Dsp_ -= 2 ;
+            _DspReg_ -= 2 ;
         }
     }
 }
@@ -159,7 +159,7 @@ CSL_Store ( ) // !
         else
         {
             _CSL_Move ( ( int64 * ) TOS, NOS, lvalueSize ) ;
-            _Dsp_ -= 2 ;
+            _DspReg_ -= 2 ;
         }
     }
 }

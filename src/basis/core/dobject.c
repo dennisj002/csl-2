@@ -133,6 +133,8 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
         d0 ( Printf ( "\n_DObject_ValueDefinition_Init :" ) ) ;
         ByteArray * svcs = _O_CodeByteArray ;
         int64 sscm = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
+        //if ( _LC_ ) _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->MemorySpace0->LispSpace, 1 * K ) ; 
+        //else 
         _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->InternalObjectSpace, 1 * K ) ; 
         Word_SetCoding ( word, Here ) ;
         word->CodeStart = Here ;

@@ -292,7 +292,7 @@ typedef struct _Identifier // _Symbol
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr
 #define Lo_NumberOfSlots S_NumberOfSlots //Slots
-#define Lo_CSLWord CSLWord 
+#define Lo_CSL_Word CSLWord 
 #define Lo_List S_SymbolList 
 #define Lo_Value S_Value
 #define Lo_PtrToValue S_PtrToValue 
@@ -581,7 +581,7 @@ typedef struct SourceCodeInfo
     Word * SciWord ;
     byte * SciBuffer ;
 } SourceCodeInfo ;
-typedef struct Lexer
+typedef struct _Lexer
 {
     uint64 State ;
     uint64 L_MorphismAttributes, L_ObjectAttributes, Token_CompiledDataFieldByteSize ;
@@ -589,7 +589,7 @@ typedef struct Lexer
     int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
     byte *OriginalToken, *ParsedToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter ;
     byte * TokenDelimiters, * DelimiterCharSet, * DelimiterOrDotCharSet, *Filename, *LastToken ;
-    byte( *NextChar ) ( ReadLiner * rl ), * TokenBuffer ;
+    byte( *NextChar ) ( struct _Lexer * lexer ), * TokenBuffer, CurrentChar ;
     union
     {
         uint64 Literal ;
@@ -836,7 +836,7 @@ typedef struct _LambdaCalculus
     uint64 State ;
     int64 DontCopyFlag, Loop, ParenLevel ;
     Namespace *LispNamespace, *LispDefinesNamespace, *LispTempNamespace, *BackgroundNamespace ;
-    ListObject *L0, *L1, *Lfirst, *Lfunction, *Locals, *Largs, *Largs1, * Nil, *True, *LambdaParameters, *FunctionCallValues ;
+    ListObject *L00, *L0, *L1, *Lfirst, *Lfunction, *Locals, *Largs, *Largs1, * Nil, *True, *LambdaParameters, *FunctionCallValues ;
     ListObject *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;

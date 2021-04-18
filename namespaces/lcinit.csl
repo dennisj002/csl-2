@@ -1,4 +1,4 @@
-bnOff lcOn 
+bnOff lcOn
 //(ld:)
 ( if 1 7 0 )
 ( if 0 0 7 )
@@ -24,4 +24,3 @@ bnOff lcOn
 ( cond (( + 0 0 ) ( + 1 0 )) ((+ 0 0 ) (+ 1 5 )) (else 7) )
 ( cond (( + 0 0 ) ( + 1 2 )) (( + 1 0 ) ( + 1 10 )) (( + 0 0 ) ( + 1 2 )) (else (+ 1 6 )) )
 "\n cond :: should show 7 7 7 7 7 11\n" ps
-//pause

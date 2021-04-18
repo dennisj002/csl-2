@@ -107,7 +107,7 @@ int64
 CSL_WhileCombinator ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    block testBlock = ( block ) _Dsp_ [ - 1 ], doBlock = ( block ) TOS ;
+    block testBlock = ( block ) _DspReg_ [ - 1 ], doBlock = ( block ) TOS ;
     DataStack_DropN ( 2 ) ;
     if ( CompileMode )
     {
@@ -165,7 +165,7 @@ _CSL_DoWhileCombinator ( block testBlock, block doBlock )
 int64
 CSL_DoWhileCombinator ( )
 {
-    block testBlock = ( block ) TOS, doBlock = ( block ) _Dsp_ [ - 1 ] ;
+    block testBlock = ( block ) TOS, doBlock = ( block ) _DspReg_ [ - 1 ] ;
     DataStack_DropN ( 2 ) ;
     return _CSL_DoWhileCombinator ( testBlock, doBlock ) ;
 }
@@ -198,7 +198,7 @@ CSL_If1Combinator ( )
 void
 CSL_If2Combinator ( )
 {
-    block testBlock = ( block ) _Dsp_ [ - 1 ], doBlock = ( block ) TOS ;
+    block testBlock = ( block ) _DspReg_ [ - 1 ], doBlock = ( block ) TOS ;
     int64 tvalue ;
     DataStack_DropN ( 2 ) ;
     if ( CompileMode )
@@ -223,8 +223,8 @@ CSL_If2Combinator ( )
 void
 CSL_TrueFalseCombinator2 ( )
 {
-    int64 testCondition = _Dsp_ [ - 2 ] ;
-    block trueBlock = ( block ) _Dsp_ [ - 1 ], elseBlock = ( block ) TOS ;
+    int64 testCondition = _DspReg_ [ - 2 ] ;
+    block trueBlock = ( block ) _DspReg_ [ - 1 ], elseBlock = ( block ) TOS ;
     DataStack_DropN ( 2 ) ;
     if ( CompileMode )
     {
@@ -291,7 +291,7 @@ void
 CSL_DoWhileDoCombinator ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    block testBlock = ( block ) _Dsp_ [ - 1 ], doBlock2 = ( block ) TOS, doBlock1 = ( block ) _Dsp_ [ - 2 ] ;
+    block testBlock = ( block ) _DspReg_ [ - 1 ], doBlock2 = ( block ) TOS, doBlock1 = ( block ) _DspReg_ [ - 2 ] ;
     byte * start ;
     DataStack_DropN ( 3 ) ;
     if ( CompileMode )
@@ -327,8 +327,8 @@ void
 CSL_ForCombinator ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    block doBlock = ( block ) TOS, doPostBlock = ( block ) _Dsp_ [ - 1 ],
-        testBlock = ( block ) _Dsp_ [ - 2 ], doPreBlock = ( block ) _Dsp_ [ - 3 ] ;
+    block doBlock = ( block ) TOS, doPostBlock = ( block ) _DspReg_ [ - 1 ],
+        testBlock = ( block ) _DspReg_ [ - 2 ], doPreBlock = ( block ) _DspReg_ [ - 3 ] ;
     DataStack_DropN ( 4 ) ;
     if ( CompileMode )
     {
@@ -379,7 +379,7 @@ CSL_CondCombinator ( int64 numBlocks )
         //for ( blockIndex = numBlocks - 1 ; ( blockIndex - ( numBlocks % 2 ) ) > 0 ; )
         for ( blockIndex = numBlocks - 1 ; blockIndex > 0 ; )
         {
-            Block_CopyCompile ( ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
+            Block_CopyCompile ( ( byte* ) _DspReg_ [ - blockIndex ], blockIndex, 0, 0 ) ;
             compiledAtAddress = Compile_UninitializedJumpEqualZero ( ) ;
             Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
             bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, blockIndex ) ;
@@ -388,7 +388,7 @@ CSL_CondCombinator ( int64 numBlocks )
             blockIndex -- ;
             //bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, blockIndex ) ;
             //Printf ( ( byte* ) "\nCSL_CondCombinator : index = %d : bi = 0x%08lx", blockIndex, bi ) ;
-            Block_CopyCompile ( ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
+            Block_CopyCompile ( ( byte* ) _DspReg_ [ - blockIndex ], blockIndex, 0, 0 ) ;
             byte * compiledAtAddress = Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
             CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
             Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
@@ -397,7 +397,7 @@ CSL_CondCombinator ( int64 numBlocks )
         if ( numBlocks % 2 )
         {
             //if ( ifFlag ) CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-            Block_CopyCompile ( ( byte* ) _Dsp_ [ - blockIndex ], blockIndex, 0, 0 ) ;
+            Block_CopyCompile ( ( byte* ) _DspReg_ [ - blockIndex ], blockIndex, 0, 0 ) ;
             //blockIndex -- ;
         }
         CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;

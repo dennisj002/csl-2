@@ -14,7 +14,7 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttribute
     {
         case T_LC_NEW:
         {
-            word = _LO_New ( lispAttributes, morphismAttributes, objectAttributes, name, ( byte* ) value, word, ( allocType ? allocType : LISP_TEMP ), 0, tsrli, scwi ) ; // all words are symbols
+            word = _LO_New ( lispAttributes, morphismAttributes, objectAttributes, name, ( byte* ) value, word, ( allocType ? allocType : LISP_ALLOC ), 0, tsrli, scwi ) ; // all words are symbols
             break ;
         }
         case T_LC_DEFINE:

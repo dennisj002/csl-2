@@ -1,6 +1,8 @@
-verbosity 1 =
+(set verbosity 1)
 //typecheckOff
-Int lcOn
+//Int d: 
+(lcOn)
+//(ld:)
 (( lambda ( x y ) ( + x y ) ) 3 4 ) 
 (define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1))))))
 (yfac yfac 10) nl
@@ -17,16 +19,15 @@ pwi fibc
 (definec fibc1 ( lambda ( n ) (ifc (< n 2) n ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
 pwi fibc1
 "\nfibc1 30 = " ps
-(fibc1 3) 
+(fibc1 30) 
 //pause
 #endif    
 lcOff 
-#if doLispTest @ // from sicp
+#if 1 //doLispTest @ // from sicp
 lcOn
-//bnOn
+bnOn
 bnInit ( 32 )
-//(define (abs n) (cond (( < n 0 ) (- 0 n)) n )) 
-(define (abs n) (cond ( < n 0 ) (- 0 n) n )) 
+(define (abs n) (cond (( < n 0 ) (- 0 n)) n )) 
 ( abs -9)
 ( abs 9)
 (define (square n) (* n n))
@@ -40,6 +41,9 @@ bnInit ( 32 )
 (sqrt 2) 
 (sqrt (sqrt (sqrt 9) ))
 bnOff
+#endif
+lcOn    
+(define (square n) (* n n))
 (define (fib n)
   (fib-iter 1 0 n))
 
@@ -102,9 +106,12 @@ bnOff
         ((= kinds-of-coins 5) 50)))
 
 (count-change 100)            
-(fib 30)         
+(fib 30)        
+;;; (define (remainder b a ) ( if ( mod b a) true false ))
+;;; (bnOn)    
 (define (divides? a b)
-  (= (remainder b a) 0))
+  (= (modulo b a) 0))
+  ;;; (= (remainder b a) 0))
 
 (define (find-divisor n test-divisor)
   (cond ((> (square test-divisor) n) n)
@@ -115,30 +122,14 @@ bnOff
   (find-divisor n 2))
 
 (define (prime? n)
-  (= n (smallest-divisor n)))
+   ( if ( = (= n (smallest-divisor n))  1) ( 'true) ('false)))
+   ;;; ( if ( = (= n (smallest-divisor n))  1) ( '#t ) ('#f))
+(define (sd n) (smallest-divisor n))       
 (prime? 13)            
-(prime? 100)            
-#if 0
-(define (fib2 n)
-  (fib-iter2 1 0 0 1 n))
-
-(define (fib-iter2 a b p q count)
-  (cond ((= count 0) b)
-        ((even? count)
-         (fib-iter a
-                   b
-                   ;;;??FILL-THIS-IN?? ; compute p'
-                   ;;;??FILL-THIS-IN?? ; compute q'
-                   (/ count 2)))
-        (else (fib-iter (+ (* b q) (* a q) (* a p))
-                        (+ (* b p) (* a q))
-                        p
-                        q
-                        (- count 1)))))
-
-(fib2 30)
-;;;SECTION 1.2.5
-#endif    
+(prime? 100) 
+(define (p? n) (prime? n))
+;;; SECTION 1.2.5
+//#endif    
 #endif
 "\ncsl : scheme/lisp : type \'x\' or \'exit\' or \'bye\' to exit ...\n" ps
-            
+//(ld:)  (load "namespaces/schemeTest2.csl")            

@@ -2,6 +2,7 @@
 5 
 User
 C
+Root
 #if 0 // debug
 : sp stack pause ; sp
 #else
@@ -209,7 +210,7 @@ fac40 ( n  | facc )
     return facc ;
 } 
 pwi fac40  //pause
-fac40 (7) dup p 5040 _assert sp
+fac40 (7) dup p 5040 _assert sp //pause
 #endif 
 
 i2halt sp

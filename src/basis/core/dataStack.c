@@ -8,35 +8,35 @@ uint64
 DataStack_Pop ( )
 {
 #if 0   
-    int64 value = _Dsp_ [ 0 ] ; //
+    int64 value = _DspReg_ [ 0 ] ; //
 #else
-    _DSP_ = _Dsp_ ;
+    _DSP_C_PTR_ = _DspReg_ ;
     int64 value = Stack_Pop_WithExceptionFlag ( _DataStack_, 1 ) ;
 #endif    
     //CSL_TypeStack_Drop ( ) ;
-    _Dsp_ -- ;
+    _DspReg_ -- ;
     return value ;
 }
 
 void
 DataStack_Push ( int64 value )
 {
-    _Dsp_ ++ ;
-    _Dsp_ [0] = value ;
+    _DspReg_ ++ ;
+    _DspReg_ [0] = value ;
 }
 
 void
 DataStack_Dup ( )
 {
-    _Dsp_ [ 1 ] = _Dsp_[0] ;
-    _Dsp_ ++ ;
+    _DspReg_ [ 1 ] = _DspReg_[0] ;
+    _DspReg_ ++ ;
     //CSL_TypeStack_Dup ( ) ;
 }
 
 void
 DataStack_DropN ( int64 n )
 {
-    _Dsp_ -= n ;
+    _DspReg_ -= n ;
 }
 
 void
@@ -51,13 +51,13 @@ DataStack_Drop ( )
 inline int64
 DataStack_Overflow ( )
 {
-    return ( _Dsp_ > _DataStack_->StackMax ) ;
+    return ( _DspReg_ > _DataStack_->StackMax ) ;
 }
 
 inline int64
 DataStack_Underflow ( )
 {
-    return ( _Dsp_ < _DataStack_->InitialTosPointer ) ;
+    return ( _DspReg_ < _DataStack_->InitialTosPointer ) ;
 }
 
 void
@@ -75,7 +75,7 @@ DataStack_Depth ( )
     if ( _O_ && _CSL_ && _DataStack_ )
     {
         //_DataStackPointer_ = _Dsp_ ;
-        _DSP_ = _Dsp_ ;
+        _DSP_C_PTR_ = _DspReg_ ;
         return Stack_Depth ( _DataStack_ ) ;
     }
     return 0 ;
@@ -105,13 +105,13 @@ CSL_PrintStackDepth ( )
 void
 Set_DebuggerDspReg_FromDspReg ( )
 {
-    _Debugger_->cs_Cpu->R14d = _Dsp_ ;
+    _Debugger_->cs_Cpu->R14d = _DspReg_ ;
 }
 
 void
 Set_DspReg ( uint64 * ptr )
 {
-    _Dsp_ = ptr ;
+    _DspReg_ = ptr ;
 }
 
 void
@@ -136,7 +136,7 @@ Set_DataStackPointers_FromDebuggerDspReg ( )
 void
 Set_DataStackPointer_FromDspReg ( )
 {
-    _CSL_->DataStack->StackPointer = _Dsp_ ;
+    _CSL_->DataStack->StackPointer = _DspReg_ ;
 }
 
 void
@@ -156,7 +156,7 @@ uint64 *
 GetDataStackPointer ( )
 {
     //_CSL_->DataStack->StackPointer = _Dsp_ ;
-    return _Dsp_ ;
+    return _DspReg_ ;
 }
 
 void

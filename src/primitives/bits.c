@@ -77,7 +77,7 @@ CSL_BitWise_OR ( ) // xor
     }
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] | TOS ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ - 1 ] | TOS ;
         DataStack_Drop ( ) ;
     }
 }
@@ -109,7 +109,7 @@ CSL_BitWise_AND ( ) // xor
     }
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] & TOS ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ - 1 ] & TOS ;
         DataStack_Drop ( ) ;
     }
 }
@@ -140,7 +140,7 @@ CSL_BitWise_XOR ( ) // xor
     }
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] ^ TOS ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ - 1 ] ^ TOS ;
         DataStack_Drop ( ) ;
     }
 }
@@ -171,7 +171,7 @@ CSL_ShiftLeft ( ) // lshift
     }
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] << TOS ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ - 1 ] << TOS ;
         DataStack_Drop ( ) ;
     }
 }
@@ -185,7 +185,7 @@ CSL_ShiftRight ( ) // rshift
     }
     else
     {
-        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] >> TOS ;
+        _DspReg_ [ - 1 ] = _DspReg_ [ - 1 ] >> TOS ;
         DataStack_Drop ( ) ;
     }
 }

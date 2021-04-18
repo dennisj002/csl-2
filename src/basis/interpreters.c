@@ -149,7 +149,7 @@ Interpret_ToEndOfLine ( Interpreter * interp )
     ReadLiner * rl = interp->ReadLiner0 ;
     do
     {
-        if ( GetState ( interp->Lexer0, ( LEXER_END_OF_LINE | END_OF_STRING ) ) ) break ; // either the lexer will get a newline or the readLiner
+        if ( GetState ( interp->Lexer0, ( END_OF_LINE | END_OF_STRING ) ) ) break ; // either the lexer will get a newline or the readLiner
         if ( ReadLine_AreWeAtNewlineAfterSpaces ( rl ) ) break ;
         Interpreter_InterpretNextToken ( interp ) ;
     }

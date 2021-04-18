@@ -60,9 +60,9 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
     debugger->w_Word = word ;
     SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
-    debugger->SaveDsp = debugger->AddressModeSaveDsp = _Dsp_ ;
+    debugger->SaveDsp = debugger->AddressModeSaveDsp = _DspReg_ ;
     if ( ! debugger->StartHere ) Debugger_Set_StartHere ( debugger ) ;
-    debugger->WordDsp = _Dsp_ ;
+    debugger->WordDsp = _DspReg_ ;
     debugger->SaveTOS = TOS ;
     debugger->Token = ( word && word->Name ) ? word->Name : token ;
     if ( address )
@@ -195,7 +195,7 @@ Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
     {
         _Debugger_Init ( debugger ) ;
         Debugger_UdisInit ( debugger ) ;
-        debugger->SaveDsp = _Dsp_ ;
+        debugger->SaveDsp = _DspReg_ ;
         debugger->SaveTOS = TOS ;
         debugger->Key = 0 ;
     }

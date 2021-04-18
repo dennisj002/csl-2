@@ -36,13 +36,12 @@ _LO_Definec ( ListObject * l0, ListObject * locals0 )
         //locals1 = 0 ;
     }
     else idLo = l0, value = _LO_Next ( l0 ) ;
-    idLo = idLo->Lo_CSLWord ;
+    idLo = idLo->Lo_CSL_Word ;
     word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) idLo->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, l0->W_RL_Index, l0->W_SC_Index ) ;
     CSL_WordList_Init ( word ) ;
     word->Definition = 0 ; // reset the definition from LO_Read
     _Context_->CurrentWordBeingCompiled = word ;
-    word->Lo_CSLWord = word ;
-    SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
+    word->Lo_CSL_Word = word ;
     Namespace_DoAddWord ( locals0 ? locals0 : lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
     if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
     if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
@@ -98,12 +97,12 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
     }
     else idLo = l0 ;
     value = _LO_Next ( l0 ) ;
-    idLo = idLo->Lo_CSLWord ;
+    idLo = idLo->Lo_CSL_Word ;
     word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) idLo->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, l0->W_RL_Index, l0->W_SC_Index ) ;
     CSL_WordList_Init ( word ) ;
     word->Definition = 0 ; // reset the definition from LO_Read
     _Context_->CurrentWordBeingCompiled = word ;
-    word->Lo_CSLWord = word ;
+    word->Lo_CSL_Word = word ;
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
     Namespace_DoAddWord ( locals0 ? locals0 : lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
     if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
@@ -141,7 +140,7 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
     l1->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
     if ( LC_CompileMode ) l1->W_SC_WordList = word->W_SC_WordList = _LC_->Lambda_SC_WordList ;
-    SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
+    //SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     _CSL_FinishWordDebugInfo ( l1 ) ;
     _Word_Finish ( l1 ) ;
     //word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
@@ -157,22 +156,22 @@ _LO_MakeLambda ( ListObject * l0 )
     else lambda = _Word_New ( ( byte* ) "<lambda>", WORD_CREATE, 0, 0, 0, 0, DICTIONARY ) ; // don't _Word_Add : must *not* be "lambda" else it will wrongly replace the lambda T_SPECIAL_FUNCTION word in LO_Find
     args = l0 ;
     body0 = _LO_Next ( l0 ) ;
-    if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_Copy ( args, LISP_TEMP ) ; // syntactically the args can be enclosed in parenthesis or not
+    if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_Copy ( args, LISP_ALLOC ) ; // syntactically the args can be enclosed in parenthesis or not
     else
     {
         lnew = LO_New ( LIST, 0 ) ;
         do
         {
-            LO_AddToTail ( lnew, _LO_CopyOne ( args, LISP_TEMP ) ) ;
+            LO_AddToTail ( lnew, _LO_CopyOne ( args, LISP_ALLOC ) ) ;
         }
         while ( ( args = _LO_Next ( args ) ) != body0 ) ;
         args = lnew ;
     }
-    if ( ( body0->W_LispAttributes & ( LIST | LIST_NODE ) ) ) body = _LO_Copy ( body0, LISP_TEMP ) ;
+    if ( ( body0->W_LispAttributes & ( LIST | LIST_NODE ) ) ) body = _LO_Copy ( body0, LISP_ALLOC ) ;
     else
     {
         lnew = LO_New ( LIST, 0 ) ;
-        LO_AddToTail ( lnew, _LO_CopyOne ( body0, LISP_TEMP ) ) ;
+        LO_AddToTail ( lnew, _LO_CopyOne ( body0, LISP_ALLOC ) ) ;
         body = lnew ;
     }
     if ( GetState ( _LC_, LC_COMPILE_MODE ) )
@@ -185,7 +184,7 @@ _LO_MakeLambda ( ListObject * l0 )
     }
     if ( ! LC_CompileMode ) // nb! this needs to be 'if' not 'else' or else if' because the state is sometimes changed by CompileLispBlock, eg. for function parameters
     {
-        lambda->Lo_CSLWord = lambda ;
+        lambda->Lo_CSL_Word = lambda ;
         lambda->Lo_LambdaFunctionParameters = args ;
         lambda->Lo_LambdaFunctionBody = body ;
         lambda->W_LispAttributes |= T_LAMBDA | T_LISP_SYMBOL ;
@@ -213,7 +212,7 @@ _LO_Macro ( ListObject * l0, ListObject * locals )
     //l0 = _LO_Define ( ( byte* ) "macro", idNode, locals ) ;
     l0 = _LO_Define ( idNode, 0 ) ;
     l0->W_LispAttributes |= T_LISP_MACRO ;
-    if ( l0->Lo_CSLWord ) l0->Lo_CSLWord->W_LispAttributes |= T_LISP_MACRO ;
+    if ( l0->Lo_CSL_Word ) l0->Lo_CSL_Word->W_LispAttributes |= T_LISP_MACRO ;
     if ( GetState ( _CSL_, DEBUG_MODE ) ) LO_Print ( l0 ) ;
     return l0 ;
 }
@@ -222,10 +221,10 @@ ListObject *
 LO_CompileDefine ( ListObject * l0 )
 {
     SetState ( _Context_->Compiler0, RETURN_TOS, true ) ;
-    SetState ( _LC_, LC_COMPILE_MODE, true ) ;
+    SetState ( _LC_, (LC_COMPILE_MODE|LC_DEFINE_MODE), true ) ;
     ListObject * idNode = _LO_Next ( l0 ) ;
     l0 = _LO_Define ( idNode, 0 ) ;
-    SetState ( _LC_, LC_COMPILE_MODE, false ) ;
+    SetState ( _LC_, (LC_COMPILE_MODE|LC_DEFINE_MODE), false ) ;
     return l0 ;
 }
 
@@ -233,10 +232,10 @@ ListObject *
 LO_CompileDefinec ( ListObject * l0 )
 {
     SetState ( _Context_->Compiler0, RETURN_TOS, true ) ;
-    SetState ( _LC_, LC_COMPILE_MODE, true ) ;
+    SetState ( _LC_, (LC_COMPILE_MODE|LC_DEFINE_MODE), true ) ;
     ListObject * idNode = _LO_Next ( l0 ) ;
     l0 = _LO_Definec ( idNode, 0 ) ;
-    SetState ( _LC_, LC_COMPILE_MODE, false ) ;
+    SetState ( _LC_, (LC_COMPILE_MODE|LC_DEFINE_MODE), false ) ;
     return l0 ;
 }
 
@@ -271,7 +270,7 @@ LO_Set (ListObject * lfirst)
             {
                 if ( lset->W_ObjectAttributes & NAMESPACE_VARIABLE )
                 {
-                    Word_Morphism_Run ( lset->Lo_CSLWord ) ;   
+                    Word_Morphism_Run ( lset->Lo_CSL_Word ) ;   
                     DataStack_Push ( value->Lo_Value  ) ;
                     CSL_Poke () ;
                     //continue ;
@@ -348,9 +347,9 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
     LambdaCalculus * lc = _LC_ ;
     ListObject *condClause, *nextCondClause, * test, *sequence, * resultNode = nil, * result = nil, *testResult ;
     int64 timt = 0 ; //, ccilt = 0 ; // timt : test is morphism type ; ccilt : condClause is list type
-    int64 ifFlag = ( int64 ) ( lfirst->Lo_CSLWord->W_LispAttributes & T_LISP_IF ) ;
+    int64 ifFlag = ( int64 ) ( lfirst->Lo_CSL_Word->W_LispAttributes & T_LISP_IF ) ;
     int64 numBlocks, d1, d0 = Stack_Depth ( compiler->CombinatorBlockInfoStack ), testValue ;
-    //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( lfirst, "\nLO_Cond : lfirst = ", "", 1 ) ;
+    if (GetState ( lc, LC_DEBUG_ON )  )  _LO_PrintWithValue ( lc->L0, "\nLO_Cond : lc->L0 = ", "", 1 ) , _LO_PrintWithValue ( lc->L00, "\nLO_Cond : lc->L00 = ", "", 1 ) ;
     ListObject * idLo = lfirst ;
     if ( condClause = _LO_Next ( idLo ) ) // 'cond' is id node ; skip it.
     {
@@ -407,7 +406,7 @@ LO_Cond ( ListObject * lfirst, ListObject * locals )//, int64 ifFlag, ListObject
 #endif            
             // we have determined test and sequence
             // either return result or find next condClause
-            if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_ShowInfo_Token ( test, "LC_Debug : ", 0, test->Name, "" ) ;
+            if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( test, "LC_Debug : ", 0, test->Name, "" ) ;
             testResult = LC_Eval ( lc, test, locals, 1 ) ;
             testValue = ( testResult && ( testResult->Lo_Value ) ) ;
             //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( testResult, "\nLO_Cond : testResult = ", "", 1 ) ;
@@ -486,13 +485,14 @@ ListObject *
 LO_Begin ( ListObject * lfirst, ListObject * locals )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject * leval ;
+    ListObject * leval, *lnext ;
     // 'begin' is first node ; skip it.
     SetState ( lc, LC_BEGIN_MODE, true ) ;
     if ( lfirst )
     {
-        for ( lfirst = _LO_Next ( lfirst ) ; lfirst ; lfirst = _LO_Next ( lfirst ) )
+        for ( lfirst = _LO_Next ( lfirst ) ; lfirst ; lfirst = lnext )
         {
+            lnext = _LO_Next ( lfirst ) ;
             leval = LC_Eval ( lc, lfirst, locals, 1 ) ;
         }
     }

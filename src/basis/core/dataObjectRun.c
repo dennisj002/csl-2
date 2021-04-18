@@ -294,7 +294,7 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
                     Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
                 }
             }
-            else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
+            else SetState ( _Context_->Lexer0, END_OF_LINE, true ) ;
         }
         else
         {
@@ -346,7 +346,7 @@ CSL_Do_C_Type ( Namespace * ns )
             SetState ( compiler, DOING_C_TYPE, true ) ;
             if ( ! GetState ( compiler, LC_ARG_PARSING ) )
             {
-                LC_Delete ( _LC_ ) ;
+                _LC_Delete ( _LC_ ) ;
                 if ( ! Compiling )
                 {
                     Compiler_Init ( compiler, 0 ) ;

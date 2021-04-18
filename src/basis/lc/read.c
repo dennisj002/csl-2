@@ -1,24 +1,31 @@
 #include "../../include/csl.h"
- 
+
 //===================================================================================================================
 //| _LO_Read 
 //===================================================================================================================
 
 ListObject *
-_LO_Read ( LambdaCalculus * lc )
+LC_Read ( LambdaCalculus * lc, int64 startReadIndex )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
+    ReadLiner * rl = cntx->ReadLiner0 ;
     ListObject *l0, *lnew ;
     byte * token ;
     int64 qidFlag ;
+    SetState ( lc, LC_READ, true ) ;
     if ( lc->ParenLevel ) // if ParenLevel == 0 we let LParen set up the list
     {
         lnew = LO_New ( LIST, 0 ) ;
         lnew->State = lc->QuoteState ;
     }
-    else lnew = 0 ;
-    SetState ( lc, LC_READ, true ) ;
+    else
+    {
+        lnew = 0 ;
+    }
+        //if ( lc->L0 ) rl->ReadIndex = lc->L0->W_RL_Index ; // if we had a tab completion within the parenthesis ReadIndex is affected
+    //if (startReadIndex != -1)  rl->ReadIndex = startReadIndex ;
+    //    rl->ReadIndex = (startReadIndex == -1) ? rl->ReadIndex : startReadIndex ;
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nEntering _LO_Read..." ) ) ;
     do
     {
@@ -47,7 +54,8 @@ _LO_Read ( LambdaCalculus * lc )
                 else lnew = l0 ;
             }
         }
-        else _SyntaxError ( ( byte* ) "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
+        else if ( GetState ( lexer, END_OF_FILE|END_OF_STRING)) break ;
+        //else _SyntaxError ( ( byte* ) "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
         //if ( Is_DebugModeOn ) CSL_PrintDataStack ( ) ;
     }
     while ( lc->ParenLevel ) ;
@@ -65,8 +73,7 @@ _LO_Read_Do_LParen ( LambdaCalculus * lc )
     Stack_Push ( lc->QuoteStateStack, lc->QuoteState ) ;
     //lc->QuoteState = 0 ;
     lc->ParenLevel ++ ;
-    l0 = _LO_Read ( lc ) ;
-    SetState ( lc, LC_READ, true ) ;
+    l0 = LC_Read ( lc, -1 ) ;
     lc->QuoteState = Stack_Pop ( lc->QuoteStateStack ) ;
     return l0 ;
 }
@@ -83,7 +90,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         Word_Eval ( word ) ;
         if ( word->W_LispAttributes & T_LISP_SPECIAL )
         {
-            l0 = DataObject_New (T_LC_NEW, word, 0, word->W_MorphismAttributes, word->W_ObjectAttributes,
+            l0 = DataObject_New ( T_LC_NEW, word, 0, word->W_MorphismAttributes, word->W_ObjectAttributes,
                 T_LISP_SYMBOL | word->W_LispAttributes, 0, word->Lo_Value, 0, allocType, tsrli, scwi ) ;
         }
     }
@@ -93,7 +100,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         Word_Eval ( word ) ;
         token1 = ( byte * ) DataStack_Pop ( ) ;
         SetState ( lc, ( LC_READ ), true ) ;
-        l0 = DataObject_New (T_LC_LITERAL, 0, token1, 0, LITERAL | word->W_ObjectAttributes, word->W_LispAttributes, 0, _Lexer_->Literal, 0, allocType, tsrli, scwi ) ;
+        l0 = DataObject_New ( T_LC_LITERAL, 0, token1, 0, LITERAL | word->W_ObjectAttributes, word->W_LispAttributes, 0, _Lexer_->Literal, 0, allocType, tsrli, scwi ) ;
     }
     else
     {
@@ -103,7 +110,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
             Word_ObjectRun ( word ) ;
             Set_CompileMode ( false ) ;
         }
-        l0 = DataObject_New (T_LC_NEW, word, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes,
+        l0 = DataObject_New ( T_LC_NEW, word, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes,
             ( T_LISP_SYMBOL | word->W_LispAttributes ), 0, word->Lo_Value, 0, allocType, tsrli, scwi ) ;
         if ( word->W_ObjectAttributes & NAMESPACE_TYPE ) Namespace_Do_Namespace ( word ) ;
     }
@@ -126,7 +133,7 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
     {
         int64 allocType = GetState ( _Compiler_, LC_ARG_PARSING ) ? DICTIONARY : LISP ;
         Lexer_ParseObject ( lexer, token ) ;
-        l0 = DataObject_New (T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, lexer->Literal, 0, allocType, tsrli, scwi ) ;
+        l0 = DataObject_New ( T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, lexer->Literal, 0, allocType, tsrli, scwi ) ;
     }
     if ( l0 )
     {

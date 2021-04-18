@@ -80,7 +80,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     Word * word = _O_->ExceptionWord ;
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
-    if ( _Context_->CurrentlyRunningWord ) CSL_ShowInfo_Token ( _Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
+    if ( _Context_->CurrentlyRunningWord ) CSL_Show_SourceCode_TokenLine ( _Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
     if ( ! _O_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) Debugger_Stack ( debugger ) ;
     if ( ! word )
     {
@@ -569,7 +569,7 @@ _Error ( byte * msg, uint64 state )
         CSL_NewLine ( ) ;
         CSL_Location ( ) ;
         Printf ( msg ) ;
-        CSL_ShowInfo_Token ( _Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
+        CSL_Show_SourceCode_TokenLine ( _Context_->CurrentlyRunningWord, "", _O_->RestartCondition, _Context_->CurrentlyRunningWord->Name, "" ) ;
         Pause ( ) ;
         DebugColors ;
     }
@@ -585,7 +585,7 @@ _Error ( byte * msg, uint64 state )
 void
 OVT_ExceptionState_Print ( )
 {
-    Printf ( "\nSignalExceptionsHandled = %d ; SigSegvs = %d ; Restarts = %d\nStartedTimes = %d ; RestartCondition = %s ; LastRestartCondtion = %s",
+    Printf ( "\nSignalExceptionsHandled = %d ; SigSegvs = %d ; Restarts = %d\nStartedTimes = %d ; RestartCondition = %s ; LastRestartCondtion = %s\n",
         _O_->SignalExceptionsHandled, _O_->SigSegvs, _O_->Restarts, _O_->StartedTimes, Convert_RestartCondtion ( _O_->LastRestartCondition ),
         Convert_RestartCondtion ( _O_->RestartCondition ) ) ;
 }

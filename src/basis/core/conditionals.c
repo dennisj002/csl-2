@@ -21,7 +21,7 @@ Match_MapFunction ( dlnode * node, uint64 switchValue )
 void
 MatchAccessFunction ( )
 {
-    dllist_Map1_Break ( ( dllist* ) TOS, ( MapFunction1 ) Match_MapFunction, _Dsp_ [ - 1 ] ) ;
+    dllist_Map1_Break ( ( dllist* ) TOS, ( MapFunction1 ) Match_MapFunction, _DspReg_ [ - 1 ] ) ;
     DataStack_DropN ( 2 ) ;
 }
 

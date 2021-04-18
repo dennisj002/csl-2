@@ -200,7 +200,7 @@
 #define SCRATCH_REG2           THRU_REG                      // r8 // eax/edx are both used sometimes by ops ebx/ecx are not ?
 #define SREG2                          SCRATCH_REG2
 #if DSP_IS_GLOBAL_REGISTER 
-register uint64 *_Dsp_          asm ( "r14" ) ;
+register uint64 *_DspReg_          asm ( "r14" ) ;
 register uint64 *_Fp_           asm ( "r15" ) ;
 #endif
 #define STACK_POINTER           R14D                    // r14

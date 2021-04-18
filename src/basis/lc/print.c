@@ -25,12 +25,14 @@ LO_PrintLiteralToString ( LambdaCalculus * lc, ListObject * l0 )
 void
 LO_PrintValueToString ( LambdaCalculus * lc, ListObject * l0 )
 {
-     //LC_sprintName ( lc->buffer, l0 ) ;
-     //LO_strcat ( lc->outBuffer, lc->buffer ) ;
-     Word_Morphism_Run ( l0->Lo_CSLWord ) ;
-     int64 * tos = (int64*) DataStack_Pop ( ) ;
-     l0->Lo_Value = * tos ;
-     LO_PrintLiteralToString ( lc, l0 ) ;
+    //LC_sprintName ( lc->buffer, l0 ) ;
+    //LO_strcat ( lc->outBuffer, lc->buffer ) ;
+    int64 * svDsp = _DspReg_ ;
+    Word_Morphism_Run ( l0->Lo_CSL_Word ) ;
+    int64 * tos = ( int64* ) DataStack_Pop ( ) ;
+    l0->Lo_Value = * tos ;
+    LO_PrintLiteralToString ( lc, l0 ) ;
+    _DspReg_ = svDsp ;
 }
 
 void
@@ -41,12 +43,13 @@ _LO_Print_NonLambdaSymbol_ToString ( LambdaCalculus * lc, ListObject * l0, int64
     {
         if ( *l0->Lo_PtrToValue != ( uint64 ) nil )
         {
-            if ( ( ! *l0->Lo_PtrToValue ) && l0->Lo_CSLWord )
+            if ( ( ! *l0->Lo_PtrToValue ) && l0->Lo_CSL_Word )
             {
-                if ( _O_->Verbosity > 2 ) LC_snprintf2 ( lc->buffer, " %s = 0x%016lx", l0->Lo_CSLWord->Lo_Name, ( int64 ) l0->Lo_CSLWord ) ;
+                if ( _O_->Verbosity > 2 ) LC_snprintf2 ( lc->buffer, " %s = 0x%016lx", l0->Lo_CSL_Word->Lo_Name, ( int64 ) l0->Lo_CSL_Word ) ;
                 else LC_sprintName ( lc->buffer, l0 ) ;
             }
-            else if ( ( l0->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) ) && (!( l0->Lo_CSLWord->W_LispAttributes & T_LISP_SYMBOL )) )
+            //else if ( ( l0->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) ) && ( l0->Lo_CSLWord ) && ( ! ( l0->Lo_CSLWord->W_LispAttributes & T_LISP_SYMBOL ) ) )
+            else if ( ( l0->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) ) && ( ! ( l0->W_LispAttributes & T_LISP_SYMBOL ) ) )
             {
                 LO_PrintValueToString ( lc, l0 ) ;
             }
@@ -88,7 +91,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
         else if ( l0->W_LispAttributes & T_LISP_SYMBOL )
         {
             if ( LO_IsQuoted ( l0 ) ) LC_sprintName ( lc->buffer, l0 ) ;
-            else if ( ( ! in_a_LambdaFlag ) && l0->Lo_CSLWord && ( l0->W_LispAttributes & T_LAMBDA ) ) _LO_Print_Lambda_ToString ( lc, l0, printSymbolValueFlag ) ;
+            else if ( ( ! in_a_LambdaFlag ) && l0->Lo_CSL_Word && ( l0->W_LispAttributes & T_LAMBDA ) ) _LO_Print_Lambda_ToString ( lc, l0, printSymbolValueFlag ) ;
             else _LO_Print_NonLambdaSymbol_ToString ( lc, l0, printSymbolValueFlag ) ;
         }
         else if ( ( l0->W_ObjectAttributes & ( T_STRING | T_RAW_STRING | T_LISP_SYMBOL ) ) ) //||( l0->W_LispAttributes & (T_LISP_SYMBOL) ))
@@ -111,12 +114,12 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
             if ( NUMBER_BASE_GET == 16 ) LC_snprintf1 ( lc->buffer, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
             else LC_snprintf1 ( lc->buffer, ( l0->Lo_Integer < 0 ) ? " 0x%016lx" : " %ld", l0->Lo_Integer ) ;
         }
-        else if ( l0->W_ObjectAttributes & LITERAL )  LO_PrintLiteralToString ( lc, l0 ) ;
+        else if ( l0->W_ObjectAttributes & LITERAL ) LO_PrintLiteralToString ( lc, l0 ) ;
         else if ( l0->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) LC_sprintName ( lc->buffer, l0 ) ;
         else if ( l0->W_LispAttributes & ( T_HEAD | T_TAIL ) ) ;
         else
         {
-            if ( l0->Lo_CSLWord && l0->Lo_CSLWord->Lo_Name ) LC_sprintString ( lc->buffer, l0->Lo_CSLWord->Lo_Name ) ;
+            if ( l0->Lo_CSL_Word && l0->Lo_CSL_Word->Lo_Name ) LC_sprintString ( lc->buffer, l0->Lo_CSL_Word->Lo_Name ) ;
             else if ( l0->Name ) LC_sprintName ( lc->buffer, l0 ) ;
         }
     }
@@ -150,18 +153,24 @@ _LO_PrintListToString ( LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, 
 byte *
 LO_PrintListToString ( LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, int64 printValueFlag )
 {
-    Buffer_Init ( lc->PrintBuffer, 0 ) ;
-    Buffer_Init ( lc->OutBuffer, 0 ) ;
-    _LO_PrintListToString ( lc, l0, lambdaFlag, printValueFlag ) ;
-    SetState ( lc, LC_PRINT_ENTERED, false ) ;
+    if ( l0 )
+    {
+        Buffer_Init ( lc->PrintBuffer, 0 ) ;
+        Buffer_Init ( lc->OutBuffer, 0 ) ;
+        _LO_PrintListToString ( lc, l0, lambdaFlag, printValueFlag ) ;
+        SetState ( lc, LC_PRINT_ENTERED, false ) ;
+    }
     return lc->outBuffer ;
 }
 
 void
 _LO_Print ( ListObject * l0, byte * prefix, byte * postfix, Boolean valueFlag )
 {
-    LO_PrintListToString ( _LC_, ( ListObject * ) l0, 0, valueFlag ) ;
-    Printf ( "%s%s%s", prefix, _LC_->outBuffer, postfix ) ;
+    if ( l0 )
+    {
+        LO_PrintListToString ( _LC_, ( ListObject * ) l0, 0, valueFlag ) ;
+        Printf ( "%s%s%s", prefix, _LC_->outBuffer, postfix ) ;
+    }
 }
 
 void

@@ -31,7 +31,7 @@ CSL_TokenQID ( )
             else break ;
         }
     }
-    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ; //necessary to update interpreter state since we are pushing the last token
+    if ( GetState ( _Lexer_, END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ; //necessary to update interpreter state since we are pushing the last token
     DataStack_Push ( ( int64 ) token ) ;
 }
 

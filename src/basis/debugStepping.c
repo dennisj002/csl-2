@@ -151,7 +151,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
         {
             if ( Word_IsSyntactic ( word ) ) //&& ( ! GetState ( word, STEPPED ) ) )
             {
-                uint64 * svDsp = _Dsp_ ;
+                uint64 * svDsp = _DspReg_ ;
                 Interpreter * interp = _Interpreter_ ;
                 interp->w_Word = word ;
                 SetState ( _Debugger_, DBG_INFIX_PREFIX, true ) ;
@@ -580,7 +580,7 @@ Debugger_CASOI_UpdateInfo ( Debugger * debugger )
     {
         // keep eip - instruction pointer - up to date ..
         debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
-        _Dsp_ = debugger->cs_Cpu->R14d ;
+        _DspReg_ = debugger->cs_Cpu->R14d ;
     }
 }
 

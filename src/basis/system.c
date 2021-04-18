@@ -195,6 +195,7 @@ _CSL_SystemState_Print ( int64 pflag )
     Printf ( " : BigNum %s", bno ? "on" : "off" ) ;
     Boolean lo = Namespace_IsUsing ( ( byte* ) "Lisp" ) ;
     Printf ( " : Lisp %s", lo ? "on" : "off" ) ;
+    Printf ( " : Lisp Debug : %s", GetState ( _LC_, LC_DEBUG_ON ) ? "on" : "off" ) ;
     Printf ( " : jcc8 %s", GetState ( _CSL_, JCC8_ON ) ? "on" : "off" ) ;
     Printf ( "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
     OVT_ExceptionState_Print ( ) ;

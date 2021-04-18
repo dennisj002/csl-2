@@ -151,7 +151,7 @@ Interpreter_ReadNextTokenToWord ( Interpreter * interp )
     Word * word = 0 ;
     byte * token ;
     if ( token = Lexer_ReadToken ( interp->Lexer0 ) ) word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
-    else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
+    else SetState ( _Context_->Lexer0, END_OF_LINE, true ) ;
     return word ;
 }
 
@@ -167,12 +167,22 @@ Word_IsSyntactic ( Word * word )
     else return false ;
 }
 
+#if 0
 void
-Interpreter_SetLexState ( Interpreter * interp )
+Interpreter_GetStateFromLexer ( Interpreter * interp )
 {
-    byte llc = _Lexer_->LastLexedChar ;
+    Lexer * lexer = interp->Lexer0 ;
+#if 0
+    byte llc = lexer->LastLexedChar ;
     if ( llc == 0 ) SetState ( interp, END_OF_STRING, true ) ;
     else if ( llc == eof ) SetState ( interp, END_OF_FILE, true ) ;
     else if ( llc == '\n' ) SetState ( interp, END_OF_LINE, true ) ;
+#elif 0
+    if ( GetState ( lexer, END_OF_FILE ) ) SetState ( interp, END_OF_FILE, true ) ; //|END_OF_STRING))
+    if ( GetState ( lexer, END_OF_STRING ) ) SetState ( interp, END_OF_STRING, true ) ; //|))
+    if ( GetState ( lexer, END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ; //|))
+#elif 1 // since these flags are the same for interp as lexer
+    return lexer->State ;
+#endif    
 }
-
+#endif

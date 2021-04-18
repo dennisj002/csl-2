@@ -4,9 +4,12 @@ Int
 bnOff dbgOff 
 scOn
 Root 
+#if 0
+'sp  purge
+: sp stack pause ;
+#else
 : sp ; //stack pause ;
-C 
-: sp ; //stack pause ;
+#endif
 sp
 dbOn 0 =
 User 
@@ -75,7 +78,7 @@ C
 7 factorial dup p 5040 "factorial" assert1
 nl location "\nstarting Lisp\n stack is ..." ddps s
 sp //pause
-Lisp 
+lcOn
 ( define g23 ( lambda ( a b c ) ( a b c))) 
 (g23 + 3 4 ) (g23 / 14 2 ) 
 (define q1x0 (lambda (a0) (a0))) 
@@ -117,6 +120,7 @@ nl
 ( + ( k ( j 1 2 3 ) ( h 2 3 59 ) ) 7 ) // 77
 ( g + ( k ( j 1 2 ( h 2 3 ( k 59 4 ) ) ) 6 ) 0 ) // 77
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 787 34 ) 21 787 34 )  // == 777
+sp
 lcOff    
 // demo : interspersing C code with lisp compiled code
 C Compiler
@@ -147,6 +151,7 @@ Compiler C
  20 _fib1 dup p 6765 _assert0 
 c_syntaxOn
 int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; } }
+pwi _fib1c 
 _fib1c (20) dup p 6765 _assert0 
 c_syntaxOff
 : fibPTC? ( n | fn fn1 fn2 ) 

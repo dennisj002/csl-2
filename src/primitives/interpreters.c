@@ -17,7 +17,7 @@ CSL_CommentToEndOfLine ( )
     ReadLiner_CommentToEndOfLine ( _Context_->ReadLiner0 ) ;
     String_RemoveEndWhitespace ( _CSL_->SC_Buffer ) ;
     _CSL_SC_ScratchPadIndex_Init ( _CSL_ ) ;
-    SetState ( lexer, LEXER_END_OF_LINE, true ) ;
+    SetState ( lexer, END_OF_LINE, true ) ;
     SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 

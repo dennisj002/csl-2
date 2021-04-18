@@ -187,13 +187,13 @@ _Context_InterpretString ( Context * cntx, byte *str )
     Interpreter * interp = cntx->Interpreter0 ;
     ReadLiner * rl = cntx->ReadLiner0 ;
     _SetEcho ( 0 ) ;
-    int64 interpState = interp->State ;
-    int64 lexerState = interp->Lexer0->State ;
+    //int64 interpState = interp->State ;
+    //int64 lexerState = interp->Lexer0->State ;
     Readline_Setup_OneStringInterpret ( rl, str ) ;
-    Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_STRING ) ;
+    Interpret_UntilFlaggedWithInit ( interp, END_OF_STRING ) ;
     Readline_Restore_InputLine_State ( rl ) ;
-    interp->Lexer0->State = lexerState ;
-    interp->State = interpState ;
+    //interp->Lexer0->State = lexerState ;
+    //interp->State = interpState ;
 }
 
 void
@@ -249,7 +249,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
 }
 
 void
-_CSL_ContextNew_IncludeFile ( byte * filename )
+CSL_ContextNew_IncludeFile ( byte * filename )
 {
     _CSL_Contex_NewRun_2 ( _CSL_, _Context_IncludeFile, filename, 1 ) ;
 }

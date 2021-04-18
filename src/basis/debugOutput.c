@@ -77,7 +77,7 @@ Debugger_Locals_Show ( Debugger * debugger )
 Boolean
 _Debugger_ShouldWeShow ( Debugger * debugger, Word * word, Boolean stepFlag, int64 debugLevel, Boolean force )
 {
-    uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _Dsp_ = debugger->cs_Cpu->R14d ) : _Dsp_ ;
+    uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _DspReg_ = debugger->cs_Cpu->R14d ) : _DspReg_ ;
     if ( ! dsp ) CSL_Exception ( STACK_ERROR, 0, QUIT ) ;
     if ( Is_DebugOn && ( _CSL_->DebugLevel >= debugLevel ) && ( force || stepFlag || ( word && ( word != debugger->LastShowEffectsWord ) ) ||
         ( debugger->PreHere && ( Here > debugger->PreHere ) ) ) )
@@ -90,7 +90,7 @@ _Debugger_ShouldWeShow ( Debugger * debugger, Word * word, Boolean stepFlag, int
 void
 _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, int64 debugLevel, Boolean force )
 {
-    uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _Dsp_ = debugger->cs_Cpu->R14d ) : _Dsp_ ;
+    uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _DspReg_ = debugger->cs_Cpu->R14d ) : _DspReg_ ;
     if ( _Debugger_ShouldWeShow ( debugger, word, stepFlag, debugLevel, force ) )
     {
         DebugColors ;
@@ -152,7 +152,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
 
-        if ( token0 ) CSL_ShowInfo_Token ( word, prompt, signal, token0, signalAscii ) ;
+        if ( token0 ) CSL_Show_SourceCode_TokenLine ( word, prompt, signal, token0, signalAscii ) ;
         else
         {
             byte *cc_line = ( char* ) Buffer_Data ( _CSL_->DebugB ) ;
@@ -558,7 +558,7 @@ CSL_PrepareDbgShowInfoString ( Word * word, byte* token, int64 twAlreayUsed )
 }
 
 void
-CSL_ShowInfo_Token ( Word * word, byte * prompt, int64 signal, byte * token0, byte * signalAscii )
+CSL_Show_SourceCode_TokenLine ( Word * word, byte * prompt, int64 signal, byte * token0, byte * signalAscii )
 {
     ReadLiner * rl = _ReadLiner_ ;
     char * compileOrInterpret = ( char* ) ( ( signal || ( int64 ) signalAscii[0] ) ?

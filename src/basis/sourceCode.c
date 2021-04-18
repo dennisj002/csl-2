@@ -180,7 +180,7 @@ void
 CheckRecycleWord ( Node * node )
 {
     Word *w = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    _CheckRecycleWord ( w ) ;
+    _CheckRecycleWord ( (Node *) w ) ;
 }
 
 void

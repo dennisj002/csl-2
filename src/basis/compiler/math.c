@@ -117,7 +117,7 @@ _CSL_Do_IncDec ( int64 op )
                 *( ( int64* ) ( TOS ) ) += 1 ;
                 DataStack_Drop ( ) ;
             }
-            else _Dsp_ [0] ++ ;
+            else _DspReg_ [0] ++ ;
         }
         else
         {
@@ -126,7 +126,7 @@ _CSL_Do_IncDec ( int64 op )
                 *( ( int64* ) ( TOS ) ) -= 1 ;
                 DataStack_Drop ( ) ;
             }
-            else _Dsp_ [0] -- ;
+            else _DspReg_ [0] -- ;
         }
         //CSL->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }

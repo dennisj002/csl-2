@@ -396,6 +396,6 @@ _CSL_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
 void
 _CSL_PrintNDataStack ( int64 size )
 {
-    _PrintNStackWindow ( _Dsp_, ( byte* ) "Data Stack", ( byte* ) "Dsp (DSP:R14)", size ) ;
+    _PrintNStackWindow ( _DspReg_, ( byte* ) "Data Stack", ( byte* ) "Dsp (DSP:R14)", size ) ;
 }
 
