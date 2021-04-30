@@ -177,13 +177,14 @@ void
 _LO_PrintWithValue ( ListObject * l0, byte * prefix, byte * postfix, Boolean indentFlag )
 {
     //if ( _LC_->IndentDbgPrint && _LC_->ParenLevel ) 
-    if ( indentFlag && _LC_->ParenLevel )
+    if ( indentFlag ) //&& _LC_->ParenLevel )
     {
         int64 i ;
         byte * b = Buffer_DataCleared ( _CSL_->StringInsertB3 ) ;
-        strncat ( b, "\n", BUFFER_IX_SIZE ) ;
-        for ( i = 0 ; i < _LC_->ParenLevel ; i ++ ) strncat ( b, "  ", BUFFER_IX_SIZE ) ;
-        strncat ( b, &prefix[ prefix[0] == '\n' ? 1 : 0 ], BUFFER_IX_SIZE ) ; // after '\n'
+       // strncat ( b, "\n", BUFFER_IX_SIZE ) ;
+        //for ( i = 0 ; i < _LC_->ParenLevel ; i ++ ) strncat ( b, "  ", BUFFER_IX_SIZE ) ;
+        snprintf ( b, BUFFER_IX_SIZE, "\n[%ld]", _LC_->ParenLevel ) ;
+        //strncat ( b, &prefix[ prefix[0] == '\n' ? 1 : 0 ], BUFFER_IX_SIZE ) ; // after '\n'
         prefix = b ;
     }
     _LO_Print ( l0, prefix, postfix, 1 ) ;

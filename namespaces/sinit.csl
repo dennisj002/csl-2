@@ -196,7 +196,7 @@ sp
 System
 : bnInit1 ( width ) width @ bnInit ; 
 : bigNumOff "BigNum" notUsing ;
-: bigNumOn BigNum 16 bnInit1 ;
+: bigNumOn BigNum 32 bnInit1 ;
 
 'bnOn 'bigNumOn find alias
 'bnOff 'bigNumOff find alias

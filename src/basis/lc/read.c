@@ -5,7 +5,7 @@
 //===================================================================================================================
 
 ListObject *
-LC_Read ( LambdaCalculus * lc, int64 startReadIndex )
+LC_Read (LambdaCalculus * lc)
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
@@ -23,7 +23,7 @@ LC_Read ( LambdaCalculus * lc, int64 startReadIndex )
     {
         lnew = 0 ;
     }
-        //if ( lc->L0 ) rl->ReadIndex = lc->L0->W_RL_Index ; // if we had a tab completion within the parenthesis ReadIndex is affected
+    //if ( lc->L0 ) rl->ReadIndex = lc->L0->W_RL_Index ; // if we had a tab completion within the parenthesis ReadIndex is affected
     //if (startReadIndex != -1)  rl->ReadIndex = startReadIndex ;
     //    rl->ReadIndex = (startReadIndex == -1) ? rl->ReadIndex : startReadIndex ;
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nEntering _LO_Read..." ) ) ;
@@ -73,7 +73,7 @@ _LO_Read_Do_LParen ( LambdaCalculus * lc )
     Stack_Push ( lc->QuoteStateStack, lc->QuoteState ) ;
     //lc->QuoteState = 0 ;
     lc->ParenLevel ++ ;
-    l0 = LC_Read ( lc, -1 ) ;
+    l0 = LC_Read (lc) ;
     lc->QuoteState = Stack_Pop ( lc->QuoteStateStack ) ;
     return l0 ;
 }

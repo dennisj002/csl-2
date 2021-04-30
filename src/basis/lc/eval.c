@@ -13,7 +13,7 @@ LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean apply
     lc->ApplyFlag = applyFlag ;
     SetState ( lc, LC_EVAL, true ) ;
     lc->L0 = l0 ;
-    //LC_Debug ( lc, "LC_Eval", LC_EVAL, 1 ) ;
+    //LC_Debug (lc, LC_EVAL, 1 ) ;
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
     if ( l0 && ( ! LO_IsQuoted ( l0 ) ) )
     {
@@ -23,7 +23,7 @@ LC_Eval ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean apply
     }
     SetState ( lc, LC_EVAL, false ) ;
     lc->L1 = l1 ;
-    LC_Debug ( lc, 0, LC_EVAL, 0 ) ;
+    LC_Debug (lc, LC_EVAL, 0 ) ;
     return l1 ;
 }
 
@@ -63,7 +63,7 @@ LC_EvalList ( LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean a
     }
     //lc->ParenLevel -- ;
     lc->L1 = l1 ;
-    LC_Debug ( lc, 0, LC_EVAL_LIST, 0 ) ;
+    LC_Debug (lc, LC_EVAL_LIST, 0 ) ;
     return l1 ;
 }
 
@@ -148,7 +148,7 @@ LC_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
 {
     ListObject * lfirst, *macro, *l1 = l0 ;
     lc->Locals = locals ;
-    LC_Debug ( lc, 0, LC_SPECIAL_FUNCTION, 1 ) ;
+    LC_Debug (lc, LC_SPECIAL_FUNCTION, 1 ) ;
     if ( lfirst = _LO_First ( l0 ) )
     {
         if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( lfirst, "LC_Debug : ", 0, lfirst->Name, "" ) ;

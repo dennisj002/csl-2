@@ -90,7 +90,8 @@ String_IsThereADotSeparatorBackFromPosToLastNonDelmiter ( byte * s, int64 pos )
 byte
 String_LastChar ( byte * s )
 {
-    int64 i ; byte rtn ;
+    int64 i ;
+    byte rtn ;
     for ( i = 0 ; s[i] ; i ++ ) ;
     rtn = s[( i <= 0 ) ? 0 : ( i - 1 )] ;
     return rtn ;
@@ -461,9 +462,12 @@ Strncmp ( byte * str0, byte * str1, int64 n )
 {
     int64 i ;
     Boolean result = 0 ;
-    for ( i = 0 ; ( str0 [ i ] || str1 [ i ] ) && ( ! result ) && n ; i ++, n -- )
+    if ( str0 && str1 )
     {
-        result = str0 [ i ] != str1 [ i ] ;
+        for ( i = 0 ; ( str0 [ i ] || str1 [ i ] ) && ( ! result ) && n ; i ++, n -- )
+        {
+            result = str0 [ i ] != str1 [ i ] ;
+        }
     }
     return result ;
 }

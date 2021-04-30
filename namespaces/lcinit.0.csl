@@ -1,8 +1,8 @@
 (set verbosity 1)
 //typecheckOff
 //Int d: 
-(lcOn)
-//(ld:)
+lcOn
+(ld:)
 (( lambda ( x y ) ( + x y ) ) 3 4 ) 
 (define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1))))))
 (yfac yfac 10) nl
@@ -26,17 +26,16 @@ lcOff
 #if 1 //doLispTest @ // from sicp
 lcOn
 bnOn
-bnInit ( 32 )
 (define (abs n) (cond (( < n 0 ) (- 0 n)) n )) 
 ( abs -9)
 ( abs 9)
 (define (square n) (* n n))
 (define (average x y) ( / (+ x y) 2 ))  
 (define (improve guess x) (average guess (/ x guess)))    
-(define (good-enough? guess x) ( < ( abs ( - (square guess) x)) 0.00000000001))  
+(define (good-enough? guess x) ( < ( abs ( - (square guess) x)) 0.000000000001))  
 //( ld: ) 
 (define (sq-iter guess x) (if (good-enough? guess x) guess (sq-iter (improve guess x ) x )))    
-( define (sqrt x) ( sq-iter 1.0 x))
+( define (sqrt x) ( sq-iter 1.00000000000 x))
 (sqrt 9) 
 (sqrt 2) 
 (sqrt (sqrt (sqrt 9) ))
@@ -128,6 +127,7 @@ lcOn
 (prime? 13)            
 (prime? 100) 
 (define (p? n) (prime? n))
+(define (d? n) (sd n))
 ;;; SECTION 1.2.5
 //#endif    
 #endif

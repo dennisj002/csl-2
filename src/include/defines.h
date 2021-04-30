@@ -182,7 +182,7 @@
 #define CONTEXT_SIZE ( 5 * K )
 
 #define OPENVMTIL_SIZE ( 2 * KB )
-#define STACK_SIZE ( 2 * KB ) // * 4 bytes per slot
+#define STACK_SIZE OVT_StackSize () // * 8 bytes per slot
 #define CSL_SIZE (STACK_SIZE * 4) + (12.5 * K)
 
 #define TEMP_MEM_SIZE (COMPILER_TEMP_OBJECTS_SIZE + SESSION_OBJECTS_SIZE + LISP_TEMP_SIZE + TEMP_OBJECTS_SIZE + HISTORY_SIZE + BUFFER_SPACE_SIZE + CONTEXT_SIZE)
@@ -687,6 +687,7 @@ typedef struct
 #define DBG_OUTPUT_SUBSTITUTION ( (uint64) 1 << 37 )
 #define DBG_SETUP_ADDRESS ( (uint64) 1 << 38 )
 #define DBG_INFIX_PREFIX ( (uint64) 1 << 39 )
+#define DBG_LC_DEBUG ( (uint64) 1 << 40 )
 
 #define SIZEOF_AddressAfterJmpCallStack 16
 // TODO : nb. flags need to be edited !!!!! for right category, overlap, use/non-use, etc.
@@ -890,6 +891,9 @@ typedef struct
 #define LC_EVAL_LIST                          ( (uint64) 1 << 22 )
 #define LC_SUBSTITUTE                       ( (uint64) 1 << 23 )
 #define LC_SPECIAL_FUNCTION            ( (uint64) 1 << 24 )
+#define LO_DEFINE                  ( (uint64) 1 << 25 )
+#define LO_DEFINEC                  ( (uint64) 1 << 26 )
+#define LC_DEBUG_MENU_SHOWN                 ( (uint64) 1 << 27 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )

@@ -173,6 +173,12 @@ CSL_CheckInitDataStack ( )
     }
 }
 
+int64
+OVT_StackSize ()
+{
+    return (_O_->DataStackSize / sizeof ( int64)) ;
+}
+
 void
 CSL_DataStack_Size ( )
 {

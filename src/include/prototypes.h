@@ -1015,6 +1015,7 @@ void Set_DspReg_FromDataStackPointer(void);
 void SetDataStackPointer(uint64 *sp);
 uint64 *GetDataStackPointer(void);
 void CSL_CheckInitDataStack(void);
+int64 OVT_StackSize(void);
 void CSL_DataStack_Size(void);
 /* src/basis/context.c */
 void _Context_Prompt(Context *cntx, int64 control);
@@ -1754,6 +1755,7 @@ void Debugger_OptimizeToggle(Debugger *debugger);
 void Debugger_CodePointerUpdate(Debugger *debugger);
 void Debugger_Dump(Debugger *debugger);
 void Debugger_Default(Debugger *debugger);
+void Debugger_Verbosity(Debugger *debugger);
 void _Debugger_State(Debugger *debugger);
 void _Debugger_Copy(Debugger *debugger, Debugger *debugger0);
 Debugger *Debugger_Copy(Debugger *debugger0, uint64 type);
@@ -1837,8 +1839,8 @@ void LC_On(void);
 LambdaCalculus *LC_Reset(void);
 LambdaCalculus *LC_Init(void);
 /* src/basis/lc/lcDebug.c */
-void LC_Debug(LambdaCalculus *lc, ListObject *lword, int64 state, Boolean setupFlag);
-void LC_Debug_Output(LambdaCalculus *lc, int64 state, Boolean setupFlag);
+void LC_Debug(LambdaCalculus *lc, int64 state, Boolean setupFlag);
+void LC_Debug_Output(LambdaCalculus *lc);
 /* src/basis/lc/apply.c */
 ListObject *LC_Apply(LambdaCalculus *lc, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag);
 ListObject *_LO_Apply(LambdaCalculus *lc, ListObject *lfunction, ListObject *largs);
@@ -1870,7 +1872,7 @@ ListObject *_LC_EvalSymbol(LambdaCalculus *lc, ListObject *l0, ListObject *local
 ListObject *_LC_EvalList(LambdaCalculus *lc, ListObject *lorig, ListObject *locals, Boolean applyFlag);
 ListObject *LC_SpecialFunction(LambdaCalculus *lc, ListObject *l0, ListObject *locals);
 /* src/basis/lc/read.c */
-ListObject *LC_Read(LambdaCalculus *lc, int64 startReadIndex);
+ListObject *LC_Read(LambdaCalculus *lc);
 ListObject *_LO_Read_Do_LParen(LambdaCalculus *lc);
 ListObject *_LO_Read_DoWord(LambdaCalculus *lc, Word *word, int64 qidFlag, int64 tsrli, int64 scwi);
 ListObject *_LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 tsrli, int64 scwi);

@@ -130,6 +130,7 @@ _InstallGotoPoint_Key ( dlnode * node, int64 blockInfo, int64 key )
         else if ( ( gotoInfo->GI_CAttribute & GI_RECURSE ) && ( key & GI_RECURSE ) )
         {
             _GotoInfo_SetAndRemove ( gotoInfo, bi->bp_First, 0 ) ;
+            //_GotoInfo_SetAndRemove ( gotoInfo, bi->LocalFrameStart, 0 ) ; //can we just make it a jmp to LocalFrameStart if there is only one in a function (tail-call)
         }
         else if ( ( gotoInfo->GI_CAttribute & GI_TAIL_CALL ) && ( key & GI_TAIL_CALL ) )
         {

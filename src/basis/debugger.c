@@ -15,7 +15,6 @@ Debugger_InterpreterLoop ( Debugger * debugger )
     do
     {
         Debugger_DoState ( debugger ) ;
-        //CSL_Using ( ) ;
         if ( ! GetState ( _Debugger_, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ) )
         {
             while ( ( debugger->Key = Key ( ) ) == - 1 ) ;
@@ -641,6 +640,12 @@ Debugger_Default ( Debugger * debugger )
 }
 
 void
+Debugger_Verbosity ( Debugger * debugger )
+{
+    Printf ( "\nVerbosity = %d", _O_->Verbosity ) ;
+}
+
+void
 _Debugger_State ( Debugger * debugger )
 {
     byte * buf = Buffer_Data ( _CSL_->DebugB2 ) ;
@@ -756,7 +761,6 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 't' ] = 7 ;
     debugger->CharacterTable [ 'Z' ] = 8 ;
     debugger->CharacterTable [ 'U' ] = 9 ;
-    //debugger->CharacterTable [ 'V' ] = 8 ;
     debugger->CharacterTable [ 'r' ] = 10 ;
     debugger->CharacterTable [ 'g' ] = 10 ;
     debugger->CharacterTable [ 'c' ] = 11 ;
@@ -789,6 +793,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'y' ] = 36 ;
     debugger->CharacterTable [ 'w' ] = 37 ;
     debugger->CharacterTable [ 'x' ] = 38 ;
+    debugger->CharacterTable [ 'V' ] = 39 ;
 
     // debugger : system related
     debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
@@ -831,5 +836,6 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 36 ] = Debugger_ShowTypeWordStack ;
     debugger->CharacterFunctionTable [ 37 ] = Debugger_Wdiss ;
     debugger->CharacterFunctionTable [ 38 ] = Debugger_Exit ;
+    debugger->CharacterFunctionTable [ 39 ] = Debugger_Verbosity ;
 }
 

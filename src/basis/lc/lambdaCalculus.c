@@ -284,7 +284,7 @@ ListObject *
 _LC_Read_ListObject ( LambdaCalculus * lc, int64 parenLevel, int64 startReadIndex )
 {
     lc->ParenLevel = parenLevel ;
-    ListObject * l0 = LC_Read ( lc, startReadIndex ) ;
+    ListObject * l0 = LC_Read (lc) ;
     return l0 ;
 }
 
@@ -500,6 +500,8 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
     lc->ParenLevel = 0 ;
     lc->QuoteState = 0 ;
     lc->ItemQuoteState = 0 ;
+    lc->DebuggerState = 0 ;
+    lc->DebuggerSetupFlag = 0 ;
     DLList_Recycle_WordList ( lc->Lambda_SC_WordList ) ;
     LC_SaveStackPointer ( lc ) ;
     LC_Init_Variables ( lc ) ;

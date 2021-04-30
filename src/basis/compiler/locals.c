@@ -411,7 +411,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
                 //_Printf ( "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
                 CSL_Exception ( SYNTAX_ERROR, "\nLocal variables syntax error : no closing parenthesis ')' found", 1 ) ;
                 break ;
-            }
+            } 
             if ( ! lispMode )
             {
                 word = Finder_Word_FindUsing ( finder, token, 1 ) ; // 1: saveQns ?? find after Literal - eliminate making strings or numbers words ??
@@ -432,10 +432,12 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
                 objectAttributes |= LOCAL_VARIABLE ;
                 if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CSL_LocalWord
             }
-            if ( regFlag == true )
+            if ( regFlag == true ) 
+            //if ( ( regFlag == true ) || ((numberOfVariables < 4) && ( GetState ( _CSL_, OPTIMIZE_ON ) ) ) )
             {
                 objectAttributes |= REGISTER_VARIABLE ;
                 numberOfRegisterVariables ++ ;
+                numberOfVariables --  ;
             }
             word = DataObject_New ( objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
             if ( lispMode ) dllist_AddNodeToTail ( localsNs->W_List, ( dlnode* ) word ) ;

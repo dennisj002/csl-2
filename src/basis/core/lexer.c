@@ -52,7 +52,7 @@ _Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi 
     {
         if ( ( GetState ( _O_, AUTO_VAR ) && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) ) )
             word = Lexer_Do_MakeItAutoVar ( lexer, token, tsrli, scwi ) ;
-        else Printf ( "\nWarning : word \'%s\' not found! Pushing \'%s\' as a string onto the stack.\n", token, token ) ;
+        else Printf ( "\nWarning : %s : word \'%s\' not found! Pushing \'%s\' as a string onto the stack.\n", Context_Location (), token, token ) ;
     }
     if ( ! word ) word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, lexer->Literal, 0, 0, tsrli, scwi ) ;
     if ( word )

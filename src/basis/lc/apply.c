@@ -11,7 +11,7 @@ LC_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListO
     ListObject * l1 ;
     lc->ApplyFlag = applyFlag ;
     SetState ( lc, LC_APPLY, true ) ;
-    LC_Debug ( lc, 0, LC_APPLY, 1 ) ;
+    LC_Debug (lc, LC_APPLY, 1 ) ;
     if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) || 
         ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) )))
     {
@@ -182,7 +182,7 @@ void
 LC_Substitute ( LambdaCalculus * lc, ListObject *lambdaParameters, ListObject * funcCallValues )
 {
     lc->LambdaParameters = lambdaParameters, lc->FunctionCallValues = funcCallValues ;
-    LC_Debug ( lc, 0, LC_SUBSTITUTE, 0 ) ;
+    LC_Debug (lc, LC_SUBSTITUTE, 0 ) ;
     while ( lambdaParameters && funcCallValues )
     {
         // ?!? this may not be the right idea but we want it so that we can have transparent lists in the parameters, ie. 
@@ -462,7 +462,7 @@ Word_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right ar
         int64 svDs = GetState ( _CSL_, _DEBUG_SHOW_ ) ;
         DebugShow_Off ;
         cntx->BaseObject = 0 ; // nb! very important !! // but maybe shouldn't be done here -> Context_DoDotted_Post
-        l0 = LC_Read (lc, 0) ;
+        l0 = LC_Read (lc) ;
         SetState ( _CSL_, _DEBUG_SHOW_, svDs ) ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LC_Apply_C_LtoR_ArgList ( lc, l0, word ) ;

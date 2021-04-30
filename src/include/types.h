@@ -772,7 +772,7 @@ typedef struct _Debugger
     Cpu * cs_Cpu ;
     ByteArray * StepInstructionBA ;
     byte CharacterTable [ 128 ] ;
-    DebuggerFunction CharacterFunctionTable [ 40 ] ;
+    DebuggerFunction CharacterFunctionTable [ 42 ] ;
     ud_t * Udis ;
     dllist * DebugWordList ;
 } Debugger ;
@@ -833,10 +833,10 @@ typedef struct _CombinatorInfo
 struct _CSL ;
 typedef struct _LambdaCalculus
 {
-    uint64 State ;
+    uint64 State, DebuggerState, DebuggerSetupFlag ;
     int64 DontCopyFlag, Loop, ParenLevel ;
     Namespace *LispNamespace, *LispDefinesNamespace, *LispTempNamespace, *BackgroundNamespace ;
-    ListObject *L00, *L0, *L1, *Lfirst, *Lfunction, *Locals, *Largs, *Largs1, * Nil, *True, *LambdaParameters, *FunctionCallValues ;
+    ListObject *L00, *L0, *L1, *Lfirst, *Lfunction, *Lvalue, *Locals, *Largs, *Largs1, * Nil, *True, *LambdaParameters, *FunctionCallValues ;
     ListObject *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;

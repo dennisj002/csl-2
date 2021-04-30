@@ -10,7 +10,6 @@ _LO_Definec ( ListObject * l0, ListObject * locals0 )
     ListObject *value, *l1, *value1, *l2, *lnext ;
     Word * word, *idLo ;
     SetState ( _CSL_, _DEBUG_SHOW_, 1 ) ;
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( l0, "\n_LO_Define : l0 = ", "", 1 ) ;
     if ( ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) ) // scheme 'define : ( define ( func args) funcBody )
     {
         idLo = _LO_First ( l0 ) ;
@@ -29,9 +28,6 @@ _LO_Definec ( ListObject * l0, ListObject * locals0 )
         LO_AddToHead ( value, value1 ) ;
         lambda = _LO_Read_DoToken ( _LC_, "lambda", 0, - 1, - 1 ) ;
         LO_AddToHead ( value, lambda ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value0, "\n_LO_Define : value0 = ", "", 1 ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
         //value->W_LispAttributes |= T_LAMBDA ;
         //locals1 = 0 ;
     }
@@ -43,18 +39,14 @@ _LO_Definec ( ListObject * l0, ListObject * locals0 )
     _Context_->CurrentWordBeingCompiled = word ;
     word->Lo_CSL_Word = word ;
     Namespace_DoAddWord ( locals0 ? locals0 : lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
     value = LC_Eval ( lc, value, 0, 0 ) ; // 0 : don't apply
     if ( ( value && ( value->W_LispAttributes & T_LAMBDA ) ) )
     {
-        value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
-        value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : function = ", "", 1 ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionParameters, "\n_LO_Define : value->Lo_LambdaFunctionParameters = ", "", 1 ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionBody, "\n_LO_Define : value->Lo_LambdaFunctionBody = ", "", 1 ) ;
+        lc->LambdaParameters = value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
+        lc->Lfunction = value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
     }
     else value = _LO_Copy ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
+    lc->Lvalue = value ;
     SetState ( _CSL_, _DEBUG_SHOW_, false ) ;
     word->Lo_Value = ( uint64 ) value ; // used by eval
     word->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
@@ -69,7 +61,7 @@ _LO_Definec ( ListObject * l0, ListObject * locals0 )
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     _CSL_FinishWordDebugInfo ( l1 ) ;
     _Word_Finish ( l1 ) ;
-    //word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
+    LC_Debug (lc, LO_DEFINEC, 0 ) ;
     return l1 ;
 }
 
@@ -80,7 +72,6 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
     ListObject *value, *l1, *locals1 = 0, *value1, *l2, *lnext ;
     Word * word, *idLo ;
     SetState ( _CSL_, _DEBUG_SHOW_, LC_DEFINE_DBG ) ;
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( l0, "\n_LO_Define : l0 = ", "", 1 ) ;
     if ( ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) ) // scheme 'define : ( define ( func args) funcBody )
     {
         idLo = _LO_First ( l0 ) ;
@@ -92,7 +83,6 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
             l2->W_ObjectAttributes |= LOCAL_VARIABLE ;
         }
         value1->W_LispAttributes |= ( LIST | LIST_NODE ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( locals1, "\n_LO_Define : locals1 = ", "", 1 ) ;
         locals1 = value1 ;
     }
     else idLo = l0 ;
@@ -105,16 +95,11 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
     word->Lo_CSL_Word = word ;
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
     Namespace_DoAddWord ( locals0 ? locals0 : lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : idLo = ", "", 1 ) ;
-    if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value, "\n_LO_Define : value = ", "", 1 ) ;
     if ( locals1 )
     {
         word->Lo_LambdaFunctionParameters = _LO_Copy ( ( ListObject* ) locals1, LISP ) ;
         word->Lo_LambdaFunctionBody = _LO_Copy ( value, LISP ) ;
         word->W_LispAttributes |= T_LAMBDA ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : function = ", "", 1 ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionParameters, "\n_LO_Define : value->Lo_LambdaFunctionParameters = ", "", 1 ) ;
-        if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionBody, "\n_LO_Define : value->Lo_LambdaFunctionBody = ", "", 1 ) ;
     }
     else
     {
@@ -123,9 +108,6 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
         {
             value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
             value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
-            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( idLo, "\n_LO_Define : function = ", "", 1 ) ;
-            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionParameters, "\n_LO_Define : value->Lo_LambdaFunctionParameters = ", "", 1 ) ;
-            if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( value->Lo_LambdaFunctionBody, "\n_LO_Define : value->Lo_LambdaFunctionBody = ", "", 1 ) ;
         }
         else value = _LO_Copy ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
     }
@@ -143,7 +125,7 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
     //SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     _CSL_FinishWordDebugInfo ( l1 ) ;
     _Word_Finish ( l1 ) ;
-    //word->W_SC_WordList = _CSL_->CSL_N_M_Node_WordList ;
+    LC_Debug (lc, LO_DEFINE, 0 ) ;
     return l1 ;
 }
 

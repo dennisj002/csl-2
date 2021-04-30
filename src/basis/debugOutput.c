@@ -79,7 +79,7 @@ _Debugger_ShouldWeShow ( Debugger * debugger, Word * word, Boolean stepFlag, int
 {
     uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _DspReg_ = debugger->cs_Cpu->R14d ) : _DspReg_ ;
     if ( ! dsp ) CSL_Exception ( STACK_ERROR, 0, QUIT ) ;
-    if ( Is_DebugOn && ( _CSL_->DebugLevel >= debugLevel ) && ( force || stepFlag || ( word && ( word != debugger->LastShowEffectsWord ) ) ||
+    if ( Is_DebugOn && ( !_LC_ ) && ( _CSL_->DebugLevel >= debugLevel ) && ( force || stepFlag || ( word && ( word != debugger->LastShowEffectsWord ) ) ||
         ( debugger->PreHere && ( Here > debugger->PreHere ) ) ) )
     {
         return true ;
@@ -272,6 +272,7 @@ Debugger_DoState ( Debugger * debugger )
         debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     }
+    if ( _LC_ && _LC_->DebuggerState && GetState ( debugger, DBG_LC_DEBUG ) ) LC_Debug_Output (_LC_) ;
 }
 
 int64
