@@ -3,8 +3,9 @@
 //| LO_SpecialFunction(s) 
 //===================================================================================================================
 
+ // scheme 'define : ( define ( func args) funcBody )
 ListObject *
-_LO_Definec ( ListObject * l0, ListObject * locals0 )
+_LO_Define_Scheme ( ListObject * l0, ListObject * locals0 )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *value, *l1, *value1, *l2, *lnext ;
@@ -42,8 +43,8 @@ _LO_Definec ( ListObject * l0, ListObject * locals0 )
     value = LC_Eval (value, 0, 0 ) ; // 0 : don't apply
     if ( ( value && ( value->W_LispAttributes & T_LAMBDA ) ) )
     {
-        lc->FunctionParameters = value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
-        lc->Lfunction = value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
+        lc->FunctionParameters = value->Lo_LambdaParameters = _LO_Copy ( value->Lo_LambdaParameters, LISP ) ;
+        lc->Lfunction = value->Lo_LambdaBody = _LO_Copy ( value->Lo_LambdaBody, LISP ) ;
     }
     else value = _LO_Copy ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
     lc->Lvalue = value ;
@@ -97,8 +98,8 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
     Namespace_DoAddWord ( locals0 ? locals0 : lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
     if ( locals1 )
     {
-        word->Lo_LambdaFunctionParameters = _LO_Copy ( ( ListObject* ) locals1, LISP ) ;
-        word->Lo_LambdaFunctionBody = _LO_Copy ( value, LISP ) ;
+        word->Lo_LambdaParameters = _LO_Copy ( ( ListObject* ) locals1, LISP ) ;
+        word->Lo_LambdaBody = _LO_Copy ( value, LISP ) ;
         word->W_LispAttributes |= T_LAMBDA ;
     }
     else
@@ -106,8 +107,8 @@ _LO_Define ( ListObject * l0, ListObject * locals0 )
         value = LC_Eval (value, 0, 0 ) ; // 0 : don't apply
         if ( ( value && ( value->W_LispAttributes & T_LAMBDA ) ) )
         {
-            value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
-            value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
+            value->Lo_LambdaParameters = _LO_Copy ( value->Lo_LambdaParameters, LISP ) ;
+            value->Lo_LambdaBody = _LO_Copy ( value->Lo_LambdaBody, LISP ) ;
         }
         else value = _LO_Copy ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
     }
@@ -167,8 +168,8 @@ _LO_MakeLambda ( ListObject * l0 )
     if ( ! LC_CompileMode ) // nb! this needs to be 'if' not 'else' or else if' because the state is sometimes changed by CompileLispBlock, eg. for function parameters
     {
         lambda->Lo_CSL_Word = lambda ;
-        lambda->Lo_LambdaFunctionParameters = args ;
-        lambda->Lo_LambdaFunctionBody = body ;
+        lambda->Lo_LambdaParameters = args ;
+        lambda->Lo_LambdaBody = body ;
         lambda->W_LispAttributes |= T_LAMBDA | T_LISP_SYMBOL ;
         //lambda->CAttribute = 0 ;
     }
@@ -216,7 +217,7 @@ LO_CompileDefinec ( ListObject * l0 )
     SetState ( _Context_->Compiler0, RETURN_TOS, true ) ;
     SetState ( _LC_, (LC_COMPILE_MODE|LC_DEFINE_MODE), true ) ;
     ListObject * idNode = _LO_Next ( l0 ) ;
-    l0 = _LO_Definec ( idNode, 0 ) ;
+    l0 = _LO_Define_Scheme ( idNode, 0 ) ;
     SetState ( _LC_, (LC_COMPILE_MODE|LC_DEFINE_MODE), false ) ;
     return l0 ;
 }

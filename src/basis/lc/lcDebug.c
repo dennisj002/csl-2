@@ -34,7 +34,7 @@ LC_Debug_Output ( LambdaCalculus * lc )
             case LC_APPLY:
             {
                 Printf ( "\nLC_Apply ") ;
-                _LO_PrintWithValue ( lc->Lfunction->Lo_LambdaFunctionBody, ": Lfunction = ", "", 1 ),
+                _LO_PrintWithValue ( lc->Lfunction->Lo_LambdaBody, ": Lfunction = ", "", 1 ),
                     _LO_PrintWithValue ( lc->Largs, ": lc->Largs = ", "", 0 ) ;
                 CSL_Show_SourceCode_TokenLine ( lc->Lfunction, "LC_Debug : ", 0, lc->Lfunction->Name, "" ) ;
                 lc->LC_Here = Here ;
@@ -74,7 +74,7 @@ LC_Debug_Output ( LambdaCalculus * lc )
                     if ( Here > lc->LC_Here ) compiled = true ;
                     lc->LC_Here = Here ;
                     Printf ( "\nLC_Apply ") ;
-                    _LO_PrintWithValue ( lc->Lfunction->Lo_LambdaFunctionBody, ": Lfunction = ", "", 1 ),
+                    _LO_PrintWithValue ( lc->Lfunction->Lo_LambdaBody, ": Lfunction = ", "", 1 ),
                         _LO_PrintWithValue ( lc->Largs, ": Largs = ", "", 0 ), ( Compiling && compiled ) ? Printf ( ": Compiled" ) : 0 ;//_LO_PrintWithValue ( lc->L1, ": L1 = ", "", 0 ) ;
                     CSL_Show_SourceCode_TokenLine ( lc->Lfunction, "LC_Debug : ", 0, lc->Lfunction->Name, "" ) ;
                 }

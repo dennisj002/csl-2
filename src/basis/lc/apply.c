@@ -6,26 +6,28 @@
 //===================================================================================================================
 
 ListObject *
-LC_Apply ( ListObject *lfunction, ListObject *largs, Boolean applyFlag )
+LC_Apply ()
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject * l1 ;
-    lc->ApplyFlag = applyFlag ;
+    ListObject *lfunction = lc->Lfunction, *largs = lc->Largs ;
+    Boolean applyFlag = lc->ApplyFlag ;
     SetState ( lc, LC_APPLY, true ) ;
     LC_Debug ( lc, LC_APPLY, 1 ) ;
     if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) ||
         ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) ) ) )
     {
-        l1 = _LO_Apply ( lfunction, largs ) ;
+        l1 = _LO_Apply () ;
     }
         //else if ( applyFlag && lfunction && ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) ) ) l1 = _LO_Apply ( lc, lfunction, largs ) ;
-    else if ( lfunction && ( lfunction->W_LispAttributes & T_LAMBDA ) && lfunction->Lo_LambdaFunctionBody )
+    else if ( lfunction && ( lfunction->W_LispAttributes & T_LAMBDA ) && lfunction->Lo_LambdaBody )
     {
         // LambdaArgs, the formal args, are not changed by LO_Substitute (locals - lvals are just essentially 'renamed') and thus don't need to be copied
-        LC_Substitute ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionParameters, largs ) ;
+        lc->FunctionParameters =  lfunction->Lo_LambdaParameters, lc->FunctionArgs = largs ;
+        LC_Substitute () ;
         //lc->CurrentLambdaFunction = lfunction ;
         lc->Locals = largs ;
-        l1 = LC_EvalList ( ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
+        l1 = LC_EvalList (( ListObject * ) lfunction->Lo_LambdaBody) ;
     }
     else
     {
@@ -58,11 +60,12 @@ LC_Apply ( ListObject *lfunction, ListObject *largs, Boolean applyFlag )
 }
 
 ListObject *
-_LO_Apply ( ListObject *lfunction, ListObject *largs )
+_LO_Apply ()
 {
     LambdaCalculus * lc = _LC_ ;
     SetState ( lc, LC_APPLY, true ) ;
     ListObject *l1 = nil ;
+    ListObject *lfunction = lc->Lfunction, *largs = lc->Largs ;
     if ( ( ! largs ) && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) || ( lfunction->W_LispAttributes & ( T_LC_IMMEDIATE ) )
         || ( lfunction->W_LispAttributes & T_LISP_CSL_COMPILED ) ) )
     {
@@ -154,32 +157,33 @@ _LO_Do_FunctionBlock ( ListObject *lfunction, ListObject *largs )
 }
 
 void
-LC_Substitute ( LambdaCalculus * lc, ListObject *lambdaParameters, ListObject * funcCallValues )
+LC_Substitute ()
 {
-    lc->FunctionParameters = lambdaParameters, lc->FunctionArgs = funcCallValues ;
+    LambdaCalculus * lc = _LC_ ;
+    ListObject *funcParameters = lc->FunctionParameters, * funcArgs = lc->FunctionArgs ;
     LC_Debug ( lc, LC_SUBSTITUTE, 0 ) ;
-    while ( lambdaParameters && funcCallValues )
+    while ( funcParameters && funcArgs )
     {
         // ?!? this may not be the right idea but we want it so that we can have transparent lists in the parameters, ie. 
         // no affect with a parenthesized list or just unparaenthesized parameters of the same number
-        if ( lambdaParameters->W_LispAttributes & ( LIST | LIST_NODE ) )
+        if ( funcParameters->W_LispAttributes & ( LIST | LIST_NODE ) )
         {
-            lambdaParameters = _LO_First ( lambdaParameters ) ; // can something like this work
-            if ( funcCallValues->W_LispAttributes & ( LIST | LIST_NODE ) ) funcCallValues = _LO_First ( funcCallValues ) ;
+            funcParameters = _LO_First ( funcParameters ) ; // can something like this work
+            if ( funcArgs->W_LispAttributes & ( LIST | LIST_NODE ) ) funcArgs = _LO_First ( funcArgs ) ;
             //else Error ( "\nLO_Substitute : funcCallValues list structure doesn't match parameter list", QUIT ) ;
         }
-        else if ( funcCallValues->W_LispAttributes & ( LIST | LIST_NODE ) )
+        else if ( funcArgs->W_LispAttributes & ( LIST | LIST_NODE ) )
         {
-            funcCallValues = _LO_First ( funcCallValues ) ;
-            if ( lambdaParameters->W_LispAttributes & ( LIST | LIST_NODE ) ) lambdaParameters = _LO_First ( lambdaParameters ) ; // can something like this work
+            funcArgs = _LO_First ( funcArgs ) ;
+            if ( funcParameters->W_LispAttributes & ( LIST | LIST_NODE ) ) funcParameters = _LO_First ( funcParameters ) ; // can something like this work
             //else Error ( "\nLO_Substitute : funcCallValues list structure doesn't match parameter list", QUIT ) ;
         }
         // just preserve the name of the arg for the finder
         // so we now have the call values with the parameter names - parameter names are unchanged 
         // so when we eval/print these parameter names they will have the function calling values -- lambda calculus substitution - beta reduction
-        funcCallValues->Lo_Name = lambdaParameters->Lo_Name ;
-        lambdaParameters = _LO_Next ( lambdaParameters ) ;
-        funcCallValues = _LO_Next ( funcCallValues ) ;
+        funcArgs->Lo_Name = funcParameters->Lo_Name ;
+        funcParameters = _LO_Next ( funcParameters ) ;
+        funcArgs = _LO_Next ( funcArgs ) ;
     }
 }
 

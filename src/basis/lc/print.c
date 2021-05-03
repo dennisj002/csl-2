@@ -9,8 +9,8 @@ _LO_Print_Lambda_ToString ( LambdaCalculus * lc, ListObject * l0, int64 printVal
     lc->buffer [0] = 0 ;
     LC_sprintName ( lc->buffer, l0 ) ;
     LO_strcat ( lc->outBuffer, lc->buffer ) ;
-    _LO_PrintListToString ( lc, ( ListObject * ) l0->Lo_LambdaFunctionParameters, 1, printValueFlag ) ; // 1 : lambdaFlag = 1 
-    _LO_PrintListToString ( lc, ( ListObject * ) l0->Lo_LambdaFunctionBody, 1, printValueFlag ) ; // 1 : lambdaFlag = 1 
+    _LO_PrintListToString ( lc, ( ListObject * ) l0->Lo_LambdaParameters, 1, printValueFlag ) ; // 1 : lambdaFlag = 1 
+    _LO_PrintListToString ( lc, ( ListObject * ) l0->Lo_LambdaBody, 1, printValueFlag ) ; // 1 : lambdaFlag = 1 
 }
 
 void

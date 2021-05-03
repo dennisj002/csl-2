@@ -12,14 +12,15 @@ LC_Eval ( ListObject *l0, ListObject *locals, Boolean applyFlag )
     LambdaCalculus * lc = _LC_ ;
     ListObject *l1 = l0 ;
     lc->ApplyFlag = applyFlag ;
+    lc->Locals = locals ;
     SetState ( lc, LC_EVAL, true ) ;
     lc->L0 = l0 ;
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
     LC_Debug ( lc, LC_EVAL, 1 ) ;
     if ( l0 && ( ! LO_IsQuoted ( l0 ) ) )
     {
-        if ( l0->W_LispAttributes & T_LISP_SYMBOL ) l1 = _LC_EvalSymbol ( l0, locals ) ;
-        else if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) l1 = LC_EvalList ( l0, locals, applyFlag ) ;
+        if ( l0->W_LispAttributes & T_LISP_SYMBOL ) l1 = _LC_EvalSymbol () ;
+        else if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) l1 = LC_EvalList ( l0 ) ;
         else if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( l0, "LC_Debug : ", 0, l0->Name, "" ) ;
     }
     SetState ( lc, LC_EVAL, false ) ;
@@ -29,15 +30,17 @@ LC_Eval ( ListObject *l0, ListObject *locals, Boolean applyFlag )
 }
 
 ListObject *
-LC_EvalList ( ListObject *l0, ListObject *locals, Boolean applyFlag )
+LC_EvalList ( ListObject *l0 )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *l1, *lfunction, *largs0, *largs, *lfirst ;
+    ListObject * locals = lc->Locals ;
+    Boolean applyFlag = lc->ApplyFlag ;
     LO_CheckEndBlock ( ) ;
     LO_CheckBeginBlock ( ) ;
     lc->ParenLevel ++ ;
     lfirst = _LO_First ( l0 ) ;
-    if ( lc->Lfirst = lfirst )
+    if ( lfirst )
     {
         if ( lfirst->W_LispAttributes & ( T_LISP_SPECIAL | T_LISP_MACRO ) )
         {
@@ -48,12 +51,12 @@ LC_EvalList ( ListObject *l0, ListObject *locals, Boolean applyFlag )
         else
         {
             lfunction = LC_Eval ( lfirst, locals, applyFlag ) ;
-            lc->Lfunction = lfunction ;
             largs0 = _LO_Next ( lfirst ) ;
-            lc->Largs = largs0 ;
-            largs = _LC_EvalList ( largs0, locals, applyFlag ) ;
+            lc->Largs0 = largs0 ;
+            largs = _LC_EvalList () ;
             lc->Largs = largs ;
-            l1 = LC_Apply ( lfunction, largs, applyFlag ) ;
+            lc->Lfunction = lfunction ;
+            l1 = LC_Apply ( ) ;
         }
     }
     lc->L1 = l1 ;
@@ -62,15 +65,15 @@ LC_EvalList ( ListObject *l0, ListObject *locals, Boolean applyFlag )
 }
 
 ListObject *
-_LC_EvalSymbol ( ListObject *l0, ListObject *locals )
+_LC_EvalSymbol ()
 {
     LambdaCalculus * lc = _LC_ ;
     Word *w ;
-    ListObject *l1 = l0 ; // default 
+    ListObject *l1 = lc->L0 ; // default 
     if ( l1 )
     {
-        if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( l0, "LC_Debug : ", 0, l0->Name, "" ) ;
-        w = LC_FindWord ( l1->Name, locals ) ;
+        if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( l1, "LC_Debug : ", 0, l1->Name, "" ) ;
+        w = LC_FindWord ( l1->Name, lc->Locals ) ;
         if ( w )
         {
             w->W_SC_Index = l1->W_SC_Index ;
@@ -114,21 +117,21 @@ _LC_EvalSymbol ( ListObject *l0, ListObject *locals )
 }
 
 ListObject *
-_LC_EvalList ( ListObject *lorig, ListObject *locals, Boolean applyFlag )
+_LC_EvalList () 
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject *lnew = 0, *lnode, *lnext, *le ;
-    if ( lorig )
+    ListObject *l1 = 0, *lnode, *lnext, *le, *locals = lc->Locals ;
+    if ( lc->Largs0 )
     {
-        lnew = LO_New ( LIST, 0 ) ;
-        for ( lnode = lorig ; lnode ; lnode = lnext )
+        l1 = LO_New ( LIST, 0 ) ;
+        for ( lnode = lc->Largs0 ; lnode ; lnode = lnext )
         {
             lnext = _LO_Next ( lnode ) ;
-            le = LC_Eval ( lnode, locals, applyFlag ) ;
-            LO_AddToTail ( lnew, LO_CopyOne ( le ) ) ;
+            le = LC_Eval ( lnode, locals, lc->ApplyFlag ) ; // lc->Locals could be changed by eval
+            LO_AddToTail ( l1, LO_CopyOne ( le ) ) ;
         }
     }
-    return lnew ;
+    return l1 ;
 }
 
 ListObject *

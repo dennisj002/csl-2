@@ -300,8 +300,8 @@ typedef struct _Identifier // _Symbol
 #define Lo_UInteger Lo_Value
 #define Lo_Integer Lo_Value
 #define Lo_String Lo_Value
-#define Lo_LambdaFunctionParameters W_WordData->LambdaArgs
-#define Lo_LambdaFunctionBody W_WordData->LambdaBody
+#define Lo_LambdaParameters W_WordData->LambdaArgs
+#define Lo_LambdaBody W_WordData->LambdaBody
 
 #define W_List S_SymbolList 
 #define W_Value S_Value

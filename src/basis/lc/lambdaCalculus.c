@@ -266,7 +266,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
 
     LC_Init_Variables ( lc ) ;
     lc->L0 = l0 ;
-    l1 = LC_Eval (l0, 0, 1 ) ;
+    l1 = LC_Eval ( l0, 0, 1 ) ;
     lc->L1 = l1 ;
     if ( lc = _LC_ ) // lambda calculus can be turned off by eval
     {
@@ -284,7 +284,7 @@ ListObject *
 _LC_Read_ListObject ( LambdaCalculus * lc, int64 parenLevel, int64 startReadIndex )
 {
     lc->ParenLevel = parenLevel ;
-    ListObject * l0 = LC_Read (lc) ;
+    ListObject * l0 = LC_Read ( lc ) ;
     return l0 ;
 }
 
@@ -619,7 +619,7 @@ List_Eval ( )
     LambdaCalculus * lc = LC_Init_Runtime ( ) ;
     //LC_LispNamespaceOn ( ) ;
     ListObject * l0 = ( ListObject * ) DataStack_Pop ( ), *l1 ;
-    l1 = LC_Eval (l0, 0, 1 ) ;
+    l1 = LC_Eval ( l0, 0, 1 ) ;
     DataStack_Push ( ( int64 ) l1 ) ;
 }
 

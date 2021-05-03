@@ -1842,14 +1842,14 @@ void List_Eval(void);
 void LC_Debug(LambdaCalculus *lc, int64 state, Boolean setupFlag);
 void LC_Debug_Output(LambdaCalculus *lc);
 /* src/basis/lc/apply.c */
-ListObject *LC_Apply(ListObject *lfunction, ListObject *largs, Boolean applyFlag);
-ListObject *_LO_Apply(ListObject *lfunction, ListObject *largs);
+ListObject *LC_Apply(void);
+ListObject *_LO_Apply(void);
 void _Interpreter_LC_InterpretWord(Interpreter *interp, ListObject *l0);
 void _LO_CompileOrInterpret_One(ListObject *l0, int64 functionFlag);
 void LO_CompileOrInterpretArgs(ListObject *largs);
 void _LO_CompileOrInterpret(ListObject *lfunction, ListObject *largs);
 ListObject *_LO_Do_FunctionBlock(ListObject *lfunction, ListObject *largs);
-void LC_Substitute(LambdaCalculus *lc, ListObject *lambdaParameters, ListObject *funcCallValues);
+void LC_Substitute(void);
 ListObject *LO_PrepareReturnObject(void);
 void LO_BeginBlock(void);
 void LO_EndBlock(void);
@@ -1867,9 +1867,9 @@ block CompileLispBlock(ListObject *args, ListObject *body);
 /* src/basis/lc/eval.c */
 Boolean LO_IsQuoted(ListObject *l0);
 ListObject *LC_Eval(ListObject *l0, ListObject *locals, Boolean applyFlag);
-ListObject *LC_EvalList(ListObject *l0, ListObject *locals, Boolean applyFlag);
-ListObject *_LC_EvalSymbol(ListObject *l0, ListObject *locals);
-ListObject *_LC_EvalList(ListObject *lorig, ListObject *locals, Boolean applyFlag);
+ListObject *LC_EvalList(ListObject *l0);
+ListObject *_LC_EvalSymbol(void);
+ListObject *_LC_EvalList(void);
 ListObject *LC_SpecialFunction(ListObject *l0, ListObject *locals);
 /* src/basis/lc/read.c */
 ListObject *LC_Read(LambdaCalculus *lc);
@@ -1899,7 +1899,7 @@ byte *_LO_PRINT_TO_STRING(ListObject *l0);
 byte *_LO_PRINT_TO_STRING_WITH_VALUE(ListObject *l0);
 void LO_Print(ListObject *l0);
 /* src/basis/lc/special.c */
-ListObject *_LO_Definec(ListObject *l0, ListObject *locals0);
+ListObject *_LO_DefineScheme(ListObject *l0, ListObject *locals0);
 ListObject *_LO_Define(ListObject *l0, ListObject *locals0);
 ListObject *_LO_MakeLambda(ListObject *l0);
 ListObject *LO_Lambda(ListObject *l0);

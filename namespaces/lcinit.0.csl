@@ -7,7 +7,7 @@ lcOn
 (define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1))))))
 (yfac yfac 10) nl
 (define yfacc (lambda (yyy n1) (if (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
-(yfacc yfacc 10) nl //pause
+(yfacc yfacc 20) pause
 (yfacc yfacc 7) nl 
 (definec fibc (lambda ( n ) (ifc (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 pwi fibc
