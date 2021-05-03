@@ -126,7 +126,7 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
     Word *word ;
     //if ( Is_DebugModeOn ) CSL_PrintDataStack ( ) ;
     if ( qidFlag ) SetState ( cntx->Finder0, QID, true ) ;
-    word = LC_FindWord ( token, 0 ) ;
+    word = LC_FindWord (token) ;
     if ( qidFlag ) SetState ( cntx->Finder0, QID, false ) ;
     if ( word ) l0 = _LO_Read_DoWord ( lc, word, qidFlag, tsrli, scwi ) ;
     else

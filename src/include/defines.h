@@ -895,6 +895,7 @@ typedef struct
 #define LO_DEFINEC                  ( (uint64) 1 << 26 )
 #define LC_DEBUG_MENU_SHOWN                 ( (uint64) 1 << 27 )
 #define LC_COND                 ( (uint64) 1 << 28 )
+#define LC_EVAL_PRINT                 ( (uint64) 1 << 29 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )

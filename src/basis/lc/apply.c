@@ -6,7 +6,7 @@
 //===================================================================================================================
 
 ListObject *
-LC_Apply ()
+LC_Apply ( )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject * l1 ;
@@ -17,25 +17,21 @@ LC_Apply ()
     if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) ||
         ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) ) ) )
     {
-        l1 = _LO_Apply () ;
+        l1 = _LO_Apply ( ) ;
     }
-        //else if ( applyFlag && lfunction && ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) ) ) l1 = _LO_Apply ( lc, lfunction, largs ) ;
     else if ( lfunction && ( lfunction->W_LispAttributes & T_LAMBDA ) && lfunction->Lo_LambdaBody )
     {
         // LambdaArgs, the formal args, are not changed by LO_Substitute (locals - lvals are just essentially 'renamed') and thus don't need to be copied
-        lc->FunctionParameters =  lfunction->Lo_LambdaParameters, lc->FunctionArgs = largs ;
-        LC_Substitute () ;
-        //lc->CurrentLambdaFunction = lfunction ;
+        lc->FunctionParameters = lfunction->Lo_LambdaParameters, lc->FunctionArgs = largs ;
+        LC_Substitute ( ) ;
         lc->Locals = largs ;
-        l1 = LC_EvalList (( ListObject * ) lfunction->Lo_LambdaBody) ;
+        lc->L0 = lfunction->Lo_LambdaBody ;
+        l1 = LC_EvalList ( ) ;
     }
     else
     {
         //these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
-        if ( ! largs )
-        {
-            l1 = lfunction ;
-        }
+        if ( ! largs ) l1 = lfunction ;
         else
         {
             LO_AddToHead ( largs, lfunction ) ;
@@ -45,11 +41,14 @@ LC_Apply ()
         {
             if ( GetState ( lc, LC_COMPILE_MODE ) )
             {
-                _LO_PrintWithValue ( lc->Lread, "\nLC_Apply : lc->Lread = ", "", 0 ) ;
-                CSL_Show_SourceCode_TokenLine ( lfunction, "LC_Debug : ", 0, lfunction->Name, "" ) ;
-                Printf ( "\nCan't compile this define because \'%s\' is not a function/combinator. Function variables are not yet implemented?!", lfunction->Name ) ;
-                Printf ( "\nHowever, it should run interpreted." ) ;
                 SetState ( lc, LC_COMPILE_MODE, false ) ;
+                if ( _O_->Verbosity > 1 )
+                {
+                    _LO_PrintWithValue ( lc->Lread, "\nLC_Apply : lc->Lread = ", "", 0 ) ;
+                    CSL_Show_SourceCode_TokenLine ( lfunction, "LC_Debug : ", 0, lfunction->Name, "" ) ;
+                    Printf ( "\nCan't compile this define because \'%s\' is not a function/combinator. Function variables are not yet implemented?!", lfunction->Name ) ;
+                    Printf ( "\nHowever, it should run interpreted." ) ;
+                }
             }
         }
     }
@@ -60,14 +59,15 @@ LC_Apply ()
 }
 
 ListObject *
-_LO_Apply ()
+_LO_Apply ( )
 {
     LambdaCalculus * lc = _LC_ ;
     SetState ( lc, LC_APPLY, true ) ;
     ListObject *l1 = nil ;
     ListObject *lfunction = lc->Lfunction, *largs = lc->Largs ;
-    if ( ( ! largs ) && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) || ( lfunction->W_LispAttributes & ( T_LC_IMMEDIATE ) )
-        || ( lfunction->W_LispAttributes & T_LISP_CSL_COMPILED ) ) )
+    //if ( ( ! largs ) && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) || ( lfunction->W_LispAttributes & ( T_LC_IMMEDIATE ) )
+    if ( ( ! largs ) && ( lfunction->W_MorphismAttributes & ( CSL_WORD ) ) || ( lfunction->W_LispAttributes & ( T_LC_IMMEDIATE ) ) // allows for lisp.csl macros !? but better logic is probably available
+        || ( lfunction->W_LispAttributes & T_LISP_CSL_COMPILED ) )
     {
         Interpreter_DoWord ( _Context_->Interpreter0, lfunction->Lo_CSL_Word, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
         l1 = nil ;
@@ -157,7 +157,7 @@ _LO_Do_FunctionBlock ( ListObject *lfunction, ListObject *largs )
 }
 
 void
-LC_Substitute ()
+LC_Substitute ( )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *funcParameters = lc->FunctionParameters, * funcArgs = lc->FunctionArgs ;

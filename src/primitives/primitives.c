@@ -14,15 +14,15 @@ CPrimitive CPrimitives [] = {
     { "print", 0, 0, 0, ( block ) List_PrintWithValue, 0, 0, 0, "Lisp", "Root" },
     { ")", 0, 0, 0, CSL_C_Comma, IMMEDIATE | NO_OP_WORD | KEYWORD, 0, 0, "Lisp", "Root" },
     { "_Printf", 0, 0, 0, ( block ) Printf, 0, 0, LISP_C_RTL_ARGS | T_LISP_SPECIAL | LISP_VOID_RETURN, "Lisp", "Root" },
-    { "define", 0, 0, 0, ( block ) LO_Define, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    { "definec", 0, 0, 0, ( block ) LO_Definec, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
+    { "define", 0, 0, 0, ( block ) LC_Define, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
+    { "definec", 0, 0, 0, ( block ) LC_Define_Scheme, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     //{ "compile", 0, 0, 0, ( block ) LO_CompileDefine, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    { "_lambda", 0, 0, 0, ( block ) LO_Lambda, IMMEDIATE, 0, T_LAMBDA | T_LISP_SPECIAL, "Lisp", "Root" },
-    { "lambda", 0, 0, 0, ( block ) LO_Lambda, IMMEDIATE, 0, T_LAMBDA | T_LISP_SPECIAL, "Lisp", "Root" },
+    { "_lambda", 0, 0, 0, ( block ) LC_Lambda, IMMEDIATE, 0, T_LAMBDA | T_LISP_SPECIAL, "Lisp", "Root" },
+    { "lambda", 0, 0, 0, ( block ) LC_Lambda, IMMEDIATE, 0, T_LAMBDA | T_LISP_SPECIAL, "Lisp", "Root" },
     { "begin", 0, 0, 0, ( block ) LO_Begin, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "set", 0, 0, 0, ( block ) LO_Set, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "let", 0, 0, 0, (block) LO_Let, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    { "macro", 0, 0, 0, ( block ) _LO_Macro, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" }, // nb. too many clashes with other 'if's
+    { "macro", 0, 0, 0, ( block ) LC_Macro, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" }, // nb. too many clashes with other 'if's
     { "ifc", 0, 0, 0, ( block ) LO_Cond, COMBINATOR, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
     { "condc", 0, 0, 0, ( block ) LO_Cond, COMBINATOR, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "if", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
@@ -32,7 +32,7 @@ CPrimitive CPrimitives [] = {
     { "cdr", 0, 0, 0, ( block ) LO_Cdr, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "quote", 0, 0, 0, ( block ) LO_Quote, 0, 0, T_LISP_READ_MACRO, "Lisp", "Root" },
     { "eval", 0, 0, 0, ( block ) LC_Eval, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    { "list", 0, 0, 0, ( block ) LO_List, 0, 0, LIST_FUNCTION | T_LISP_SPECIAL, "Lisp", "Root" },
+    { "list", 0, 0, 0, ( block ) LC_List, 0, 0, LIST_FUNCTION | T_LISP_SPECIAL, "Lisp", "Root" },
     { "load", 0, 0, 0, ( block ) CSL_IncludeFile, 0, 0, 0, "Lisp", "Root" },
     { "'", 0, 0, 0, ( block ) LO_Quote, KEYWORD, 0, T_LISP_READ_MACRO, "Lisp", "Root" },
     { "@", 0, 0, 0, ( block ) LO_Splice, 0, 0, T_LISP_READ_MACRO, "Lisp", "Root" },

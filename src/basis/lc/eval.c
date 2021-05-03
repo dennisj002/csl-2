@@ -10,8 +10,8 @@ ListObject *
 LC_Eval ( ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject *l1 = l0 ;
-    lc->ApplyFlag = applyFlag ;
+    ListObject *l1 = l0 ; // default
+    lc->ApplyFlag = applyFlag ; //= ! GetState (lc, LC_DEFINE_MODE);
     lc->Locals = locals ;
     SetState ( lc, LC_EVAL, true ) ;
     lc->L0 = l0 ;
@@ -19,8 +19,8 @@ LC_Eval ( ListObject *l0, ListObject *locals, Boolean applyFlag )
     LC_Debug ( lc, LC_EVAL, 1 ) ;
     if ( l0 && ( ! LO_IsQuoted ( l0 ) ) )
     {
-        if ( l0->W_LispAttributes & T_LISP_SYMBOL ) l1 = _LC_EvalSymbol () ;
-        else if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) l1 = LC_EvalList ( l0 ) ;
+        if ( l0->W_LispAttributes & T_LISP_SYMBOL ) l1 = _LC_EvalSymbol ( ) ;
+        else if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) ) l1 = LC_EvalList ( ) ;
         else if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( l0, "LC_Debug : ", 0, l0->Name, "" ) ;
     }
     SetState ( lc, LC_EVAL, false ) ;
@@ -30,42 +30,39 @@ LC_Eval ( ListObject *l0, ListObject *locals, Boolean applyFlag )
 }
 
 ListObject *
-LC_EvalList ( ListObject *l0 )
+LC_EvalList ( )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject *l1, *lfunction, *largs0, *largs, *lfirst ;
-    ListObject * locals = lc->Locals ;
-    Boolean applyFlag = lc->ApplyFlag ;
+    ListObject *lfunction, *lfirst ;
     LO_CheckEndBlock ( ) ;
     LO_CheckBeginBlock ( ) ;
     lc->ParenLevel ++ ;
-    lfirst = _LO_First ( l0 ) ;
+    lfirst = _LO_First ( lc->L0 ) ;
+    LC_Debug ( lc, LC_EVAL_LIST, 1 ) ;
     if ( lfirst )
     {
         if ( lfirst->W_LispAttributes & ( T_LISP_SPECIAL | T_LISP_MACRO ) )
         {
             if ( LO_IsQuoted ( lfirst ) ) return lfirst ;
-            l1 = LC_SpecialFunction ( l0, locals ) ;
+            lc->Lfirst = lfirst ;
+            lc->L1 = LC_SpecialFunction ( ) ;
             lc->ParenLevel -- ;
         }
         else
         {
-            lfunction = LC_Eval ( lfirst, locals, applyFlag ) ;
-            largs0 = _LO_Next ( lfirst ) ;
-            lc->Largs0 = largs0 ;
-            largs = _LC_EvalList () ;
-            lc->Largs = largs ;
+            lfunction = LC_Eval ( lfirst, lc->Locals, lc->ApplyFlag ) ;
+            lc->Largs0 = _LO_Next ( lfirst ) ;
+            lc->Largs = _LC_EvalList ( ) ;
             lc->Lfunction = lfunction ;
-            l1 = LC_Apply ( ) ;
+            lc->L1 = LC_Apply ( ) ;
         }
     }
-    lc->L1 = l1 ;
     LC_Debug ( lc, LC_EVAL_LIST, 0 ) ;
-    return l1 ;
+    return lc->L1 ;
 }
 
 ListObject *
-_LC_EvalSymbol ()
+_LC_EvalSymbol ( )
 {
     LambdaCalculus * lc = _LC_ ;
     Word *w ;
@@ -73,7 +70,7 @@ _LC_EvalSymbol ()
     if ( l1 )
     {
         if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( l1, "LC_Debug : ", 0, l1->Name, "" ) ;
-        w = LC_FindWord ( l1->Name, lc->Locals ) ;
+        w = LC_FindWord ( l1->Name ) ;
         if ( w )
         {
             w->W_SC_Index = l1->W_SC_Index ;
@@ -83,10 +80,7 @@ _LC_EvalSymbol ()
                 lc->Sc_Word = l1 = w ;
                 w->State = l1->State ;
             }
-            else if ( w->W_LispAttributes & T_LC_DEFINE )
-            {
-                l1 = ( ListObject * ) w->Lo_Value ;
-            }
+            else if ( w->W_LispAttributes & T_LC_DEFINE ) l1 = ( ListObject * ) w->Lo_Value ;
             else if ( ( w->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) )
                 || ( w->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | NAMESPACE_VARIABLE ) )
                 || ( w->W_LispAttributes & ( T_LISP_COMPILED_WORD ) ) )
@@ -104,20 +98,20 @@ _LC_EvalSymbol ()
             }
             if ( ( CompileMode ) && LO_CheckBeginBlock ( ) ) _LO_CompileOrInterpret_One ( l1, 0 ) ;
             if ( w->W_MorphismAttributes & COMBINATOR ) LC_InitForCombinator ( lc ) ;
+            if ( ( ! ( w->W_LispAttributes & T_LAMBDA ) ) )
+            {
+                w->W_MySourceCodeWord = lc->Sc_Word ;
+                l1->W_MySourceCodeWord = lc->Sc_Word ;
+            }
         }
     }
     // else the node evals to itself
-    if ( w && ( ! ( w->W_LispAttributes & T_LAMBDA ) ) )
-    {
-        if ( w ) w->W_MySourceCodeWord = lc->Sc_Word ;
-        if ( l1 ) l1->W_MySourceCodeWord = lc->Sc_Word ;
-    }
     l1 = LO_CopyOne ( l1 ) ;
     return l1 ;
 }
 
 ListObject *
-_LC_EvalList () 
+_LC_EvalList ( )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *l1 = 0, *lnode, *lnext, *le, *locals = lc->Locals ;
@@ -135,31 +129,30 @@ _LC_EvalList ()
 }
 
 ListObject *
-LC_SpecialFunction ( ListObject * l0, ListObject * locals )
+LC_SpecialFunction ( )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject * lfirst, *macro, *l1 = l0 ;
-    lc->Locals = locals ;
+    ListObject * lfirst = lc->Lfirst, *macro, *lnext, *l1 = lc->L0 ;
     LC_Debug ( lc, LC_SPECIAL_FUNCTION, 1 ) ;
-    if ( lfirst = _LO_First ( l0 ) )
+    if ( lfirst )
     {
-        if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( lfirst, "LC_Debug : ", 0, lfirst->Name, "" ) ;
         while ( lfirst && ( lfirst->W_LispAttributes & T_LISP_MACRO ) )
         {
+            lnext = _LO_Next ( lfirst ) ;
             macro = lfirst ;
             macro->W_LispAttributes &= ~ T_LISP_MACRO ; // prevent short recursive loop calling of this function thru LO_Eval below
-            if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( l0, "LC_Debug : ", 0, l0->Name, "" ) ;
-            l1 = LC_Eval ( l0, locals, 1 ) ;
+            l1 = LC_Eval ( macro, lc->Locals, 1 ) ;
             macro->W_LispAttributes |= T_LISP_MACRO ; // restore to its true type
-            lfirst = _LO_First ( l0 ) ;
+            lfirst = lnext ;
         }
         if ( lfirst && lfirst->Lo_CSL_Word && IS_MORPHISM_TYPE ( lfirst->Lo_CSL_Word ) )
         {
             if ( lfirst->W_MorphismAttributes & COMBINATOR ) LC_InitForCombinator ( lc ) ;
-            l1 = ( ( ListFunction2 ) ( lfirst->Lo_CSL_Word->Definition ) ) ( lfirst, locals ) ; // ??? : does adding extra parameters to functions not defined with them mess up the the c runtime return stack
+            lc->Lfirst = lfirst ;
+            l1 = ( ( ListFunction0 ) ( lfirst->Lo_CSL_Word->Definition ) ) ( ) ; // ??? : does adding extra parameters to functions not defined with them mess up the the c runtime return stack
         }
-        else l1 = LC_Eval ( l0, locals, 1 ) ;
+        else l1 = LC_Eval ( lc->L0, lc->Locals, 1 ) ;
     }
+    LC_Debug ( lc, LC_SPECIAL_FUNCTION, 0 ) ;
     return l1 ;
 }
-

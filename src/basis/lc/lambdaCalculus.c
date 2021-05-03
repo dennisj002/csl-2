@@ -130,16 +130,18 @@ _LO_Next ( ListObject * l0 )
 }
 
 Word *
-LC_FindWord ( byte * name, ListObject * locals )
+LC_FindWord ( byte * name )
 {
+    LambdaCalculus * lc = _LC_ ;
     Word * word = 0 ;
+    ListObject * locals = lc->Locals ;
     if ( GetState ( _Compiler_, LC_ARG_PARSING ) ) word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;
     else
     {
         if ( locals ) word = _Finder_FindWord_InOneNamespace ( _Finder_, locals, name ) ;
         if ( ! word )
         {
-            word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispDefinesNamespace, name ) ;
+            word = _Finder_FindWord_InOneNamespace ( _Finder_, lc->LispDefinesNamespace, name ) ;
             if ( ! word )
             {
 #if 0        
@@ -149,7 +151,7 @@ LC_FindWord ( byte * name, ListObject * locals )
                     LC_Print_LispDefinesNamespace ( ) ;
                 }
 #endif        
-                word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispNamespace, name ) ; // prefer Lisp namespace
+                word = _Finder_FindWord_InOneNamespace ( _Finder_, lc->LispNamespace, name ) ; // prefer Lisp namespace
                 if ( ! word )
                 {
 #if 0        
@@ -209,34 +211,6 @@ _LO_CopyOne ( ListObject * l0, uint64 allocType )
 }
 
 // copy a whole list or a single node
-#if 0 // this seems more understandable but it crashes with gcc-10 -O3 ?
-
-ListObject *
-_LO_Copy ( ListObject * l0, uint64 allocType )
-{
-    ListObject * lnew = 0, *l1, *lnext, *lcopy ;
-    if ( l0 )
-    {
-        if ( l0->W_LispAttributes & ( LIST | LIST_NODE ) )
-        {
-            lnew = LO_List_New ( allocType ) ;
-            for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext )
-            {
-                lnext = _LO_Next ( l1 ) ;
-                lcopy = _LO_Copy ( l1, allocType ) ;
-                LO_AddToTail ( lnew, lcopy ) ;
-            }
-        }
-        else
-        {
-            lcopy = _LO_CopyOne ( l1, allocType ) ;
-            return lcopy ;
-        }
-    }
-    return lnew ;
-}
-#else
-
 ListObject *
 _LO_Copy ( ListObject * l0, uint64 allocType )
 {
@@ -254,23 +228,20 @@ _LO_Copy ( ListObject * l0, uint64 allocType )
     }
     return lnew ;
 }
-#endif
+
 //===================================================================================================================
 //| LO_Repl
 //===================================================================================================================
 
 void
-LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
+LC_EvalPrint ( ListObject * lread )
 {
-    ListObject * l1 ;
+    LambdaCalculus * lc = _LC_ ;
 
-    LC_Init_Variables ( lc ) ;
-    lc->L0 = l0 ;
-    l1 = LC_Eval ( l0, 0, 1 ) ;
-    lc->L1 = l1 ;
-    if ( lc = _LC_ ) // lambda calculus can be turned off by eval
+    lc->L1 = LC_Eval ( lread, 0, 1 ) ;
+    if ( lc = _LC_ ) // lambda calculus can be changed by eval
     {
-        LO_Print ( l1 ) ;
+        LO_Print ( lc->L1 ) ;
         CSL_NewLine ( ) ;
         SetState ( lc, LC_PRINT_ENTERED, false ) ;
         SetBuffersUnused ( 1 ) ;
@@ -302,17 +273,18 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     else CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 1 ) ;
     SetState ( _CSL_, DBG_TYPECHECK_ON, false ) ;
 
-    if ( lc && parenLevel )
-        lc->QuoteState = lc->ItemQuoteState ;
+    if ( lc && parenLevel ) lc->QuoteState = lc->ItemQuoteState ;
     else lc = LC_Init_Runtime ( ) ;
     SetState ( lc, LC_INTERP_DONE, false ) ;
     LC_LispNamespaceOn ( ) ;
+    LC_Init_Variables ( lc ) ;
     lc->ItemQuoteState = itemQuoteState ;
     int64 * svDsp = _DspReg_ ;
-    ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel, 0 ) ;
-    lc->Lread = l0 ;
-    if ( GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lc->Lread, "\n_LC_ReadEvalPrint_ListObject : lc->Lread = ", "", 1 ) ;
-    LC_EvalPrint ( lc, l0 ) ;
+    SetState ( lc, LC_EVAL_PRINT, true ) ;
+    lc->Lread = _LC_Read_ListObject ( lc, parenLevel, 0 ) ;
+    LC_EvalPrint ( lc->Lread ) ;
+    SetState ( lc, LC_EVAL_PRINT, false ) ;
+    LC_Debug ( lc, LC_EVAL_PRINT, 0 ) ;
     LC_ClearTempNamespace ( ) ;
     _DspReg_ = svDsp ;
 
@@ -478,7 +450,6 @@ LC_LispNamespaceOn ( )
 void
 LC_Init_Variables ( LambdaCalculus * lc )
 {
-    //ListObject *L0, *L1, *Lfirst, *LFunction, *Locals, *LArgs, *Largs1, * Nil, *True ;
     lc->L0 = 0 ;
     lc->L1 = 0 ;
     lc->Lfirst = 0 ;
@@ -498,7 +469,6 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
     if ( lc->QuoteStateStack ) _Stack_Init ( lc->QuoteStateStack, 256 ) ;
     LC_ClearTempNamespace ( ) ;
     lc->SavedCodeSpace = 0 ;
-    //lc->CurrentLambdaFunction = 0 ;
     _LC_SaveDsp ( lc ) ;
     lc->ParenLevel = 0 ;
     lc->QuoteState = 0 ;

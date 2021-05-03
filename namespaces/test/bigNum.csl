@@ -243,7 +243,7 @@ sp
 ( macro swch3 ( lambda ( i2 b2 ) ( (swch2 b2 i2) (swch2 b2 i2 ) ) ) )
 ( macro id4 ( lambda ( a12 b13 ) ( a12 a12 (swch3 a12 b13 ) b13 b13 a12 a12 ) ) ) 
 ( id4 7 ( + 5 6 ) ) 
-// pause
+//pause
 (define x (swch2 3 4) ) 
 (swch2 3 4) 
 (define x (swch 8 15) )  ( - @x) 
