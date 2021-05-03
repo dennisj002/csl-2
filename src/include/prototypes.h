@@ -1587,7 +1587,6 @@ void List_InterpretLists(dllist *olist);
 void List_CheckInterpretLists_OnVariable(dllist *list, byte *token);
 void List_PrintNames(dllist *list, int64 count, int64 flag);
 void List_Show_N_Word_Names(dllist *list, uint64 n, int64 showBeforeAfterFlag, int64 dbgFlag);
-void List_Eval(void);
 void List_DupList(void);
 void List_PrintWithValue(void);
 /* src/basis/debugDisassembly.c */
@@ -1838,12 +1837,13 @@ LambdaCalculus *LC_New(void);
 void LC_On(void);
 LambdaCalculus *LC_Reset(void);
 LambdaCalculus *LC_Init(void);
+void List_Eval(void);
 /* src/basis/lc/lcDebug.c */
 void LC_Debug(LambdaCalculus *lc, int64 state, Boolean setupFlag);
 void LC_Debug_Output(LambdaCalculus *lc);
 /* src/basis/lc/apply.c */
-ListObject *LC_Apply(LambdaCalculus *lc, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag);
-ListObject *_LO_Apply(LambdaCalculus *lc, ListObject *lfunction, ListObject *largs);
+ListObject *LC_Apply(ListObject *lfunction, ListObject *largs, Boolean applyFlag);
+ListObject *_LO_Apply(ListObject *lfunction, ListObject *largs);
 void _Interpreter_LC_InterpretWord(Interpreter *interp, ListObject *l0);
 void _LO_CompileOrInterpret_One(ListObject *l0, int64 functionFlag);
 void LO_CompileOrInterpretArgs(ListObject *largs);
@@ -1866,11 +1866,11 @@ Word *Word_CompileRun_C_ArgList(Word *word);
 block CompileLispBlock(ListObject *args, ListObject *body);
 /* src/basis/lc/eval.c */
 Boolean LO_IsQuoted(ListObject *l0);
-ListObject *LC_Eval(LambdaCalculus *lc, ListObject *l0, ListObject *locals, Boolean applyFlag);
-ListObject *LC_EvalList(LambdaCalculus *lc, ListObject *l0, ListObject *locals, Boolean applyFlag);
-ListObject *_LC_EvalSymbol(LambdaCalculus *lc, ListObject *l0, ListObject *locals);
-ListObject *_LC_EvalList(LambdaCalculus *lc, ListObject *lorig, ListObject *locals, Boolean applyFlag);
-ListObject *LC_SpecialFunction(LambdaCalculus *lc, ListObject *l0, ListObject *locals);
+ListObject *LC_Eval(ListObject *l0, ListObject *locals, Boolean applyFlag);
+ListObject *LC_EvalList(ListObject *l0, ListObject *locals, Boolean applyFlag);
+ListObject *_LC_EvalSymbol(ListObject *l0, ListObject *locals);
+ListObject *_LC_EvalList(ListObject *lorig, ListObject *locals, Boolean applyFlag);
+ListObject *LC_SpecialFunction(ListObject *l0, ListObject *locals);
 /* src/basis/lc/read.c */
 ListObject *LC_Read(LambdaCalculus *lc);
 ListObject *_LO_Read_Do_LParen(LambdaCalculus *lc);

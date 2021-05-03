@@ -436,7 +436,7 @@ doLisp 0 =
 'doBigNum 1 const 
     
 dbgOff
-//lisp
+lisp
 //dbgOn 
 
 #if Is_DebugOn forStarters ||

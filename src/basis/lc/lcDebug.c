@@ -2,7 +2,7 @@
 #include "../../include/csl.h"
 
 void
-LC_Debug (LambdaCalculus * lc, int64 state, Boolean setupFlag )
+LC_Debug ( LambdaCalculus * lc, int64 state, Boolean setupFlag )
 {
     if ( GetState ( lc, LC_DEBUG_ON ) )
     {
@@ -10,14 +10,14 @@ LC_Debug (LambdaCalculus * lc, int64 state, Boolean setupFlag )
         DebugColors ;
         lc->DebuggerSetupFlag = setupFlag ;
         lc->DebuggerState = state ;
-        //if ( lc->ApplyFlag ) LC_Debug_Output ( lc ) ;
-        SetState_TrueFalse ( debugger, ( DBG_NEWLINE | DBG_LC_DEBUG | ((GetState ( lc, LC_DEBUG_MENU_SHOWN) ? 0 : DBG_MENU ) )), ( DBG_INFO | DBG_PROMPT ) ) ; //| DBG_MENU ) ) ;
+        //if ( lc->ApplyFlag ) LC_Debug_Output ( lc ) ; // done by Debugger_InterpreterLoop
+        SetState_TrueFalse ( debugger, ( DBG_NEWLINE | DBG_LC_DEBUG | ( ( GetState ( lc, LC_DEBUG_MENU_SHOWN ) ? 0 : DBG_MENU ) ) ), ( DBG_INFO | DBG_PROMPT ) ) ; //| DBG_MENU ) ) ;
         byte * svDbgMenu = debugger->Menu ;
         debugger->Menu = "\nDebug Menu at : \n%s :\n(m)enu, so(U)rce, (e)val, sto(P), (S)tate, (c)ontinue, s(t)ack, auto(z), (V)erbosity, (q)uit, a(B)ort, usi(N)g, e(x)it \n '\\\' - <esc> - escape, ' ' - <space> - continue" ;
         Debugger_InterpreterLoop ( debugger ) ;
         debugger->Menu = svDbgMenu ;
         lc->DebuggerState = 0 ;
-        SetState ( lc, LC_DEBUG_MENU_SHOWN, true) ;
+        SetState ( lc, LC_DEBUG_MENU_SHOWN, true ) ;
         DefaultColors ;
     }
 }
@@ -25,24 +25,39 @@ LC_Debug (LambdaCalculus * lc, int64 state, Boolean setupFlag )
 void
 LC_Debug_Output ( LambdaCalculus * lc )
 {
+    int64 compiled = false ;
     if ( lc->DebuggerSetupFlag )
     {
+        if ( lc->L0 ) _LO_PrintWithValue ( lc->L0, "LC_Debug_Output : lc->L0 = ", "", 1 ) ;
         switch ( lc->DebuggerState )
         {
             case LC_APPLY:
             {
-                _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ) ;
+                Printf ( "\nLC_Apply ") ;
+                _LO_PrintWithValue ( lc->Lfunction->Lo_LambdaFunctionBody, ": Lfunction = ", "", 1 ),
+                    _LO_PrintWithValue ( lc->Largs, ": lc->Largs = ", "", 0 ) ;
                 CSL_Show_SourceCode_TokenLine ( lc->Lfunction, "LC_Debug : ", 0, lc->Lfunction->Name, "" ) ;
+                lc->LC_Here = Here ;
                 break ;
             }
             case LC_EVAL:
             {
-                if ( lc->L0 ) _LO_PrintWithValue ( lc->L0, "\nLC_Eval : l0 = ", "", 1 ) ; //, Printf ( "%s", lc->L0->Name ) ;
+                if ( lc->L0 ) _LO_PrintWithValue ( lc->L0, "LC_Eval : l0 = ", "", 1 ) ; //, Printf ( "%s", lc->L0->Name ) ;
                 break ;
             }
             case LC_SPECIAL_FUNCTION:
             {
-                _LO_PrintWithValue ( lc->L0, "\nLC_SpecialFuncion : special function = ", "", 1 ), _LO_PrintWithValue ( lc->Locals, " : locals = ", "", 0 ) ;
+                _LO_PrintWithValue ( lc->Lfirst, "LC_SpecialFuncion : lc->Lfirst = ", "", 1 ) ; //, _LO_PrintWithValue ( lc->Locals, " : locals = ", "", 0 ) ;
+                break ;
+            }
+            case LC_EVAL_LIST:
+            {
+                if ( lc->L0 ) _LO_PrintWithValue ( lc->L0, "LC_EvalList : l0 = ", "", 1 ) ;
+                break ;
+            }
+            case LC_COND:
+            {
+                _LO_PrintWithValue ( lc->L0, "LO_Cond : lc->L0 = ", "", 1 ) ;
                 break ;
             }
             default: break ;
@@ -56,41 +71,53 @@ LC_Debug_Output ( LambdaCalculus * lc )
             {
                 if ( lc->Lfunction )
                 {
-                    _LO_PrintWithValue ( lc->Lfunction, "LC_Apply : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ), Compiling ? Printf ( " : Compiled" ) : _LO_PrintWithValue ( lc->L1, " : result = ", "", 0 ) ;
+                    if ( Here > lc->LC_Here ) compiled = true ;
+                    lc->LC_Here = Here ;
+                    Printf ( "\nLC_Apply ") ;
+                    _LO_PrintWithValue ( lc->Lfunction->Lo_LambdaFunctionBody, ": Lfunction = ", "", 1 ),
+                        _LO_PrintWithValue ( lc->Largs, ": Largs = ", "", 0 ), ( Compiling && compiled ) ? Printf ( ": Compiled" ) : 0 ;//_LO_PrintWithValue ( lc->L1, ": L1 = ", "", 0 ) ;
                     CSL_Show_SourceCode_TokenLine ( lc->Lfunction, "LC_Debug : ", 0, lc->Lfunction->Name, "" ) ;
                 }
                 break ;
             }
             case LC_EVAL:
             {
-                if ( lc->L0 )
-                    _LO_PrintWithValue ( lc->L0, "\nLC_Eval : l0 = ", "", 1 ) ;
-                else if ( lc->L00 ) _LO_PrintWithValue ( lc->L00, "\nLC_Eval : l00 = ", "", 1 ) ; //Printf ( "\nLC_Eval : l00 = %s", lc->L00->Name ) ;
-                if ( lc->L1 ) _LO_PrintWithValue ( lc->L1, " : l1 = ", "", 0 ), Compiling ? Printf ( " : Compiled" ) : 0 ;
-                //_LO_PrintWithValue ( lc->L1, "\nLC_Eval : l1 = ", "", 1 ), Compiling ? Printf ( " : Compiled" ) : 0 ;
+                if ( Here > lc->LC_Here ) compiled = true ;
+                lc->LC_Here = Here ;
+                if ( lc->L0 ) _LO_PrintWithValue ( lc->L0, "LC_Eval : l0 = ", "", 1 ) ;
+                else if ( lc->Lread ) _LO_PrintWithValue ( lc->Lread, "LC_Eval : lread = ", "", 1 ) ;
+                //if ( lc->L1 ) _LO_PrintWithValue ( lc->L1, " : l1 = ", "", 0 ), ( Compiling && compiled ) ? Printf ( " : Compiled" ) : 0 ;
+                //_LO_PrintWithValue ( lc->L1, " : l1 = ", "", 0 ), ( Compiling && compiled ) ? Printf ( " : Compiled" ) : 0 ;
                 break ;
             }
             case LC_EVAL_LIST:
             {
-                _LO_PrintWithValue ( lc->Lfunction, "\nLC_EvalList : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( lc->Locals, " : locals = ", "", 0 ) ;
+                _LO_PrintWithValue ( lc->Lfunction, "LC_EvalList : lfunction = ", "", 1 ), _LO_PrintWithValue ( lc->Largs, " : largs = ", "", 0 ), _LO_PrintWithValue ( lc->Locals, " : locals = ", "", 0 ) ;
                 if ( lc->Lfunction ) CSL_Show_SourceCode_TokenLine ( lc->Lfunction, "LC_Debug : ", 0, lc->Lfunction->Name, "" ) ;
                 break ;
             }
             case LC_SUBSTITUTE:
             {
-                _LO_PrintWithValue ( lc->LambdaParameters, "\nLO_Substitute : lambdaParameters = ", "", 1 ), _LO_PrintWithValue ( lc->FunctionCallValues, " : funcCallValues = ", "", 0 ) ;
+                _LO_PrintWithValue ( lc->FunctionParameters, "LO_Substitute : lambdaParameters = ", "", 1 ), _LO_PrintWithValue ( lc->FunctionArgs, " : funcCallValues = ", "", 0 ) ;
                 break ;
             }
             case LO_DEFINE:
             case LO_DEFINEC:
             {
-                _LO_PrintWithValue ( lc->L00, "\n_LO_Define : l00 = ", "", 1 ) ;
-                _LO_PrintWithValue ( lc->L0, "\n_LO_Define : l0 = ", "", 1 ) ;
+                _LO_PrintWithValue ( lc->Lread, "_LO_Define : l00 = ", "", 1 ) ;
+                _LO_PrintWithValue ( lc->L0, "_LO_Define : l0 = ", "", 1 ) ;
                 _LO_PrintWithValue ( lc->Lfunction, " : Function = ", "", 0 ) ;
-                _LO_PrintWithValue ( lc->LambdaParameters, " : LambdaParameters = ", "", 0 ) ;
+                _LO_PrintWithValue ( lc->FunctionParameters, " : LambdaParameters = ", "", 0 ) ;
+                break ;
+            }
+            case LC_COND:
+            {
+                //_LO_PrintWithValue ( lc->L1, "LO_Cond : lc->L1 = ", "", 1 ) ;
+                Printf ( "\nLO_Cond : ") ;
                 break ;
             }
             default: break ;
         }
+        if ( lc->L1 )_LO_PrintWithValue ( lc->L1, "LC_Debug_Output : lc->L1 = ", "", 1 ), ( Compiling && compiled ) ? Printf ( " : Compiled" ) : 0 ;
     }
 }

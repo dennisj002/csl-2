@@ -6,87 +6,68 @@
 //===================================================================================================================
 
 ListObject *
-LC_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
+LC_Apply ( ListObject *lfunction, ListObject *largs, Boolean applyFlag )
 {
+    LambdaCalculus * lc = _LC_ ;
     ListObject * l1 ;
     lc->ApplyFlag = applyFlag ;
     SetState ( lc, LC_APPLY, true ) ;
-    LC_Debug (lc, LC_APPLY, 1 ) ;
-    if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) || 
-        ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) )))
+    LC_Debug ( lc, LC_APPLY, 1 ) ;
+    if ( applyFlag && lfunction && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) ||
+        ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) ) ) )
     {
-#if 0        
-        if ( largs ) l1 = _LO_Apply ( lc, lfunction, largs ) ;
-        else
-        {
-            //if ( ! ( lfunction->W_LispAttributes & T_LISP_SYMBOL ) ) Word_Eval ( lfunction->Lo_CSLWord ) ;
-            //if ( lfunction->W_ObjectAttributes & NAMESPACE_VARIABLE ) l1 = LO_PrepareReturnObject ( ) ;
-            //else l1 = nil ;
-            if ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) Word_Eval ( lfunction->Lo_CSL_Word ) ;
-            l1 = lfunction ;
-        }
-#else
-        l1 = _LO_Apply ( lc, lfunction, largs ) ;
-#endif        
+        l1 = _LO_Apply ( lfunction, largs ) ;
     }
-    //else if ( applyFlag && lfunction && ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) ) ) l1 = _LO_Apply ( lc, lfunction, largs ) ;
+        //else if ( applyFlag && lfunction && ( lfunction->W_LispAttributes & ( T_LISP_COMPILED_WORD | T_LC_IMMEDIATE ) ) ) l1 = _LO_Apply ( lc, lfunction, largs ) ;
     else if ( lfunction && ( lfunction->W_LispAttributes & T_LAMBDA ) && lfunction->Lo_LambdaFunctionBody )
     {
         // LambdaArgs, the formal args, are not changed by LO_Substitute (locals - lvals are just essentially 'renamed') and thus don't need to be copied
         LC_Substitute ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionParameters, largs ) ;
-        lc->CurrentLambdaFunction = lfunction ;
+        //lc->CurrentLambdaFunction = lfunction ;
         lc->Locals = largs ;
-        l1 = LC_EvalList ( lc, ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
+        l1 = LC_EvalList ( ( ListObject * ) lfunction->Lo_LambdaFunctionBody, largs, applyFlag ) ;
     }
     else
     {
         //these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
         if ( ! largs )
         {
-            //if ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) l1 = nil, Word_Eval ( lfunction ) ;
-            //else 
             l1 = lfunction ;
         }
         else
         {
             LO_AddToHead ( largs, lfunction ) ;
             l1 = largs ;
-            //if ( LC_DEFINE_DBG ) Printf ("\nlfunction->Name = %s :: _Context_->CurrentWordBeingCompiled->Name = %s", lfunction->Name, _Context_->CurrentWordBeingCompiled->Name ) ;
-            //if (( lfunction->Name && ( ! String_Equal ( lfunction->Name, _Context_->CurrentWordBeingCompiled->Name )) ) )
-            //    SetState ( lc, LC_COMPILE_MODE, false ) ;
         }
         if ( ! ( lfunction->W_MorphismAttributes & COMBINATOR ) )
         {
             if ( GetState ( lc, LC_COMPILE_MODE ) )
             {
-                _LO_PrintWithValue ( lc->L00, "\nLC_Apply : lc->L00 = ", "", 0 ) ;
+                _LO_PrintWithValue ( lc->Lread, "\nLC_Apply : lc->Lread = ", "", 0 ) ;
                 CSL_Show_SourceCode_TokenLine ( lfunction, "LC_Debug : ", 0, lfunction->Name, "" ) ;
                 Printf ( "\nCan't compile this define because \'%s\' is not a function/combinator. Function variables are not yet implemented?!", lfunction->Name ) ;
                 Printf ( "\nHowever, it should run interpreted." ) ;
                 SetState ( lc, LC_COMPILE_MODE, false ) ;
-                //if ( GetState ( lc, LC_DEBUG_ON ) ) Pause ( ) ;
             }
         }
     }
-    //if ( applyFlag ) LC_Debug ( lc, lfunction, LC_APPLY, 0 ) ;
     lc->L1 = l1 ;
     SetState ( lc, LC_APPLY, false ) ;
+    LC_Debug ( lc, LC_APPLY, 0 ) ;
     return l1 ;
 }
 
 ListObject *
-_LO_Apply ( LambdaCalculus * lc, ListObject *lfunction, ListObject *largs )
+_LO_Apply ( ListObject *lfunction, ListObject *largs )
 {
+    LambdaCalculus * lc = _LC_ ;
     SetState ( lc, LC_APPLY, true ) ;
     ListObject *l1 = nil ;
-    //if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte * ) "\n_LO_Apply : \n\tl0 =%s", _LO_PRINT_TO_STRING ( lfunction ) ) ;
-    //if ( Is_DebugOn ) Printf ( "\n_LO_Apply : lfunction with args :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ) ; //, Pause () ;
-    //if ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) // this case is hypothetical for now
-    if ( ( ! largs ) && (( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) || ( lfunction->W_LispAttributes & ( T_LC_IMMEDIATE ) ) 
+    if ( ( ! largs ) && ( ( lfunction->W_MorphismAttributes & ( CPRIMITIVE | CSL_WORD ) ) || ( lfunction->W_LispAttributes & ( T_LC_IMMEDIATE ) )
         || ( lfunction->W_LispAttributes & T_LISP_CSL_COMPILED ) ) )
     {
-            Interpreter_DoWord ( _Context_->Interpreter0, lfunction->Lo_CSL_Word, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
-            l1 = nil ;
+        Interpreter_DoWord ( _Context_->Interpreter0, lfunction->Lo_CSL_Word, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
+        l1 = nil ;
     }
     else if ( largs ) l1 = _LO_Do_FunctionBlock ( lfunction, largs ) ;
     else
@@ -97,7 +78,6 @@ _LO_Apply ( LambdaCalculus * lc, ListObject *lfunction, ListObject *largs )
         l1 = lfunction ;
     }
     SetState ( lc, LC_APPLY, false ) ;
-    //if ( Is_DebugOn ) Printf ( "\n_LO_Apply : lfunction with args and result :: " ), LO_PrintWithValue ( lfunction ), LO_PrintWithValue ( largs ) , LO_PrintWithValue ( rtn ) ; //, Pause () ;
     lc->L1 = l1 ;
     return l1 ;
 }
@@ -134,11 +114,7 @@ void
 _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
 {
     ListObject *lfword = lfunction->Lo_CSL_Word ;
-    //Word_SetTsrliScwi( lfword, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
-
-    //if ( Is_DebugOn ) if (String_Equal ("-", lfunction->Name ) ) Printf ( "\ngot \'-\'") ;
     if ( largs && lfword && ( lfword->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!?
-        //if ( largs && lfword && ( lfword->W_MorphismAttributes & ( CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!?
     {
         Boolean svTcs = GetState ( _CSL_, TYPECHECK_ON ) ; // sometimes ok but for now off here
         SetState ( _CSL_, TYPECHECK_ON, false ) ; // sometimes ok but for now off here
@@ -163,7 +139,6 @@ _LO_Do_FunctionBlock ( ListObject *lfunction, ListObject *largs )
 {
     LambdaCalculus *lc = _O_->OVT_LC ;
     ListObject *vReturn = nil, *lfargs = _LO_First ( largs ) ;
-    //uint64 * dsp = _Dsp_ ;
     _LO_CompileOrInterpret ( lfunction, lfargs ) ;
     lc->ParenLevel -- ;
     // this is necessary in "lisp" mode : eg. if user hits return but needs to be clarified, refactored, maybe renamed, etc.
@@ -181,8 +156,8 @@ _LO_Do_FunctionBlock ( ListObject *lfunction, ListObject *largs )
 void
 LC_Substitute ( LambdaCalculus * lc, ListObject *lambdaParameters, ListObject * funcCallValues )
 {
-    lc->LambdaParameters = lambdaParameters, lc->FunctionCallValues = funcCallValues ;
-    LC_Debug (lc, LC_SUBSTITUTE, 0 ) ;
+    lc->FunctionParameters = lambdaParameters, lc->FunctionArgs = funcCallValues ;
+    LC_Debug ( lc, LC_SUBSTITUTE, 0 ) ;
     while ( lambdaParameters && funcCallValues )
     {
         // ?!? this may not be the right idea but we want it so that we can have transparent lists in the parameters, ie. 
@@ -373,7 +348,7 @@ _LC_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 * i )
     if ( l1->W_LispAttributes & ( LIST | LIST_NODE ) )
     {
         Set_CompileMode ( false ) ;
-        l2 = LC_Eval ( lc, l1, 0, 1 ) ;
+        l2 = LC_Eval ( l1, 0, 1 ) ;
         _Debugger_->SpecialPreHere = Here ;
         if ( ! l2 || ( l2->W_LispAttributes & T_NIL ) ) Compile_MoveImm_To_Reg ( RegParameterOrder ( ( *i ) ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         else Compile_MoveImm_To_Reg ( RegParameterOrder ( ( *i ) ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
@@ -462,7 +437,7 @@ Word_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right ar
         int64 svDs = GetState ( _CSL_, _DEBUG_SHOW_ ) ;
         DebugShow_Off ;
         cntx->BaseObject = 0 ; // nb! very important !! // but maybe shouldn't be done here -> Context_DoDotted_Post
-        l0 = LC_Read (lc) ;
+        l0 = LC_Read ( lc ) ;
         SetState ( _CSL_, _DEBUG_SHOW_, svDs ) ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LC_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
@@ -489,7 +464,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     Namespace * locals = _CSL_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0 ) ;
     word->W_MorphismAttributes = BLOCK ;
     word->W_LispAttributes |= T_LISP_COMPILED_WORD ;
-    LC_Eval ( lc, body, locals, 1 ) ;
+    LC_Eval ( body, locals, 1 ) ;
     if ( _LC_CompileMode ( lc ) )
     {
         LO_EndBlock ( ) ;

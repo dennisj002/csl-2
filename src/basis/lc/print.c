@@ -48,7 +48,7 @@ _LO_Print_NonLambdaSymbol_ToString ( LambdaCalculus * lc, ListObject * l0, int64
                 if ( _O_->Verbosity > 2 ) LC_snprintf2 ( lc->buffer, " %s = 0x%016lx", l0->Lo_CSL_Word->Lo_Name, ( int64 ) l0->Lo_CSL_Word ) ;
                 else LC_sprintName ( lc->buffer, l0 ) ;
             }
-            //else if ( ( l0->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) ) && ( l0->Lo_CSLWord ) && ( ! ( l0->Lo_CSLWord->W_LispAttributes & T_LISP_SYMBOL ) ) )
+                //else if ( ( l0->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) ) && ( l0->Lo_CSLWord ) && ( ! ( l0->Lo_CSLWord->W_LispAttributes & T_LISP_SYMBOL ) ) )
             else if ( ( l0->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) ) && ( ! ( l0->W_LispAttributes & T_LISP_SYMBOL ) ) )
             {
                 LO_PrintValueToString ( lc, l0 ) ;
@@ -177,17 +177,18 @@ void
 _LO_PrintWithValue ( ListObject * l0, byte * prefix, byte * postfix, Boolean indentFlag )
 {
     //if ( _LC_->IndentDbgPrint && _LC_->ParenLevel ) 
-    if ( indentFlag ) //&& _LC_->ParenLevel )
+    if ( l0 )
     {
-        int64 i ;
-        byte * b = Buffer_DataCleared ( _CSL_->StringInsertB3 ) ;
-       // strncat ( b, "\n", BUFFER_IX_SIZE ) ;
-        //for ( i = 0 ; i < _LC_->ParenLevel ; i ++ ) strncat ( b, "  ", BUFFER_IX_SIZE ) ;
-        snprintf ( b, BUFFER_IX_SIZE, "\n[%ld]", _LC_->ParenLevel ) ;
-        //strncat ( b, &prefix[ prefix[0] == '\n' ? 1 : 0 ], BUFFER_IX_SIZE ) ; // after '\n'
-        prefix = b ;
+        if ( indentFlag ) //&& _LC_->ParenLevel )
+        {
+            int64 i ;
+            byte * b = Buffer_DataCleared ( _CSL_->StringInsertB3 ) ;
+            snprintf ( b, BUFFER_IX_SIZE, "\n[%ld] %s", _LC_->ParenLevel, prefix ) ;
+            //strncat ( b, prefix, BUFFER_IX_SIZE ) ;
+            prefix = b ;
+        }
+        _LO_Print ( l0, prefix, postfix, 1 ) ;
     }
-    _LO_Print ( l0, prefix, postfix, 1 ) ;
 }
 
 void

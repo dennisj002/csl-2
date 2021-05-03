@@ -266,7 +266,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
 
     LC_Init_Variables ( lc ) ;
     lc->L0 = l0 ;
-    l1 = LC_Eval ( lc, l0, 0, 1 ) ;
+    l1 = LC_Eval (l0, 0, 1 ) ;
     lc->L1 = l1 ;
     if ( lc = _LC_ ) // lambda calculus can be turned off by eval
     {
@@ -310,8 +310,8 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     lc->ItemQuoteState = itemQuoteState ;
     int64 * svDsp = _DspReg_ ;
     ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel, 0 ) ;
-    lc->L00 = l0 ;
-    if ( GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lc->L00, "\n_LC_ReadEvalPrint_ListObject : lc->L00 = ", "", 1 ) ;
+    lc->Lread = l0 ;
+    if ( GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lc->Lread, "\n_LC_ReadEvalPrint_ListObject : lc->Lread = ", "", 1 ) ;
     LC_EvalPrint ( lc, l0 ) ;
     LC_ClearTempNamespace ( ) ;
     _DspReg_ = svDsp ;
@@ -484,9 +484,12 @@ LC_Init_Variables ( LambdaCalculus * lc )
     lc->Lfirst = 0 ;
     lc->Lfunction = 0 ;
     lc->Locals = 0 ;
+    lc->Largs0 = 0 ;
     lc->Largs = 0 ;
     lc->Largs1 = 0 ;
     lc->Code = 0 ;
+    lc->ApplyFlag = 0 ;
+    lc->LC_Here = Here ;
 }
 
 LambdaCalculus *
@@ -495,7 +498,7 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
     if ( lc->QuoteStateStack ) _Stack_Init ( lc->QuoteStateStack, 256 ) ;
     LC_ClearTempNamespace ( ) ;
     lc->SavedCodeSpace = 0 ;
-    lc->CurrentLambdaFunction = 0 ;
+    //lc->CurrentLambdaFunction = 0 ;
     _LC_SaveDsp ( lc ) ;
     lc->ParenLevel = 0 ;
     lc->QuoteState = 0 ;
@@ -608,6 +611,16 @@ LC_Init ( )
     if ( _LC_ ) lc = _LC_Init_Runtime ( _LC_ ) ;
     else lc = LC_New ( ) ;
     return lc ;
+}
+
+void
+List_Eval ( )
+{
+    LambdaCalculus * lc = LC_Init_Runtime ( ) ;
+    //LC_LispNamespaceOn ( ) ;
+    ListObject * l0 = ( ListObject * ) DataStack_Pop ( ), *l1 ;
+    l1 = LC_Eval (l0, 0, 1 ) ;
+    DataStack_Push ( ( int64 ) l1 ) ;
 }
 
 #if 0

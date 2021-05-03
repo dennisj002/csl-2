@@ -16,7 +16,7 @@ CPrimitive CPrimitives [] = {
     { "_Printf", 0, 0, 0, ( block ) Printf, 0, 0, LISP_C_RTL_ARGS | T_LISP_SPECIAL | LISP_VOID_RETURN, "Lisp", "Root" },
     { "define", 0, 0, 0, ( block ) LO_Define, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "definec", 0, 0, 0, ( block ) LO_Definec, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    { "compile", 0, 0, 0, ( block ) LO_CompileDefine, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
+    //{ "compile", 0, 0, 0, ( block ) LO_CompileDefine, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "_lambda", 0, 0, 0, ( block ) LO_Lambda, IMMEDIATE, 0, T_LAMBDA | T_LISP_SPECIAL, "Lisp", "Root" },
     { "lambda", 0, 0, 0, ( block ) LO_Lambda, IMMEDIATE, 0, T_LAMBDA | T_LISP_SPECIAL, "Lisp", "Root" },
     { "begin", 0, 0, 0, ( block ) LO_Begin, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
