@@ -164,12 +164,20 @@ LO_PrintListToString ( LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, i
 }
 
 void
-_LO_Print ( ListObject * l0, byte * prefix, byte * postfix, Boolean valueFlag )
+_LO_Print ( ListObject * l0, byte * prefix, byte * postfix, Boolean valueFlag, Boolean addQuoteFlag )
 {
+    LambdaCalculus * lc = _LC_ ;
     if ( l0 )
     {
-        LO_PrintListToString ( _LC_, ( ListObject * ) l0, 0, valueFlag ) ;
-        Printf ( "%s%s%s", prefix, _LC_->outBuffer, postfix ) ;
+        LO_PrintListToString ( lc, ( ListObject * ) l0, 0, valueFlag ) ;
+        if ( addQuoteFlag )
+        {
+            byte * out ;
+            if ( lc->outBuffer [0] == ' ' ) out = & lc->outBuffer [1] ;
+            else out = lc->outBuffer ;
+            Printf ( "%s\'%s\'%s", prefix, out, postfix ) ;
+        }
+        else Printf ( "%s%s%s", prefix, lc->outBuffer, postfix ) ;
     }
 }
 
@@ -181,13 +189,11 @@ _LO_PrintWithValue ( ListObject * l0, byte * prefix, byte * postfix, Boolean ind
     {
         if ( indentFlag ) //&& _LC_->ParenLevel )
         {
-            int64 i ;
             byte * b = Buffer_DataCleared ( _CSL_->StringInsertB3 ) ;
             snprintf ( b, BUFFER_IX_SIZE, "\n[%ld] %s", _LC_->ParenLevel, prefix ) ;
-            //strncat ( b, prefix, BUFFER_IX_SIZE ) ;
             prefix = b ;
         }
-        _LO_Print ( l0, prefix, postfix, 1 ) ;
+        _LO_Print ( l0, prefix, postfix, 1, 1 ) ;
     }
 }
 
@@ -213,6 +219,6 @@ void
 LO_Print ( ListObject * l0 )
 {
     DefaultColors ;
-    _LO_Print ( l0, ( byte* ) "", ( byte* ) "", 1 ) ;
+    _LO_Print ( l0, ( byte* ) "", ( byte* ) "", 1, 0 ) ;
 }
 

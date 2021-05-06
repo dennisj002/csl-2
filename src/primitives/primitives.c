@@ -1,6 +1,8 @@
 #include "../include/csl.h"
 
 CPrimitive CPrimitives [] = {
+    { "flisp", 0, 0, 0, CSL_Flisp, 0, 0, 0, "Flisp", "Root" },
+    
     { "locationPush", 0, 0, 0, Location_PushNew, 0, 0, 0, "Experimental", "Root" },
     { "locationPrint", 0, 0, 0, CSL_Location_Printf, 0, 0, 0, "Experimental", "Root" },
     { "do>", 0, 0, 0, CSL_Do, IMMEDIATE, 0, 0, "Experimental", "Root" },
@@ -639,7 +641,7 @@ CPrimitive CPrimitives [] = {
     { "pokeRegWithValue", 0, 0, 0, CSL_PokeRegWithValue, 0, 0, 0, "Compiling", "Compiler" },
     { "pokeRegAtAddress", 0, 0, 0, CSL_PokeRegAtAddress, 0, 0, 0, "Compiling", "Compiler" },
 
-    { 0 }
+    0, //{ 0 }
 } ;
 
 

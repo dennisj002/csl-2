@@ -435,10 +435,10 @@ CSL_C_Include_PreProcessor ( )
             {
                 if ( VERBOSITY > 1 ) Printf ( ( byte* ) "\nEntering : %s at %s", afn, Context_Location ( ) ) ;
                 AddFilenameTo_C_Preprocessor_IncludedList ( afn ) ;
-                _CSL_Contex_NewRun_2 ( _CSL_, _Context_IncludeFile, afn, 2 ) ;
+                _CSL_Contex_NewRun_3 ( _CSL_, _Context_IncludeFile, afn, 2, 0 ) ;
             }
         }
-        else CSL_ContextNew_IncludeFile ( afn ) ;
+        else CSL_ContextNew_IncludeFile (afn, 0) ;
         SetDataStackPointer ( svStackPointer ) ;
     }
 }

@@ -78,8 +78,8 @@ CSL_ResetAll_Init ( CSL * csl )
         if ( _O_->StartupFilename )
         {
             _O_->Verbosity = 0 ;
-            CSL_ContextNew_IncludeFile ( ( byte* ) "./namespaces/sinit.csl" ) ;
-            CSL_ContextNew_IncludeFile ( _O_->StartupFilename ) ;
+            CSL_ContextNew_IncludeFile (( byte* ) "./namespaces/sinit.csl", 0) ;
+            CSL_ContextNew_IncludeFile (_O_->StartupFilename, 0) ;
         }
         else
         {
@@ -91,7 +91,7 @@ CSL_ResetAll_Init ( CSL * csl )
             else if ( _O_->StartIncludeTries < 3 )
             {
                 AlertColors ;
-                CSL_ContextNew_IncludeFile ( ( byte* ) "./namespaces/init.csl" ) ;
+                CSL_ContextNew_IncludeFile (( byte* ) "./namespaces/init.csl", 0) ;
                 if ( _O_->ErrorFilename )
                 {
                     if ( strcmp ( ( char* ) _O_->ErrorFilename, "Debug Context" ) )

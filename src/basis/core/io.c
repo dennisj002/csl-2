@@ -60,7 +60,7 @@ getCursor ( int* x, int* y )
 int64
 _Key ( FILE * f )
 {
-    int64 key = getc ( f ) ; // GetC () ;
+    int64 key = fgetc ( f ) ; // GetC () ;
     //if ( _O_->LogFlag && ( isalnum ( key ) || ispunct ( key ) ) ) CSL_LogChar ( key ) ;
     if ( _O_->LogFlag && ( isgraph ( key ) || isspace ( key ) ) ) CSL_LogChar ( key ) ;
     return key ;
@@ -90,7 +90,7 @@ byte
 _CSL_Key ( ReadLiner * rl )
 {
     int key = _Key ( rl->InputFile ) ;
-    return ( byte ) key ;
+    return (byte) key ;
 }
 
 void

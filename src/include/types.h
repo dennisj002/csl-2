@@ -215,6 +215,7 @@ typedef struct _Identifier // _Symbol
         uint64 S_Value ;
         byte * S_BytePtr ;
         byte * S_Object ;
+        struct _Identifier * S_ValueWord ;
     } ;
     dllist * S_SymbolList ;
     uint64 S_DObjectValue ; // nb! DynamicObject value can not be a union with S_SymbolList
@@ -813,6 +814,7 @@ typedef struct
     NBA * ContextNba ;
     sigjmp_buf JmpBuf0 ;
 } Context ;
+typedef void (* ContextFunction_3 ) ( Context * cntx, byte* arg1, int64 arg2, int64 arg3 ) ;
 typedef void (* ContextFunction_2 ) ( Context * cntx, byte* arg1, int64 arg2 ) ;
 typedef void (* ContextFunction_1 ) ( Context * cntx, byte* arg ) ;
 typedef void (* ContextFunction ) ( Context * cntx ) ;
@@ -836,7 +838,7 @@ typedef struct _LambdaCalculus
     uint64 State, DebuggerState, DebuggerSetupFlag ;
     int64 DontCopyFlag, Loop, ParenLevel ;
     Namespace *LispNamespace, *LispDefinesNamespace, *LispTempNamespace, *BackgroundNamespace ;
-    ListObject *Lread, *L0, *L1, *Lfirst, *Lfunction, *Lvalue, *Locals, *Largs0, *Largs, *Largs1, * Nil, *True, *FunctionParameters, *FunctionArgs ;
+    ListObject *Lread, *L0, *L1, *Lfirst, *Lfunction0, *Lfunction, *Lvalue, *Locals, *Largs0, *Largs, *Largs1, * Nil, *True, *FunctionParameters, *FunctionArgs ;
     ListObject *LastInterpretedWord ; 
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
@@ -851,6 +853,7 @@ typedef struct _LambdaCalculus
     dllist * Lambda_SC_WordList ;
     Boolean ApplyFlag, LetFlag, SavedTypeCheckState, IndentDbgPrint ;
     struct _CSL * OurCSL ;
+    sigjmp_buf LC_JmpBuf ;
 } LambdaCalculus ;
 typedef struct
 {

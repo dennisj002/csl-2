@@ -19,12 +19,12 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/primitives/strings.c src/primitives/bits.c src/primitives/maths.c src/primitives/logics.c src/primitives/openvmtils.c\
 	src/primitives/ios.c src/primitives/parsers.c src/primitives/interpreters.c src/primitives/namespaces.c src/primitives/systems.c\
 	src/primitives/compilers.c src/primitives/words.c  src/primitives/file.c src/primitives/stacks.c\
-	src/primitives/debuggers.c src/primitives/memorys.c src/primitives/primitives.c src/primitives/contexts.c\
-	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c 
+	src/primitives/debuggers.c src/primitives/memorys.c src/primitives/primitives.c src/primitives/contexts.c src/primitives/flisp.c \
+	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c  
 
 INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
 	src/include/csl.h src/include/macros.h src/include/lc.h\
-	src/include/machineCodeMacros.h 
+	src/include/machineCodeMacros.h src/include/lisp.h
 	
 
 OBJECTS = $(SOURCES:%.c=%.o) 
@@ -106,7 +106,10 @@ _cslo :  src/include/prototypes.h $(OBJECTS)
 
 src/primitives/cmaths.o : src/primitives/cmaths.c
 	$(CC) $(CFLAGS) -O3 -c src/primitives/cmaths.c -o src/primitives/cmaths.o
-	
+
+src/primitives/flisp.o : src/primitives/flisp.c src/primitives/flread.c	
+	$(CC) $(CFLAGS) -O3 -c src/primitives/flisp.c -o src/primitives/flisp.o
+
 proto:
 	touch src/include/defines.h
 	make src/include/prototypes.h

@@ -438,6 +438,7 @@ doLisp 0 =
 dbgOff
 //lisp
 //dbgOn 
+//flisp ps pause
 
 #if Is_DebugOn forStarters ||
 

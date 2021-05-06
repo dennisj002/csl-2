@@ -55,6 +55,11 @@ LC_Debug_Output ( LambdaCalculus * lc )
                 if ( lc->L0 ) _LO_PrintWithValue ( lc->L0, "LC_EvalList : l0 = ", "", 1 ) ;
                 break ;
             }
+            case LC_EVAL_SYMBOL:
+            {
+                if ( lc->L0 ) _LO_PrintWithValue ( lc->L0, "_LC_EvalSymbol : l0 = ", "", 1 ) ;
+                break ;
+            }
             case LC_COND:
             {
                 _LO_PrintWithValue ( lc->L0, "LO_Cond : lc->L0 = ", "", 1 ) ;
@@ -67,6 +72,11 @@ LC_Debug_Output ( LambdaCalculus * lc )
     {
         switch ( lc->DebuggerState )
         {
+            case LC_EVAL_SYMBOL:
+            {
+                if ( lc->L1 ) _LO_PrintWithValue ( lc->L1, "_LC_EvalSymbol : l1 = ", "", 1 ) ;
+                break ;
+            }
             case LC_APPLY:
             {
                 if ( lc->Lfunction )
@@ -113,16 +123,22 @@ LC_Debug_Output ( LambdaCalculus * lc )
             case LO_DEFINE:
             case LO_DEFINEC:
             {
-                _LO_PrintWithValue ( lc->Lread, "_LO_Define : l00 = ", "", 1 ) ;
+                _LO_PrintWithValue ( lc->Lread, "_LO_Define : lread = ", "", 1 ) ;
                 _LO_PrintWithValue ( lc->L0, "_LO_Define : l0 = ", "", 1 ) ;
-                _LO_PrintWithValue ( lc->Lfunction, " : Function = ", "", 0 ) ;
+                //_LO_PrintWithValue ( lc->Lfunction, "_LO_Define : Function = ", "", 1 ) ;
+                Printf ( "\n_LO_Define : function name : %s : ", lc->L1->Name ) ;
                 _LO_PrintWithValue ( lc->FunctionParameters, " : LambdaParameters = ", "", 0 ) ;
                 break ;
             }
             case LC_COND:
             {
-                //_LO_PrintWithValue ( lc->L1, "LO_Cond : lc->L1 = ", "", 1 ) ;
-                Printf ( "\nLO_Cond : " ) ;
+                _LO_PrintWithValue ( lc->L1, "LO_Cond : lc->L1 = ", "", 1 ) ;
+                //Printf ( "LO_Cond : " ) ;
+                break ;
+            }
+            case LC_SPECIAL_FUNCTION:
+            {
+                _LO_PrintWithValue ( lc->L1, "LC_SpecialFuncion : l1 = ", "", 1 ) ; 
                 break ;
             }
             default: break ;

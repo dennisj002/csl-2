@@ -29,7 +29,7 @@ _LO_Define_Scheme ( ListObject * idNode )
         }
         value1->W_LispAttributes |= ( LIST | LIST_NODE ) ;
         LO_AddToHead ( value, value1 ) ;
-        lambda = _LO_Read_DoToken ( lc, "lambda", 0, - 1, - 1 ) ;
+        lambda = _LO_Read_DoToken ( "lambda", 0, - 1, - 1 ) ;
         LO_AddToHead ( value, lambda ) ;
     }
     else idLo = idNode, value = _LO_Next ( idNode ) ;
@@ -67,7 +67,7 @@ _LO_Define_Scheme ( ListObject * idNode )
 }
 
 ListObject *
-_LO_Define ( ListObject * idNode )
+_LO_Define_Lisp ( ListObject * idNode )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *value, *l1, *locals1 = 0, *value1, *l2, *lnext ;
@@ -125,6 +125,7 @@ _LO_Define ( ListObject * idNode )
     if ( LC_CompileMode ) l1->W_SC_WordList = word->W_SC_WordList = lc->Lambda_SC_WordList ;
     _CSL_FinishWordDebugInfo ( l1 ) ;
     _Word_Finish ( l1 ) ;
+    lc->L1 = l1 ;
     LC_Debug ( lc, LO_DEFINE, 0 ) ;
     return l1 ;
 }
@@ -193,7 +194,7 @@ LC_Macro ( )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *l1, *idNode = _LO_Next ( lc->Lfirst ) ;
-    l1 = _LO_Define ( idNode ) ;
+    l1 = _LO_Define_Lisp ( idNode ) ;
     l1->W_LispAttributes |= T_LISP_MACRO ;
     if ( l1->Lo_CSL_Word ) l1->Lo_CSL_Word->W_LispAttributes |= T_LISP_MACRO ;
     return lc->L1 = l1 ;
@@ -206,7 +207,7 @@ LC_Define ( )
     SetState ( _Context_->Compiler0, RETURN_TOS, true ) ;
     SetState ( lc, ( LC_COMPILE_MODE | LC_DEFINE_MODE ), true ) ;
     ListObject * idNode = _LO_Next ( lc->Lfirst ) ;
-    lc->L1 = _LO_Define ( idNode ) ;
+    lc->L1 = _LO_Define_Lisp ( idNode ) ;
     SetState ( lc, ( LC_COMPILE_MODE | LC_DEFINE_MODE ), false ) ;
     return lc->L1 ;
 }
@@ -247,7 +248,7 @@ LO_Set ()
                     //continue ;
                 }
             }
-            if ( ! lset ) lset = _LO_Define ( lsymbol ) ;
+            if ( ! lset ) lset = _LO_Define_Lisp ( lsymbol ) ;
             lset->Lo_Value = value->Lo_Value ;
             LO_Print ( lset ) ;
         }
@@ -264,17 +265,6 @@ LO_Let ()
     ListObject * l1 = LO_Set () ;
     lc->LetFlag = 0 ;
     return l1 ;
-}
-
-ListObject *
-_LO_Cons ( ListObject * second ) //, uint64 allocType )
-{
-    LambdaCalculus * lc = _LC_ ;
-    ListObject * lcons = LO_New ( LIST, 0 ) ;
-    LO_AddToTail ( lcons, lc->Lfirst ) ;
-    LO_AddToTail ( lcons, second ) ;
-
-    return lcons ;
 }
 
 ListObject *
@@ -323,7 +313,8 @@ LO_Cond ()
     int64 timt = 0 ; // timt : test is morphism type 
     int64 ifFlag = ( int64 ) ( idLo->Lo_CSL_Word->W_LispAttributes & T_LISP_IF ) ;
     int64 numBlocks, d1, d0 = Stack_Depth ( compiler->CombinatorBlockInfoStack ), testValue ;
-    if ( GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lc->L0, "\nLO_Cond : lc->L0 = ", "", 1 ), _LO_PrintWithValue ( lc->Lread, "\nLO_Cond : lc->Lread = ", "", 1 ) ;
+    //if ( GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lc->L0, "LO_Cond : lc->L0 = ", "", 1 ); //, _LO_PrintWithValue ( lc->Lread, "LO_Cond : lc->Lread = ", "", 1 ) ;
+    LC_Debug ( lc, LC_COND, 1 ) ;
     if ( condClause = _LO_Next ( idLo ) ) // 'cond' is id node ; skip it.
     {
         do
@@ -411,6 +402,8 @@ LO_Cond ()
             }
         }
     }
+    lc->L1 = result ;
+    LC_Debug ( lc, LC_COND, 0 ) ;
     return result ;
 }
 
@@ -620,3 +613,15 @@ _LO_CSL ()
     return nil ;
 }
 
+#if 0
+// this won't work as written but here's a marker
+ListObject *
+_LO_Cons ( ListObject * second ) 
+{
+    LambdaCalculus * lc = _LC_ ;
+    ListObject * lcons = LO_New ( LIST, 0 ) ;
+    LO_AddToTail ( lcons, lc->Lfirst ) ;
+    LO_AddToTail ( lcons, second ) ;
+    return lcons ;
+}
+#endif

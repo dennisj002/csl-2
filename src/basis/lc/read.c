@@ -5,8 +5,9 @@
 //===================================================================================================================
 
 ListObject *
-LC_Read (LambdaCalculus * lc)
+LC_Read ()
 {
+    LambdaCalculus * lc = _LC_ ;
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     ReadLiner * rl = cntx->ReadLiner0 ;
@@ -41,20 +42,20 @@ LC_Read (LambdaCalculus * lc)
                 lc->ParenLevel -- ;
                 break ;
             }
-            else if ( l0 = LO_Read_DoToken ( lc, token, qidFlag, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) )
+            else if ( l0 = LO_Read_DoToken (token, qidFlag, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) )
             {
                 l0->State |= ( lc->ItemQuoteState | lc->QuoteState ) ;
                 lc->ItemQuoteState = 0 ;
                 if ( lnew )
                 {
                     if ( ( l0->State & SPLICE ) || ( ( l0->State & UNQUOTE_SPLICE ) &&
-                        ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, LC_Eval (l0, 0, 1 ) ) ;
+                        ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, LC_Eval ( l0, 0, 1 ) ) ;
                     else LO_AddToTail ( lnew, l0 ) ;
                 }
                 else lnew = l0 ;
             }
         }
-        else if ( GetState ( lexer, END_OF_FILE|END_OF_STRING)) break ;
+        else if ( GetState ( lexer, END_OF_FILE | END_OF_STRING ) ) break ;
         //else _SyntaxError ( ( byte* ) "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
         //if ( Is_DebugModeOn ) CSL_PrintDataStack ( ) ;
     }
@@ -66,21 +67,23 @@ LC_Read (LambdaCalculus * lc)
 }
 
 ListObject *
-_LO_Read_Do_LParen ( LambdaCalculus * lc )
+_LO_Read_Do_LParen ()
 {
+    LambdaCalculus * lc = _LC_ ;
     ListObject *l0 ;
     lc->QuoteState |= lc->ItemQuoteState ;
     Stack_Push ( lc->QuoteStateStack, lc->QuoteState ) ;
     //lc->QuoteState = 0 ;
     lc->ParenLevel ++ ;
-    l0 = LC_Read (lc) ;
+    l0 = LC_Read () ;
     lc->QuoteState = Stack_Pop ( lc->QuoteStateStack ) ;
     return l0 ;
 }
 
 ListObject *
-_LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, int64 scwi )
+_LO_Read_DoWord (Word * word, int64 qidFlag, int64 tsrli, int64 scwi )
 {
+    LambdaCalculus * lc = _LC_ ;
     ListObject *l0 = 0 ;
     byte *token1 ;
     SetState ( word, QID, qidFlag ) ;
@@ -118,17 +121,18 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
 }
 
 ListObject *
-_LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
+_LO_Read_DoToken (byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
 {
+    LambdaCalculus * lc = _LC_ ;
     Context *cntx = _Context_ ;
     Lexer *lexer = cntx->Lexer0 ;
     ListObject *l0 = 0 ;
     Word *word ;
     //if ( Is_DebugModeOn ) CSL_PrintDataStack ( ) ;
     if ( qidFlag ) SetState ( cntx->Finder0, QID, true ) ;
-    word = LC_FindWord (token) ;
+    word = LC_FindWord ( token ) ;
     if ( qidFlag ) SetState ( cntx->Finder0, QID, false ) ;
-    if ( word ) l0 = _LO_Read_DoWord ( lc, word, qidFlag, tsrli, scwi ) ;
+    if ( word ) l0 = _LO_Read_DoWord (word, qidFlag, tsrli, scwi ) ;
     else
     {
         int64 allocType = GetState ( _Compiler_, LC_ARG_PARSING ) ? DICTIONARY : LISP ;
@@ -145,22 +149,23 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
 }
 
 ListObject *
-LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
+LO_Read_DoToken (byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
 {
+    LambdaCalculus * lc = _LC_ ;
     ListObject *l0 = 0 ;
     //if ( Is_DebugOn ) _Printf ( ( byte * ) "\n_LO_Read : \'%s\' scwi = %d", token, scwi ) ;
     if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CSL_ParenthesisComment ( ) ;
     else if ( String_Equal ( ( char * ) token, ( byte * ) "//" ) ) CSL_CommentToEndOfLine ( ) ;
-    else if ( _String_EqualSingleCharString ( token, '(' ) ) l0 = _LO_Read_Do_LParen ( lc ) ;
-    else l0 = _LO_Read_DoToken ( lc, token, qidFlag, tsrli, scwi ) ;
+    else if ( _String_EqualSingleCharString ( token, '(' ) ) l0 = _LO_Read_Do_LParen () ;
+    else l0 = _LO_Read_DoToken (token, qidFlag, tsrli, scwi ) ;
     return l0 ;
 }
 
 void
 LC_QuoteQuasiQuoteRepl ( uint64 itemQuoteState, Boolean doReplFlag )
 {
-    Boolean replFlag = false ;
     LambdaCalculus * lc = _LC_ ;
+    Boolean replFlag = false ;
     if ( ! lc )
     {
         replFlag = true ;

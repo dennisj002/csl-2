@@ -9,6 +9,7 @@ LO_IsQuoted ( ListObject *l0 )
 ListObject *
 LC_Eval ( ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
+    //if ( _LC_->ParenLevel == 0 ) if ( ! sigsetjmp ( _LC_->LC_JmpBuf, 0 ) ) ;
     LambdaCalculus * lc = _LC_ ;
     ListObject *l1 = l0 ; // default
     lc->ApplyFlag = applyFlag ; //= ! GetState (lc, LC_DEFINE_MODE);
@@ -41,6 +42,7 @@ LC_EvalList ( )
     LC_Debug ( lc, LC_EVAL_LIST, 1 ) ;
     if ( lfirst )
     {
+        //lc->Lfunction0 = lfirst ;
         if ( lfirst->W_LispAttributes & ( T_LISP_SPECIAL | T_LISP_MACRO ) )
         {
             if ( LO_IsQuoted ( lfirst ) ) return lfirst ;
@@ -51,6 +53,15 @@ LC_EvalList ( )
         else
         {
             lfunction = LC_Eval ( lfirst, lc->Locals, lc->ApplyFlag ) ;
+#if 0            
+        if ( String_Equal ( lfunction->Name, "cc")) 
+            Printf ("") ;
+        if (( lfunction == lc->L0 ) && (  lfunction->W_LispAttributes & ( T_LC_DEFINE  ) ) ) 
+                siglongjmp ( lc->LC_JmpBuf, 1 ) ;
+        //lc->Lfunction0 = l1 ;
+            //if ( ! lc->Lfunction0 ) 
+            //if (( lc->ParenLevel == 1 ) && ( lc->Lfunction0 == lfunction ) ) //&& String_Equal (lc->Lfunction0->Name, lfunction->Name)) 
+#endif            
             lc->Largs0 = _LO_Next ( lfirst ) ;
             lc->Largs = _LC_EvalList ( ) ;
             lc->Lfunction = lfunction ;
@@ -69,7 +80,7 @@ _LC_EvalSymbol ( )
     ListObject *l1 = lc->L0 ; // default 
     if ( l1 )
     {
-        if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( l1, "LC_Debug : ", 0, l1->Name, "" ) ;
+        LC_Debug ( lc, LC_EVAL_SYMBOL, 1 ) ;
         w = LC_FindWord ( l1->Name ) ;
         if ( w )
         {
@@ -106,8 +117,10 @@ _LC_EvalSymbol ( )
         }
     }
     // else the node evals to itself
-    l1 = LO_CopyOne ( l1 ) ;
-    return l1 ;
+    lc->L1 = LO_CopyOne ( l1 ) ;
+    //if ( lc->L1->W_LispAttributes & ( T_LC_DEFINE  ) ) lc->Lfunction0 = lc->L1 ; 
+    LC_Debug ( lc, LC_EVAL_SYMBOL, 0 ) ;
+    return lc->L1  ;
 }
 
 ListObject *
@@ -121,6 +134,10 @@ _LC_EvalList ( )
         for ( lnode = lc->Largs0 ; lnode ; lnode = lnext )
         {
             lnext = _LO_Next ( lnode ) ;
+#if 0            
+            if (lnode == lc->Lfunction0 ) 
+                siglongjmp ( lc->LC_JmpBuf, 1 ) ;
+#endif            
             le = LC_Eval ( lnode, locals, lc->ApplyFlag ) ; // lc->Locals could be changed by eval
             LO_AddToTail ( l1, LO_CopyOne ( le ) ) ;
         }

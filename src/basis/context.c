@@ -2,9 +2,9 @@
 #include "../include/csl.h"
 
 void
-_Context_Prompt (Context * cntx, int64 control )
+_Context_Prompt ( Context * cntx, int64 control )
 {
-    if ( _O_->Verbosity && ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) ) Context_DoPrompt (cntx, control ) ;
+    if ( _O_->Verbosity && ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) ) Context_DoPrompt ( cntx, control ) ;
 }
 
 byte *
@@ -14,7 +14,7 @@ _Context_Location ( Context * cntx )
     if ( cntx && cntx->ReadLiner0 )
     {
         byte * buffer = Buffer_Data ( _CSL_->StringB ) ;
-         snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", 
+        snprintf ( ( char* ) buffer, BUFFER_IX_SIZE, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>",
             cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
         str = cntx->Location = String_New ( buffer, TEMPORARY ) ;
     }
@@ -114,6 +114,12 @@ _Context_Run_2 ( Context * cntx, ContextFunction_2 contextFunction, byte * arg, 
 }
 
 void
+_Context_Run_3 ( Context * cntx, ContextFunction_3 contextFunction, byte * arg, int64 arg2, int64 arg3 )
+{
+    contextFunction ( cntx, arg, arg2, arg3 ) ;
+}
+
+void
 _Context_Run ( Context * cntx, ContextFunction contextFunction )
 {
     contextFunction ( cntx ) ;
@@ -124,7 +130,7 @@ CSL_Context_PushNew ( CSL * csl )
 {
     uint64 svState = csl->Context0->State ;
     _Stack_Push ( csl->ContextStack, ( int64 ) csl->Context0 ) ;
-     Context * cntx = _Context_New ( csl ) ;
+    Context * cntx = _Context_New ( csl ) ;
     cntx->State = svState ;
     return cntx ;
 }
@@ -153,6 +159,14 @@ _CSL_Contex_NewRun_2 ( CSL * csl, ContextFunction_2 contextFunction, byte *arg, 
 {
     Context * cntx = CSL_Context_PushNew ( csl ) ;
     _Context_Run_2 ( cntx, contextFunction, arg, arg2 ) ;
+    CSL_Context_PopDelete ( csl ) ; // this could be coming back from wherever so the stack variables are gone
+}
+
+void
+_CSL_Contex_NewRun_3 ( CSL * csl, ContextFunction_3 contextFunction, byte *arg, int64 arg2, int64 arg3 )
+{
+    Context * cntx = CSL_Context_PushNew ( csl ) ;
+    _Context_Run_3 ( cntx, contextFunction, arg, arg2, arg3 ) ;
     CSL_Context_PopDelete ( csl ) ; // this could be coming back from wherever so the stack variables are gone
 }
 
@@ -213,7 +227,7 @@ _Context_InterpretFile ( Context * cntx )
 }
 
 void
-_Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
+_Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag, int64 flispFlag )
 {
     if ( filename )
     {
@@ -232,13 +246,14 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             ReadLine_ReadFileIntoAString ( rl, file ) ;
             fclose ( file ) ;
 
-            if ( interpretFlag == 1 ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
-            else if ( interpretFlag == 2 ) Interpret_UntilFlagged2WithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
+            if ( ! flispFlag )
+            {
+                if ( interpretFlag == 1 ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
+                else if ( interpretFlag == 2 ) Interpret_UntilFlagged2WithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
+            }
 
             cntx->System0->IncludeFileStackNumber -- ;
             if ( _O_->Verbosity > 2 ) Printf ( "\n%s included\n", filename ) ;
-            //OVT_MemListFree_Objects ( ) ;
-            //OVT_FreeTempMem ( ) ;// no because it would delete eg. literals in the debug word list!! -> crash
         }
         else
         {
@@ -249,15 +264,15 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
 }
 
 void
-CSL_ContextNew_IncludeFile ( byte * filename )
+CSL_ContextNew_IncludeFile ( byte * filename, int flispFlag )
 {
-    _CSL_Contex_NewRun_2 ( _CSL_, _Context_IncludeFile, filename, 1 ) ;
+    _CSL_Contex_NewRun_3 ( _CSL_, _Context_IncludeFile, filename, 1, flispFlag ) ;
 }
 
 int64
 _Context_StringEqual_PeekNextToken ( Context * cntx, byte * check, Boolean evalFlag )
 {
-    byte *token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, evalFlag, 0 ) ;
+    byte *token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, evalFlag, 0 ) ;
     if ( token ) return String_Equal ( ( char* ) token, ( char* ) check ) ;
     else return 0 ;
 }

@@ -675,8 +675,8 @@ ReadLine_GetLine ( ReadLiner * rl )
 byte
 ReadLine_NextChar ( ReadLiner * rl )
 {
-    byte nchar = _ReadLine_GetNextChar ( rl ) ;
-    if ( ! nchar )
+    byte nchar ; 
+    if ( ! (nchar = _ReadLine_GetNextChar ( rl ) ) )
     {
         if ( GetState ( rl, STRING_MODE ) )
         {

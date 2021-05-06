@@ -5,7 +5,7 @@ void
 CSL_IncludeFile ( )
 {
    byte * filename = ( byte* ) DataStack_Pop ( ) ;
-    CSL_ContextNew_IncludeFile ( filename ) ;
+    CSL_ContextNew_IncludeFile (filename, 0) ;
 }
 
 int64

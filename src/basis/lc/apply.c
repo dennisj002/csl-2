@@ -39,7 +39,7 @@ LC_Apply ( )
         }
         if ( ! ( lfunction->W_MorphismAttributes & COMBINATOR ) )
         {
-            if ( GetState ( lc, LC_COMPILE_MODE ) )
+            //if ( GetState ( lc, LC_COMPILE_MODE ) )
             {
                 SetState ( lc, LC_COMPILE_MODE, false ) ;
                 if ( _O_->Verbosity > 1 )
@@ -441,7 +441,7 @@ Word_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right ar
         int64 svDs = GetState ( _CSL_, _DEBUG_SHOW_ ) ;
         DebugShow_Off ;
         cntx->BaseObject = 0 ; // nb! very important !! // but maybe shouldn't be done here -> Context_DoDotted_Post
-        l0 = LC_Read ( lc ) ;
+        l0 = LC_Read () ;
         SetState ( _CSL_, _DEBUG_SHOW_, svDs ) ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LC_Apply_C_LtoR_ArgList ( lc, l0, word ) ;

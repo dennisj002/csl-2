@@ -1,7 +1,7 @@
 
 #include "../include/csl.h"
 
-#if LINUX
+#ifdef LINUX
 struct termios SavedTerminalAttributes ;
 
 void
@@ -97,6 +97,7 @@ Linux_SetInputMode ( struct termios * savedTerminalAttributes )
     term.c_iflag |= IGNBRK ;
     term.c_iflag &= ~ ( INLCR | ICRNL | IXON | IXOFF ) ;
     term.c_lflag &= ~ ( ICANON | ECHO | ECHOK | ECHOE | ECHONL | ISIG | IEXTEN ) ;
+    //term.c_lflag &= ~ ( ICANON | ISIG | IEXTEN ) ;
     term.c_cc[VMIN] = 1 ;
     term.c_cc[VTIME] = 0 ;
     tcsetattr ( fileno ( stdin ), TCSANOW, &term ) ;

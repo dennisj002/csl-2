@@ -255,7 +255,7 @@ ListObject *
 _LC_Read_ListObject ( LambdaCalculus * lc, int64 parenLevel, int64 startReadIndex )
 {
     lc->ParenLevel = parenLevel ;
-    ListObject * l0 = LC_Read ( lc ) ;
+    ListObject * l0 = LC_Read () ;
     return l0 ;
 }
 
@@ -279,6 +279,7 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     LC_LispNamespaceOn ( ) ;
     LC_Init_Variables ( lc ) ;
     lc->ItemQuoteState = itemQuoteState ;
+    lc->ParenLevel = parenLevel ;
     int64 * svDsp = _DspReg_ ;
     SetState ( lc, LC_EVAL_PRINT, true ) ;
     lc->Lread = _LC_Read_ListObject ( lc, parenLevel, 0 ) ;
@@ -315,7 +316,7 @@ LC_ReadEvalPrint ( )
 void
 LC_ReadInitFile ( byte * filename )
 {
-    CSL_ContextNew_IncludeFile ( filename ) ;
+    CSL_ContextNew_IncludeFile (filename, 0) ;
 }
 
 void
