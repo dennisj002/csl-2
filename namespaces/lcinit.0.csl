@@ -42,7 +42,7 @@ bnOff
 (define (square n) (* n n))
 (define (fib n)
   (fib-iter 1 0 n))
-//(ld:)
+
 (define (fib-iter a b count)
   (if (= count 0)
       b
@@ -94,7 +94,7 @@ bnOff
                  (cc (- amount
                         (first-denomination kinds-of-coins))
                      kinds-of-coins)))))
-pwi cc
+
 (define (first-denomination kinds-of-coins)
   (cond ((= kinds-of-coins 1) 1)
         ((= kinds-of-coins 2) 5)
@@ -102,8 +102,7 @@ pwi cc
         ((= kinds-of-coins 4) 25)
         ((= kinds-of-coins 5) 50)))
 
-(ld:) (count-change 100) (;ld)          
-//(count-change 100)        
+(count-change 100)            
 (fib 30)        
 ;;; (define (remainder b a ) ( if ( mod b a) true false ))
 ;;; (bnOn)    

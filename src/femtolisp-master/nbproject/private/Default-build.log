@@ -1,0 +1,26 @@
+gcc -O3 -DNDEBUG -falign-functions -Wall -Wno-strict-aliasing -Illt  -DUSE_COMPUTED_GOTO -c flisp.c -o flisp.o
+gcc -O3 -DNDEBUG -falign-functions -Wall -Wno-strict-aliasing -Illt  -DUSE_COMPUTED_GOTO -c flmain.c -o flmain.o
+gcc -O3 -DNDEBUG -falign-functions -Wall -Wno-strict-aliasing -Illt  -DUSE_COMPUTED_GOTO -c builtins.c -o builtins.o
+gcc -O3 -DNDEBUG -falign-functions -Wall -Wno-strict-aliasing -Illt  -DUSE_COMPUTED_GOTO -c string.c -o string.o
+string.c: In function ‘fl_string_width’:
+string.c:56:21: warning: implicit declaration of function ‘wcwidth’ [-Wimplicit-function-declaration]
+   56 |             int w = wcwidth(*(uint32_t*)cp_data(cp));
+      |                     ^~~~~~~
+gcc -O3 -DNDEBUG -falign-functions -Wall -Wno-strict-aliasing -Illt  -DUSE_COMPUTED_GOTO -c equalhash.c -o equalhash.o
+gcc -O3 -DNDEBUG -falign-functions -Wall -Wno-strict-aliasing -Illt  -DUSE_COMPUTED_GOTO -c table.c -o table.o
+gcc -O3 -DNDEBUG -falign-functions -Wall -Wno-strict-aliasing -Illt  -DUSE_COMPUTED_GOTO -c iostream.c -o iostream.o
+rm -rf libflisp.a
+ar rs libflisp.a flisp.o flmain.o builtins.o string.o equalhash.o table.o iostream.o
+ar: creating libflisp.a
+gcc -O3 -DNDEBUG -falign-functions -Wall -Wno-strict-aliasing -Illt  -DUSE_COMPUTED_GOTO -c csl_flmain.c -o csl_flmain.o
+gcc -O3 -DNDEBUG -falign-functions -Wall -Wno-strict-aliasing -Illt  -DUSE_COMPUTED_GOTO flisp.o flmain.o builtins.o string.o equalhash.o table.o iostream.o csl_flmain.o -o flisp llt/libllt.a -lm libflisp.a
+/usr/bin/make test
+make[1]: Entering directory '/media/sdf5/dennisj/csl/src/femtolisp-master'
+cd tests && ../flisp unittest.lsp
+;  _
+; |_ _ _ |_ _ |  . _ _
+; | (-||||_(_)|__|_)|_)
+;-------------------|----------------------------------------------------------
+
+> make[1]: *** [Makefile:23: test] Terminated
+make: *** [Makefile:55: release] Terminated

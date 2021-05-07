@@ -62,7 +62,6 @@ _Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi 
     }
     return word ;
 }
-#if 1
 
 Word *
 Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
@@ -92,27 +91,6 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
     }
     return word ;
 }
-
-#else
-
-Word *
-Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
-{
-    Context * cntx = _Context_ ;
-    Compiler * compiler = cntx->Compiler0 ;
-    Word * word = 0 ;
-    Namespace * locals = compiler->LocalsNamespace ;
-    if ( token )
-    {
-        if ( locals ) word = _Finder_FindWord_InOneNamespace ( _Finder_, locals, token ) ;
-        if ( ! word ) word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ; // maybe need to respect a possible qualifying namespace ??
-        if ( ! word ) word = _Lexer_ParseToken_ToWord ( lexer, token, - 1, - 1 ) ;
-        lexer->TokenWord = word ;
-    }
-    return word ;
-}
-
-#endif
 
 byte *
 _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
@@ -158,11 +136,7 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
     lexer->SC_Index = _CSL_->SC_Index ;
-    if ( delimiters )
-    {
-        Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
-        //cntx->SpecialDelimiterCharSet = 0 ;
-    }
+    if ( delimiters )  Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
     else
     {
         if ( cntx->SpecialDelimiterCharSet )
@@ -390,6 +364,13 @@ Lexer_ReadToken ( Lexer * lexer )
 }
 
 void
+Lexer_AppendToTokenBuffer ( Lexer * lexer, byte c )
+{
+    lexer->TokenBuffer [ lexer->TokenWriteIndex ++ ] = c ;
+    lexer->TokenBuffer [ lexer->TokenWriteIndex ] = 0 ;
+}
+
+void
 _Lexer_AppendByteToTokenBuffer ( Lexer * lexer, byte c )
 {
     ReadLiner * rl = lexer->ReadLiner0 ;
@@ -397,8 +378,9 @@ _Lexer_AppendByteToTokenBuffer ( Lexer * lexer, byte c )
     {
         lexer->TokenStart_ReadLineIndex = rl->ReadIndex - 1 ; // -1 : ReadIndex has already been incremented for the next char so this char is -1
     }
-    lexer->TokenBuffer [ lexer->TokenWriteIndex ++ ] = c ;
-    lexer->TokenBuffer [ lexer->TokenWriteIndex ] = 0 ;
+    //lexer->TokenBuffer [ lexer->TokenWriteIndex ++ ] = c ;
+    //lexer->TokenBuffer [ lexer->TokenWriteIndex ] = 0 ;
+    Lexer_AppendToTokenBuffer ( lexer, c ) ;
 }
 
 void
@@ -418,7 +400,6 @@ Lexer_Append_ConvertedCharacterToTokenBuffer ( Lexer * lexer )
 void
 Lexer_AppendCharacterToTokenBuffer ( Lexer * lexer )
 {
-    // if ( AtCommandLine () && ! formattingChar )
     if ( ! GetState ( lexer, LEXER_ESCAPE_SEQUENCE ) )
     {
         Lexer_AppendByteToTokenBuffer ( lexer ) ;
@@ -426,10 +407,11 @@ Lexer_AppendCharacterToTokenBuffer ( Lexer * lexer )
     }
 }
 
-byte
-Lexer_UnAppendCharacterToTokenBuffer ( Lexer * lexer )
+void
+Lexer_UnAppendCharacter ( Lexer * lexer )
 {
-    return lexer->TokenBuffer [ -- lexer->TokenWriteIndex ] ;
+    //return lexer->TokenBuffer [ -- lexer->TokenWriteIndex ] ;
+    -- lexer->TokenWriteIndex ;
 }
 
 byte

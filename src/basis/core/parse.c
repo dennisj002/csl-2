@@ -270,7 +270,7 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
     if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CSL ) ) ) ) && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) )
         CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 0 ) ;
     _CSL_->SC_QuoteMode = true ;
-    if ( ! includeTermChar ) Lexer_UnAppendCharacterToTokenBuffer ( lexer ) ;
+    if ( ! includeTermChar ) Lexer_UnAppendCharacter ( lexer ) ;
     do
     {
         lexer->TokenInputByte = ReadLine_NextChar ( rl ) ;
@@ -278,7 +278,7 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
         else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
     }
     while ( lexer->TokenInputByte != termChar ) ;
-    if ( ! includeTermChar ) Lexer_UnAppendCharacterToTokenBuffer ( lexer ) ;
+    if ( ! includeTermChar ) Lexer_UnAppendCharacter ( lexer ) ;
     _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
     _CSL_->SC_QuoteMode = false ;
     SetState ( lexer, LEXER_DONE, true ) ;

@@ -10,55 +10,60 @@ byte *
 _ReadLine_pb_NextChar ( ReadLiner * rl )
 {
     if ( rl->ReadIndex < BUFFER_SIZE ) return &rl->InputLine [ rl->ReadIndex ] ;
-    //if ( rl->ReadIndex < BUFFER_SIZE ) return &rl->InputStringCurrent [rl->InputStringIndex] ; 
+        //if ( rl->ReadIndex < BUFFER_SIZE ) return &rl->InputStringCurrent [rl->InputStringIndex] ; 
     else return 0 ;
 }
 
 byte
 _ReadLine_NextChar ( ReadLiner * rl )
 {
-    if ( rl->ReadIndex < BUFFER_SIZE ) return rl->InputLine [ rl->ReadIndex ] ;
-    else return 0 ;
+    byte c = 0 ;
+    if ( rl->ReadIndex < BUFFER_SIZE ) c = rl->InputLine [ rl->ReadIndex ] ;
+    return c ;
 }
 
 inline byte
 _ReadLine_PeekIndexedChar ( ReadLiner * rl, int64 offset )
 {
-    return rl->InputLine [ offset ] ;
+    byte c = rl->InputLine [ offset ] ;
+    return c ;
 }
 
 byte
 ReadLine_PeekIndexedChar ( ReadLiner * rl, int64 index )
 {
-    if ( index < BUFFER_SIZE ) return _ReadLine_PeekIndexedChar ( rl, index ) ; //rl->InputLine [ offset ] ;
-    else return 0 ;
+    byte c = 0 ;
+    if ( index < BUFFER_SIZE ) c = _ReadLine_PeekIndexedChar ( rl, index ) ; //rl->InputLine [ offset ] ;
+    return c ;
 }
 
 byte
 _ReadLine_PeekOffsetChar ( ReadLiner * rl, int64 offset )
 {
-    if ( ( rl->ReadIndex + offset ) < BUFFER_SIZE ) return _ReadLine_PeekIndexedChar ( rl, rl->ReadIndex + offset ) ;
-    else return 0 ;
+    byte c = 0 ;
+    if ( ( rl->ReadIndex + offset ) < BUFFER_SIZE ) c = _ReadLine_PeekIndexedChar ( rl, rl->ReadIndex + offset ) ;
+    return c ;
 }
 
 byte
 ReadLine_PeekNextChar ( ReadLiner * rl )
 {
-    return _ReadLine_PeekOffsetChar ( rl, 0 ) ; //_ReadLine_NextChar ( rl );
+    byte c = _ReadLine_PeekOffsetChar ( rl, 0 ) ; //_ReadLine_NextChar ( rl );
+    return c ;
 }
 
 byte
 _ReadLine_GetNextChar ( ReadLiner * rl )
 {
     byte c = _ReadLine_NextChar ( rl ) ;
-    if ( c ) rl->ReadIndex++ ;
+    if ( c ) rl->ReadIndex ++ ;
     return c ;
 }
 
 void
 _ReadLine_EndThisLine ( ReadLiner * rl )
 {
-    ReadLine_Set_ReadIndex ( rl, -1 ) ;
+    ReadLine_Set_ReadIndex ( rl, - 1 ) ;
 }
 
 byte
@@ -90,21 +95,21 @@ ReadLine_PeekNextNonWhitespaceChar ( ReadLiner * rl )
 {
     int64 index = rl->ReadIndex ;
     byte atIndex = 0 ;
-    do 
+    do
     {
         if ( index >= BUFFER_SIZE ) break ;
-        atIndex = rl->InputLine [ index++ ] ;
+        atIndex = rl->InputLine [ index ++ ] ;
     }
     while ( atIndex <= ' ' ) ;
     return atIndex ;
 }
 
 int64
-ReadLine_IsThereNextChar( ReadLiner * rl ) 
+ReadLine_IsThereNextChar ( ReadLiner * rl )
 {
-    if ( ! rl->InputLine ) return false ;// in case we are at in a _OpenVmTil_Pause
+    if ( ! rl->InputLine ) return false ; // in case we are at in a _OpenVmTil_Pause
     char c = ReadLine_PeekNextChar ( rl ) ;
-    return c || ( rl->InputFile && (rl->InputKeyedCharacter != eof) ) ; // || (c != '\n') ) ;
+    return c || ( rl->InputFile && ( rl->InputKeyedCharacter != eof ) ) ; // || (c != '\n') ) ;
 }
 
 void
@@ -152,7 +157,7 @@ _ReadLine_CharAtCursor ( ReadLiner * rl )
 }
 
 byte
-_ReadLine_CharAtACursorPos ( ReadLiner * rl, int64 pos  )
+_ReadLine_CharAtACursorPos ( ReadLiner * rl, int64 pos )
 {
     return rl->InputLine [ pos ] ;
 }
@@ -188,7 +193,8 @@ Boolean
 ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
 {
     int64 i = 0, space = 0 ;
-    Boolean escSeqFlag = false, inArray = false ; ; //, quoteMode = false ;
+    Boolean escSeqFlag = false, inArray = false ;
+    ; //, quoteMode = false ;
     byte * nc = & rl->InputLineString [ index ] ;
     for ( i = 0 ; 1 ; i ++, nc ++ )
     {
@@ -210,9 +216,13 @@ ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
                     escSeqFlag = true ;
                     continue ;
                 }
-                case ']': { inArray = false ; continue ; }
+                case ']':
+                {
+                    inArray = false ;
+                    continue ;
+                }
                 case '[': return true ; //{ inArray = true ; continue ; } //continue ;
-                case 0 : case ',': case ';': case '(': case ')': case '\n': case '\'': return false ;
+                case 0: case ',': case ';': case '(': case ')': case '\n': case '\'': return false ;
                 case '.':
                 {
                     if ( i && ( *( nc + 1 ) != '.' ) )// watch for (double/triple) dot ellipsis

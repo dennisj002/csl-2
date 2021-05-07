@@ -21,6 +21,7 @@
 
 value_t FL_NIL, T, FL_LAMBDA, FL_MACRO, FL_LABEL, FL_QUOTE ;
 value_t lv ; // last value
+Boolean lf = false ;
 // error utilities ------------------------------------------------------------
 
 jmp_buf toplevel ;
@@ -283,21 +284,21 @@ print ( FILE *f, value_t v )
 byte *
 sprint ( value_t v )
 {
-     byte * b = Buffer_New_pbyte ( BUFFER_SIZE ) ;
+    byte * b = Buffer_New_pbyte ( BUFFER_SIZE ) ;
 
     value_t cd ;
 
     switch ( tag ( v ) )
     {
-        case TAG_NUM: sprintf ( b,"%ld", numval ( v ) ) ;
+        case TAG_NUM: sprintf ( b, "%ld", numval ( v ) ) ;
             break ;
-        case TAG_SYM: sprintf ( b,"%s", ( ( symbol_t* ) ptr ( v ) )->name ) ;
+        case TAG_SYM: sprintf ( b, "%s", ( ( symbol_t* ) ptr ( v ) )->name ) ;
             break ;
-        case TAG_BUILTIN: sprintf ( b,"#<builtin %s>",
+        case TAG_BUILTIN: sprintf ( b, "#<builtin %s>",
                 builtin_names[intval ( v )] ) ;
             break ;
         case TAG_CONS:
-            sprintf ( b,"(" ) ;
+            sprintf ( b, "(" ) ;
             while ( 1 )
             {
                 sprint ( car_ ( v ) ) ;
@@ -306,13 +307,13 @@ sprint ( value_t v )
                 {
                     if ( cd != FL_NIL )
                     {
-                        sprintf ( b," . " ) ;
+                        sprintf ( b, " . " ) ;
                         sprint ( cd ) ;
                     }
-                    sprintf ( b,")" ) ;
+                    sprintf ( b, ")" ) ;
                     break ;
                 }
-                sprintf ( b," " ) ;
+                sprintf ( b, " " ) ;
                 v = cd ;
             }
             break ;
@@ -569,7 +570,7 @@ apply_builtin:
                 return - 1 ;
                 break ;
             case F_RETURN:
-                DataStack_Push ( (int64) sprint ( lv ) ) ;
+                DataStack_Push ( ( int64 ) sprint ( lv ) ) ;
                 return - 1 ;
                 break ;
             case F_CONS:
@@ -676,6 +677,7 @@ apply_builtin:
                 break ;
             case F_LOAD:
                 argcount ( "load", nargs, 1 ) ;
+                lf = true ;
                 v = load_file ( tosymbol ( FL_Stack[SP - 1], "load" )->name ) ;
                 break ;
             case F_PROG1:
@@ -848,16 +850,9 @@ load_file ( char *fname )
 {
     value_t e, v = FL_NIL ;
     char *lastfile = infile ;
-#if 0   
-    FILE *f = fopen ( fname, "r" ) ;
-    if ( f == NULL ) lerror ( "file not found\n" ) ;
-#else    
     infile = fname ;
     Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
     _Context_IncludeFile ( cntx, fname, 0, 1 ) ;
-    buf = _Lexer_->TokenBuffer ;
-
-#endif    
     while ( 1 )
     {
         e = read_sexpr ( ) ;
@@ -872,10 +867,12 @@ load_file ( char *fname )
 int
 fl_main ( int argc, char* argv[] )
 {
+    ReadLiner * rl = _ReadLiner_ ;
     value_t v ;
-    FL_AtCommandLine = false ;
+    cli = false ;
     stack_bottom = ( ( char* ) &v ) - PROCESS_STACK_SIZE ;
     lisp_init ( ) ;
+    buf = _Lexer_->TokenBuffer ;
     if ( setjmp ( toplevel ) )
     {
         SP = 0 ;
@@ -893,14 +890,21 @@ fl_main ( int argc, char* argv[] )
         load_file ( argv[1] ) ;
         return 0 ;
     }
-    printf ( "Welcome to femtoLisp ----------------------------------------------------------\n" ) ;
-    printf ( "type '(exit)' to exit ---------------------------------------------------------\n" ) ;
+    printf ( "femtoLisp - tiny : type '(exit)' to exit\n" ) ;
 repl:
 
-    FL_AtCommandLine = true ;
+    cli = true ;
+    _ReadLiner_->InputFile = stdin ;
+    ReadLine_Init ( rl, _CSL_Key ) ;
+    buf = _Lexer_->TokenBuffer ;
+    SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
+    byte * snp = rl->NormalPrompt, *sap = rl->AltPrompt ;
+    rl->AltPrompt = ( byte* ) "fl< " ;
+    rl->NormalPrompt = ( byte* ) "fl> " ;
     while ( 1 )
     {
-        if ( lic != '\r' ) printf ( "\n> " ), fflush ( stdout ) ;
+        if (( lic != '\r' ) ) printf ( "\nfl> " ), fflush ( stdout ) ;
+        ReadLine_GetLine ( rl ) ;
         v = read_sexpr ( ) ;
         if ( feof ( stdin ) ) break ;
         printf ( "\n" ), fflush ( stdout ) ;
@@ -910,6 +914,11 @@ repl:
         print ( stdout, v ) ;
         set ( symbol ( "that" ), v ) ;
     }
+    rl->NormalPrompt = snp ;
+    rl->AltPrompt = sap ;
+    SetState ( _LC_, LC_REPL, false ) ;
+    Printf ( "\nfemtolisp : exiting ... " ) ;
+    //DefaultColors ;
     return 0 ;
 }
 
@@ -918,3 +927,4 @@ CSL_Flisp ( )
 {
     fl_main ( 1, ( char*[] ) { "flisp" } ) ;
 }
+ 

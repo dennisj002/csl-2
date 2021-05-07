@@ -69,6 +69,7 @@ extern struct termios SavedTerminalAttributes ;
 extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
 extern value_t FL_NIL, T, FL_LAMBDA, FL_MACRO, FL_LABEL, FL_QUOTE ;
-extern Boolean FL_AtCommandLine ;
+extern Boolean cli ;
 extern value_t lv ; // last value
+extern Boolean lf ;
 #endif

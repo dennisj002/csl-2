@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name="attic">
+        <in>s.c</in>
+        <in>scrap.c</in>
+      </df>
+      <df name="llt">
+        <in>bitvector-ops.c</in>
+        <in>bitvector.c</in>
+        <in>dirpath.c</in>
+        <in>dump.c</in>
+        <in>hashing.c</in>
+        <in>htable.c</in>
+        <in>int2str.c</in>
+        <in>ios.c</in>
+        <in>lltinit.c</in>
+        <in>lookup3.c</in>
+        <in>mt19937ar.c</in>
+        <in>ptrhash.c</in>
+        <in>random.c</in>
+        <in>socket.c</in>
+        <in>timefuncs.c</in>
+        <in>utf8.c</in>
+        <in>wcwidth.c</in>
+      </df>
+      <df name="tiny">
+        <in>flutils.c</in>
+        <in>lisp-nontail.c</in>
+        <in>lisp.c</in>
+        <in>lisp2.c</in>
+        <in>lispf.c</in>
+      </df>
+      <in>builtins.c</in>
+      <in>csl_flmain.c</in>
+      <in>cvalues.c</in>
+      <in>equal.c</in>
+      <in>equalhash.c</in>
+      <in>flisp.c</in>
+      <in>flmain.c</in>
+      <in>iostream.c</in>
+      <in>opaque_type_template.c</in>
+      <in>operators.c</in>
+      <in>print.c</in>
+      <in>read.c</in>
+      <in>string.c</in>
+      <in>table.c</in>
+      <in>types.c</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+      <itemPath>nbproject/private/launcher.properties</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <flagsDictionary>
+        <element flagsID="0" commonFlags="-O3"/>
+      </flagsDictionary>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath>flisp-gdb</executablePath>
+          <cTool>
+            <incDir>
+              <pElem>llt</pElem>
+            </incDir>
+            <preprocessorList>
+              <Elem>NDEBUG</Elem>
+              <Elem>USE_COMPUTED_GOTO</Elem>
+            </preprocessorList>
+          </cTool>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="builtins.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="csl_flmain.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="equalhash.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="flisp.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="flmain.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="iostream.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="string.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="table.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

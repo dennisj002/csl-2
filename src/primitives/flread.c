@@ -27,18 +27,18 @@ enum
     TOK_NONE, TOK_OPEN, TOK_CLOSE, TOK_DOT, TOK_QUOTE, TOK_SYM, TOK_NUM
 } ;
 
+static u_int32_t toktype = TOK_NONE ;
+static value_t tokval ;
+static char *buf ;
+Boolean cli = false ;
+int lic ; // last input char
+
 static int
 symchar ( char c )
 {
     static char *special = "()';\\|" ;
     return (! isspace ( c ) && ! strchr ( special, c ) ) ;
 }
-
-static u_int32_t toktype = TOK_NONE ;
-static value_t tokval ;
-static char *buf ; 
-Boolean FL_AtCommandLine = false ;
-int lic ; // last input char
 
 int64
 FL_Key ( )
@@ -48,17 +48,24 @@ FL_Key ( )
     return key ;
 }
 
-int64
+byte
 FL_Key2 ( )
 {
-    int64 key = fgetc (  stdin ) ; 
-    return key ;
+    //ReadLiner * rl = _ReadLiner_ ;
+    Lexer * lexer = _Lexer_ ;
+    //int64 key = fgetc (  stdin ) ; 
+    //int key = ReadLine_NextChar ( rl ) ;
+    byte c = _Lexer_NextChar ( lexer ) ;
+    return c ;
 }
 
 int64
 FL_Input ( )
 {
-    if ( FL_AtCommandLine ) lic = FL_Key2 ( ) ;
+    if ( cli )
+    {
+        lic = FL_Key2 ( ) ;
+    }
     else lic = FL_Key ( ) ;
     return lic ;
 }
@@ -66,11 +73,13 @@ FL_Input ( )
 void
 FL_PutChar ( int c )
 {
-    if ( FL_AtCommandLine )
+#if 0    
+    if ( cli )
     {
         fputc ( c, stdout ) ;
         fflush ( stdout ) ;
     }
+#endif    
 }
 
 void
@@ -78,19 +87,21 @@ FL_PushChar ( int c )
 {
     ReadLiner * rl = _ReadLiner_ ;
     rl->InputStringOriginal [ -- rl->InputStringIndex ] = c ;
+
 }
 
 void
 FL_PushChar2 ( int c )
 {
-    ungetc ( c, stdin ) ;
+    ReadLiner * rl = _ReadLiner_ ;
+    ReadLine_UnGetChar ( rl ) ;
 }
 
 int64
 FL_Push ( int c )
 {
     int key ;
-    if ( FL_AtCommandLine ) FL_PushChar2 ( c ) ;
+    if ( cli ) FL_PushChar2 ( c ) ;
     else FL_PushChar ( c ) ;
 }
 
@@ -103,11 +114,18 @@ take ( void )
 static void
 accumchar ( char c, int *pi )
 {
-    if ( c == '\b' ) ( *pi ) -- ;
-    else buf[( *pi ) ++] = c ;
-    if ( *pi >= ( int ) ( BUFFER_SIZE - 1 ) ) //sizeof (buf ) - 1 ) )
-        lerror ( "read: error: token too long\n" ) ;
-    FL_PutChar ( ( int ) c ) ;
+    if ( ! cli )
+    {
+        if ( c == '\b' ) ( *pi ) -- ;
+        else buf[( *pi ) ++] = c ;
+        if ( *pi >= ( int ) ( BUFFER_SIZE - 1 ) ) //sizeof (buf ) - 1 ) )
+            lerror ( "read: error: token too long\n" ) ;
+    }
+    else
+    {
+        if ( c == '\b' ) ( *pi ) --, Lexer_UnAppendCharacter ( _Lexer_ ) ;
+        else ( *pi ) ++, Lexer_AppendToTokenBuffer ( _Lexer_, c ) ;
+    }
 }
 
 static char
@@ -119,24 +137,25 @@ nextchar ( )
     do
     {
         ch = FL_Input ( ) ;
-        if ( ( ch == EOF ) || ( ch == 0 ) ) return 0 ;
+        if ( ( ch == EOF ) || ( ch == 0 ) )
+            return 0 ;
         c = ( char ) ch ;
         if ( c == ';' )
         {
             // single-line comment
             do
             {
-                ch = FL_Input ( ) ; // fgetc ( f ) ;
+                ch = FL_Input ( ) ;
                 if ( ( ch == EOF ) || ( ch == 0 ) )
                     return 0 ;
             }
             while ( ( char ) ch != '\n' ) ;
             c = ( char ) ch ;
         }
-        if ( c == '\b' ) FL_Push ( c ) ;
-        if ( ( c == '\r' ) && ( FL_AtCommandLine ) ) 
-            printf ( "\n> "), fflush (stdout)  ;
-        else if ( isspace ( c ) ) FL_PutChar ( c ) ;
+        if ( c == '\b' ) ReadLine_UnGetChar ( _ReadLiner_ ) ;
+        if ( ( ( c == '\r' ) || ( c == '\n' ) ) && ( cli ) && ( ! lf ) )
+            printf ( "\nfl> " ), fflush ( stdout ) ;
+        //else if ( isspace ( c ) ) FL_PutChar ( c ) ;
     }
     while ( isspace ( c ) ) ;
     return c ;
@@ -151,9 +170,9 @@ peek ( )
     if ( toktype != TOK_NONE ) return toktype ;
     c = nextchar ( ) ;
     if ( ( c == EOF ) || ( c == 0 ) ) return TOK_NONE ;
-    if ( c == '(' ) toktype = TOK_OPEN, FL_PutChar ( c ) ;
-    else if ( c == ')' ) toktype = TOK_CLOSE, FL_PutChar ( c ) ;
-    else if ( c == '\'' ) toktype = TOK_QUOTE, FL_PutChar ( c ) ;
+    if ( c == '(' ) toktype = TOK_OPEN ;
+    else if ( c == ')' ) toktype = TOK_CLOSE ;
+    else if ( c == '\'' ) toktype = TOK_QUOTE ;
     else if ( isdigit ( c ) || c == '-' || c == '+' )
     {
         fl_read_token ( c ) ;
@@ -175,39 +194,40 @@ peek ( )
         else
         {
             toktype = TOK_SYM ;
-            tokval = symbol ( buf ? buf : ( char* ) _Lexer_->TokenBuffer ) ;
+            tokval = symbol ( buf ) ;
         }
     }
     return toktype ;
 }
 
 int
-//Fl_Lexer_LexNextToken_WithDelimiters (  ) //, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
 fl_read_token ( char c )
 {
+    Lexer * lexer = _Lexer_ ;
     int inChar, escaped = 0, dot = ( c == '.' ), totread = 0, i = 0 ;
+    lexer->TokenWriteIndex = 0 ;
     FL_Push ( c ) ;
     while ( 1 )
     {
         inChar = FL_Input ( ) ;
         totread ++ ;
-        if ( ( inChar == EOF ) || ( inChar == 0 ) ) goto terminate ;
+        if ( ( inChar == EOF ) || ( inChar == 0 ) ) break ;
         c = ( char ) inChar ;
         if ( c == '|' ) escaped = ! escaped ;
         else if ( c == '\\' )
         {
             inChar = FL_Input ( ) ;
-            if ( ( inChar == EOF ) || ( inChar == 0 ) ) goto terminate ;
+            if ( ( inChar == EOF ) || ( inChar == 0 ) ) break ;
             accumchar ( ( char ) inChar, &i ) ;
         }
-        else if ( ! escaped && ! symchar ( c ) ) break ;
+        else if ( ! escaped && ! symchar ( c ) )
+        {
+            FL_Push ( c ) ;
+            break ;
+        }
         else accumchar ( c, &i ) ;
     }
-    FL_Push ( c ) ;
-terminate:
     buf [ i ++ ] = '\0' ;
-
-    //FL_PutSpace ( ) ;
     return (dot && ( totread == 2 ) ) ;
 }
 
