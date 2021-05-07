@@ -21,7 +21,10 @@
 
 value_t FL_NIL, T, FL_LAMBDA, FL_MACRO, FL_LABEL, FL_QUOTE ;
 value_t lv ; // last value
-Boolean lf = false ;
+FILE *f ; // input file
+Boolean cli = false ;
+int lic ; // last input char 
+
 // error utilities ------------------------------------------------------------
 
 jmp_buf toplevel ;
@@ -677,8 +680,9 @@ apply_builtin:
                 break ;
             case F_LOAD:
                 argcount ( "load", nargs, 1 ) ;
-                lf = true ;
+                cli = false ; //lf = true ;
                 v = load_file ( tosymbol ( FL_Stack[SP - 1], "load" )->name ) ;
+                cli = true ;
                 break ;
             case F_PROG1:
                 // return first arg
@@ -850,17 +854,19 @@ load_file ( char *fname )
 {
     value_t e, v = FL_NIL ;
     char *lastfile = infile ;
+    f = fopen ( fname, "r" ) ;
     infile = fname ;
-    Context * cntx = CSL_Context_PushNew ( _CSL_ ) ;
-    _Context_IncludeFile ( cntx, fname, 0, 1 ) ;
+    if ( f == NULL ) lerror ( "file not found\n" ) ;
+    cli = 0 ;
     while ( 1 )
     {
-        e = read_sexpr ( ) ;
-        if ( ( e == 0 ) || ( e == EOF ) || ( e == FL_NIL ) ) break ;
+        e = read_sexpr () ;
+        if ( feof ( f ) ) break ;
         v = toplevel_eval ( e ) ;
     }
     infile = lastfile ;
-    CSL_Context_PopDelete ( _CSL_ ) ; // this could be coming back from wherever so the stack variables are gone
+    fclose ( f ) ;
+    cli = 1 ;
     return v ;
 }
 
@@ -890,7 +896,7 @@ fl_main ( int argc, char* argv[] )
         load_file ( argv[1] ) ;
         return 0 ;
     }
-    printf ( "femtoLisp - tiny : type '(exit)' to exit\n" ) ;
+    printf ( "femtoLisp - tiny : type '(exit)' to exit" ) ;
 repl:
 
     cli = true ;
@@ -899,25 +905,25 @@ repl:
     buf = _Lexer_->TokenBuffer ;
     SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
     byte * snp = rl->NormalPrompt, *sap = rl->AltPrompt ;
-    rl->AltPrompt = ( byte* ) "fl< " ;
-    rl->NormalPrompt = ( byte* ) "fl> " ;
+    rl->AltPrompt = ( byte* ) "flt< " ;
+    rl->NormalPrompt = ( byte* ) "flt> " ;
     while ( 1 )
     {
-        if (( lic != '\r' ) ) printf ( "\nfl> " ), fflush ( stdout ) ;
+        if ( ( lic != '\r' ) ) printf ( "\nflt> " ), fflush ( stdout ) ;
         ReadLine_GetLine ( rl ) ;
         v = read_sexpr ( ) ;
         if ( feof ( stdin ) ) break ;
-        printf ( "\n" ), fflush ( stdout ) ;
+        //printf ( "\n" ), fflush ( stdout ) ;
         v = toplevel_eval ( v ) ;
         lv = v ;
         if ( v == - 1 ) break ;
-        print ( stdout, v ) ;
+        print ( stdout, v ) ; 
         set ( symbol ( "that" ), v ) ;
     }
     rl->NormalPrompt = snp ;
     rl->AltPrompt = sap ;
     SetState ( _LC_, LC_REPL, false ) ;
-    Printf ( "\nfemtolisp : exiting ... " ) ;
+    Printf ( "\nfemtolisp - tiny : exiting ... " ) ;
     //DefaultColors ;
     return 0 ;
 }
@@ -927,4 +933,3 @@ CSL_Flisp ( )
 {
     fl_main ( 1, ( char*[] ) { "flisp" } ) ;
 }
- 

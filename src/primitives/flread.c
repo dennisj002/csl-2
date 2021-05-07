@@ -30,79 +30,27 @@ enum
 static u_int32_t toktype = TOK_NONE ;
 static value_t tokval ;
 static char *buf ;
-Boolean cli = false ;
-int lic ; // last input char
+
+int64
+fl_getChar ( )
+{
+    if ( cli ) lic = _Lexer_NextChar ( _Lexer_ ) ;
+    else lic = fgetc ( f ) ;
+    return lic ;
+}
+
+void
+fl_ungetChar ( int c )
+{
+    if ( cli ) ReadLine_UnGetChar ( _ReadLiner_ ) ;
+    else ungetc ( c, f ) ;
+}
 
 static int
 symchar ( char c )
 {
     static char *special = "()';\\|" ;
     return (! isspace ( c ) && ! strchr ( special, c ) ) ;
-}
-
-int64
-FL_Key ( )
-{
-    ReadLiner * rl = _ReadLiner_ ;
-    int key = rl->InputStringOriginal [rl->InputStringIndex ++] ;
-    return key ;
-}
-
-byte
-FL_Key2 ( )
-{
-    //ReadLiner * rl = _ReadLiner_ ;
-    Lexer * lexer = _Lexer_ ;
-    //int64 key = fgetc (  stdin ) ; 
-    //int key = ReadLine_NextChar ( rl ) ;
-    byte c = _Lexer_NextChar ( lexer ) ;
-    return c ;
-}
-
-int64
-FL_Input ( )
-{
-    if ( cli )
-    {
-        lic = FL_Key2 ( ) ;
-    }
-    else lic = FL_Key ( ) ;
-    return lic ;
-}
-
-void
-FL_PutChar ( int c )
-{
-#if 0    
-    if ( cli )
-    {
-        fputc ( c, stdout ) ;
-        fflush ( stdout ) ;
-    }
-#endif    
-}
-
-void
-FL_PushChar ( int c )
-{
-    ReadLiner * rl = _ReadLiner_ ;
-    rl->InputStringOriginal [ -- rl->InputStringIndex ] = c ;
-
-}
-
-void
-FL_PushChar2 ( int c )
-{
-    ReadLiner * rl = _ReadLiner_ ;
-    ReadLine_UnGetChar ( rl ) ;
-}
-
-int64
-FL_Push ( int c )
-{
-    int key ;
-    if ( cli ) FL_PushChar2 ( c ) ;
-    else FL_PushChar ( c ) ;
 }
 
 static void
@@ -136,7 +84,7 @@ nextchar ( )
 
     do
     {
-        ch = FL_Input ( ) ;
+        ch = fl_getChar ( ) ;
         if ( ( ch == EOF ) || ( ch == 0 ) )
             return 0 ;
         c = ( char ) ch ;
@@ -145,7 +93,7 @@ nextchar ( )
             // single-line comment
             do
             {
-                ch = FL_Input ( ) ;
+                ch = fl_getChar ( ) ;
                 if ( ( ch == EOF ) || ( ch == 0 ) )
                     return 0 ;
             }
@@ -153,8 +101,8 @@ nextchar ( )
             c = ( char ) ch ;
         }
         if ( c == '\b' ) ReadLine_UnGetChar ( _ReadLiner_ ) ;
-        if ( ( ( c == '\r' ) || ( c == '\n' ) ) && ( cli ) && ( ! lf ) )
-            printf ( "\nfl> " ), fflush ( stdout ) ;
+        if ( ( ( c == '\r' ) || ( c == '\n' ) ) && ( cli ) )
+            printf ( "\nflt> " ), fflush ( stdout ) ;
         //else if ( isspace ( c ) ) FL_PutChar ( c ) ;
     }
     while ( isspace ( c ) ) ;
@@ -206,23 +154,23 @@ fl_read_token ( char c )
     Lexer * lexer = _Lexer_ ;
     int inChar, escaped = 0, dot = ( c == '.' ), totread = 0, i = 0 ;
     lexer->TokenWriteIndex = 0 ;
-    FL_Push ( c ) ;
+    fl_ungetChar ( c ) ;
     while ( 1 )
     {
-        inChar = FL_Input ( ) ;
+        inChar = fl_getChar ( ) ;
         totread ++ ;
         if ( ( inChar == EOF ) || ( inChar == 0 ) ) break ;
         c = ( char ) inChar ;
         if ( c == '|' ) escaped = ! escaped ;
         else if ( c == '\\' )
         {
-            inChar = FL_Input ( ) ;
+            inChar = fl_getChar ( ) ;
             if ( ( inChar == EOF ) || ( inChar == 0 ) ) break ;
             accumchar ( ( char ) inChar, &i ) ;
         }
         else if ( ! escaped && ! symchar ( c ) )
         {
-            FL_Push ( c ) ;
+            fl_ungetChar ( c ) ;
             break ;
         }
         else accumchar ( c, &i ) ;
@@ -238,7 +186,6 @@ fl_read_token ( char c )
 static void
 read_list ( value_t *pval )
 {
-    //FILE *f = _Context_->ReadLiner0->InputFile ;
     value_t c, *pc ;
     u_int32_t t ;
 
@@ -247,7 +194,7 @@ read_list ( value_t *pval )
     t = peek ( ) ;
     while ( t != TOK_CLOSE )
     {
-        //if ( feof ( f ) )   lerror ( "read: error: unexpected end of input\n" ) ;
+        if ( feof ( f ) )   lerror ( "read: error: unexpected end of input\n" ) ;
         c = mk_cons ( ) ;
         car_ ( c ) = cdr_ ( c ) = FL_NIL ;
         if ( iscons ( *pc ) )

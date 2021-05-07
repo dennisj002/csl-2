@@ -7,10 +7,32 @@
 #include <setjmp.h>
 #include "llt.h"
 #include "flisp.h"
+#include "../include/csl_fl.h"
 
 static value_t iostreamsym, rdsym, wrsym, apsym, crsym, truncsym;
 static value_t instrsym, outstrsym;
 fltype_t *iostreamtype;
+FILE *f ; // input file
+Boolean cli = false ;
+int lic ; // last input char
+
+int64
+fl_getChar ( )
+{
+    if ( cli )
+    {
+        lic = _Lexer_NextChar ( _Lexer_ ) ;
+    }
+    else lic = fgetc ( f ) ;
+    return lic ;
+}
+
+void
+fl_ungetChar ( int c )
+{
+    if ( cli ) ReadLine_UnGetChar ( _ReadLiner_ ) ;
+    else ungetc ( c, f ) ;
+}
 
 void print_iostream(value_t v, ios_t *f)
 {

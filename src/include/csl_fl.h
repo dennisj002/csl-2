@@ -56,10 +56,10 @@ const void *const __dso_handle __attribute__ ((__visibility__ ("hidden")))
 #include "macros.h"
 
 //#include "codegen_x86.h" // i want to make sure i have this - not using much now but probably later on
-#include "lisp.h"
+//#include "lisp.h"
 #include "machineCode.h"
 #include "machineCodeMacros.h"
-#include "prototypes.h"
+//#include "prototypes.h"
 #include "lc.h"
 
 extern OVT_StaticMemSystem *_OSMS_ ;
@@ -68,8 +68,8 @@ extern OpenVmTil * _O_;
 extern struct termios SavedTerminalAttributes ;
 extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
-extern value_t FL_NIL, T, FL_LAMBDA, FL_MACRO, FL_LABEL, FL_QUOTE ;
-extern Boolean cli ;
+//extern value_t FL_NIL, T, FL_LAMBDA, FL_MACRO, FL_LABEL, FL_QUOTE ;
+//extern Boolean cli ;
 extern value_t lv ; // last value
 extern Boolean lf ;
 extern FILE * f ;

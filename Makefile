@@ -105,11 +105,11 @@ _cslo :  src/include/prototypes.h $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
 
 src/primitives/cmaths.o : src/primitives/cmaths.c
-	$(CC) $(CFLAGS) -ggdb -c src/primitives/cmaths.c -o src/primitives/cmaths.o
+	$(CC) $(CFLAGS) -O3 -c src/primitives/cmaths.c -o src/primitives/cmaths.o
 
 src/primitives/flisp.o : src/primitives/flisp.c src/primitives/flread.c	
-#	$(CC) $(CFLAGS) -O3 -c src/primitives/flisp.c -o src/primitives/flisp.o
-	$(CC) $(CFLAGS) -ggdb -c src/primitives/flisp.c -o src/primitives/flisp.o
+	$(CC) $(CFLAGS) -O3 -c src/primitives/flisp.c -o src/primitives/flisp.o
+#	$(CC) $(CFLAGS) -ggdb -c src/primitives/flisp.c -o src/primitives/flisp.o
 
 proto:
 	touch src/include/defines.h
