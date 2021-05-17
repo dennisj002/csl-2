@@ -20,10 +20,10 @@ typedef void (*vFunction_1_UArg ) ( uint64 ) ;
 typedef void (*vFunction_2_Arg ) ( int64, int64 ) ;
 typedef int64( *cFunction_0_Arg ) ( ) ;
 typedef int64( *cFunction_1_Arg ) ( int64 ) ;
-typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;
+typedef
+int64( *cFunction_2_Arg ) ( int64, int64 ) ;
 typedef VoidFunction block ; // code block
-typedef int ( *mpf2andOutFunc) (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t) ;
-
+typedef int ( *mpf2andOutFunc ) ( mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t ) ;
 typedef struct
 {
     int64 StackSize ;
@@ -112,14 +112,12 @@ enum types
 {
     BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, CARTESIAN_PRODUCT
 } ;
-
 typedef struct
 {
     dllist osl_List ;
     dlnode n_Head ;
     dlnode n_Tail ;
-} OS_List;
-
+} OS_List ;
 typedef struct
 {
     OS_List OVT_StaticMemList ;
@@ -131,7 +129,6 @@ typedef struct
     int64 osc_Size ;
     byte osc_b_Chunk [0] ;
 } OS_Chunk, OS_Node ;
-
 typedef struct
 {
     union
@@ -156,7 +153,7 @@ typedef struct
         byte * do_bData ;
         int64 * do_iData ;
     } ;
-} dobject ; 
+} dobject ;
 typedef struct
 {
     union
@@ -206,10 +203,30 @@ typedef
 Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
 typedef struct _Identifier // _Symbol
 {
+#if 0
+    union
+    {
+        struct Namespace Namespace ;
+        struct Vocabulary Vocabulary ;
+        struct Class Class ;
+        struct DynamicObject DynamicObject ;
+        struct DObject DObject ;
+        struct ListObject ListObject ;
+        struct Symbol Symbol ;
+        struct MemChunk MemChunk
+        struct HistoryStringNode HistoryStringNode ;
+        struct Buffer Buffer ;
+        struct CaseNode CaseNode ;
+    }
+#else    
     DLNode S_Node ;
     int64 CodeSize ;
     byte * S_Name ;
     uint64 State ;
+    dllist * S_SymbolList ;
+    uint64 S_DObjectValue ; // nb! DynamicObject value can not be a union with S_SymbolList
+    uint64 * S_PtrToValue ; // because we copy words with Compiler_PushCheckAndCopyDuplicates and we want the original value
+    block Definition ;
     union
     {
         uint64 S_Value ;
@@ -217,9 +234,6 @@ typedef struct _Identifier // _Symbol
         byte * S_Object ;
         struct _Identifier * S_ValueWord ;
     } ;
-    dllist * S_SymbolList ;
-    uint64 S_DObjectValue ; // nb! DynamicObject value can not be a union with S_SymbolList
-    uint64 * S_PtrToValue ; // because we copy words with Compiler_PushCheckAndCopyDuplicates and we want the original value
     union // leave this here so we can add a ListObject to a namespace
     {
         struct _Identifier * S_ContainingNamespace ;
@@ -238,11 +252,7 @@ typedef struct _Identifier // _Symbol
         dlnode * S_Node3 ;
         byte * S_pb_Data3 ;
     } ;
-    block Definition ;
-    dllist * DebugWordList ;
-    int64 StartCharRlIndex ;
-    int64 SC_WordIndex ; 
-    struct _Identifier * CSLWord, * BaseObject ;
+#endif
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer, CaseNode ;
 #define S_Car S_Node.n_DLNode.n_After
@@ -293,7 +303,6 @@ typedef struct _Identifier // _Symbol
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr
 #define Lo_NumberOfSlots S_NumberOfSlots //Slots
-#define Lo_CSL_Word CSLWord 
 #define Lo_List S_SymbolList 
 #define Lo_Value S_Value
 #define Lo_PtrToValue S_PtrToValue 
@@ -405,6 +414,10 @@ typedef struct _WordData
     dllist * SourceCodeWordList ;
     byte * SourceCoding ; //
     int64 SourceCodeMemSpaceRandMarker ;
+    dllist * DebugWordList ;
+    int64 StartCharRlIndex ;
+    int64 SC_WordIndex ;
+    Identifier * CSLWord, * BaseObject ;
 } WordData ; // try to put all compiler related data here so in the future we can maybe delete WordData at runtime
 
 // to keep using existing code without rewriting ...
@@ -446,8 +459,6 @@ typedef struct _WordData
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
 #define WL_OriginalWord W_WordData->OriginalWord
-#define W_RL_Index StartCharRlIndex
-#define W_SC_Index SC_WordIndex 
 #define W_SC_WordList W_WordData->SourceCodeWordList 
 #define W_SC_MemSpaceRandMarker W_WordData->SourceCodeMemSpaceRandMarker
 #define W_OpInsnCode W_WordData->OpInsnCode 
@@ -456,6 +467,13 @@ typedef struct _WordData
 #define W_TypeObjectsNamespaces W_WordData->TypeObjectsNamespaces
 #define NamespaceStack W_WordData->WD_NamespaceStack
 #define W_MySourceCodeWord W_WordData->CompiledAsPartOf
+#define W_BaseObject W_WordData->BaseObject
+#define W_RL_Index W_WordData->StartCharRlIndex
+#define W_SC_Index W_WordData->SC_WordIndex 
+#define W_StartCharRlIndex W_WordData->StartCharRlIndex
+#define W_SC_WordIndex W_WordData->SC_WordIndex
+#define W_CSLWord W_WordData->CSLWord
+#define Lo_CSL_Word W_WordData->CSLWord 
 
 struct NamedByteArray ;
 typedef struct
@@ -549,8 +567,7 @@ typedef struct TCI
 } TabCompletionInfo, TCI ;
 
 struct ReadLiner ;
-typedef
-byte( *ReadLiner_KeyFunction ) (struct ReadLiner *) ;
+typedef byte( *ReadLiner_KeyFunction ) (struct ReadLiner *) ;
 typedef struct ReadLiner
 {
     uint64 State, svState ;
@@ -590,7 +607,7 @@ typedef struct _Lexer
     int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
     byte *OriginalToken, *ParsedToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter ;
     byte * TokenDelimiters, * DelimiterCharSet, * DelimiterOrDotCharSet, *Filename, *LastToken ;
-    byte( *NextChar ) ( struct _Lexer * lexer ), * TokenBuffer, CurrentChar ;
+    byte( *NextChar ) (struct _Lexer * lexer ), * TokenBuffer, CurrentChar ;
     union
     {
         uint64 Literal ;
@@ -839,7 +856,7 @@ typedef struct _LambdaCalculus
     int64 DontCopyFlag, Loop, ParenLevel ;
     Namespace *LispNamespace, *LispDefinesNamespace, *LispTempNamespace, *BackgroundNamespace ;
     ListObject *Lread, *L0, *L1, *Lfirst, *Lfunction0, *Lfunction, *Lvalue, *Locals, *Largs0, *Largs, *Largs1, * Nil, *True, *FunctionParameters, *FunctionArgs ;
-    ListObject *LastInterpretedWord ; 
+    ListObject *LastInterpretedWord ;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
     Stack * QuoteStateStack ;
@@ -881,8 +898,8 @@ typedef struct _CSL
     uint64 State, SavedState, * SaveDsp ;
     int64 InitSessionCoreTimes, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount, DebugLevel ; // SC_Index == SC_Buffer Index ;
     Stack *ReturnStack, * DataStack ;
-    Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace, 
-            *C_Preprocessor_IncludeDirectory_SearchList, *C_Preprocessor_IncludedList ; 
+    Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace,
+    *C_Preprocessor_IncludeDirectory_SearchList, *C_Preprocessor_IncludedList ;
     Context * Context0 ;
     Stack * ContextStack, * TypeWordStack ;
     Debugger * Debugger0 ;
@@ -921,6 +938,7 @@ typedef struct
     NamedByteArray * ContextSpace ;
     NamedByteArray * WordRecylingSpace ;
     NamedByteArray * LispTempSpace ;
+    NamedByteArray * LispCopySpace ;
     // quasi long term
     NamedByteArray * BufferSpace ;
     // long term memory
@@ -999,7 +1017,7 @@ typedef struct
 
     // variables accessible from csl
     int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, ReAllocations, Dbi ;
-    int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectSpaceSize, InternalObjectsSize, LispSpaceSize, ContextSize ;
+    int64 DictionarySize, LispCopySize, LispTempSize, MachineCodeSize, ObjectSpaceSize, InternalObjectsSize, LispSpaceSize, ContextSize ;
     int64 TempObjectsSize, CompilerTempObjectsSize, WordRecylingSize, SessionObjectsSize, DataStackSize, OpenVmTilSize ;
     int64 CSLSize, BufferSpaceSize, StringSpaceSize, Thrown ;
     Buffer *PrintBuffer ;
@@ -1065,7 +1083,6 @@ typedef struct typeStatusInfo
     Boolean TypeErrorStatus, OpWord_ReturnsACodedValue_Flag ;
     byte OpWordReturnSignatureLetterCode ;
 } TypeStatusInfo, TSI ;
-
 typedef struct
 {
     int64 HistoryAllocation ; //mmap_TotalMemAllocated, mmap_TotalMemFreed, HistoryAllocation ; //, StaticAllocation ;

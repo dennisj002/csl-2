@@ -182,10 +182,11 @@ Lisp
 //sp    
 (define q3 q2)
 (define q4 q3)
-(define q2 q4)
+(define q5 q4)
 //sp
-//(ld:) 
-((q2 +) (q2 28) (q2 2)(q3 2) (q4 45))
+//ld: 
+((q5 +) (q5 28) (q5 2)(q3 2) (q4 45))
+//;ld
 "above line should show 77" ps
 stack pause
 (( lambda ( x y ) ( + x y ) ) 3 4 ) 

@@ -84,7 +84,7 @@ _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Bool
     if ( imm || ( controlFlags & IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags & IMM_B ) ) ;
     if ( _DBI || ( _O_->Dbi > 1 ) )
     {
-        d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
+        d1 ( Debugger_UdisOneInstruction (_Debugger_, 0, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
         d0 ( _Debugger_Disassemble (_Debugger_, 0, ( byte* ) here, Here - here, 1 ) ) ;
     }
 }

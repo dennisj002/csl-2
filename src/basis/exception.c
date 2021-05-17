@@ -101,7 +101,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     if ( GetState ( debugger, DBG_STEPPING ) )
     {
         Debugger_Registers ( debugger ) ;
-        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ;
+        Debugger_UdisOneInstruction (debugger, 0, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ;
     }
     Debugger_ShowInfo ( debugger, _O_->ExceptionMessage, _O_->Signal ) ;
     if ( word != _Context_->LastEvalWord ) _CSL_Source ( word, 0 ) ;

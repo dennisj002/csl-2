@@ -83,7 +83,6 @@ int64
 _CFib ( int64 n )
 {
     if ( n < 2 ) return n ;
-
     else return ( _CFib ( n - 1 ) + _CFib ( n - 2 ) ) ;
 }
 
@@ -149,18 +148,39 @@ CFactorial3 ( void )
 }
 
 
-void
-ctct ()
+int
+first_denomination ( int kinds_of_coins)
 {
-    struct ct { int64 ar [4][4][4] ; } ;
-    struct ct a  ;
-    int64 y = DataStack_Pop () ;
-    a.ar [0][y + 1][0] = y ;
-    a.ar [y ][y + 1][0] = a.ar [0][y + 1][0] ;
-    //a.ar [y @ 1 +][y @][y @] dup nl hp a.ar [0][0][0] @ = // if y == 2 this is an array out of bounds reference :: not checked for yet ??
-    //a.ar [y @][y @][y @ 1 +] dup nl hp a.ar [0][0][0] @ =
-    //TODO ( "array out of bounds checking with variables?!" )
-    //a.ar 32 dump
-    printf ( "ctct a.ar [y ][y ][0] = %ld", a.ar [y + 1][y + 1][0] ) ;
+   int rtrn ;
+   if ( kinds_of_coins == 1) rtrn = 1 ;
+   else if ( kinds_of_coins == 2) rtrn = 5 ;
+   else if ( kinds_of_coins == 3) rtrn = 10 ;
+   else if ( kinds_of_coins == 4) rtrn = 25 ;
+   else if ( kinds_of_coins == 5) rtrn = 50 ;
+   return rtrn ;
 }
 
+int
+cc1 ( int amount, int kinds_of_coins)
+{
+    int rtrn ;
+    //printf ( "\ncc1 : amount = %d : kinds_of_coins = %d", amount, kinds_of_coins ) ;
+    if (amount == 0) rtrn = 1  ;
+    else if ( ( amount < 0) || ( kinds_of_coins == 0) ) rtrn = 0 ;
+    else rtrn = cc1 ( amount, kinds_of_coins - 1) + 
+        cc1 (amount - first_denomination (kinds_of_coins), kinds_of_coins) ;
+   //printf ( "\ncc1 : rtrn = %d", rtrn ) ;
+   return rtrn ;
+}
+
+int count_change ( int amount)
+{
+  //printf ( "\ncount_change = %d", cc ( amount 5) ) ;
+  return cc1 ( amount, 5)  ;
+}
+
+void
+CSL_CountChange ()
+{
+    TOS = count_change ( TOS ) ;
+}

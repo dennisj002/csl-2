@@ -346,7 +346,7 @@ void Compile_ShiftRight(void);
 void _Udis_PrintInstruction(ud_t *ud, byte *address, byte *prefix, byte *postfix);
 int64 _Udis_GetInstructionSize(ud_t *ud, byte *address);
 ud_t *_Udis_Init(ud_t *ud);
-int64 Debugger_UdisOneInstruction(Debugger *debugger, byte *address, byte *prefix, byte *postfix);
+int64 Debugger_UdisOneInstruction(Debugger *debugger, Word *word, byte *address, byte *prefix, byte *postfix);
 int64 _Udis_Disassemble(ud_t *ud, Word *word, byte *iaddress, int64 number, int64 cflag);
 /* src/basis/compiler/arrays.c */
 int64 _CheckArrayDimensionForVariables_And_UpdateCompilerState(void);
@@ -2257,7 +2257,7 @@ void CSL_Store(void);
 /* src/primitives/primitives.c */
 /* src/primitives/contexts.c */
 void CSL_Contex_New_RunWord(void);
-/* src/primitives/flisp.c */
+/* src/primitives/fltlisp.c */
 void lerror(char *format, ...);
 void type_error(char *fname, char *expected, value_t got);
 cons_t *tocons(value_t v, char *fname);
@@ -2323,7 +2323,10 @@ void CFactorial(void);
 int64 _CFactorial(int64 n);
 void CFactorial2(void);
 void CFactorial3(void);
-void ctct(void);
+int first_denomination(int kinds_of_coins);
+int cc1(int amount, int kinds_of_coins);
+int count_change(int amount);
+void CSL_CountChange(void);
 /* src/primitives/dataObjectNews.c */
 void CSL_Class_New(void);
 void CSL_Class_Object_New(void);

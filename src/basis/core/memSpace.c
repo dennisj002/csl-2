@@ -188,6 +188,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
         case CONTEXT: return _Allocate ( size, ms->ContextSpace ) ;
         case BUFFER: return _Allocate ( size, ms->BufferSpace ) ;
         case LISP_TEMP: return _Allocate ( size, ms->LispTempSpace ) ;
+        //case LISP_COPY: return _Allocate ( size, ms->LispCopySpace ) ;
         case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
         case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
         case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
@@ -224,6 +225,7 @@ MemorySpace_Init ( MemorySpace * ms )
 
     ms->TempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "TempObjectSpace", ovt->TempObjectsSize, TEMPORARY ) ;
     ms->LispTempSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispTempSpace", ovt->LispTempSize, LISP_TEMP ) ;
+    //ms->LispCopySpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispCopySpace", ovt->LispCopySize, LISP_COPY ) ;
     ms->CompilerTempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CompilerTempObjectSpace", ovt->CompilerTempObjectsSize, COMPILER_TEMP ) ;
     ms->WordRecylingSpace = MemorySpace_NBA_New ( ms, ( byte* ) "WordRecylingSpace", ovt->WordRecylingSize, WORD_RECYCLING ) ;
     ms->SessionObjectsSpace = MemorySpace_NBA_New ( ms, ( byte* ) "SessionObjectsSpace", ovt->SessionObjectsSize, SESSION ) ;
@@ -610,7 +612,6 @@ OVT_MemListFree_LispTemp ( )
 void
 OVT_MemListFree_Session ( )
 {
-
     OVT_MemList_FreeNBAMemory ( ( byte* ) "SessionObjectsSpace", 2 * M, 1 ) ;
 }
 

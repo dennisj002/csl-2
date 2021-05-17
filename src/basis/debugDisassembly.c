@@ -17,7 +17,7 @@ Debugger_Udis_GetInstructionSize ( Debugger * debugger )
 int64
 _Debugger_Disassemble (Debugger * debugger, Word * word, byte* address, int64 number, int64 cflag )
 {
-    int64 size = _Udis_Disassemble (Debugger_UdisInit ( debugger ), word, address, ( ( number > ( 3 * K ) ) ? ( 3 * K ) : number ), cflag ) ;
+    int64 size = _Udis_Disassemble (Debugger_UdisInit ( debugger ), debugger->w_Word, address, ( ( number > ( 3 * K ) ) ? ( 3 * K ) : number ), cflag ) ;
     debugger->LastDisStart = address ;
     return size ; //+ 1 ; // ? 1 : return - 'ret' - ins
 }
@@ -46,7 +46,7 @@ Debugger_Dis ( Debugger * debugger )
         if ( debugger->DebugAddress )
         {
             Printf ( "\nNext instruction ..." ) ;
-            Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\n", ( byte* ) "" ) ; // the next instruction
+            Debugger_UdisOneInstruction (debugger, 0, debugger->DebugAddress, ( byte* ) "\n", ( byte* ) "" ) ; // the next instruction
         }
 #endif        
     }

@@ -25,7 +25,8 @@ void
 Compile_WordRun ( )
 {
     _Compile_Stack_PopToReg ( DSP, RAX ) ;
-    Compile_Move_Rm_To_Reg ( RAX, RAX, 0xa8, 0 ) ; // 0xa8 : Definition offset in Word structure in version 0.902.860
+    //Compile_Move_Rm_To_Reg ( RAX, RAX, 0xa8, 0 ) ; // 0xa8 : Definition offset in Word structure in version 0.902.860
+    Compile_Move_Rm_To_Reg ( RAX, RAX, 0x88, 0 ) ; // 0x88 : Definition offset in Word structure in version 0.918.550
     _Compile_Group5 ( CALL, REG, RAX, 0, 0, 0 ) ;
 }
 

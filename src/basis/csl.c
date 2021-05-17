@@ -82,7 +82,7 @@ CSL_Debugger_CheckSaveCpuStateShow ( )
 void
 CSL_Debugger_UdisOneInsn ( )
 {
-    Debugger_UdisOneInstruction ( _Debugger_, _Debugger_->DebugAddress, ( byte* ) "\r\r", ( byte* ) "" ) ; // current insn
+    Debugger_UdisOneInstruction (_Debugger_, 0, _Debugger_->DebugAddress, ( byte* ) "\r\r", ( byte* ) "" ) ; // current insn
 }
 
 void

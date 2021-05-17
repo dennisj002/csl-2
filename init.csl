@@ -429,7 +429,7 @@ Root
 'doScript 1 const
 'doScript2 1 const
 'forStarters 0 const 
-'_doDemo 0 const
+'_doDemo 1 const
 '_doTest 1 const
 doLisp 0 =
 'doLispTest var doLispTest 1 =
@@ -437,7 +437,7 @@ doLisp 0 =
     
 dbgOff
 //lisp
-//dbgOn 
+dbgOn 
 : fl flisp ;
 //fl //ps pause
 
@@ -493,3 +493,5 @@ cOff
 #endif 
 #endif    
 2 + 7 assertStkChk //d: // stack checking 
+//"namespaces/test2c.csl" include
+//100 count_changec p

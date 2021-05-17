@@ -521,8 +521,8 @@ typedef struct _WordData
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
 #define WL_OriginalWord W_WordData->OriginalWord
-#define W_RL_Index StartCharRlIndex
-#define W_SC_Index SC_WordIndex 
+#define W_RL_Index W_WordData->StartCharRlIndex
+#define W_SC_Index W_WordData->SC_WordIndex 
 #define W_SC_WordList W_WordData->SourceCodeWordList 
 #define W_SC_MemSpaceRandMarker W_WordData->SourceCodeMemSpaceRandMarker
 #define W_OpInsnCode W_WordData->OpInsnCode 

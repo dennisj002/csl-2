@@ -1,44 +1,15 @@
-(set verbosity 1)
-(( lambda ( x y ) ( + x y ) ) 3 4 ) 
-(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1))))))
-(yfac yfac 10) nl
-(define yfacc (lambda (yyy n1) (if (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
-(yfacc yfacc 20) 
-(yfacc yfacc 7) nl 
-pause
-(definec fibc (lambda ( n ) (ifc (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
-pwi fibc
-"\nfibc 30 = " ps
-(fibc 30)
-
-#if 1   
-(definec (fibc1 n ) (ifc (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2)))))
-//d: (define fibc1 ( lambda ( n ) (ifc (< n 2) (n) ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
-(definec fibc2 ( lambda ( n ) (ifc (< n 2) n ( + (fibc2 (- n 1)) (fibc2 (- n 2)) ) ) ) )
-pwi fibc1
-"\nfibc1 30 = " ps
-(fibc1 30) 
-(fibc2 30) 
-pause
-#endif    
-
-#if 1 //doLispTest @ // from sicp
-bnOn
 (define (abs n) (cond (( < n 0 ) (- 0 n)) n )) 
 ( abs -9)
 ( abs 9)
 (define (square n) (* n n))
 (define (average x y) ( / (+ x y) 2 ))  
 (define (improve guess x) (average guess (/ x guess)))    
-(define (good-enough? guess x) ( < ( abs ( - (square guess) x)) 0.000000000001))  
-//( ld: ) 
+(define (good-enough? guess x) ( < ( abs ( - (square guess) x)) 0.00000000000001))  
 (define (sq-iter guess x) (if (good-enough? guess x) guess (sq-iter (improve guess x ) x )))    
 ( define (sqrt x) ( sq-iter 1.00000000000 x))
 (sqrt 9) 
 (sqrt 2) 
 (sqrt (sqrt (sqrt 9) ))
-bnOff
-#endif
 (define (square n) (* n n))
 (define (fib n)
   (fib-iter 1 0 n))
@@ -47,9 +18,7 @@ bnOff
   (if (= count 0)
       b
       (fib-iter (+ a b) a (- count 1))))
-//pwi fib-iter
 (fib 30)           
-//(;ld)
 (define ( A x y) 
     (cond 
         (( = y 0 ) 0 )
@@ -105,7 +74,6 @@ bnOff
 (count-change 100)            
 (fib 30)        
 ;;; (define (remainder b a ) ( if ( mod b a) true false ))
-;;; (bnOn)    
 (define (divides? a b)
   (= (modulo b a) 0))
   ;;; (= (remainder b a) 0))
@@ -126,9 +94,3 @@ bnOff
 (prime? 100) 
 (define (p? n) (prime? n))
 (define (d? n) (sd n))
-;;; SECTION 1.2.5
-//#endif    
-#endif
-"\ncsl : scheme/lisp : type \'x\' or \'exit\' or \'bye\' to exit ..." ps
-//(ld:)  (load "namespaces/schemeTest2.csl")            
-"\nfib 30 =" ps (fib 30)

@@ -5,7 +5,7 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/basis/core/block.c src/basis/compiler/blocks.c src/basis/core/conditionals.c src/basis/compiler/compile.c src/basis/core/_system.c\
 	src/basis/compiler/optimize.c src/basis/compiler/bit.c src/basis/compiler/udis.c src/basis/compiler/arrays.c \
 	src/basis/core/io.c src/basis/core/symbol.c src/basis/repl.c src/basis/core/syntax.c src/basis/core/dataObjectNew.c\
-        src/basis/csl.c src/basis/core/parse.c src/basis/core/memSpace.c src/basis/init.c src/basis/system.c src/basis/core/charSet.c\
+	src/basis/csl.c src/basis/core/parse.c src/basis/core/memSpace.c src/basis/init.c src/basis/system.c src/basis/core/charSet.c\
 	src/basis/core/dllist.c src/basis/core/interpret.c src/basis/core/lexer.c src/basis/core/cstack.c src/basis/core/classes.c src/basis/debugOutput.c\
 	src/basis/core/namespace.c src/basis/history.c src/basis/core/readline.c src/basis/core/dataStack.c src/basis/context.c\
 	src/basis/core/word.c src/basis/core/readTable.c src/basis/bigNum.c src/basis/core/_readline.c src/basis/core/array.c\
@@ -19,8 +19,11 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/primitives/strings.c src/primitives/bits.c src/primitives/maths.c src/primitives/logics.c src/primitives/openvmtils.c\
 	src/primitives/ios.c src/primitives/parsers.c src/primitives/interpreters.c src/primitives/namespaces.c src/primitives/systems.c\
 	src/primitives/compilers.c src/primitives/words.c  src/primitives/file.c src/primitives/stacks.c\
-	src/primitives/debuggers.c src/primitives/memorys.c src/primitives/primitives.c src/primitives/contexts.c src/primitives/flisp.c \
+	src/primitives/debuggers.c src/primitives/memorys.c src/primitives/primitives.c src/primitives/contexts.c src/primitives/fltlisp.c \
 	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c  
+
+	#src/basis/lc/read.c src/basis/lc/evalNew3.c src/basis/lc/special.c src/basis/lc/apply.c src/basis/lc/print.c \
+	#src/basis/lc/apply.c src/basis/lc/eval.c src/basis/lc/read.c src/basis/lc/print.c src/basis/lc/special.c \
 
 INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
 	src/include/csl.h src/include/macros.h src/include/lc.h\
@@ -107,8 +110,8 @@ _cslo :  src/include/prototypes.h $(OBJECTS)
 src/primitives/cmaths.o : src/primitives/cmaths.c
 	$(CC) $(CFLAGS) -O3 -c src/primitives/cmaths.c -o src/primitives/cmaths.o
 
-src/primitives/flisp.o : src/primitives/flisp.c src/primitives/flread.c	
-	$(CC) $(CFLAGS) -O3 -c src/primitives/flisp.c -o src/primitives/flisp.o
+src/primitives/flisp.o : src/primitives/flisp.c src/primitives/fltlread.c	
+	$(CC) $(CFLAGS) -O3 -c src/primitives/fltlisp.c -o src/primitives/fltlisp.o
 #	$(CC) $(CFLAGS) -ggdb -c src/primitives/flisp.c -o src/primitives/flisp.o
 
 proto:

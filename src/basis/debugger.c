@@ -4,8 +4,8 @@
 Boolean
 DBG_Interpret_Loop_Test ( Debugger * debugger )
 {
-    Boolean rtn = ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
-        ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
+    Boolean rtn = ( ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) && (GetState ( debugger, DBG_STEPPING ) || 
+        ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ) ;
     return rtn ;
 }
 
@@ -165,7 +165,7 @@ DebugRuntimeBreakpoint ( )
         if ( GetState ( debugger, ( DBG_CONTINUE_MODE ) ) ) SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
     }
     SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_CONTINUE_MODE ), false ) ;
-    Debugger_Interpret ( debugger, 0, 0, debugger->DebugAddress ) ;
+    Debugger_Interpret ( debugger, debugger->w_Word, 0, debugger->DebugAddress ) ;
     SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
 }
 
@@ -730,7 +730,8 @@ Debugger_ShowTypeWordStack ( Debugger * debugger )
 void
 Debugger_Exit ( Debugger * debugger )
 {
-    if ( _OVT_SimpleFinal_Key_Pause ( _O_ ) ) OVT_Exit ( ) ;
+    //if ( _OVT_SimpleFinal_Key_Pause ( _O_ ) ) OVT_Exit ( ) ;
+    SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
 }
 
 void

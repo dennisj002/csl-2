@@ -102,8 +102,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, int6
         debugger->LastShowEffectsWord = word ;
         //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
     }
-    //if ( ! GetState ( debugger, DBG_STEPPING ) ) 
-    Debugger_Setup_ResetState ( debugger ) ;
+    if ( ! GetState ( debugger, DBG_STEPPING ) ) Debugger_Setup_ResetState ( debugger ) ;
     debugger->ShowLine = 0 ;
 }
 
@@ -194,7 +193,7 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
     if ( ( _O_->SigSegvs < 2 ) && GetState ( debugger, DBG_STEPPING ) )
     {
         Printf ( "\nDebug Stepping Address : 0x%016lx", ( uint64 ) debugger->DebugAddress ) ;
-        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
+        Debugger_UdisOneInstruction (debugger, 0, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
     }
     if ( ( ! sif ) && ( ! GetState ( debugger, DBG_STEPPING ) ) && ( GetState ( debugger, DBG_INFO ) ) ) _Debugger_ShowInfo ( debugger, prompt, signal, 1 ) ;
     if ( prompt == _O_->ExceptionMessage ) _O_->ExceptionMessage = 0 ;
@@ -237,7 +236,7 @@ Debugger_ShowState ( Debugger * debugger, byte * prompt )
         if ( word ) _CSL_Source ( word, 0 ) ;
 
         if ( GetState ( debugger, DBG_STEPPING ) )
-            Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ; // current insn
+            Debugger_UdisOneInstruction (debugger, 0, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ; // current insn
     }
 }
 
@@ -270,7 +269,7 @@ Debugger_DoState ( Debugger * debugger )
         if ( GetState ( debugger, DBG_START_STEPPING ) ) Printf ( "\n ... Next stepping instruction ..." ) ;
         SetState ( debugger, DBG_START_STEPPING, false ) ;
         debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
-        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+        Debugger_UdisOneInstruction (debugger, debugger->w_Word, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     }
     if ( _LC_ && _LC_->DebuggerState && GetState ( debugger, DBG_LC_DEBUG ) ) LC_Debug_Output (_LC_) ;
 }

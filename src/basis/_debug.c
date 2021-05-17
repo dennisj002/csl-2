@@ -37,7 +37,7 @@ JumpCallInstructionAddress ( byte * address )
     else
     {
         int8 offset8 = * ( byte* ) ( address + 1 ) ;
-        if ( ( abs ( offset8 ) < 127 ) && GetState ( _CSL_, JCC8_ON ) )
+        if ( ( abs ( offset8 ) < 127 ) && (( insn == JCC8 ) || ( insn == JMPI8 )) ) //GetState ( _CSL_, JCC8_ON ) )
         {
             jcAddress = address + offset8 + 2 ;
         }

@@ -375,7 +375,7 @@ CSL_Do_ClassField ( Word * word )
     if ( word->Offset ) offsetPtr = Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
     if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) ) CSL_Do_AccumulatedAddress ( word, ( byte* ) TOS, word->Offset ) ;
     if ( GetState ( cntx, IS_FORWARD_DOTTED ) ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
-    word->BaseObject = cntx->BaseObject ;
+    word->W_BaseObject = cntx->BaseObject ;
     CSL_TypeStack_SetTop ( word ) ;
     Word_SetSourceCoding ( word, offsetPtr - 3 ) ; // 3 : sizeof add immediate insn with rex
 
