@@ -18,10 +18,14 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/basis/lc/apply.c src/basis/lc/eval.c src/basis/lc/read.c src/basis/lc/print.c src/basis/lc/special.c \
 	src/primitives/strings.c src/primitives/bits.c src/primitives/maths.c src/primitives/logics.c src/primitives/openvmtils.c\
 	src/primitives/ios.c src/primitives/parsers.c src/primitives/interpreters.c src/primitives/namespaces.c src/primitives/systems.c\
-	src/primitives/compilers.c src/primitives/words.c  src/primitives/file.c src/primitives/stacks.c\
-	src/primitives/debuggers.c src/primitives/memorys.c src/primitives/primitives.c src/primitives/contexts.c src/primitives/fltlisp.c \
-	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c  
-
+	src/primitives/compilers.c src/primitives/words.c  src/primitives/file.c src/primitives/stacks.c \
+	src/primitives/debuggers.c src/primitives/memorys.c src/primitives/primitives.c src/primitives/contexts.c\
+	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c \
+	#src/primitives/s9.c src/primitives/s9core.c
+	#src/primitives/fltlisp.c src/primitives/fltread.c src/primitives/s9.c src/primitives/s9core.c
+	#src/primitives/ls9.c src/primitives/s9.c src/primitives/s9core.c
+	
+S9_SOURCES = src/primitives/s9.c src/primitives/s9core.c
 	#src/basis/lc/read.c src/basis/lc/evalNew3.c src/basis/lc/special.c src/basis/lc/apply.c src/basis/lc/print.c \
 	#src/basis/lc/apply.c src/basis/lc/eval.c src/basis/lc/read.c src/basis/lc/print.c src/basis/lc/special.c \
 
@@ -29,8 +33,12 @@ INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
 	src/include/csl.h src/include/macros.h src/include/lc.h\
 	src/include/machineCodeMacros.h src/include/lisp.h
 	
+S9_INCLUDES = src/include/s9core.h src/include/s9ext.h	
 
 OBJECTS = $(SOURCES:%.c=%.o) 
+#S9_OBJECTS = $(S9_SOURCES:%.c=%.o) 
+S9_OBJECTS = src/primitives/s9.o src/primitives/s9core.o
+ALL_OBJECTS = $(OBJECTS) $(S9_OBJECTS) 	
 CC = gcc-10  
 #CC = g++-10 -fpermissive -Wwrite-strings
 OUT = csl-gdb
@@ -54,39 +62,42 @@ clean :
 	make src/include/prototypes.h
 	-rm bin/csl*
 
-src/include/prototypes.h : $(INCLUDES)
+src/include/prototypes.h : $(INCLUDES) $(S9_INCLUDES)
 	cp src/include/_proto.h src/include/prototypes.h
+	cp src/include/_proto.h src/include/s9_prototypes.h
 	cproto -o proto.h $(SOURCES)
+	cproto -o s9_proto.h $(S9_SOURCES)
+	mv s9_proto.h src/include/s9_prototypes.h
 	mv proto.h src/include/prototypes.h
 	make oclean
 
 csl : CFLAGS = $(CFLAGS_CORE)
-csl : $(INCLUDES) $(OBJECTS) #_csl_O3
-	$(CC) $(CFLAGS) $(OBJECTS) -o csl $(LIBS)
+csl : $(INCLUDES) $(ALL_OBJECTS) #_csl_O3
+	$(CC) $(CFLAGS) $(ALL_OBJECTS) -o csl $(LIBS)
 	#strip -o csl csl
 	mv csl bin/
 	
 csls : CFLAGS = $(CFLAGS_CORE) -O3
-csls : src/include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o csls $(LIBS)
+csls : src/include/prototypes.h $(ALL_OBJECTS)
+	$(CC) -static $(CFLAGS) $(ALL_OBJECTS) -O3 -o csls $(LIBS)
 	strip csls
 	mv csls bin/
 	
 static : CFLAGS = $(CFLAGS_CORE)
-static : src/include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -o csls $(LIBS)
+static : src/include/prototypes.h $(ALL_OBJECTS)
+	$(CC) -static $(CFLAGS) $(ALL_OBJECTS) -o csls $(LIBS)
 	strip csls
 	mv csls bin/
 
 bin/csl-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
-bin/csl-gdb : src/include/prototypes.h $(OBJECTS) 
-	$(CC) $(CFLAGS) $(OBJECTS) -o bin/csl-gdb $(LIBS)
+bin/csl-gdb : src/include/prototypes.h $(ALL_OBJECTS) 
+	$(CC) $(CFLAGS) $(ALL_OBJECTS) -o bin/csl-gdb $(LIBS)
 	strip -o bin/csl bin/csl-gdb
 	gcc-10 --version
 	
 
-cslo : oclean $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
+cslo : oclean $(ALL_OBJECTS)
+	$(CC) $(CFLAGS) $(ALL_OBJECTS) -o $(OUT) $(LIBS)
 	strip $(OUT)
 	mv $(OUT) bin
 	-cp bin/$(OUT) bin/csl
@@ -104,8 +115,8 @@ _csl_O3 : CFLAGS = $(CFLAGS_CORE) -O3
 _csl_O3 : OUT = cslo3
 _csl_O3 : cslo
 
-_cslo :  src/include/prototypes.h $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
+_cslo :  src/include/prototypes.h $(ALL_OBJECTS)
+	$(CC) $(CFLAGS) $(ALL_OBJECTS) -o $(OUT) $(LIBS)
 
 src/primitives/cmaths.o : src/primitives/cmaths.c
 	$(CC) $(CFLAGS) -O3 -c src/primitives/cmaths.c -o src/primitives/cmaths.o
@@ -114,6 +125,16 @@ src/primitives/flisp.o : src/primitives/flisp.c src/primitives/fltlread.c
 	$(CC) $(CFLAGS) -O3 -c src/primitives/fltlisp.c -o src/primitives/fltlisp.o
 #	$(CC) $(CFLAGS) -ggdb -c src/primitives/flisp.c -o src/primitives/flisp.o
 
+src/primitives/s9.o:	src/primitives/s9.c #s9core.h s9import.h s9ext.h
+	$(CC) -o src/primitives/s9.o $(CFLAGS_CORE)  $(DEFS) -c src/primitives/s9.c
+
+src/primitives/s9core.o:    src/primitives/s9core.c #s9core.h s9.image
+	$(CC) -o src/primitives/s9core.o $(CFLAGS_CORE)  $(DEFS) -c src/primitives/s9core.c
+	
+s9.image:	s9 s9.scm ext/sys-unix/unix.scm ext/curses/curses.scm \
+		ext/csv/csv.scm config.scm
+	$(BUILD_ENV) ./s9 -i - $(EXTRA_SCM) -l config.scm -d s9.image
+	
 proto:
 	touch src/include/defines.h
 	make src/include/prototypes.h
@@ -211,13 +232,14 @@ _install :
 	-sudo cp -r ~/csl /usr/local/lib/csl/
 	-sudo cp -r ~/csl/etc /usr/local/
 	-sudo cp ~/csl/lib/* /usr/local/lib
+	-killall csl
 	-sudo cp bin/* /usr/local/bin
 	-sudo ldconfig
 	ls -l /usr/local/bin/csl*
 
 install :
-#	make
-	make optimize
+	make
+	#make optimize
 	make _install
 	
 run :

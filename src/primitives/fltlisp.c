@@ -23,7 +23,7 @@ value_t FL_NIL, T, FL_LAMBDA, FL_MACRO, FL_LABEL, FL_QUOTE ;
 value_t lv ; // last value
 FILE *f ; // input file
 Boolean cli = false ;
-int lic ; // last input char 
+int64 lic ; // last input char 
 
 // error utilities ------------------------------------------------------------
 
@@ -910,7 +910,7 @@ repl:
     while ( 1 )
     {
         if ( ( lic != '\r' ) ) printf ( "\nflt> " ), fflush ( stdout ) ;
-        ReadLine_GetLine ( rl ) ;
+        ReadLine_GetLine () ;
         v = read_sexpr ( ) ;
         if ( feof ( stdin ) ) break ;
         v = toplevel_eval ( v ) ;

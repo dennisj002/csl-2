@@ -168,3 +168,53 @@ OVT_Ok ( )
     //_CSL_Prompt ( _O_->Verbosity && ( ( _O_->RestartCondition < RESET_ALL ) || _O_->StartTimes > 1 ) ) ;
 }
 
+Boolean cli ;
+int lic, csl_returnValue = 0 ;
+int s9_main ( int argc, char **argv ) ;
+
+void
+doPrompt ( )
+{
+    if ( ( lic == '\r' ) || ( lic == '\n' ) ) printf ( "s9> " ) ;
+    else printf ( "\ns9> " ) ;
+    fflush ( stdout ) ;
+}
+
+int
+s9_getChar ( FILE * f )
+{
+    if ( cli ) lic = _Lexer_NextChar ( _Lexer_ ) ;
+    else lic = fgetc ( f ) ;
+    return lic ;
+}
+
+void
+s9_ungetChar ( int c, FILE * f )
+{
+    if ( cli ) ReadLine_UnGetChar ( _ReadLiner_ ) ;
+    else ungetc ( c, f ) ;
+}
+
+void
+CSL_S9fes ( )
+{
+    ReadLiner * rl = _ReadLiner_ ;
+    FILE * svFile = rl->InputFile ;
+    rl->InputFile = stdin ;
+    ReadLine_Init ( rl, _CSL_Key ) ;
+    //buf = _Lexer_->TokenBuffer ;
+    SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
+    byte * snp = rl->NormalPrompt, *sap = rl->AltPrompt ;
+    rl->AltPrompt = ( byte* ) "l9< " ;
+    rl->NormalPrompt = ( byte* ) "l9> " ;
+
+    s9_main ( 1, ( char*[] ) { "s9" } ) ;
+
+    _Lexer_->TokenBuffer [0] = 0 ;
+    //if ( ! Quiet ) nl ( ) ;
+    rl->NormalPrompt = snp ;
+    rl->AltPrompt = sap ;
+    rl->InputFile = svFile ;
+    Printf ( "s9fes : s9 : exiting ... \n" ) ;
+}
+

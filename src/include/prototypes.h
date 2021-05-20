@@ -988,7 +988,7 @@ void _Readline_Setup_OneStringInterpret(ReadLiner *rl, byte *str);
 void Readline_Setup_OneStringInterpret(ReadLiner *rl, byte *str);
 void _ReadLine_TabCompletion_Check(ReadLiner *rl);
 byte _ReadLine_GetLine(ReadLiner *rl, byte c);
-byte ReadLine_GetLine(ReadLiner *rl);
+byte ReadLine_GetLine(void);
 byte ReadLine_NextChar(ReadLiner *rl);
 byte ReadLine_NextNonPunctCharAfterEndOfString(ReadLiner *rl);
 Boolean ReadLine_AreWeAtNewlineAfterSpaces(ReadLiner *rl);
@@ -1989,6 +1989,10 @@ void OVT_Exit(void);
 void OVT_StartupMessage(Boolean promptFlag);
 void _OVT_Ok(Boolean control);
 void OVT_Ok(void);
+void doPrompt(void);
+int s9_getChar(FILE *f);
+void s9_ungetChar(int c, FILE *f);
+void CSL_S9fes(void);
 /* src/primitives/ios.c */
 void Fflush(void);
 void CSL_Kbhit(void);
@@ -2257,27 +2261,6 @@ void CSL_Store(void);
 /* src/primitives/primitives.c */
 /* src/primitives/contexts.c */
 void CSL_Contex_New_RunWord(void);
-/* src/primitives/fltlisp.c */
-void lerror(char *format, ...);
-void type_error(char *fname, char *expected, value_t got);
-cons_t *tocons(value_t v, char *fname);
-symbol_t *tosymbol(value_t v, char *fname);
-number_t tonumber(value_t v, char *fname);
-value_t symbol(char *str);
-void lisp_init(void);
-value_t *cons(value_t *pcar, value_t *pcdr);
-void gc(void);
-int64 fl_getChar(void);
-void fl_ungetChar(int c);
-int fl_read_token(char c);
-value_t read_sexpr(void);
-void print(FILE *f, value_t v);
-byte *sprint(value_t v);
-value_t eval_sexpr(value_t e, value_t *penv);
-value_t toplevel_eval(value_t expr);
-value_t load_file(char *fname);
-int fl_main(int argc, char *argv[]);
-void CSL_Flisp(void);
 /* src/primitives/disassembler.c */
 void Word_Disassemble(Word *word);
 void _CSL_Word_Disassemble(Word *word);

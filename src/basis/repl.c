@@ -29,7 +29,7 @@ _Repl ( block repl )
             //Printf ( "<= " ) ;
             Context_DoPrompt (_Context_, 0) ;
             //LC_SaveStack ( ) ; // ?!? maybe we should do this stuff differently : literals are pushed on the stack by the interpreter
-            ReadLine_GetLine ( rl ) ;
+            ReadLine_GetLine () ;
             if ( strstr ( ( char* ) rl->InputLineString, ".." ) || strstr ( ( char* ) rl->InputLineString, "bye" ) || strstr ( ( char* ) rl->InputLineString, "exit" )  || strstr ( ( char* ) rl->InputLineString, "x" ) ) 
             {
                 Lexer_ReadToken ( _Lexer_ ) ;

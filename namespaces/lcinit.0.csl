@@ -1,17 +1,18 @@
 (set verbosity 1)
+#if 1
 (( lambda ( x y ) ( + x y ) ) 3 4 ) 
-(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1))))))
+//(ld:) 
+(define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1)))))) 
 (yfac yfac 10) nl
 (define yfacc (lambda (yyy n1) (if (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 20) 
 (yfacc yfacc 7) nl 
-pause
-(definec fibc (lambda ( n ) (ifc (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+//pause
+(definec fibc (lambda ( n ) (ifc (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2)))))) //(;ld)
 pwi fibc
 "\nfibc 30 = " ps
 (fibc 30)
 
-#if 1   
 (definec (fibc1 n ) (ifc (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2)))))
 //d: (define fibc1 ( lambda ( n ) (ifc (< n 2) (n) ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
 (definec fibc2 ( lambda ( n ) (ifc (< n 2) n ( + (fibc2 (- n 1)) (fibc2 (- n 2)) ) ) ) )
@@ -19,8 +20,7 @@ pwi fibc1
 "\nfibc1 30 = " ps
 (fibc1 30) 
 (fibc2 30) 
-pause
-#endif    
+//pause
 
 #if 1 //doLispTest @ // from sicp
 bnOn
@@ -39,6 +39,7 @@ bnOn
 (sqrt (sqrt (sqrt 9) ))
 bnOff
 #endif
+
 (define (square n) (* n n))
 (define (fib n)
   (fib-iter 1 0 n))
@@ -47,9 +48,28 @@ bnOff
   (if (= count 0)
       b
       (fib-iter (+ a b) a (- count 1))))
-//pwi fib-iter
-(fib 30)           
-//(;ld)
+(fib 30)     
+      
+(define (count-change amount)                                                                                                                         
+  (cc amount 5)) 
+(define (cc amount kinds-of-coins)                                                                                                                        
+  (cond ((= amount 0) 1)                                                                                                                                  
+        ((or (< amount 0) (= kinds-of-coins 0)) 0)                                                                                                        
+        (else (+ (cc amount                                                                                                                               
+                     (- kinds-of-coins 1))                                                                                                                
+                 (cc (- amount                                                                                                                            
+                        (first-denomination kinds-of-coins))
+                     kinds-of-coins)))))
+ 
+(define (first-denomination kinds-of-coins)
+  (cond ((= kinds-of-coins 1) 1)
+        ((= kinds-of-coins 2) 5)
+        ((= kinds-of-coins 3) 10)
+        ((= kinds-of-coins 4) 25)
+        ((= kinds-of-coins 5) 50))) 
+(count-change 100)     
+       
+2//(;ld)
 (define ( A x y) 
     (cond 
         (( = y 0 ) 0 )
@@ -83,26 +103,6 @@ bnOff
     )
 )      
 (tx 3) (tx 0)
-(define (count-change amount)
-  (cc amount 5))
-
-(define (cc amount kinds-of-coins)
-  (cond ((= amount 0) 1)
-        ((or (< amount 0) (= kinds-of-coins 0)) 0)
-        (else (+ (cc amount
-                     (- kinds-of-coins 1))
-                 (cc (- amount
-                        (first-denomination kinds-of-coins))
-                     kinds-of-coins)))))
-
-(define (first-denomination kinds-of-coins)
-  (cond ((= kinds-of-coins 1) 1)
-        ((= kinds-of-coins 2) 5)
-        ((= kinds-of-coins 3) 10)
-        ((= kinds-of-coins 4) 25)
-        ((= kinds-of-coins 5) 50)))
-
-(count-change 100)            
 (fib 30)        
 ;;; (define (remainder b a ) ( if ( mod b a) true false ))
 ;;; (bnOn)    
@@ -127,8 +127,38 @@ bnOff
 (define (p? n) (prime? n))
 (define (d? n) (sd n))
 ;;; SECTION 1.2.5
-//#endif    
-#endif
-"\ncsl : scheme/lisp : type \'x\' or \'exit\' or \'bye\' to exit ..." ps
-//(ld:)  (load "namespaces/schemeTest2.csl")            
 "\nfib 30 =" ps (fib 30)
+#endif    
+//(ld:)  (load "namespaces/schemeTest2.csl")            
+#endif
+"\ncsl : scheme/lisp : type \'x\' or \'exit\' or \'bye\' to exit ...\n" ps
+#if 0 //lisp
+(defun ( substt x y z )  
+    ( cond ((atom z)  
+            (cond ( (eq z y) x )
+                ( 't z )))
+        ( 't 
+            ( cons ( substt x y ( car z) ) 
+                      ( substt x y ( cdr z ) )
+            )
+        )
+    )
+ )
+(substt 'm 'b  '(a b ( a b c ) d))
+
+#endif
+(define (substt x y z )  
+    ( cond ((atom z)  
+            (cond ( (eq z y) x )
+                ( 't z )))
+        ( 't 
+            ( cons ( substt x y ( car z) ) 
+                      ( substt x y ( cdr z ) )
+            )
+        )
+    )
+ )
+
+ 
+//(substt 'm 'b  '(a b ( a b c ) d))
+

@@ -1,7 +1,11 @@
 #include "../include/csl.h"
 
+void CSL_S9fes ( ) ;
+
 CPrimitive CPrimitives [] = {
-    { "flisp", 0, 0, 0, CSL_Flisp, 0, 0, 0, "Flisp", "Root" },
+    //{ "flisp", 0, 0, 0, CSL_Flisp, 0, 0, 0, "Flisp", "Root" },
+    //{ "l9", 0, 0, 0, CSL_Lisp9, 0, 0, 0, "L9", "Root" },
+    { "s9fes", 0, 0, 0, CSL_S9fes, 0, 0, 0, "L9", "Root" },
     
     { "locationPush", 0, 0, 0, Location_PushNew, 0, 0, 0, "Experimental", "Root" },
     { "locationPrint", 0, 0, 0, CSL_Location_Printf, 0, 0, 0, "Experimental", "Root" },

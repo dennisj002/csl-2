@@ -48,20 +48,25 @@ const void *const __dso_handle __attribute__ ((__visibility__ ("hidden")))
 #include <assert.h>
 #include <ctype.h>
 
+#ifdef S9
+#include "s9core.h"
+#define S9_S9CORE
+#include "s9import.h"
+#include "s9ext.h"
+#include "s9_prototypes.h"
+#else
 #include <udis86.h>
 #include <gmp.h>
 #include <mpfr.h>
 #include "defines.h"
 #include "types.h"
 #include "macros.h"
-
 //#include "codegen_x86.h" // i want to make sure i have this - not using much now but probably later on
 #include "lisp.h"
 #include "machineCode.h"
 #include "machineCodeMacros.h"
 #include "prototypes.h"
 #include "lc.h"
-
 extern OVT_StaticMemSystem *_OSMS_ ;
 extern OVT_Static * _OS_ ;
 extern OpenVmTil * _O_;
@@ -73,4 +78,8 @@ extern Boolean cli ;
 extern value_t lv ; // last value
 extern Boolean lf ;
 extern FILE * f ;
+extern int lic ;
+#endif
+
+
 #endif

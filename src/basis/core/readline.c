@@ -667,8 +667,9 @@ _ReadLine_GetLine ( ReadLiner * rl, byte c )
 }
 
 byte
-ReadLine_GetLine ( ReadLiner * rl )
+ReadLine_GetLine ()
 {
+    ReadLiner * rl = _ReadLiner_ ;
     return _ReadLine_GetLine ( rl, 0 ) ;
 }
 
@@ -683,7 +684,7 @@ ReadLine_NextChar ( ReadLiner * rl )
             SetState ( rl, STRING_MODE, false ) ; // only good once
             return nchar ;
         }
-        else ReadLine_GetLine ( rl ) ; // get a line of characters
+        else ReadLine_GetLine () ; // get a line of characters
         ReadLine_Set_ReadIndex ( rl, 0 ) ;
         nchar = _ReadLine_GetNextChar ( rl ) ;
     }
