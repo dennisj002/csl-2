@@ -20,14 +20,11 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/primitives/ios.c src/primitives/parsers.c src/primitives/interpreters.c src/primitives/namespaces.c src/primitives/systems.c\
 	src/primitives/compilers.c src/primitives/words.c  src/primitives/file.c src/primitives/stacks.c \
 	src/primitives/debuggers.c src/primitives/memorys.c src/primitives/primitives.c src/primitives/contexts.c\
-	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c \
-	#src/primitives/s9.c src/primitives/s9core.c
+	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c
+	#src/primitives/ls9.c 
 	#src/primitives/fltlisp.c src/primitives/fltread.c src/primitives/s9.c src/primitives/s9core.c
-	#src/primitives/ls9.c src/primitives/s9.c src/primitives/s9core.c
 	
 S9_SOURCES = src/primitives/s9.c src/primitives/s9core.c
-	#src/basis/lc/read.c src/basis/lc/evalNew3.c src/basis/lc/special.c src/basis/lc/apply.c src/basis/lc/print.c \
-	#src/basis/lc/apply.c src/basis/lc/eval.c src/basis/lc/read.c src/basis/lc/print.c src/basis/lc/special.c \
 
 INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
 	src/include/csl.h src/include/macros.h src/include/lc.h\
@@ -62,7 +59,7 @@ clean :
 	make src/include/prototypes.h
 	-rm bin/csl*
 
-src/include/prototypes.h : $(INCLUDES) $(S9_INCLUDES)
+src/include/prototypes.h : $(INCLUDES) #$(S9_INCLUDES)
 	cp src/include/_proto.h src/include/prototypes.h
 	cp src/include/_proto.h src/include/s9_prototypes.h
 	cproto -o proto.h $(SOURCES)
@@ -126,10 +123,10 @@ src/primitives/flisp.o : src/primitives/flisp.c src/primitives/fltlread.c
 #	$(CC) $(CFLAGS) -ggdb -c src/primitives/flisp.c -o src/primitives/flisp.o
 
 src/primitives/s9.o:	src/primitives/s9.c #s9core.h s9import.h s9ext.h
-	$(CC) -o src/primitives/s9.o $(CFLAGS_CORE)  $(DEFS) -c src/primitives/s9.c
+	$(CC) -o src/primitives/s9.o  -ggdb $(CFLAGS_CORE)-c src/primitives/s9.c
 
 src/primitives/s9core.o:    src/primitives/s9core.c #s9core.h s9.image
-	$(CC) -o src/primitives/s9core.o $(CFLAGS_CORE)  $(DEFS) -c src/primitives/s9core.c
+	$(CC) -o src/primitives/s9core.o  -ggdb $(CFLAGS_CORE) -c src/primitives/s9core.c
 	
 s9.image:	s9 s9.scm ext/sys-unix/unix.scm ext/curses/curses.scm \
 		ext/csv/csv.scm config.scm
@@ -239,7 +236,7 @@ _install :
 
 install :
 	make
-	#make optimize
+	#make optimize // so far s9fes doesn't work optimized ??
 	make _install
 	
 run :

@@ -982,7 +982,7 @@ byte ReadLine_Set_KeyedChar(ReadLiner *rl, byte c);
 byte ReadLine_Get_Key(ReadLiner *rl);
 byte ReadLine_GetNextCharFromString(ReadLiner *rl);
 void ReadLine_SetRawInputFunction(ReadLiner *rl, ReadLiner_KeyFunction ripf);
-void ReadLine_SetInputString(ReadLiner *rl, byte *string, int64 size);
+void ReadLine_SetInputString(ReadLiner *rl, byte *string0, int64 size);
 void ReadLine_ReadFileIntoAString(ReadLiner *rl, FILE *file);
 void _Readline_Setup_OneStringInterpret(ReadLiner *rl, byte *str);
 void Readline_Setup_OneStringInterpret(ReadLiner *rl, byte *str);

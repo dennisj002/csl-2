@@ -6468,7 +6468,7 @@ l9_main ( int argc, char **argv )
 
     CSL_L9_Init ( ) ;
     cli = false ;
-    imgfile = IMAGEFILE ;
+    imgfile = "-" ; //IMAGEFILE ;
     usrimg = 0 ;
     doload = 1 ;
     if ( setjmp ( Restart ) != 0 ) exit ( EXIT_FAILURE ) ;
@@ -6493,8 +6493,8 @@ l9_main ( int argc, char **argv )
     }
     else
     {
-        if ( setjmp ( Restart ) != 0 )
-            fatal ( "could not load library" ) ;
+        //if ( setjmp ( Restart ) != 0 )
+        //    fatal ( "could not load library" ) ;
         loadfile ( IMAGESRC ) ;
     }
     if ( setjmp ( Restart ) != 0 ) exit ( EXIT_FAILURE ) ;

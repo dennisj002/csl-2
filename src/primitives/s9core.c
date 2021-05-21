@@ -16,11 +16,13 @@
 #include "../include/csl.h"
 int s9_getChar ( FILE * f ) ;
 void s9_ungetChar ( int c, FILE * f ) ;
+extern int csl_returnValue ;
+extern char * csl_buffer ;
 
 /*
  * Global state
  */
-
+ 
 static int Cons_segment_size,
 Vec_segment_size ;
 static int Cons_pool_size,
@@ -387,6 +389,21 @@ s9_printer_limit ( void )
     return Printer_limit && Printer_count >= Printer_limit ;
 }
 
+int
+s9_fwrite ( char *s, int k )
+{
+    int i, n = 0 ;
+    for ( i = 0 ; csl_buffer [i] ; i++ ) ;
+    if ( csl_returnValue == -1 ) return k ;
+    if ( csl_returnValue > 1 ) 
+    {
+        n = snprintf ( &csl_buffer[i], k + 1, "%s", s ) ; // 1 : null
+        //printf ( " %s", csl_buffer ), fflush (stdout) ;
+    }
+    else n = fwrite ( s, 1, k, Ports[Output_port] ) ;
+    return n ;
+}
+
 void
 s9_blockwrite ( char *s, int k )
 {
@@ -408,11 +425,13 @@ s9_blockwrite ( char *s, int k )
     if ( Printer_limit && Printer_count > Printer_limit )
     {
         if ( Printer_limit > 0 )
-            fwrite ( "...", 1, 3, Ports[Output_port] ) ;
+            //fwrite ( "...", 1, 3, Ports[Output_port] ) ;
+            s9_fwrite ( "...", 3 ) ;
         Printer_limit = - 1 ;
         return ;
     }
-    if ( fwrite ( s, 1, k, Ports[Output_port] ) != k )
+    //if ( fwrite ( s, 1, k, Ports[Output_port] ) != k )
+    if ( s9_fwrite ( s, k ) != k )
         IO_error = 1 ;
     if ( Output_port == 1 && s[k - 1] == '\n' )
         s9_flush ( ) ;
@@ -3340,6 +3359,7 @@ struct magic
 static char *
 xfwrite ( void *buf, int siz, int n, FILE *f )
 {
+    //if ( fwrite ( buf, siz, n, f ) != n )
     if ( fwrite ( buf, siz, n, f ) != n )
     {
         return "image file write error" ;

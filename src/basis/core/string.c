@@ -418,14 +418,17 @@ _String_ConvertStringToBackSlash ( byte * dst, byte * src, int64 nchars )
 byte *
 String_ConvertToBackSlash ( byte * str0 )
 {
-    byte * buffer = Buffer_Data ( _CSL_->ScratchB2 ) ;
-    byte * str1 = _String_ConvertStringToBackSlash ( buffer, str0, - 1 ) ;
-    if ( str1 )
+    if ( str0 )
     {
-        byte * nstr = String_New ( str1, TEMPORARY ) ;
-        return nstr ;
+        byte * buffer = Buffer_Data ( _CSL_->ScratchB2 ) ;
+        byte * str1 = _String_ConvertStringToBackSlash ( buffer, str0, - 1 ) ;
+        if ( str1 )
+        {
+            byte * nstr = String_New ( str1, TEMPORARY ) ;
+            return nstr ;
+        }
     }
-    else return 0 ;
+    return 0 ;
 }
 
 Boolean

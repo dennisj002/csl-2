@@ -78,7 +78,8 @@ extern Boolean cli ;
 extern value_t lv ; // last value
 extern Boolean lf ;
 extern FILE * f ;
-extern int lic ;
+extern int lic, csl_returnValue ;
+
 #endif
 
 

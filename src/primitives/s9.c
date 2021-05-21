@@ -20,7 +20,9 @@
 #include "s9import.h"
 extern int cli, csl_returnValue ;
 void doPrompt ( ) ;
+void Interpret_String ( char* ) ;
 cell lv ;
+extern char * csl_buffer ;
 
 #ifdef unix
 #include <signal.h>
@@ -207,8 +209,8 @@ P_system_command, P_throw, P_times, P_truncate,
 P_vector, P_vector_append, P_vector_copy,
 P_vector_fill_b, P_vector_length, P_vector_p,
 P_vector_ref, P_vector_set_b, P_vector_to_list, P_write,
-P_write_char, P_zero_p//, P_csl_return ;
-;
+P_write_char, P_zero_p, P_csl_return, P_atom_p, P_csl_interpret ;
+
 
 /*
  * Abstract machine opcodes
@@ -276,7 +278,7 @@ enum
     OP_VECTOR_APPEND, OP_VECTOR_COPY, OP_VECTOR_FILL_B,
     OP_VECTOR_LENGTH, OP_VECTOR_P, OP_VECTOR_REF,
     OP_VECTOR_SET_B, OP_VECTOR_TO_LIST, OP_WRITE,
-    OP_WRITE_CHAR, OP_ZERO_P//, OP_CSL_RETURN
+    OP_WRITE_CHAR, OP_ZERO_P, OP_CSL_RETURN, OP_ATOM_P, OP_CSL_INTERPRET 
 } ;
 
 /*
@@ -1148,7 +1150,7 @@ init ( void )
     S_starstar = symbol_ref ( "**" ) ;
     S_unquote = symbol_ref ( "unquote" ) ;
     S_unquote_splicing = symbol_ref ( "unquote-splicing" ) ;
-    //P_csl_return = symbol_ref ( "csl_return" ) ;
+    P_csl_return = symbol_ref ( "csl_return" ) ;
     P_abs = symbol_ref ( "abs" ) ;
     P_append = symbol_ref ( "append" ) ;
     P_assq = symbol_ref ( "assq" ) ;
@@ -1281,6 +1283,7 @@ init ( void )
     P_positive_p = symbol_ref ( "positive?" ) ;
     P_procedure_p = symbol_ref ( "procedure?" ) ;
     P_quit = symbol_ref ( "quit" ) ;
+    P_quit = symbol_ref ( "bye" ) ;
     P_quotient = symbol_ref ( "quotient" ) ;
     P_read = symbol_ref ( "read" ) ;
     P_read_char = symbol_ref ( "read-char" ) ;
@@ -1309,6 +1312,9 @@ init ( void )
     P_string_less = symbol_ref ( "string<?" ) ;
     P_string_lteq = symbol_ref ( "string<=?" ) ;
     P_string_p = symbol_ref ( "string?" ) ;
+    P_csl_interpret = symbol_ref ( "csl_interpret" ) ;
+    P_csl_interpret = symbol_ref ( "csli" ) ;
+    P_atom_p = symbol_ref ( "atom?" ) ;
     P_string_ref = symbol_ref ( "string-ref" ) ;
     P_string_set_b = symbol_ref ( "string-set!" ) ;
     P_string_to_list = symbol_ref ( "string->list" ) ;
@@ -1681,7 +1687,7 @@ meta_command ( void )
         case 'q': cmdsym = symbol_ref ( "quit" ) ;
             break ;
             //case 'c': cmdsym = symbol_ref ( "csl_return" ) ;
-            //break ;
+            //    break ;
         default: prints ( ",a = apropos" ) ;
             nl ( ) ;
             prints ( ",h = help" ) ;
@@ -2971,6 +2977,7 @@ subr0p ( cell x )
     if ( x == P_gensym ) return OP_GENSYM ;
     if ( x == P_quit ) return OP_QUIT ;
     if ( x == P_symbols ) return OP_SYMBOLS ;
+    if ( x == P_csl_return ) return OP_CSL_RETURN ;
     return - 1 ;
 }
 
@@ -3072,6 +3079,8 @@ subr1p ( cell x )
     if ( x == P_string_copy ) return OP_STRING_COPY ;
     if ( x == P_string_length ) return OP_STRING_LENGTH ;
     if ( x == P_string_p ) return OP_STRING_P ;
+    if ( x == P_csl_interpret ) return OP_CSL_INTERPRET ;
+    if ( x == P_atom_p ) return OP_ATOM_P ;
     if ( x == P_string_to_list ) return OP_STRING_TO_LIST ;
     if ( x == P_string_to_symbol ) return OP_STRING_TO_SYMBOL ;
     if ( x == P_symbol_p ) return OP_SYMBOL_P ;
@@ -3082,7 +3091,6 @@ subr1p ( cell x )
     if ( x == P_vector_p ) return OP_VECTOR_P ;
     if ( x == P_vector_to_list ) return OP_VECTOR_TO_LIST ;
     if ( x == P_zero_p ) return OP_ZERO_P ;
-    //if ( x == P_csl_return ) return OP_CSL_RETURN ;
     return - 1 ;
 }
 
@@ -5154,7 +5162,9 @@ run ( cell x )
         Ip = throw ( Error_handler, getbind ( S_error_value ) ) ;
         if ( Ip < 0 ) longjmp ( Restart, 1 ) ;
     }
-    for ( Running = 1 ; Running ; ) switch ( ins ( ) )
+    for ( Running = 1 ; Running ; )
+    {
+        switch ( ins ( ) )
         {
             case OP_APPLIS:
                 Ip = applis ( 0 ) ;
@@ -5290,14 +5300,12 @@ run ( cell x )
                 csl_returnValue = 1 ;
                 skip ( 1 ) ;
                 break ;
-#if 0                
             case OP_CSL_RETURN:
                 //reset_tty ( ) ;
                 //bye ( 0 ) ;
                 csl_returnValue = 2 ;
                 skip ( 1 ) ;
                 break ;
-#endif                
             case OP_SYMBOLS:
                 Acc = carof ( Glob ) ;
                 skip ( 1 ) ;
@@ -5798,6 +5806,18 @@ run ( cell x )
                 Acc = string_p ( Acc ) ? TRUE : FALSE ;
                 skip ( 1 ) ;
                 break ;
+            case OP_CSL_INTERPRET :
+                csl_returnValue = 3 ;
+                csl_buffer [0] = 0 ;
+                print_form ( Acc ) ;
+                Interpret_String ( csl_buffer ) ;
+                csl_returnValue = -1 ;
+                skip ( 1 ) ;
+                break ;
+            case OP_ATOM_P:
+                Acc = atom_p ( Acc ) ? TRUE : FALSE ;
+                skip ( 1 ) ;
+                break ;
             case OP_STRING_TO_LIST:
                 if ( ! string_p ( Acc ) ) expect ( "string->list", "string", Acc ) ;
                 Acc = string_to_list ( Acc ) ;
@@ -6157,8 +6177,9 @@ run ( cell x )
             default:
                 error ( "illegal instruction", make_integer ( ins ( ) ) ) ;
                 return ;
+                error ( "interrupted", UNDEFINED ) ;
         }
-    error ( "interrupted", UNDEFINED ) ;
+    }
 }
 
 /*
@@ -6329,14 +6350,18 @@ repl ( void )
         cli = 0 ;
         if ( END_OF_FILE == x && 0 == Intr ) break ;
         x = eval ( x, 1 ) ;
+        lv = x ;
         if ( x != UNSPECIFIC )
         {
             setbind ( S_starstar, x ) ;
             print_form ( x ) ;
             nl ( ) ;
         }
-        lv = x ;
-        if ( csl_returnValue == 1 ) break ;
+        if ( csl_returnValue > 0 ) 
+        {
+            if ( csl_returnValue == 2 )  csl_buffer [0] = 0, print_form ( lv ) ;
+            break ;
+        }
     }
     if ( ! O_quiet ) nl ( ) ;
 }
@@ -6472,7 +6497,7 @@ s9_main ( int argc, char **argv )
     }
     else
     {
-        load_initial_image ( IMAGE_FILE ) ;
+        load_initial_image ( "-" ) ; //IMAGE_FILE ) ; 
     }
     setbind ( S_library_path, make_library_path ( ) ) ;
     save ( libs = NIL ) ;
@@ -6596,7 +6621,7 @@ s9_main ( int argc, char **argv )
     {
         if ( ! O_quiet )
         {
-            prints ( "Scheme 9 from Empty Space (Reimagined)" ) ;
+            prints ( "s9fes : csl : type 'quit' to exit " ) ;
             nl ( ) ;
         }
         repl ( ) ;

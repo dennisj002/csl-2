@@ -253,6 +253,7 @@ void s9_close_input_string(void);
 void s9_flush(void);
 void s9_set_printer_limit(int k);
 int s9_printer_limit(void);
+int s9_fwrite(char *s, int k);
 void s9_blockwrite(char *s, int k);
 int s9_blockread(char *s, int k);
 void s9_prints(char *s);

@@ -4,61 +4,61 @@
 #define _ReadLine_SetFinalCharacter( rl, chr ) rl->InputBuffer [ rl->EndPosition ] = chr 
 
 void
-CSL_ReadTables_Setup ( CSL * cfrl )
+CSL_ReadTables_Setup ( CSL * csl )
 {
     int64 i ;
     for ( i = 0 ; i < 256 ; i ++ )
     {
-        cfrl->ReadLine_CharacterTable [ i ] = 0 ;
+        csl->ReadLine_CharacterTable [ i ] = 0 ;
     }
-    cfrl->ReadLine_CharacterTable [ 0 ] = 21 ;
-    cfrl->ReadLine_CharacterTable [ 127 ] = 1 ;
-    cfrl->ReadLine_CharacterTable [ '\b' ] = 1 ;
-    cfrl->ReadLine_CharacterTable [ '\t' ] = 2 ;
-    cfrl->ReadLine_CharacterTable [ 3 ] = 3 ; // Ctrl-C
-    cfrl->ReadLine_CharacterTable [ 4 ] = 4 ; // Ctrl-D
-    cfrl->ReadLine_CharacterTable [ '\r' ] = 20 ; // remember this is raw char input : the lexer also handles some of these
-    cfrl->ReadLine_CharacterTable [ '\n' ] = 5 ;
-    cfrl->ReadLine_CharacterTable [ eof ] = 6 ;
-    cfrl->ReadLine_CharacterTable [ ESC ] = 7 ;
-    cfrl->ReadLine_CharacterTable [ '[' ] = 8 ;
-    cfrl->ReadLine_CharacterTable [ '1' ] = 9 ;
-    cfrl->ReadLine_CharacterTable [ '4' ] = 10 ;
-    cfrl->ReadLine_CharacterTable [ 'A' ] = 11 ;
-    cfrl->ReadLine_CharacterTable [ 'B' ] = 12 ;
-    cfrl->ReadLine_CharacterTable [ 'C' ] = 13 ;
-    cfrl->ReadLine_CharacterTable [ 'D' ] = 14 ;
-    cfrl->ReadLine_CharacterTable [ '3' ] = 15 ;
-    cfrl->ReadLine_CharacterTable [ 'H' ] = 16 ;
-    cfrl->ReadLine_CharacterTable [ 'O' ] = 17 ;
-    cfrl->ReadLine_CharacterTable [ 'F' ] = 18 ;
-    cfrl->ReadLine_CharacterTable [ '~' ] = 19 ;
-    cfrl->ReadLine_CharacterTable [ '(' ] = 22 ;
+    csl->ReadLine_CharacterTable [ 0 ] = 21 ;
+    csl->ReadLine_CharacterTable [ 127 ] = 1 ;
+    csl->ReadLine_CharacterTable [ '\b' ] = 1 ;
+    csl->ReadLine_CharacterTable [ '\t' ] = 2 ;
+    csl->ReadLine_CharacterTable [ 3 ] = 3 ; // Ctrl-C
+    csl->ReadLine_CharacterTable [ 4 ] = 4 ; // Ctrl-D
+    csl->ReadLine_CharacterTable [ '\r' ] = 20 ; // remember this is raw char input : the lexer also handles some of these
+    csl->ReadLine_CharacterTable [ '\n' ] = 5 ;
+    csl->ReadLine_CharacterTable [ eof ] = 6 ;
+    csl->ReadLine_CharacterTable [ ESC ] = 7 ;
+    csl->ReadLine_CharacterTable [ '[' ] = 8 ;
+    csl->ReadLine_CharacterTable [ '1' ] = 9 ;
+    csl->ReadLine_CharacterTable [ '4' ] = 10 ;
+    csl->ReadLine_CharacterTable [ 'A' ] = 11 ;
+    csl->ReadLine_CharacterTable [ 'B' ] = 12 ;
+    csl->ReadLine_CharacterTable [ 'C' ] = 13 ;
+    csl->ReadLine_CharacterTable [ 'D' ] = 14 ;
+    csl->ReadLine_CharacterTable [ '3' ] = 15 ;
+    csl->ReadLine_CharacterTable [ 'H' ] = 16 ;
+    csl->ReadLine_CharacterTable [ 'O' ] = 17 ;
+    csl->ReadLine_CharacterTable [ 'F' ] = 18 ;
+    csl->ReadLine_CharacterTable [ '~' ] = 19 ;
+    csl->ReadLine_CharacterTable [ '(' ] = 22 ;
     //cfrl->ReadLine_CharacterTable [ '!' ] = 23 ; // the lexer handles this
 
-    cfrl->ReadLine_FunctionTable [ 0 ] = ReadTable_Default ;
-    cfrl->ReadLine_FunctionTable [ 1 ] = ReadTable_BackSpace ;
-    cfrl->ReadLine_FunctionTable [ 2 ] = ReadTable_Tab ;
-    cfrl->ReadLine_FunctionTable [ 3 ] = ReadTable_0x03 ; // Ctrl-C
-    cfrl->ReadLine_FunctionTable [ 4 ] = ReadTable_0x04 ; // Ctrl-D
-    cfrl->ReadLine_FunctionTable [ 5 ] = ReadTable_Newline ;
-    cfrl->ReadLine_FunctionTable [ 6 ] = ReadTable_EOF ;
-    cfrl->ReadLine_FunctionTable [ 7 ] = ReadTable_ESC ;
-    cfrl->ReadLine_FunctionTable [ 8 ] = ReadTable_LeftBracket ;
-    cfrl->ReadLine_FunctionTable [ 9 ] = ReadTable_1 ; // ESC[1 Home ;
-    cfrl->ReadLine_FunctionTable [ 10 ] = ReadTable_4 ; // ESC[4 End ;
-    cfrl->ReadLine_FunctionTable [ 11 ] = ReadTable_A ; // ESC[A Up Arrow ;
-    cfrl->ReadLine_FunctionTable [ 12 ] = ReadTable_B ; // ESC[B Down Arrow ;
-    cfrl->ReadLine_FunctionTable [ 13 ] = ReadTable_C ; // ESC[C Right Arrow ;
-    cfrl->ReadLine_FunctionTable [ 14 ] = ReadTable_D ; // ESC[D Left Arrow ;
-    cfrl->ReadLine_FunctionTable [ 15 ] = ReadTable_3 ; // part of Delete escape sequence ;
-    cfrl->ReadLine_FunctionTable [ 16 ] = ReadTable_H ; // ;
-    cfrl->ReadLine_FunctionTable [ 17 ] = ReadTable_O ; // ESC[O Home ;
-    cfrl->ReadLine_FunctionTable [ 18 ] = ReadTable_F ; // End ;
-    cfrl->ReadLine_FunctionTable [ 19 ] = ReadTable_Tilde ; // ESC[~ Delete ;
-    cfrl->ReadLine_FunctionTable [ 20 ] = ReadTable_CarriageReturn ; // '\r'
-    cfrl->ReadLine_FunctionTable [ 21 ] = ReadTable_Zero ;
-    cfrl->ReadLine_FunctionTable [ 22 ] = ReadTable_LParen ;
+    csl->ReadLine_FunctionTable [ 0 ] = ReadTable_Default ;
+    csl->ReadLine_FunctionTable [ 1 ] = ReadTable_BackSpace ;
+    csl->ReadLine_FunctionTable [ 2 ] = ReadTable_Tab ;
+    csl->ReadLine_FunctionTable [ 3 ] = ReadTable_0x03 ; // Ctrl-C
+    csl->ReadLine_FunctionTable [ 4 ] = ReadTable_0x04 ; // Ctrl-D
+    csl->ReadLine_FunctionTable [ 5 ] = ReadTable_Newline ;
+    csl->ReadLine_FunctionTable [ 6 ] = ReadTable_EOF ;
+    csl->ReadLine_FunctionTable [ 7 ] = ReadTable_ESC ;
+    csl->ReadLine_FunctionTable [ 8 ] = ReadTable_LeftBracket ;
+    csl->ReadLine_FunctionTable [ 9 ] = ReadTable_1 ; // ESC[1 Home ;
+    csl->ReadLine_FunctionTable [ 10 ] = ReadTable_4 ; // ESC[4 End ;
+    csl->ReadLine_FunctionTable [ 11 ] = ReadTable_A ; // ESC[A Up Arrow ;
+    csl->ReadLine_FunctionTable [ 12 ] = ReadTable_B ; // ESC[B Down Arrow ;
+    csl->ReadLine_FunctionTable [ 13 ] = ReadTable_C ; // ESC[C Right Arrow ;
+    csl->ReadLine_FunctionTable [ 14 ] = ReadTable_D ; // ESC[D Left Arrow ;
+    csl->ReadLine_FunctionTable [ 15 ] = ReadTable_3 ; // part of Delete escape sequence ;
+    csl->ReadLine_FunctionTable [ 16 ] = ReadTable_H ; // ;
+    csl->ReadLine_FunctionTable [ 17 ] = ReadTable_O ; // ESC[O Home ;
+    csl->ReadLine_FunctionTable [ 18 ] = ReadTable_F ; // End ;
+    csl->ReadLine_FunctionTable [ 19 ] = ReadTable_Tilde ; // ESC[~ Delete ;
+    csl->ReadLine_FunctionTable [ 20 ] = ReadTable_CarriageReturn ; // '\r'
+    csl->ReadLine_FunctionTable [ 21 ] = ReadTable_Zero ;
+    csl->ReadLine_FunctionTable [ 22 ] = ReadTable_LParen ;
     //cfrl->ReadLine_FunctionTable [ 23 ] = ReadTable_Exclam ;
 }
 

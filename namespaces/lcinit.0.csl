@@ -31,7 +31,7 @@ bnOn
 (define (average x y) ( / (+ x y) 2 ))  
 (define (improve guess x) (average guess (/ x guess)))    
 (define (good-enough? guess x) ( < ( abs ( - (square guess) x)) 0.000000000001))  
-//( ld: ) 
+ 
 (define (sq-iter guess x) (if (good-enough? guess x) guess (sq-iter (improve guess x ) x )))    
 ( define (sqrt x) ( sq-iter 1.00000000000 x))
 (sqrt 9) 
@@ -41,6 +41,7 @@ bnOff
 #endif
 
 (define (square n) (* n n))
+
 (define (fib n)
   (fib-iter 1 0 n))
 
@@ -49,7 +50,8 @@ bnOff
       b
       (fib-iter (+ a b) a (- count 1))))
 (fib 30)     
-      
+// (csl_return)       
+     
 (define (count-change amount)                                                                                                                         
   (cc amount 5)) 
 (define (cc amount kinds-of-coins)                                                                                                                        
@@ -68,7 +70,7 @@ bnOff
         ((= kinds-of-coins 4) 25)
         ((= kinds-of-coins 5) 50))) 
 (count-change 100)     
-       
+(csl_return)       
 2//(;ld)
 (define ( A x y) 
     (cond 
@@ -144,6 +146,19 @@ bnOff
         )
     )
  )
+(substt 'm 'b  '(a b ( a b c ) d))
+#elif
+(define substt ( lambda (x y z )  
+    ( cond ((atom? z)  
+            (cond ( (eq? z y) x )
+                ( 't z )))
+        ( else
+            ( cons ( substt x y ( car z) ) 
+                      ( substt x y ( cdr z ) )
+            )
+        )
+    )
+ ) )
 (substt 'm 'b  '(a b ( a b c ) d))
 
 #endif

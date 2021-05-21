@@ -172,6 +172,7 @@ Boolean cli ;
 int lic, csl_returnValue = 0 ;
 int s9_main ( int argc, char **argv ) ;
 
+#if 1
 void
 doPrompt ( )
 {
@@ -195,6 +196,7 @@ s9_ungetChar ( int c, FILE * f )
     else ungetc ( c, f ) ;
 }
 
+char * csl_buffer ;
 void
 CSL_S9fes ( )
 {
@@ -207,6 +209,7 @@ CSL_S9fes ( )
     byte * snp = rl->NormalPrompt, *sap = rl->AltPrompt ;
     rl->AltPrompt = ( byte* ) "l9< " ;
     rl->NormalPrompt = ( byte* ) "l9> " ;
+    csl_buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
 
     s9_main ( 1, ( char*[] ) { "s9" } ) ;
 
@@ -216,5 +219,7 @@ CSL_S9fes ( )
     rl->AltPrompt = sap ;
     rl->InputFile = svFile ;
     Printf ( "s9fes : s9 : exiting ... \n" ) ;
+    if ( csl_returnValue == 2 ) DataStack_Push ( (int64) csl_buffer ) ;
 }
+#endif
 

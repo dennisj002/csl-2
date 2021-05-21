@@ -583,8 +583,19 @@ ReadLine_SetRawInputFunction ( ReadLiner * rl, ReadLiner_KeyFunction ripf )
 }
 
 void
-ReadLine_SetInputString ( ReadLiner * rl, byte * string, int64 size )
+ReadLine_SetInputString ( ReadLiner * rl, byte * string0, int64 size )
 {
+    byte * string ;
+    int size1 ;
+    if ( csl_returnValue == 3 )
+    {
+        string = & string0[1] ;
+        size1 = Strlen ( ( char* ) string0 ) - 1 ;
+        string0[size1]  = 0 ;
+        size = 0 ;
+        //csl_returnValue = -1 ;
+    }
+    else string = string0 ;
     rl->InputStringOriginal = string ;
     rl->InputStringCurrent = rl->InputStringOriginal ;
     rl->InputStringIndex = 0 ;
@@ -622,7 +633,7 @@ Readline_Setup_OneStringInterpret ( ReadLiner * rl, byte * str )
     Readline_Save_InputLine_State ( rl ) ;
     ReadLine_SetRawInputFunction ( rl, 0 ) ; //ReadLine_GetNextCharFromString ) ;
     ReadLine_SetInputString ( rl, str, 0 ) ;
-    _Readline_Setup_OneStringInterpret ( rl, str ) ;
+    _Readline_Setup_OneStringInterpret ( rl, rl->InputStringOriginal ) ;
 }
 
 void
@@ -659,7 +670,7 @@ _ReadLine_GetLine ( ReadLiner * rl, byte c )
     {
         if ( ! c ) ReadLine_Get_Key ( rl ) ;
         else ReadLine_Set_KeyedChar ( rl, c ), c = 0 ;
-        if ( AtCommandLine ( rl ) ) _ReadLine_TabCompletion_Check ( rl ) ;
+        if ( (!csl_returnValue ) && AtCommandLine ( rl ) ) _ReadLine_TabCompletion_Check ( rl ) ;
         _CSL_->ReadLine_FunctionTable [ _CSL_->ReadLine_CharacterTable [ rl->InputKeyedCharacter ] ] ( rl ) ;
         SetState ( rl, ANSI_ESCAPE, false ) ;
     }
@@ -667,7 +678,7 @@ _ReadLine_GetLine ( ReadLiner * rl, byte c )
 }
 
 byte
-ReadLine_GetLine ()
+ReadLine_GetLine ( )
 {
     ReadLiner * rl = _ReadLiner_ ;
     return _ReadLine_GetLine ( rl, 0 ) ;
@@ -676,15 +687,15 @@ ReadLine_GetLine ()
 byte
 ReadLine_NextChar ( ReadLiner * rl )
 {
-    byte nchar ; 
-    if ( ! (nchar = _ReadLine_GetNextChar ( rl ) ) )
+    byte nchar ;
+    if ( ! ( nchar = _ReadLine_GetNextChar ( rl ) ) )
     {
         if ( GetState ( rl, STRING_MODE ) )
         {
             SetState ( rl, STRING_MODE, false ) ; // only good once
             return nchar ;
         }
-        else ReadLine_GetLine () ; // get a line of characters
+        else _ReadLine_GetLine ( rl, 0 ) ; // get a line of characters
         ReadLine_Set_ReadIndex ( rl, 0 ) ;
         nchar = _ReadLine_GetNextChar ( rl ) ;
     }
