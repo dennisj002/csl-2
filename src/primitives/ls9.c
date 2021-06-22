@@ -20,7 +20,9 @@
 #else
 #include "../include/csl.h"
 #endif
-//int64 lic ;
+extern char * csl_buffer ;
+int64 l9_getChar ( FILE * f ) ;
+void l9_ungetChar ( int c, FILE * f ) ;
 /*
  * Tunable parameters
  */
@@ -60,7 +62,7 @@
 /*
  * Memory pools
  */
-
+cell lv ;
 cell *Car = NULL,
     *Cdr = NULL ;
 byte *Tag = NULL ;
@@ -81,8 +83,8 @@ cell Freevec = 0 ;
 
 #define l9_tag(n)  (Tag[n])
 
-#define l9_car(x)          (Car[x])
-#define l9_cdr(x)          (Cdr[x])
+#define car(x)          (Car[x])
+#define cdr(x)          (Cdr[x])
 #define caar(x)         (Car[Car[x]])
 #define cadr(x)         (Car[Cdr[x]])
 #define cdar(x)         (Cdr[Car[x]])
@@ -154,35 +156,35 @@ cell Freevec = 0 ;
  */
 
 #define charp(n) \
-    (!specialp(n) && (l9_tag(n) & ATOM_TAG) && T_L9_CHAR == l9_car(n))
+    (!specialp(n) && (l9_tag(n) & ATOM_TAG) && T_L9_CHAR == car(n))
 
 #define closurep(n) \
-    (!specialp(n) && (l9_tag(n) & ATOM_TAG) && T_CLOSURE == l9_car(n))
+    (!specialp(n) && (l9_tag(n) & ATOM_TAG) && T_CLOSURE == car(n))
 
 #define ctagp(n) \
-    (!specialp(n) && (l9_tag(n) & ATOM_TAG) && T_CATCHTAG == l9_car(n))
+    (!specialp(n) && (l9_tag(n) & ATOM_TAG) && T_CATCHTAG == car(n))
 
 #define eofp(n) (EOFMARK == (n))
 
 #define fixp(n) \
-    (!specialp(n) && (l9_tag(n) & ATOM_TAG) && T_FIXNUM == l9_car(n))
+    (!specialp(n) && (l9_tag(n) & ATOM_TAG) && T_FIXNUM == car(n))
 
 #define inportp(n) \
     (!specialp(n) && (l9_tag(n) & ATOM_TAG) && \
-     (l9_tag(n) & PORT_TAG) && T_INPORT == l9_car(n))
+     (l9_tag(n) & PORT_TAG) && T_INPORT == car(n))
 
 #define outportp(n) \
     (!specialp(n) && (l9_tag(n) & ATOM_TAG) && \
-     (l9_tag(n) & PORT_TAG) && T_OUTPORT == l9_car(n))
+     (l9_tag(n) & PORT_TAG) && T_OUTPORT == car(n))
 
 #define stringp(n) \
-    (!specialp(n) && (l9_tag(n) & VECTOR_TAG) && T_L9_STRING == l9_car(n))
+    (!specialp(n) && (l9_tag(n) & VECTOR_TAG) && T_L9_STRING == car(n))
 
 #define symbolp(n) \
-    (!specialp(n) && (l9_tag(n) & VECTOR_TAG) && T_SYMBOL == l9_car(n))
+    (!specialp(n) && (l9_tag(n) & VECTOR_TAG) && T_SYMBOL == car(n))
 
 #define vectorp(n) \
-    (!specialp(n) && (l9_tag(n) & VECTOR_TAG) && T_VECTOR == l9_car(n))
+    (!specialp(n) && (l9_tag(n) & VECTOR_TAG) && T_VECTOR == car(n))
 
 #define atomp(n) \
     (specialp(n) || (l9_tag(n) & ATOM_TAG) || (l9_tag(n) & VECTOR_TAG))
@@ -220,7 +222,7 @@ enum
     OP_NEGATE, OP_NRECONC, OP_NULL, OP_NUMERIC, OP_NUMSTR,
     OP_OBTAB, OP_OPEN_INFILE, OP_OPEN_OUTFILE, OP_OUTPORT,
     OP_OUTPORTP, OP_PAIR, OP_PEEKC, OP_PLUS, OP_PRIN, OP_PRINC,
-    OP_QUIT, OP_READ, OP_READC, OP_RECONC, OP_REM, OP_RENAME,
+    OP_QUIT, OP_CSL_RETURN, OP_CRETURN, OP_READ, OP_READC, OP_RECONC, OP_REM, OP_RENAME,
     OP_SCONC, OP_SEQUAL, OP_SETCAR, OP_SETCDR, OP_SET_INPORT,
     OP_SET_OUTPORT, OP_SFILL, OP_SGRTR, OP_SGTEQ, OP_SIEQUAL,
     OP_SIGRTR, OP_SIGTEQ, OP_SILESS, OP_SILTEQ, OP_SLESS, OP_SLTEQ,
@@ -296,7 +298,7 @@ report ( char *s, cell x )
     if ( Files != NIL )
     {
         prints ( "*** file: " ) ;
-        printb ( string ( l9_car ( Files ) ) ) ;
+        printb ( string ( car ( Files ) ) ) ;
         prints ( ", line: " ) ;
         prints ( ntoa ( Line, 10 ) ) ;
         nl ( ) ;
@@ -437,6 +439,21 @@ flush ( void )
         mkport ( Outport, T_OUTPORT ) ) ;
 }
 
+int
+l9_fwrite ( char *s, int k )
+{
+    int i, n = 0 ;
+    for ( i = 0 ; csl_buffer [i] ; i ++ ) ;
+    if ( csl_returnValue == - 1 ) return k ;
+    if ( csl_returnValue > 1 )
+    {
+        n = snprintf ( &csl_buffer[i], k + 1, "%s", s ) ; // 1 : null
+        //printf ( " %s", csl_buffer ), fflush (stdout) ;
+    }
+    else n = fwrite ( s, 1, k, Ports[Outport] ) ;
+    return n ;
+}
+
 void
 blockwrite ( char *s, int k )
 {
@@ -459,7 +476,8 @@ blockwrite ( char *s, int k )
     }
     if ( NULL == Ports[Outport] )
         fatal ( "blockwrite: output port is not open" ) ;
-    if ( fwrite ( s, 1, k, Ports[Outport] ) != k )
+    //if ( fwrite ( s, 1, k, Ports[Outport] ) != k )
+    if ( l9_fwrite ( s, k ) != k )
         error ( "file write error, port",
         mkport ( Outport, T_OUTPORT ) ) ;
     if ( ( 1 == Outport || 2 == Outport ) && '\n' == s[k - 1] )
@@ -493,9 +511,9 @@ prints ( char *s )
 void
 alloc_nodepool ( void )
 {
-    Car = malloc ( sizeof (cell ) * NNODES ) ;
-    Cdr = malloc ( sizeof (cell ) * NNODES ) ;
-    Tag = malloc ( NNODES ) ;
+    Car = sl9_malloc ( sizeof (cell ) * NNODES ) ;
+    Cdr = sl9_malloc ( sizeof (cell ) * NNODES ) ;
+    Tag = sl9_malloc ( NNODES ) ;
     if ( NULL == Car || NULL == Cdr || NULL == Tag )
         fatal ( "alloc_nodepool: out of physical memory" ) ;
     memset ( Car, 0, sizeof (cell ) * NNODES ) ;
@@ -506,7 +524,7 @@ alloc_nodepool ( void )
 void
 alloc_vecpool ( void )
 {
-    Vectors = malloc ( sizeof (cell ) * NVCELLS ) ;
+    Vectors = sl9_malloc ( sizeof (cell ) * NVCELLS ) ;
     if ( NULL == Vectors )
         fatal ( "alloc_vecpool: out of physical memory" ) ;
     memset ( Vectors, 0, sizeof (cell ) * NVCELLS ) ;
@@ -605,24 +623,24 @@ mark ( cell n )
             }
             else if ( l9_tag ( parent ) & TRAV_TAG )
             { /* S1 --> S2 */
-                x = l9_cdr ( parent ) ;
-                l9_cdr ( parent ) = l9_car ( parent ) ;
-                l9_car ( parent ) = n ;
+                x = cdr ( parent ) ;
+                cdr ( parent ) = car ( parent ) ;
+                car ( parent ) = n ;
                 l9_tag ( parent ) &= ~ TRAV_TAG ;
                 n = x ;
             }
             else
             { /* S2 --> done */
                 x = parent ;
-                parent = l9_cdr ( x ) ;
-                l9_cdr ( x ) = n ;
+                parent = cdr ( x ) ;
+                cdr ( x ) = n ;
                 n = x ;
             }
         }
         else if ( l9_tag ( n ) & VECTOR_TAG )
         { /* S0 --> S1 */
             l9_tag ( n ) |= MARK_TAG ;
-            if ( T_VECTOR == l9_car ( n ) && veclen ( n ) != 0 )
+            if ( T_VECTOR == car ( n ) && veclen ( n ) != 0 )
             {
                 l9_tag ( n ) |= TRAV_TAG ;
                 vecndx ( n ) = 0 ;
@@ -639,27 +657,27 @@ mark ( cell n )
         }
         else if ( l9_tag ( n ) & ATOM_TAG )
         { /* S0 --> S2 */
-            if ( l9_cdr ( n ) != NIL )
+            if ( cdr ( n ) != NIL )
             {
-                if ( T_BYTECODE == l9_car ( n ) )
+                if ( T_BYTECODE == car ( n ) )
                 {
-                    marklit ( l9_cdr ( n ) ) ;
+                    marklit ( cdr ( n ) ) ;
                 }
-                else if ( T_INPORT == l9_car ( n ) ||
-                    T_OUTPORT == l9_car ( n )
+                else if ( T_INPORT == car ( n ) ||
+                    T_OUTPORT == car ( n )
                     )
                     Port_flags[portno ( n )] |= USED_TAG ;
             }
-            x = l9_cdr ( n ) ;
-            l9_cdr ( n ) = parent ;
+            x = cdr ( n ) ;
+            cdr ( n ) = parent ;
             parent = n ;
             n = x ;
             l9_tag ( parent ) |= MARK_TAG ;
         }
         else
         { /* S0 --> S1 */
-            x = l9_car ( n ) ;
-            l9_car ( n ) = parent ;
+            x = car ( n ) ;
+            car ( n ) = parent ;
             l9_tag ( n ) |= MARK_TAG ;
             parent = n ;
             n = x ;
@@ -709,7 +727,7 @@ l9_gc ( void )
     {
         if ( ! ( l9_tag ( i ) & MARK_TAG ) )
         {
-            l9_cdr ( i ) = Freelist ;
+            cdr ( i ) = Freelist ;
             Freelist = i ;
             k ++ ;
         }
@@ -776,9 +794,9 @@ cons3 ( cell pcar, cell pcdr, int ptag )
             error ( "cons3: out of nodes", UNDEF ) ;
     }
     n = Freelist ;
-    Freelist = l9_cdr ( Freelist ) ;
-    l9_car ( n ) = pcar ;
-    l9_cdr ( n ) = pcdr ;
+    Freelist = cdr ( Freelist ) ;
+    car ( n ) = pcar ;
+    cdr ( n ) = pcdr ;
     l9_tag ( n ) = ptag ;
     return n ;
 }
@@ -821,7 +839,7 @@ gcv ( void )
             {
                 memmove ( &Vectors[to], &Vectors[from],
                     k * sizeof (cell ) ) ;
-                l9_cdr ( Vectors[to + RAW_VECLINK] ) =
+                cdr ( Vectors[to + RAW_VECLINK] ) =
                     to + RAW_VECDATA ;
             }
             to += k ;
@@ -875,8 +893,8 @@ unprot ( int k )
     {
         if ( NIL == Protected )
             error ( "unprot: stack underflow", UNDEF ) ;
-        n = l9_car ( Protected ) ;
-        Protected = l9_cdr ( Protected ) ;
+        n = car ( Protected ) ;
+        Protected = cdr ( Protected ) ;
         k -- ;
     }
     return n ;
@@ -977,10 +995,10 @@ mkht ( int k )
     return n ;
 }
 
-#define htlen(d) veclen(l9_cdr(d))
-#define htelts(d) fixval(l9_car(d))
-#define htdata(d) l9_cdr(d)
-#define htslots(d) vector(l9_cdr(d))
+#define htlen(d) veclen(cdr(d))
+#define htelts(d) fixval(car(d))
+#define htdata(d) cdr(d)
+#define htslots(d) vector(cdr(d))
 
 uint
 hash ( byte *s, uint k )
@@ -1052,10 +1070,10 @@ htgrow ( cell d )
     nk = htlen ( nd ) ;
     for ( i = 0 ; i < k ; i ++ )
     {
-        for ( e = htslots ( d )[i] ; e != NIL ; e = l9_cdr ( e ) )
+        for ( e = htslots ( d )[i] ; e != NIL ; e = cdr ( e ) )
         {
             h = obhash ( caar ( e ), nk ) ;
-            n = cons ( l9_car ( e ), htslots ( nd )[h] ) ;
+            n = cons ( car ( e ), htslots ( nd )[h] ) ;
             htslots ( nd )[h] = n ;
         }
     }
@@ -1073,8 +1091,8 @@ htlookup ( cell d, cell k )
     x = htslots ( d )[h] ;
     while ( x != NIL )
     {
-        if ( match ( caar ( x ), k ) ) return l9_car ( x ) ;
-        x = l9_cdr ( x ) ;
+        if ( match ( caar ( x ), k ) ) return car ( x ) ;
+        x = cdr ( x ) ;
     }
     return UNDEF ;
 }
@@ -1112,11 +1130,11 @@ htrem ( cell d, cell k )
     {
         if ( match ( caar ( *x ), k ) )
         {
-            *x = l9_cdr ( *x ) ;
+            *x = cdr ( *x ) ;
             htelts ( d ) -- ;
             break ;
         }
-        x = & l9_cdr ( *x ) ;
+        x = & cdr ( *x ) ;
     }
     return d ;
 }
@@ -1142,7 +1160,7 @@ findsym ( char *s )
 
     y = mksym ( s, strlen ( s ) ) ;
     y = htlookup ( Symhash, y ) ;
-    if ( y != UNDEF ) return l9_car ( y ) ;
+    if ( y != UNDEF ) return car ( y ) ;
     return NIL ;
 }
 
@@ -1190,8 +1208,8 @@ reconc ( cell n, cell m )
     while ( n != NIL )
     {
         if ( atomp ( n ) ) error ( "reconc: dotted list", n ) ;
-        m = cons ( l9_car ( n ), m ) ;
-        n = l9_cdr ( n ) ;
+        m = cons ( car ( n ), m ) ;
+        n = cdr ( n ) ;
     }
     return m ;
 }
@@ -1206,8 +1224,8 @@ nreconc ( cell n, cell m )
     while ( n != NIL )
     {
         if ( atomp ( n ) ) error ( "nreconc: dotted list", n ) ;
-        h = l9_cdr ( n ) ;
-        l9_cdr ( n ) = m ;
+        h = cdr ( n ) ;
+        cdr ( n ) = m ;
         m = n ;
         n = h ;
     }
@@ -1226,8 +1244,8 @@ conc ( cell a, cell b )
     n = b ;
     while ( a != NIL )
     {
-        n = cons ( l9_car ( a ), n ) ;
-        a = l9_cdr ( a ) ;
+        n = cons ( car ( a ), n ) ;
+        a = cdr ( a ) ;
     }
     unprot ( 1 ) ;
     return n ;
@@ -1240,8 +1258,8 @@ nconc ( cell a, cell b )
 
     n = a ;
     if ( NIL == a ) return b ;
-    while ( l9_cdr ( a ) != NIL ) a = l9_cdr ( a ) ;
-    l9_cdr ( a ) = b ;
+    while ( cdr ( a ) != NIL ) a = cdr ( a ) ;
+    cdr ( a ) = b ;
     return n ;
 }
 
@@ -1371,8 +1389,8 @@ bindnew ( cell v, cell a )
 int
 assq ( cell x, cell a )
 {
-    for ( ; a != NIL ; a = l9_cdr ( a ) )
-        if ( caar ( a ) == x ) return l9_car ( a ) ;
+    for ( ; a != NIL ; a = cdr ( a ) )
+        if ( caar ( a ) == x ) return car ( a ) ;
     return NIL ;
 }
 
@@ -1540,7 +1558,7 @@ rdlist ( void )
                 return NIL ;
             }
             n = xread2 ( ) ;
-            l9_cdr ( p ) = n ;
+            cdr ( p ) = n ;
             if ( RPAREN == n || xread2 ( ) != RPAREN )
             {
                 unprot ( 1 ) ;
@@ -1550,7 +1568,7 @@ rdlist ( void )
             Inlist -- ;
             return unprot ( 1 ) ;
         }
-        l9_car ( a ) = n ;
+        car ( a ) = n ;
         p = a ;
         n = xread2 ( ) ;
         if ( n != RPAREN )
@@ -1558,8 +1576,8 @@ rdlist ( void )
             Tmp = n ;
             new = cons3 ( NIL, NIL, CONST_TAG ) ;
             Tmp = NIL ;
-            l9_cdr ( a ) = new ;
-            a = l9_cdr ( a ) ;
+            cdr ( a ) = new ;
+            a = cdr ( a ) ;
         }
     }
     Inlist -- ;
@@ -1791,7 +1809,7 @@ meta ( void )
 }
 
 void
-doPrompt ( )
+ls9_doPrompt ( )
 {
     if ( ( lic == '\r' ) || ( lic == '\n' ) ) printf ( "l9> " ) ;
     else printf ( "\nl9> " ) ;
@@ -1812,7 +1830,7 @@ xread2 ( void )
             if ( '\n' == c )
             {
                 Line ++ ;
-                if ( cli && ( ! Inlist ) ) doPrompt ( ) ;
+                if ( cli && ( ! Inlist ) ) ls9_doPrompt ( ) ;
             }
             c = readc ( ) ;
         }
@@ -1994,8 +2012,8 @@ prlist ( int sl, cell x, int d )
     writec ( LP ) ;
     while ( x != NIL && Plimit != 1 )
     {
-        prex ( sl, l9_car ( x ), d + 1 ) ;
-        x = l9_cdr ( x ) ;
+        prex ( sl, car ( x ), d + 1 ) ;
+        x = cdr ( x ) ;
         if ( x != NIL )
         {
             writec ( ' ' ) ;
@@ -2046,20 +2064,20 @@ void
 pruatom ( cell x )
 {
     prints ( "#<atom " ) ;
-    prints ( ntoa ( l9_car ( x ), 10 ) ) ;
+    prints ( ntoa ( car ( x ), 10 ) ) ;
     prints ( ">" ) ;
 }
 
 #define quoted(x, q) \
-    (l9_car(x) == (q) && l9_cdr(x) != NIL && NIL == cddr(x))
+    (car(x) == (q) && cdr(x) != NIL && NIL == cddr(x))
 
 void
 prquote ( int sl, cell x, int d )
 {
-    if ( l9_car ( x ) == S_quote ) writec ( '\'' ) ;
-    else if ( l9_car ( x ) == S_qquote ) writec ( '@' ) ;
-    else if ( l9_car ( x ) == S_unquote ) writec ( ',' ) ;
-    else if ( l9_car ( x ) == S_splice ) prints ( ",@" ) ;
+    if ( car ( x ) == S_quote ) writec ( '\'' ) ;
+    else if ( car ( x ) == S_qquote ) writec ( '@' ) ;
+    else if ( car ( x ) == S_unquote ) writec ( ',' ) ;
+    else if ( car ( x ) == S_splice ) prints ( ",@" ) ;
     prex ( sl, cadr ( x ), d ) ;
 }
 
@@ -2137,7 +2155,7 @@ length ( cell n )
 {
     int k ;
 
-    for ( k = 0 ; n != NIL ; n = l9_cdr ( n ) )
+    for ( k = 0 ; n != NIL ; n = cdr ( n ) )
         k ++ ;
     return k ;
 }
@@ -2152,7 +2170,7 @@ ckargs ( cell x, int min, int max )
     if ( k < min || ( k > max && max >= 0 ) )
     {
         sprintf ( buf, "%s: wrong number of arguments",
-            symname ( l9_car ( x ) ) ) ;
+            symname ( car ( x ) ) ) ;
         error ( buf, x ) ;
     }
 }
@@ -2162,8 +2180,8 @@ int syncheck ( cell x, int top ) ;
 int
 ckseq ( cell x, int top )
 {
-    for ( ; pairp ( x ) ; x = l9_cdr ( x ) )
-        syncheck ( l9_car ( x ), top ) ;
+    for ( ; pairp ( x ) ; x = cdr ( x ) )
+        syncheck ( car ( x ), top ) ;
     return 0 ;
 }
 
@@ -2188,14 +2206,14 @@ int
 ckif ( cell x )
 {
     ckargs ( x, 2, 3 ) ;
-    return ckseq ( l9_cdr ( x ), 0 ) ;
+    return ckseq ( cdr ( x ), 0 ) ;
 }
 
 int
 ckifstar ( cell x )
 {
     ckargs ( x, 2, 2 ) ;
-    return ckseq ( l9_cdr ( x ), 0 ) ;
+    return ckseq ( cdr ( x ), 0 ) ;
 }
 
 int
@@ -2203,9 +2221,9 @@ symlistp ( cell x )
 {
     cell p ;
 
-    for ( p = x ; pairp ( p ) ; p = l9_cdr ( p ) )
+    for ( p = x ; pairp ( p ) ; p = cdr ( p ) )
     {
-        if ( ! symbolp ( l9_car ( p ) ) )
+        if ( ! symbolp ( car ( p ) ) )
             return 0 ;
     }
     return symbolp ( p ) || NIL == p ;
@@ -2214,8 +2232,8 @@ symlistp ( cell x )
 int
 memq ( cell x, cell a )
 {
-    for ( ; a != NIL ; a = l9_cdr ( a ) )
-        if ( l9_car ( a ) == x ) return a ;
+    for ( ; a != NIL ; a = cdr ( a ) )
+        if ( car ( a ) == x ) return a ;
     return NIL ;
 }
 
@@ -2223,11 +2241,11 @@ int
 uniqlistp ( cell x )
 {
     if ( NIL == x ) return 1 ;
-    while ( l9_cdr ( x ) != NIL )
+    while ( cdr ( x ) != NIL )
     {
-        if ( memq ( l9_car ( x ), l9_cdr ( x ) ) != NIL )
+        if ( memq ( car ( x ), cdr ( x ) ) != NIL )
             return 0 ;
-        x = l9_cdr ( x ) ;
+        x = cdr ( x ) ;
     }
     return 1 ;
 }
@@ -2240,9 +2258,9 @@ flatargs ( cell a )
     protect ( n = NIL ) ;
     while ( pairp ( a ) )
     {
-        n = cons ( l9_car ( a ), n ) ;
-        l9_car ( Protected ) = n ;
-        a = l9_cdr ( a ) ;
+        n = cons ( car ( a ), n ) ;
+        car ( Protected ) = n ;
+        a = cdr ( a ) ;
     }
     if ( a != NIL ) n = cons ( a, n ) ;
     unprot ( 1 ) ;
@@ -2273,7 +2291,7 @@ ckmacro ( cell x, int top )
 int
 ckprog ( cell x, int top )
 {
-    return ckseq ( l9_cdr ( x ), top ) ;
+    return ckseq ( cdr ( x ), top ) ;
 }
 
 int
@@ -2298,19 +2316,19 @@ syncheck ( cell x, int top )
     cell p ;
 
     if ( atomp ( x ) ) return 0 ;
-    for ( p = x ; pairp ( p ) ; p = l9_cdr ( p ) )
+    for ( p = x ; pairp ( p ) ; p = cdr ( p ) )
         ;
     if ( p != NIL )
         error ( "dotted list in program", x ) ;
-    if ( l9_car ( x ) == S_apply ) return ckapply ( x ) ;
-    if ( l9_car ( x ) == S_def ) return ckdef ( x, top ) ;
-    if ( l9_car ( x ) == S_if ) return ckif ( x ) ;
-    if ( l9_car ( x ) == S_ifstar ) return ckifstar ( x ) ;
-    if ( l9_car ( x ) == S_lambda ) return cklambda ( x ) ;
-    if ( l9_car ( x ) == S_macro ) return ckmacro ( x, top ) ;
-    if ( l9_car ( x ) == S_prog ) return ckprog ( x, top ) ;
-    if ( l9_car ( x ) == S_quote ) return ckquote ( x ) ;
-    if ( l9_car ( x ) == S_setq ) return cksetq ( x ) ;
+    if ( car ( x ) == S_apply ) return ckapply ( x ) ;
+    if ( car ( x ) == S_def ) return ckdef ( x, top ) ;
+    if ( car ( x ) == S_if ) return ckif ( x ) ;
+    if ( car ( x ) == S_ifstar ) return ckifstar ( x ) ;
+    if ( car ( x ) == S_lambda ) return cklambda ( x ) ;
+    if ( car ( x ) == S_macro ) return ckmacro ( x, top ) ;
+    if ( car ( x ) == S_prog ) return ckprog ( x, top ) ;
+    if ( car ( x ) == S_quote ) return ckquote ( x ) ;
+    if ( car ( x ) == S_setq ) return cksetq ( x ) ;
     return ckseq ( x, top ) ;
 }
 
@@ -2328,10 +2346,10 @@ set_union ( cell a, cell b )
     protect ( n = b ) ;
     while ( pairp ( a ) )
     {
-        if ( memq ( l9_car ( a ), b ) == NIL )
-            n = cons ( l9_car ( a ), n ) ;
-        l9_car ( Protected ) = n ;
-        a = l9_cdr ( a ) ;
+        if ( memq ( car ( a ), b ) == NIL )
+            n = cons ( car ( a ), n ) ;
+        car ( Protected ) = n ;
+        a = cdr ( a ) ;
     }
     if ( a != NIL && memq ( a, b ) == NIL )
         n = cons ( a, n ) ;
@@ -2360,30 +2378,30 @@ freevars ( cell x, cell e )
     {
         return NIL ;
     }
-    else if ( l9_car ( x ) == S_quote )
+    else if ( car ( x ) == S_quote )
     {
         return NIL ;
     }
-    else if ( l9_car ( x ) == S_apply ||
-        l9_car ( x ) == S_prog ||
-        l9_car ( x ) == S_if ||
-        l9_car ( x ) == S_ifstar ||
-        l9_car ( x ) == S_setq
+    else if ( car ( x ) == S_apply ||
+        car ( x ) == S_prog ||
+        car ( x ) == S_if ||
+        car ( x ) == S_ifstar ||
+        car ( x ) == S_setq
         )
     {
-        x = l9_cdr ( x ) ;
+        x = cdr ( x ) ;
     }
-    else if ( l9_car ( x ) == S_def ||
-        l9_car ( x ) == S_macro
+    else if ( car ( x ) == S_def ||
+        car ( x ) == S_macro
         )
     {
         x = cddr ( x ) ;
     }
-    else if ( subrp ( l9_car ( x ) ) )
+    else if ( subrp ( car ( x ) ) )
     {
-        x = l9_cdr ( x ) ;
+        x = cdr ( x ) ;
     }
-    else if ( l9_car ( x ) == S_lambda )
+    else if ( car ( x ) == S_lambda )
     {
         protect ( e ) ;
         a = flatargs ( cadr ( x ) ) ;
@@ -2397,13 +2415,13 @@ freevars ( cell x, cell e )
     protect ( u = NIL ) ;
     while ( pairp ( x ) )
     {
-        n = freevars ( l9_car ( x ), e ) ;
+        n = freevars ( car ( x ), e ) ;
         protect ( n ) ;
         u = set_union ( u, n ) ;
         unprot ( 1 ) ;
         ;
-        l9_car ( Protected ) = u ;
-        x = l9_cdr ( x ) ;
+        car ( Protected ) = u ;
+        x = cdr ( x ) ;
     }
     n = unprot ( 1 ) ;
     if ( lam ) e = unprot ( 3 ) ;
@@ -2416,9 +2434,9 @@ posq ( cell x, cell a )
     int n ;
 
     n = 0 ;
-    for ( ; a != NIL ; a = l9_cdr ( a ) )
+    for ( ; a != NIL ; a = cdr ( a ) )
     {
-        if ( l9_car ( a ) == x ) return n ;
+        if ( car ( a ) == x ) return n ;
         n ++ ;
     }
     return NIL ;
@@ -2436,19 +2454,19 @@ initmap ( cell fv, cell e, cell a )
     i = 0 ;
     while ( fv != NIL )
     {
-        p = cons ( l9_car ( fv ), NIL ) ;
+        p = cons ( car ( fv ), NIL ) ;
         protect ( p ) ;
         n = mkfix ( i ) ;
         p = cons ( n, p ) ;
-        l9_car ( Protected ) = p ;
-        if ( ( j = posq ( l9_car ( fv ), a ) ) != NIL )
+        car ( Protected ) = p ;
+        if ( ( j = posq ( car ( fv ), a ) ) != NIL )
         {
             n = mkfix ( j ) ;
             p = cons ( n, p ) ;
             unprot ( 1 ) ;
             p = cons ( I_a, p ) ;
         }
-        else if ( ( j = posq ( l9_car ( fv ), e ) ) != NIL )
+        else if ( ( j = posq ( car ( fv ), e ) ) != NIL )
         {
             n = mkfix ( j ) ;
             p = cons ( n, p ) ;
@@ -2457,12 +2475,12 @@ initmap ( cell fv, cell e, cell a )
         }
         else
         {
-            error ( "undefined symbol", l9_car ( fv ) ) ;
+            error ( "undefined symbol", car ( fv ) ) ;
         }
         m = cons ( p, m ) ;
-        l9_car ( Protected ) = m ;
+        car ( Protected ) = m ;
         i ++ ;
-        fv = l9_cdr ( fv ) ;
+        fv = cdr ( fv ) ;
     }
     return nreverse ( unprot ( 1 ) ) ;
 }
@@ -2471,8 +2489,8 @@ cell
 lastpair ( cell x )
 {
     if ( NIL == x ) return NIL ;
-    while ( l9_cdr ( x ) != NIL )
-        x = l9_cdr ( x ) ;
+    while ( cdr ( x ) != NIL )
+        x = cdr ( x ) ;
     return x ;
 }
 
@@ -2487,7 +2505,7 @@ newvar ( cell x )
     if ( memq ( x, Env ) != NIL ) return ;
     if ( NIL == Envp ) Envp = lastpair ( Env ) ;
     n = cons ( x, NIL ) ;
-    l9_cdr ( Envp ) = n ;
+    cdr ( Envp ) = n ;
     Envp = n ;
 }
 
@@ -2496,8 +2514,8 @@ newvars ( cell x )
 {
     while ( x != NIL )
     {
-        newvar ( l9_car ( x ) ) ;
-        x = l9_cdr ( x ) ;
+        newvar ( car ( x ) ) ;
+        x = cdr ( x ) ;
     }
 }
 
@@ -2511,10 +2529,10 @@ mapconv ( cell x, cell e, cell a )
     protect ( n = NIL ) ;
     while ( pairp ( x ) )
     {
-        new = cconv ( l9_car ( x ), e, a ) ;
+        new = cconv ( car ( x ), e, a ) ;
         n = cons ( new, n ) ;
-        l9_car ( Protected ) = n ;
-        x = l9_cdr ( x ) ;
+        car ( Protected ) = n ;
+        x = cdr ( x ) ;
     }
     return nreverse ( unprot ( 1 ) ) ;
 }
@@ -2545,7 +2563,7 @@ int
 contains ( cell a, cell x )
 {
     if ( a == x ) return 1 ;
-    if ( pairp ( a ) && ( contains ( l9_car ( a ), x ) || contains ( l9_cdr ( a ), x ) ) )
+    if ( pairp ( a ) && ( contains ( car ( a ), x ) || contains ( cdr ( a ), x ) ) )
         return 1 ;
     return 0 ;
 }
@@ -2567,11 +2585,11 @@ liftnames ( cell m )
     {
         if ( caar ( m ) == I_a )
         {
-            n = name ( l9_car ( m ) ) ;
+            n = name ( car ( m ) ) ;
             a = cons ( n, a ) ;
-            l9_car ( Protected ) = a ;
+            car ( Protected ) = a ;
         }
-        m = l9_cdr ( m ) ;
+        m = cdr ( m ) ;
     }
     return nreverse ( unprot ( 1 ) ) ;
 #undef name
@@ -2590,13 +2608,13 @@ liftargs ( cell m )
     {
         if ( caar ( m ) == I_a )
         {
-            n = source ( l9_car ( m ) ) ;
+            n = source ( car ( m ) ) ;
             n = cons ( n, NIL ) ;
             n = cons ( caar ( m ) == I_a ? I_arg : I_ref, n ) ;
             a = cons ( n, a ) ;
-            l9_car ( Protected ) = a ;
+            car ( Protected ) = a ;
         }
-        m = l9_cdr ( m ) ;
+        m = cdr ( m ) ;
     }
     return nreverse ( unprot ( 1 ) ) ;
 #undef source
@@ -2607,8 +2625,8 @@ appconv ( cell x, cell e, cell a )
 {
     cell fn, as, fv, fnargs, m, n, lv, vars, cv ;
 
-    fn = l9_car ( x ) ;
-    as = l9_cdr ( x ) ;
+    fn = car ( x ) ;
+    as = cdr ( x ) ;
     fv = freevars ( fn, NIL ) ;
     protect ( fv ) ;
     fnargs = flatargs ( cadr ( fn ) ) ;
@@ -2620,7 +2638,7 @@ appconv ( cell x, cell e, cell a )
     protect ( as ) ;
     n = liftargs ( m ) ;
     as = nconc ( n, as ) ;
-    l9_car ( Protected ) = as ;
+    car ( Protected ) = as ;
     lv = liftnames ( m ) ;
     protect ( lv ) ;
     vars = conc ( lv, cadr ( fn ) ) ;
@@ -2656,14 +2674,14 @@ cconv ( cell x, cell e, cell a )
     int n ;
 
     if ( pairp ( x ) &&
-        ( S_apply == l9_car ( x ) ||
-        S_if == l9_car ( x ) ||
-        S_ifstar == l9_car ( x ) ||
-        S_prog == l9_car ( x ) ||
-        S_setq == l9_car ( x ) ||
-        subrp ( l9_car ( x ) ) ) )
+        ( S_apply == car ( x ) ||
+        S_if == car ( x ) ||
+        S_ifstar == car ( x ) ||
+        S_prog == car ( x ) ||
+        S_setq == car ( x ) ||
+        subrp ( car ( x ) ) ) )
     {
-        return cons ( l9_car ( x ), mapconv ( l9_cdr ( x ), e, a ) ) ;
+        return cons ( car ( x ), mapconv ( cdr ( x ), e, a ) ) ;
     }
     if ( ( n = posq ( x, a ) ) != NIL )
     {
@@ -2686,27 +2704,27 @@ cconv ( cell x, cell e, cell a )
     {
         return x ;
     }
-    if ( S_quote == l9_car ( x ) )
+    if ( S_quote == car ( x ) )
     {
         return x ;
     }
-    if ( pairp ( l9_car ( x ) ) &&
+    if ( pairp ( car ( x ) ) &&
         S_lambda == caar ( x ) &&
-        liftable ( l9_car ( x ) ) )
+        liftable ( car ( x ) ) )
     {
         return appconv ( x, e, a ) ;
     }
-    if ( S_lambda == l9_car ( x ) )
+    if ( S_lambda == car ( x ) )
     {
         return lamconv ( x, e, a ) ;
     }
-    if ( S_def == l9_car ( x ) )
+    if ( S_def == car ( x ) )
     {
         return defconv ( x, e, a ) ;
     }
-    if ( S_macro == l9_car ( x ) )
+    if ( S_macro == car ( x ) )
     {
-        return cons ( l9_car ( x ),
+        return cons ( car ( x ),
             cons ( cadr ( x ),
             mapconv ( cddr ( x ), e, a ) ) ) ;
     }
@@ -2722,8 +2740,8 @@ carof ( cell a )
     while ( a != NIL )
     {
         n = cons ( caar ( a ), n ) ;
-        l9_car ( Protected ) = n ;
-        a = l9_cdr ( a ) ;
+        car ( Protected ) = n ;
+        a = cdr ( a ) ;
     }
     unprot ( 1 ) ;
     return nreverse ( n ) ;
@@ -2739,16 +2757,16 @@ zipenv ( cell vs, cell oe )
     {
         if ( NIL == oe )
         {
-            b = cons ( l9_car ( vs ), cons ( UNDEF, NIL ) ) ;
+            b = cons ( car ( vs ), cons ( UNDEF, NIL ) ) ;
         }
         else
         {
-            b = l9_car ( oe ) ;
-            oe = l9_cdr ( oe ) ;
+            b = car ( oe ) ;
+            oe = cdr ( oe ) ;
         }
         n = cons ( b, n ) ;
-        l9_car ( Protected ) = n ;
-        vs = l9_cdr ( vs ) ;
+        car ( Protected ) = n ;
+        vs = cdr ( vs ) ;
     }
     return nreverse ( unprot ( 1 ) ) ;
 }
@@ -2825,7 +2843,7 @@ obindex ( cell x )
     n = htlookup ( Obhash, x ) ;
     if ( n != UNDEF )
     {
-        i = fixval ( l9_cdr ( n ) ) ;
+        i = fixval ( cdr ( n ) ) ;
         if ( string ( Obmap )[i] != OBFREE &&
             match ( x, vector ( Obarray )[i] )
             )
@@ -2851,18 +2869,18 @@ emit ( int x )
     byte *vp, *vn ;
     int i, k ;
 
-    if ( L9_Here >= stringlen ( l9_cdr ( Emitbuf ) ) )
+    if ( L9_Here >= stringlen ( cdr ( Emitbuf ) ) )
     {
         protect ( x ) ;
-        k = stringlen ( l9_cdr ( Emitbuf ) ) ;
+        k = stringlen ( cdr ( Emitbuf ) ) ;
         n = mkstr ( NULL, CHUNKSIZE + k ) ;
-        vp = string ( l9_cdr ( Emitbuf ) ) ;
+        vp = string ( cdr ( Emitbuf ) ) ;
         vn = string ( n ) ;
         for ( i = 0 ; i < k ; i ++ ) vn[i] = vp[i] ;
-        l9_cdr ( Emitbuf ) = n ;
+        cdr ( Emitbuf ) = n ;
         unprot ( 1 ) ;
     }
-    string ( l9_cdr ( Emitbuf ) )[L9_Here] = x ;
+    string ( cdr ( Emitbuf ) )[L9_Here] = x ;
     L9_Here ++ ;
 }
 
@@ -2893,8 +2911,8 @@ patch ( int a, int n )
 {
     if ( n < 0 || n > 65535 )
         error ( "bytecode argument out of range", mkfix ( n ) ) ;
-    string ( l9_cdr ( Emitbuf ) )[a] = n >> 8 ;
-    string ( l9_cdr ( Emitbuf ) )[a + 1] = n & 255 ;
+    string ( cdr ( Emitbuf ) )[a] = n >> 8 ;
+    string ( cdr ( Emitbuf ) )[a + 1] = n & 255 ;
 }
 
 cell Cts = NIL ;
@@ -2908,8 +2926,8 @@ cpopval ( void )
 
     if ( NIL == Cts )
         error ( "oops: compile stack underflow", UNDEF ) ;
-    n = l9_car ( Cts ) ;
-    Cts = l9_cdr ( Cts ) ;
+    n = car ( Cts ) ;
+    Cts = cdr ( Cts ) ;
     return fixval ( n ) ;
 }
 
@@ -2918,10 +2936,10 @@ swap ( void )
 {
     cell x ;
 
-    if ( NIL == Cts || NIL == l9_cdr ( Cts ) )
+    if ( NIL == Cts || NIL == cdr ( Cts ) )
         error ( "oops: compile stack underflow", UNDEF ) ;
-    x = l9_car ( Cts ) ;
-    l9_car ( Cts ) = cadr ( Cts ) ;
+    x = car ( Cts ) ;
+    car ( Cts ) = cadr ( Cts ) ;
     cadr ( Cts ) = x ;
 }
 
@@ -2936,6 +2954,7 @@ subr0 ( cell x )
     if ( x == P_obtab ) return OP_OBTAB ;
     if ( x == P_outport ) return OP_OUTPORT ;
     if ( x == P_quit ) return OP_QUIT ;
+    if ( x == P_csl_return ) return OP_CSL_RETURN ;
     if ( x == P_symtab ) return OP_SYMTAB ;
     return - 1 ;
 }
@@ -3117,18 +3136,18 @@ void compexpr ( cell x, int t ) ;
 void
 compprog ( cell x, int t )
 {
-    x = l9_cdr ( x ) ;
+    x = cdr ( x ) ;
     if ( NIL == x )
     {
         emitq ( NIL ) ;
         return ;
     }
-    while ( l9_cdr ( x ) != NIL )
+    while ( cdr ( x ) != NIL )
     {
-        compexpr ( l9_car ( x ), 0 ) ;
-        x = l9_cdr ( x ) ;
+        compexpr ( car ( x ), 0 ) ;
+        x = cdr ( x ) ;
     }
-    compexpr ( l9_car ( x ), t ) ;
+    compexpr ( car ( x ), t ) ;
 }
 
 void
@@ -3184,14 +3203,14 @@ setupenv ( cell m )
             error ( "oops: unknown location in closure", m ) ;
         emitarg ( fixval ( cadar ( m ) ) ) ;
         emitarg ( fixval ( caddar ( m ) ) ) ;
-        m = l9_cdr ( m ) ;
+        m = cdr ( m ) ;
     }
 }
 
 cell
 dottedp ( cell x )
 {
-    while ( pairp ( x ) ) x = l9_cdr ( x ) ;
+    while ( pairp ( x ) ) x = cdr ( x ) ;
     return x != NIL ;
 }
 
@@ -3244,11 +3263,11 @@ compapply ( cell x, int t )
 
     xs = reverse ( cddr ( x ) ) ;
     protect ( xs ) ;
-    compexpr ( l9_car ( xs ), 0 ) ;
-    for ( xs = l9_cdr ( xs ) ; xs != NIL ; xs = l9_cdr ( xs ) )
+    compexpr ( car ( xs ), 0 ) ;
+    for ( xs = cdr ( xs ) ; xs != NIL ; xs = cdr ( xs ) )
     {
         emitop ( OP_PUSH ) ;
-        compexpr ( l9_car ( xs ), 0 ) ;
+        compexpr ( car ( xs ), 0 ) ;
         emitop ( OP_CONS ) ;
     }
     emitop ( OP_PUSH ) ;
@@ -3262,18 +3281,18 @@ compapp ( cell x, int t )
 {
     cell xs ;
 
-    xs = reverse ( l9_cdr ( x ) ) ;
+    xs = reverse ( cdr ( x ) ) ;
     protect ( xs ) ;
     while ( xs != NIL )
     {
-        compexpr ( l9_car ( xs ), 0 ) ;
+        compexpr ( car ( xs ), 0 ) ;
         emitop ( OP_PUSH ) ;
-        xs = l9_cdr ( xs ) ;
+        xs = cdr ( xs ) ;
     }
     unprot ( 1 ) ;
     emitop ( OP_PUSHVAL ) ;
-    emitarg ( length ( l9_cdr ( x ) ) ) ;
-    compexpr ( l9_car ( x ), 0 ) ;
+    emitarg ( length ( cdr ( x ) ) ) ;
+    compexpr ( car ( x ), 0 ) ;
     emitop ( t ? OP_TAILAPP : OP_APPLY ) ;
 }
 
@@ -3319,7 +3338,7 @@ void
 composubr0 ( cell x, int op )
 {
     ckargs ( x, 0, 1 ) ;
-    if ( NIL == l9_cdr ( x ) )
+    if ( NIL == cdr ( x ) )
         emitop ( OP_INPORT ) ;
     else
         compexpr ( cadr ( x ), 0 ) ;
@@ -3377,7 +3396,7 @@ composubr1 ( cell x, int op )
 void
 complsubr0 ( cell x, int op )
 {
-    if ( NIL == l9_cdr ( x ) )
+    if ( NIL == cdr ( x ) )
     {
         if ( OP_PLUS == op )
             emitq ( Zero ) ;
@@ -3399,31 +3418,31 @@ complsubr0 ( cell x, int op )
     else if ( OP_CONC == op || OP_SCONC == op ||
         OP_VCONC == op || OP_NCONC == op )
     {
-        x = reverse ( l9_cdr ( x ) ) ;
+        x = reverse ( cdr ( x ) ) ;
         protect ( x ) ;
         emitq ( NIL ) ;
         while ( x != NIL )
         {
             emitop ( OP_PUSH ) ;
-            compexpr ( l9_car ( x ), 0 ) ;
+            compexpr ( car ( x ), 0 ) ;
             emitop ( OP_CONS ) ;
-            x = l9_cdr ( x ) ;
+            x = cdr ( x ) ;
         }
         unprot ( 1 ) ;
         emitop ( op ) ;
     }
     else
     {
-        x = l9_cdr ( x ) ;
+        x = cdr ( x ) ;
         protect ( x ) ;
-        compexpr ( l9_car ( x ), 0 ) ;
-        x = l9_cdr ( x ) ;
+        compexpr ( car ( x ), 0 ) ;
+        x = cdr ( x ) ;
         while ( x != NIL )
         {
             emitop ( OP_PUSH ) ;
-            compexpr ( l9_car ( x ), 0 ) ;
+            compexpr ( car ( x ), 0 ) ;
             emitop ( op ) ;
-            x = l9_cdr ( x ) ;
+            x = cdr ( x ) ;
         }
         unprot ( 1 ) ;
     }
@@ -3433,15 +3452,15 @@ void
 compbitop ( cell x )
 {
     if ( NIL == cddr ( x ) || NIL == cdddr ( x ) )
-        error ( "bitop: too few arguments", l9_cdr ( x ) ) ;
+        error ( "bitop: too few arguments", cdr ( x ) ) ;
     compexpr ( cadr ( x ), 0 ) ;
     emitop ( OP_PUSH ) ;
     x = cddr ( x ) ;
-    compexpr ( l9_car ( x ), 0 ) ;
-    for ( x = l9_cdr ( x ) ; x != NIL ; x = l9_cdr ( x ) )
+    compexpr ( car ( x ), 0 ) ;
+    for ( x = cdr ( x ) ; x != NIL ; x = cdr ( x ) )
     {
         emitop ( OP_PUSH ) ;
-        compexpr ( l9_car ( x ), 0 ) ;
+        compexpr ( car ( x ), 0 ) ;
         emitop ( OP_BITOP ) ;
     }
     emitop ( OP_DROP ) ;
@@ -3478,12 +3497,12 @@ complsubr1 ( cell x, int op )
         {
             emitop ( OP_PUSHTRUE ) ;
         }
-        x = l9_cdr ( x ) ;
-        compexpr ( l9_car ( x ), 0 ) ;
-        for ( x = l9_cdr ( x ) ; x != NIL ; x = l9_cdr ( x ) )
+        x = cdr ( x ) ;
+        compexpr ( car ( x ), 0 ) ;
+        for ( x = cdr ( x ) ; x != NIL ; x = cdr ( x ) )
         {
             emitop ( OP_PUSH ) ;
-            compexpr ( l9_car ( x ), 0 ) ;
+            compexpr ( car ( x ), 0 ) ;
             emitop ( op ) ;
         }
         if ( op != OP_MINUS && op != OP_MIN && op != OP_MAX )
@@ -3501,16 +3520,16 @@ compexpr ( cell x, int t )
     {
         emitq ( x ) ;
     }
-    else if ( l9_car ( x ) == S_quote )
+    else if ( car ( x ) == S_quote )
     {
         emitq ( cadr ( x ) ) ;
     }
-    else if ( l9_car ( x ) == I_arg )
+    else if ( car ( x ) == I_arg )
     {
         emitop ( OP_ARG ) ;
         emitarg ( fixval ( cadr ( x ) ) ) ;
     }
-    else if ( l9_car ( x ) == I_ref )
+    else if ( car ( x ) == I_ref )
     {
         emitop ( OP_REF ) ;
         emitarg ( fixval ( cadr ( x ) ) ) ;
@@ -3518,69 +3537,69 @@ compexpr ( cell x, int t )
         if ( UNDEF == y )
             emitarg ( 0 ) ;
         else
-            emitarg ( fixval ( l9_cdr ( y ) ) ) ;
+            emitarg ( fixval ( cdr ( y ) ) ) ;
     }
-    else if ( l9_car ( x ) == S_if )
+    else if ( car ( x ) == S_if )
     {
         compif ( x, t, 0 ) ;
     }
-    else if ( l9_car ( x ) == S_ifstar )
+    else if ( car ( x ) == S_ifstar )
     {
         compif ( x, t, 1 ) ;
     }
-    else if ( l9_car ( x ) == I_closure )
+    else if ( car ( x ) == I_closure )
     {
         compcls ( x ) ;
     }
-    else if ( l9_car ( x ) == S_prog )
+    else if ( car ( x ) == S_prog )
     {
         compprog ( x, t ) ;
     }
-    else if ( l9_car ( x ) == S_setq )
+    else if ( car ( x ) == S_setq )
     {
         compsetq ( x ) ;
     }
-    else if ( l9_car ( x ) == S_apply )
+    else if ( car ( x ) == S_apply )
     {
         compapply ( x, t ) ;
     }
-    else if ( l9_car ( x ) == S_macro )
+    else if ( car ( x ) == S_macro )
     {
         compexpr ( caddr ( x ), 0 ) ;
         emitop ( OP_MACRO ) ;
         y = htlookup ( Symhash, cadr ( x ) ) ;
         if ( UNDEF == y ) error ( "oops: unknown name in MACRO", cadr ( x ) ) ;
-        emitarg ( fixval ( l9_cdr ( y ) ) ) ;
+        emitarg ( fixval ( cdr ( y ) ) ) ;
     }
-    else if ( ( op = subr0 ( l9_car ( x ) ) ) >= 0 )
+    else if ( ( op = subr0 ( car ( x ) ) ) >= 0 )
     {
         compsubr0 ( x, op ) ;
     }
-    else if ( ( op = subr1 ( l9_car ( x ) ) ) >= 0 )
+    else if ( ( op = subr1 ( car ( x ) ) ) >= 0 )
     {
         compsubr1 ( x, op ) ;
     }
-    else if ( ( op = subr2 ( l9_car ( x ) ) ) >= 0 )
+    else if ( ( op = subr2 ( car ( x ) ) ) >= 0 )
     {
         compsubr2 ( x, op ) ;
     }
-    else if ( ( op = subr3 ( l9_car ( x ) ) ) >= 0 )
+    else if ( ( op = subr3 ( car ( x ) ) ) >= 0 )
     {
         compsubr3 ( x, op ) ;
     }
-    else if ( ( op = osubr0 ( l9_car ( x ) ) ) >= 0 )
+    else if ( ( op = osubr0 ( car ( x ) ) ) >= 0 )
     {
         composubr0 ( x, op ) ;
     }
-    else if ( ( op = osubr1 ( l9_car ( x ) ) ) >= 0 )
+    else if ( ( op = osubr1 ( car ( x ) ) ) >= 0 )
     {
         composubr1 ( x, op ) ;
     }
-    else if ( ( op = lsubr0 ( l9_car ( x ) ) ) >= 0 )
+    else if ( ( op = lsubr0 ( car ( x ) ) ) >= 0 )
     {
         complsubr0 ( x, op ) ;
     }
-    else if ( ( op = lsubr1 ( l9_car ( x ) ) ) >= 0 )
+    else if ( ( op = lsubr1 ( car ( x ) ) ) >= 0 )
     {
         complsubr1 ( x, op ) ;
     }
@@ -3619,7 +3638,7 @@ compile ( cell x )
     Cts = NIL ;
     compexpr ( x, 0 ) ;
     emitop ( OP_HALT ) ;
-    n = mkatom ( T_BYTECODE, subprog ( l9_cdr ( Emitbuf ), L9_Here ) ) ;
+    n = mkatom ( T_BYTECODE, subprog ( cdr ( Emitbuf ), L9_Here ) ) ;
     Emitbuf = NIL ;
     return n ;
 }
@@ -3645,7 +3664,7 @@ newmacro ( int id, cell fn )
     }
     else
     {
-        l9_cdr ( n ) = fn ;
+        cdr ( n ) = fn ;
     }
 }
 
@@ -3661,10 +3680,10 @@ mapexp ( cell x, int r )
     p = x ;
     while ( pairp ( p ) )
     {
-        new = expand ( l9_car ( p ), r ) ;
+        new = expand ( car ( p ), r ) ;
         n = cons ( new, n ) ;
-        l9_car ( Protected ) = n ;
-        p = l9_cdr ( p ) ;
+        car ( Protected ) = n ;
+        p = cdr ( p ) ;
     }
     if ( p != NIL ) error ( "dotted list in program", x ) ;
     n = nreverse ( unprot ( 1 ) ) ;
@@ -3680,11 +3699,11 @@ zip ( cell a, cell b )
     protect ( n = NIL ) ;
     while ( a != NIL && b != NIL )
     {
-        p = cons ( l9_car ( a ), l9_car ( b ) ) ;
+        p = cons ( car ( a ), car ( b ) ) ;
         n = cons ( p, n ) ;
-        l9_car ( Protected ) = n ;
-        a = l9_cdr ( a ) ;
-        b = l9_cdr ( b ) ;
+        car ( Protected ) = n ;
+        a = cdr ( a ) ;
+        b = cdr ( b ) ;
     }
     unprot ( 1 ) ;
     return nreverse ( n ) ;
@@ -3700,22 +3719,22 @@ expandbody ( cell x )
     protect ( vs = NIL ) ;
     protect ( as = NIL ) ;
     while ( pairp ( x ) &&
-        pairp ( l9_car ( x ) ) &&
+        pairp ( car ( x ) ) &&
         ( caar ( x ) == S_def ||
         caar ( x ) == S_defun ) )
     {
         if ( caar ( x ) == S_def )
         {
-            n = l9_car ( x ) ;
+            n = car ( x ) ;
             vs = cons ( cadr ( n ), vs ) ;
             cadr ( Protected ) = vs ;
             n = cons ( caddr ( n ), NIL ) ;
             as = cons ( n, as ) ;
-            l9_car ( Protected ) = as ;
+            car ( Protected ) = as ;
         }
         else
         {
-            n = expanddef ( l9_car ( x ) ) ;
+            n = expanddef ( car ( x ) ) ;
             protect ( n ) ;
             vs = cons ( cadr ( n ), vs ) ;
             caddr ( Protected ) = vs ;
@@ -3724,14 +3743,14 @@ expandbody ( cell x )
             cadr ( Protected ) = as ;
             unprot ( 1 ) ;
         }
-        x = l9_cdr ( x ) ;
+        x = cdr ( x ) ;
     }
     if ( NIL == vs )
     {
         unprot ( 2 ) ;
         return x ;
     }
-    as = l9_car ( Protected ) = nreverse ( as ) ;
+    as = car ( Protected ) = nreverse ( as ) ;
     vs = cadr ( Protected ) = nreverse ( vs ) ;
     n = cons ( zip ( vs, as ), x ) ;
     n = cons ( S_labels, n ) ;
@@ -3748,14 +3767,14 @@ expanddef ( cell x )
 
     if ( ! pairp ( cadr ( x ) ) )
     {
-        sprintf ( b, "%s: expected signature", symname ( l9_car ( x ) ) ) ;
+        sprintf ( b, "%s: expected signature", symname ( car ( x ) ) ) ;
         error ( b, cadr ( x ) ) ;
     }
     n = cons ( cdadr ( x ), expandbody ( cddr ( x ) ) ) ;
     n = cons ( S_lambda, n ) ;
     n = cons ( n, NIL ) ;
     n = cons ( caadr ( x ), n ) ;
-    n = cons ( l9_car ( x ) == S_defun ? S_def : S_macro, n ) ;
+    n = cons ( car ( x ) == S_defun ? S_def : S_macro, n ) ;
     return n ;
 }
 
@@ -3775,42 +3794,42 @@ expand ( cell x, int r )
     {
         return x ;
     }
-    if ( l9_car ( x ) == S_quote )
+    if ( car ( x ) == S_quote )
     {
         return x ;
     }
     Mxlev ++ ;
-    if ( l9_car ( x ) == S_lambda )
+    if ( car ( x ) == S_lambda )
     {
         protect ( x ) ;
         n = mapexp ( cddr ( x ), r ) ;
         n = cons ( cadr ( x ), n ) ;
-        n = cons ( l9_car ( x ), n ) ;
+        n = cons ( car ( x ), n ) ;
         unprot ( 1 ) ;
         Mxlev -- ;
         return n ;
     }
-    if ( l9_car ( x ) == S_defun || l9_car ( x ) == S_defmac )
+    if ( car ( x ) == S_defun || car ( x ) == S_defmac )
     {
         protect ( x ) ;
         x = expanddef ( x ) ;
-        l9_car ( Protected ) = x ;
+        car ( Protected ) = x ;
         x = expand ( x, r ) ;
         unprot ( 1 ) ;
         Mxlev -- ;
         return x ;
     }
-    if ( symbolp ( l9_car ( x ) ) &&
-        ( m = assq ( l9_car ( x ), Macros ) ) != NIL )
+    if ( symbolp ( car ( x ) ) &&
+        ( m = assq ( car ( x ), Macros ) ) != NIL )
     {
         protect ( x ) ;
-        n = cons ( l9_cdr ( x ), NIL ) ;
+        n = cons ( cdr ( x ), NIL ) ;
         n = cons ( S_quote, n ) ;
         n = cons ( n, NIL ) ;
-        n = cons ( l9_cdr ( m ), n ) ;
+        n = cons ( cdr ( m ), n ) ;
         n = cons ( S_apply, n ) ;
         x = eval ( n, 1 ) ;
-        l9_car ( Protected ) = x ;
+        car ( Protected ) = x ;
         if ( r ) x = expand ( x, r ) ;
         unprot ( 1 ) ;
         Mxlev -- ;
@@ -4193,19 +4212,19 @@ sconc ( cell x )
     byte *s ;
 
     k = 0 ;
-    for ( p = x ; p != NIL ; p = l9_cdr ( p ) )
+    for ( p = x ; p != NIL ; p = cdr ( p ) )
     {
-        if ( ! stringp ( l9_car ( p ) ) )
-            expect ( "sconc", "string", l9_car ( p ) ) ;
-        k += stringlen ( l9_car ( p ) ) - 1 ;
+        if ( ! stringp ( car ( p ) ) )
+            expect ( "sconc", "string", car ( p ) ) ;
+        k += stringlen ( car ( p ) ) - 1 ;
     }
     n = mkstr ( NULL, k ) ;
     s = string ( n ) ;
     k = 0 ;
-    for ( p = x ; p != NIL ; p = l9_cdr ( p ) )
+    for ( p = x ; p != NIL ; p = cdr ( p ) )
     {
-        m = stringlen ( l9_car ( p ) ) ;
-        memcpy ( &s[k], string ( l9_car ( p ) ), m ) ;
+        m = stringlen ( car ( p ) ) ;
+        memcpy ( &s[k], string ( car ( p ) ), m ) ;
         k += m - 1 ;
     }
     return n ;
@@ -4308,19 +4327,19 @@ vconc ( cell x )
     int k, m ;
 
     k = 0 ;
-    for ( p = x ; p != NIL ; p = l9_cdr ( p ) )
+    for ( p = x ; p != NIL ; p = cdr ( p ) )
     {
-        if ( ! vectorp ( l9_car ( p ) ) )
-            expect ( "vconc", "vector", l9_car ( p ) ) ;
-        k += veclen ( l9_car ( p ) ) ;
+        if ( ! vectorp ( car ( p ) ) )
+            expect ( "vconc", "vector", car ( p ) ) ;
+        k += veclen ( car ( p ) ) ;
     }
     n = mkvec ( k ) ;
     v = vector ( n ) ;
     k = 0 ;
-    for ( p = x ; p != NIL ; p = l9_cdr ( p ) )
+    for ( p = x ; p != NIL ; p = cdr ( p ) )
     {
-        m = veclen ( l9_car ( p ) ) ;
-        memcpy ( &v[k], vector ( l9_car ( p ) ), m * sizeof (cell ) ) ;
+        m = veclen ( car ( p ) ) ;
+        memcpy ( &v[k], vector ( car ( p ) ), m * sizeof (cell ) ) ;
         k += m ;
     }
     return n ;
@@ -4528,29 +4547,29 @@ lconc ( cell x )
     cell p, q, n, m ;
     int k ;
 
-    if ( NIL == l9_cdr ( x ) ) return l9_car ( x ) ;
+    if ( NIL == cdr ( x ) ) return car ( x ) ;
     protect ( n = cons ( NIL, NIL ) ) ;
     k = 0 ;
-    for ( p = x ; l9_cdr ( p ) != NIL ; p = l9_cdr ( p ) )
+    for ( p = x ; cdr ( p ) != NIL ; p = cdr ( p ) )
     {
-        if ( NIL == l9_car ( p ) ) continue ;
-        for ( q = l9_car ( p ) ; q != NIL ; q = l9_cdr ( q ) )
+        if ( NIL == car ( p ) ) continue ;
+        for ( q = car ( p ) ; q != NIL ; q = cdr ( q ) )
         {
             if ( ! pairp ( q ) )
-                expect ( "conc", "list", l9_car ( p ) ) ;
+                expect ( "conc", "list", car ( p ) ) ;
             if ( k != 0 )
             {
                 m = cons ( NIL, NIL ) ;
-                l9_cdr ( n ) = m ;
-                n = l9_cdr ( n ) ;
+                cdr ( n ) = m ;
+                n = cdr ( n ) ;
             }
-            l9_car ( n ) = l9_car ( q ) ;
+            car ( n ) = car ( q ) ;
             k ++ ;
         }
     }
     m = unprot ( 1 ) ;
-    if ( 0 == k ) return l9_car ( p ) ;
-    l9_cdr ( n ) = l9_car ( p ) ;
+    if ( 0 == k ) return car ( p ) ;
+    cdr ( n ) = car ( p ) ;
     return m ;
 }
 
@@ -4559,23 +4578,23 @@ nlconc ( cell x )
 {
     cell p, q ;
 
-    while ( pairp ( l9_cdr ( x ) ) && NIL == l9_car ( x ) ) x = l9_cdr ( x ) ;
-    if ( NIL == l9_cdr ( x ) ) return l9_car ( x ) ;
-    for ( p = x ; l9_cdr ( p ) != NIL ; p = l9_cdr ( p ) )
+    while ( pairp ( cdr ( x ) ) && NIL == car ( x ) ) x = cdr ( x ) ;
+    if ( NIL == cdr ( x ) ) return car ( x ) ;
+    for ( p = x ; cdr ( p ) != NIL ; p = cdr ( p ) )
     {
-        if ( NIL == l9_car ( p ) ) continue ;
-        if ( constp ( l9_car ( p ) ) ) error ( "nconc: immutable", l9_car ( p ) ) ;
-        for ( q = l9_car ( p ) ; l9_cdr ( q ) != NIL ; q = l9_cdr ( q ) )
+        if ( NIL == car ( p ) ) continue ;
+        if ( constp ( car ( p ) ) ) error ( "nconc: immutable", car ( p ) ) ;
+        for ( q = car ( p ) ; cdr ( q ) != NIL ; q = cdr ( q ) )
         {
             if ( ! pairp ( q ) )
-                expect ( "nconc", "list", l9_car ( p ) ) ;
+                expect ( "nconc", "list", car ( p ) ) ;
         }
-        while ( pairp ( l9_cdr ( p ) ) && NIL == cadr ( p ) )
-            p = l9_cdr ( p ) ;
-        if ( NIL == l9_cdr ( p ) ) break ;
-        l9_cdr ( q ) = cadr ( p ) ;
+        while ( pairp ( cdr ( p ) ) && NIL == cadr ( p ) )
+            p = cdr ( p ) ;
+        if ( NIL == cdr ( p ) ) break ;
+        cdr ( q ) = cadr ( p ) ;
     }
-    return l9_car ( x ) ;
+    return car ( x ) ;
 }
 
 /*
@@ -4623,15 +4642,15 @@ liststr ( cell x )
     byte *s ;
 
     k = 0 ;
-    for ( n = x ; n != NIL ; n = l9_cdr ( n ) )
+    for ( n = x ; n != NIL ; n = cdr ( n ) )
         k ++ ;
     v = mkstr ( NULL, k ) ;
     s = string ( v ) ;
-    for ( n = x ; n != NIL ; n = l9_cdr ( n ) )
+    for ( n = x ; n != NIL ; n = cdr ( n ) )
     {
         if ( atomp ( n ) ) error ( "liststr: dotted list", x ) ;
-        if ( ! charp ( l9_car ( n ) ) ) expect ( "liststr", "char", l9_car ( n ) ) ;
-        *s = charval ( l9_car ( n ) ) ;
+        if ( ! charp ( car ( n ) ) ) expect ( "liststr", "char", car ( n ) ) ;
+        *s = charval ( car ( n ) ) ;
         s ++ ;
     }
     return v ;
@@ -4648,16 +4667,16 @@ listvec ( cell x, int veclit )
     msg = veclit ? "vector literal contains a dot" :
         "listvec: dotted list" ;
     k = 0 ;
-    for ( n = x ; n != NIL ; n = l9_cdr ( n ) )
+    for ( n = x ; n != NIL ; n = cdr ( n ) )
         k ++ ;
     if ( 0 == k ) return Nullvec ;
     v = mkvec ( k ) ;
     if ( veclit ) l9_tag ( v ) |= CONST_TAG ;
     p = vector ( v ) ;
-    for ( n = x ; n != NIL ; n = l9_cdr ( n ) )
+    for ( n = x ; n != NIL ; n = cdr ( n ) )
     {
         if ( atomp ( n ) ) error ( msg, x ) ;
-        *p = l9_car ( n ) ;
+        *p = car ( n ) ;
         p ++ ;
     }
     return v ;
@@ -4675,12 +4694,12 @@ strlist ( cell x )
     for ( i = 0 ; i < k ; i ++ )
     {
         new = mkchar ( string ( x )[i] ) ;
-        l9_car ( a ) = new ;
+        car ( a ) = new ;
         if ( i < k - 1 )
         {
             new = cons ( NIL, NIL ) ;
-            l9_cdr ( a ) = new ;
-            a = l9_cdr ( a ) ;
+            cdr ( a ) = new ;
+            a = cdr ( a ) ;
         }
     }
     return unprot ( 1 ) ;
@@ -4697,12 +4716,12 @@ veclist ( cell x )
     protect ( a = cons ( NIL, NIL ) ) ;
     for ( i = 0 ; i < k ; i ++ )
     {
-        l9_car ( a ) = vector ( x )[i] ;
+        car ( a ) = vector ( x )[i] ;
         if ( i < k - 1 )
         {
             new = cons ( NIL, NIL ) ;
-            l9_cdr ( a ) = new ;
-            a = l9_cdr ( a ) ;
+            cdr ( a ) = new ;
+            a = cdr ( a ) ;
         }
     }
     return unprot ( 1 ) ;
@@ -4740,7 +4759,11 @@ loadfile ( char *s )
     int ldport, rdport, oline ;
     cell x ;
 
-    ldport = open_inport ( s ) ;
+    if ( strcmp ( s, "-" ) == 0 )
+    {
+        loadfile ( "/home/dennisj/csl/ls9.ls9" ) ;
+    }
+    else ldport = open_inport ( s ) ;
     if ( ldport < 0 )
         error ( "load: cannot open file",
         mkstr ( s, strlen ( s ) ) ) ;
@@ -4759,7 +4782,7 @@ loadfile ( char *s )
         eval ( x, 0 ) ;
     }
     end_rec ( ) ;
-    Files = l9_cdr ( Files ) ;
+    Files = cdr ( Files ) ;
     Line = oline ;
     close_port ( ldport ) ;
 }
@@ -5006,8 +5029,8 @@ untag ( cell x )
 {
     if ( specialp ( x ) ) return x ;
     if ( l9_tag ( x ) & VECTOR_TAG ) return NIL ;
-    if ( closurep ( x ) ) return l9_cdr ( cadddr ( x ) ) ;
-    return l9_cdr ( x ) ;
+    if ( closurep ( x ) ) return cdr ( cadddr ( x ) ) ;
+    return cdr ( x ) ;
 }
 
 /*
@@ -5029,17 +5052,17 @@ int Sp = - 1,
 cell E0 = NIL,
     Ep = NIL ;
 
-#define ins()  (string(l9_cdr(Prog))[Ip])
+#define ins()  (string(cdr(Prog))[Ip])
 
-#define op1()  fetcharg(string(l9_cdr(Prog)), Ip+1)
-#define op2()  fetcharg(string(l9_cdr(Prog)), Ip+3)
+#define op1()  fetcharg(string(cdr(Prog)), Ip+1)
+#define op2()  fetcharg(string(cdr(Prog)), Ip+3)
 
 #define skip(n)  (Ip += (n))
 #define clear(n) (Sp -= (n))
 
 #define box(x)  cons((x), NIL)
-#define boxref(x) l9_car(x)
-#define boxset(x,v) (l9_car(x) = (v))
+#define boxref(x) car(x)
+#define boxset(x,v) (car(x) = (v))
 
 #define stackref(n) (vector(Rts)[n])
 #define stackset(n,v) (vector(Rts)[n] = (v))
@@ -5162,7 +5185,7 @@ conses ( cell n )
 {
     int k ;
 
-    for ( k = 0 ; pairp ( n ) ; n = l9_cdr ( n ) )
+    for ( k = 0 ; pairp ( n ) ; n = cdr ( n ) )
         k ++ ;
     return k ;
 }
@@ -5179,10 +5202,10 @@ applis ( int tail )
     stkalloc ( k ) ;
     Sp += k ;
     i = Sp - 1 ;
-    for ( p = a ; p != NIL ; p = l9_cdr ( p ) )
+    for ( p = a ; p != NIL ; p = cdr ( p ) )
     {
         if ( atomp ( p ) ) error ( "apply: dotted list", a ) ;
-        new = box ( l9_car ( p ) ) ;
+        new = box ( car ( p ) ) ;
         stackset ( i, new ) ;
         i -- ;
     }
@@ -5200,11 +5223,11 @@ ret ( void )
     v = vector ( Rts ) ;
     Fp = fixval ( v[Sp] ) ;
     r = v[Sp - 1] ;
-    Prog = l9_cdr ( r ) ;
+    Prog = cdr ( r ) ;
     Ep = v[Sp - 2] ;
     n = fixval ( v[Sp - 3] ) ;
     Sp -= n + 4 ;
-    return fixval ( l9_car ( r ) ) ;
+    return fixval ( car ( r ) ) ;
 }
 
 void
@@ -5224,12 +5247,12 @@ entcol ( int fix )
         if ( NIL == a )
         {
             a = x ;
-            l9_car ( Protected ) = a ;
+            car ( Protected ) = a ;
         }
         else
         {
-            l9_cdr ( a ) = x ;
-            a = l9_cdr ( a ) ;
+            cdr ( a ) = x ;
+            a = cdr ( a ) ;
         }
         i -- ;
     }
@@ -5275,15 +5298,15 @@ int
 throw ( cell ct, cell v )
 {
     if ( ! ctagp ( ct ) ) expect ( "throw", "catch l9_tag", ct ) ;
-    ct = l9_cdr ( ct ) ;
-    Ip = fixval ( l9_car ( ct ) ) ;
-    ct = l9_cdr ( ct ) ;
-    Sp = fixval ( l9_car ( ct ) ) ;
-    ct = l9_cdr ( ct ) ;
-    Fp = fixval ( l9_car ( ct ) ) ;
-    ct = l9_cdr ( ct ) ;
-    Ep = l9_car ( ct ) ;
-    ct = l9_cdr ( ct ) ;
+    ct = cdr ( ct ) ;
+    Ip = fixval ( car ( ct ) ) ;
+    ct = cdr ( ct ) ;
+    Sp = fixval ( car ( ct ) ) ;
+    ct = cdr ( ct ) ;
+    Fp = fixval ( car ( ct ) ) ;
+    ct = cdr ( ct ) ;
+    Ep = car ( ct ) ;
+    ct = cdr ( ct ) ;
     Prog = ct ;
     Acc = v ;
     return Ip ;
@@ -5442,16 +5465,18 @@ run ( cell x )
                 break ;
             case OP_QUIT:
                 //exit ( EXIT_SUCCESS ) ;
+                csl_returnValue = 1 ;
                 //skip ( ISIZE0 ) ;
-                //break ;
-                return - 1 ;
-#if 0                
+                Acc = 0 ;
+                return 0 ;
             case OP_CSL_RETURN:
+            case OP_CRETURN:
                 //exit ( EXIT_SUCCESS ) ;
+                csl_returnValue = 2 ;
                 //skip ( ISIZE0 ) ;
                 //break ;
-                return - 1 ;
-#endif                
+                Acc = 0 ;
+                return 0 ;
             case OP_OBTAB:
                 Acc = Obarray ;
                 skip ( ISIZE0 ) ;
@@ -5508,35 +5533,35 @@ run ( cell x )
                 skip ( ISIZE0 ) ;
                 break ;
             case OP_CAR:
-                if ( ! pairp ( Acc ) ) expect ( "l9_car", "pair", Acc ) ;
-                Acc = l9_car ( Acc ) ;
+                if ( ! pairp ( Acc ) ) expect ( "car", "pair", Acc ) ;
+                Acc = car ( Acc ) ;
                 skip ( ISIZE0 ) ;
                 break ;
             case OP_CDR:
-                if ( ! pairp ( Acc ) ) expect ( "l9_cdr", "pair", Acc ) ;
-                Acc = l9_cdr ( Acc ) ;
+                if ( ! pairp ( Acc ) ) expect ( "cdr", "pair", Acc ) ;
+                Acc = cdr ( Acc ) ;
                 skip ( ISIZE0 ) ;
                 break ;
             case OP_CAAR:
-                if ( ! pairp ( Acc ) || ! pairp ( l9_car ( Acc ) ) )
+                if ( ! pairp ( Acc ) || ! pairp ( car ( Acc ) ) )
                     expect ( "caar", "nested pair", Acc ) ;
                 Acc = caar ( Acc ) ;
                 skip ( ISIZE0 ) ;
                 break ;
             case OP_CADR:
-                if ( ! pairp ( Acc ) || ! pairp ( l9_cdr ( Acc ) ) )
+                if ( ! pairp ( Acc ) || ! pairp ( cdr ( Acc ) ) )
                     expect ( "cadr", "nested pair", Acc ) ;
                 Acc = cadr ( Acc ) ;
                 skip ( ISIZE0 ) ;
                 break ;
             case OP_CDAR:
-                if ( ! pairp ( Acc ) || ! pairp ( l9_car ( Acc ) ) )
+                if ( ! pairp ( Acc ) || ! pairp ( car ( Acc ) ) )
                     expect ( "cdar", "nested pair", Acc ) ;
                 Acc = cdar ( Acc ) ;
                 skip ( ISIZE0 ) ;
                 break ;
             case OP_CDDR:
-                if ( ! pairp ( Acc ) || ! pairp ( l9_cdr ( Acc ) ) )
+                if ( ! pairp ( Acc ) || ! pairp ( cdr ( Acc ) ) )
                     expect ( "cddr", "nested pair", Acc ) ;
                 Acc = cddr ( Acc ) ;
                 skip ( ISIZE0 ) ;
@@ -5948,14 +5973,14 @@ run ( cell x )
             case OP_SETCAR:
                 if ( ! pairp ( Acc ) ) expect ( "setcar", "pair", Acc ) ;
                 if ( constp ( Acc ) ) error ( "setcar: immutable", Acc ) ;
-                l9_car ( Acc ) = arg ( 0 ) ;
+                car ( Acc ) = arg ( 0 ) ;
                 clear ( 1 ) ;
                 skip ( ISIZE0 ) ;
                 break ;
             case OP_SETCDR:
                 if ( ! pairp ( Acc ) ) expect ( "setcdr", "pair", Acc ) ;
                 if ( constp ( Acc ) ) error ( "setcdr: immutable", Acc ) ;
-                l9_cdr ( Acc ) = arg ( 0 ) ;
+                cdr ( Acc ) = arg ( 0 ) ;
                 clear ( 1 ) ;
                 skip ( ISIZE0 ) ;
                 break ;
@@ -6078,7 +6103,7 @@ interpret ( cell x )
 
     E0 = mkvec ( length ( Glob ) ) ;
     i = 0 ;
-    for ( n = Glob ; n != NIL ; n = l9_cdr ( n ) )
+    for ( n = Glob ; n != NIL ; n = cdr ( n ) )
     {
         vector ( E0 )[i] = cdar ( n ) ;
         i ++ ;
@@ -6116,12 +6141,12 @@ eval ( cell x, int r )
     protect ( x ) ;
     Tmp = NIL ;
     x = expand ( x, 1 ) ;
-    l9_car ( Protected ) = x ;
+    car ( Protected ) = x ;
     syncheck ( x, 1 ) ;
     x = clsconv ( x ) ;
-    l9_car ( Protected ) = x ;
+    car ( Protected ) = x ;
     x = compile ( x ) ;
-    l9_car ( Protected ) = x ;
+    car ( Protected ) = x ;
     x = interpret ( x ) ;
     unprot ( 1 ) ;
     if ( r ) end_rec ( ) ;
@@ -6220,11 +6245,11 @@ init ( void )
     P_bitop = symref ( "bitop" ) ;
     P_caar = symref ( "caar" ) ;
     P_cadr = symref ( "cadr" ) ;
-    P_car = symref ( "l9_car" ) ;
+    P_car = symref ( "car" ) ;
     P_catchstar = symref ( "catch*" ) ;
     P_cdar = symref ( "cdar" ) ;
     P_cddr = symref ( "cddr" ) ;
-    P_cdr = symref ( "l9_cdr" ) ;
+    P_cdr = symref ( "cdr" ) ;
     P_cequal = symref ( "c=" ) ;
     P_cgrtr = symref ( "c>" ) ;
     P_cgteq = symref ( "c>=" ) ;
@@ -6290,6 +6315,7 @@ init ( void )
     P_prin = symref ( "prin" ) ;
     P_princ = symref ( "princ" ) ;
     P_quit = symref ( "quit" ) ;
+    P_csl_return = symref ( "return" ) ;
     P_read = symref ( "read" ) ;
     P_readc = symref ( "readc" ) ;
     P_reconc = symref ( "reconc" ) ;
@@ -6448,27 +6474,142 @@ argvec ( char **argv )
     for ( i = 0 ; argv[i] != NULL ; i ++ )
     {
         n = mkstr ( argv[i], strlen ( argv[i] ) ) ;
-        l9_car ( a ) = n ;
+        car ( a ) = n ;
         if ( argv[i + 1] != NULL )
         {
             n = cons ( NIL, NIL ) ;
-            l9_cdr ( a ) = n ;
-            a = l9_cdr ( a ) ;
+            cdr ( a ) = n ;
+            a = cdr ( a ) ;
         }
     }
     return unprot ( 1 ) ;
 }
 
 void
-l9_main ( int argc, char **argv )
+ls9_repl ( void )
+{
+    cell x ;
+
+    if ( setjmp ( Restart ) && Quiet )
+        exit ( EXIT_FAILURE ) ;
+    if ( ! Quiet ) signal ( SIGINT, kbdintr ) ;
+    cli = true ;
+    for ( ; ; )
+    {
+        reset_stdports ( ) ;
+        clrtrace ( ) ;
+        initrts ( ) ;
+        bindset ( S_errtag, NIL ) ;
+        Protected = NIL ;
+        Run = 0 ;
+        Intr = 0 ;
+
+        if ( ! Quiet )
+        {
+            //prints ( "* " ) ;
+            //flush ( ) ;
+            ls9_doPrompt ( ) ;
+        }
+        cli = 1 ;
+        ReadLine_GetLine ( ) ;
+        x = xread ( ) ;
+        cli = 0 ;
+        if ( EOFMARK == x && ! Intr ) break ;
+        Mxlev = 0 ;
+        x = eval ( x, 0 ) ;
+#if 0        
+        if ( x == - 1 )
+        {
+            Quiet = 1 ;
+            break ;
+            //continue ;
+        }
+#endif        
+        if ( ( lic == '\r' ) || ( lic == '\n' ) )
+            continue ;
+        if ( csl_returnValue > 0 )
+        {
+            if ( csl_returnValue == 2 ) csl_buffer [0] = 0, l9_print ( lv ) ;
+            break ;
+        }
+        lv = x ;
+        bindset ( S_starstar, x ) ;
+        l9_print ( x ) ;
+    }
+    //return 0 ;
+}
+
+int64
+l9_getChar ( FILE * f )
+{
+    if ( cli ) lic = _Lexer_NextChar ( _Lexer_ ) ;
+    else lic = fgetc ( f ) ;
+    return lic ;
+}
+
+void
+l9_ungetChar ( int c, FILE * f )
+{
+    if ( cli ) ReadLine_UnGetChar ( _ReadLiner_ ) ;
+    else ungetc ( c, f ) ;
+}
+
+void
+CSL_L9_Init ( )
+{
+    Car = NULL, Cdr = NULL ;
+    Tag = NULL ;
+    Vectors = NULL ;
+    Freelist = NIL ;
+    Freevec = 0 ;
+    Tp = 0 ;
+    Plimit = 0 ;
+    Line = 1 ;
+    Files = NIL ;
+    Handler = NIL ;
+    Inport = 0, Outport = 1, Errport = 2 ;
+    Outmax = 0 ;
+    Outptr = 0 ;
+    Instr = NULL ;
+    Rejected = - 1 ;
+    GC_verbose = 0 ;
+    Symptr = 0 ;
+    Inlist = 0 ;
+    Quoting = 0 ;
+    Obptr = 0 ;
+    Readerr = NULL ;
+    L9_Here = 0 ;
+    Mxlev = 0 ;
+    Ip = 0 ;
+    Sz = CHUNKSIZE ;
+    Sp = - 1, Fp = - 1 ;
+    Intr = 0 ;
+    Quiet = 0 ;
+    Protected = NIL, Symbols = NIL, Symhash = NIL, Prog = NIL, Env = NIL, Obhash = NIL,
+        Obarray = NIL, Obmap = NIL, Cts = NIL, Emitbuf = NIL, Glob = NIL, Macros = NIL,
+        Rts = NIL, Acc = NIL, E0 = NIL, Ep = NIL, Argv = NIL, Tmp = NIL, Tmp_car = NIL,
+        Tmp_cdr = NIL, Files = NIL, Outstr = NIL, Nullvec = NIL,
+        Nullstr = NIL, Blank = NIL, Zero = NIL, One = NIL, Ten = NIL ;
+    GC_roots [0] = & Protected, GC_roots[1] = & Symbols, GC_roots[2] = & Symhash, GC_roots[3] = & Prog, GC_roots[4] = & Env, GC_roots[5] = & Obhash,
+        GC_roots[6] = & Obarray, GC_roots[7] = & Obmap, GC_roots[8] = & Cts, GC_roots[9] = & Emitbuf, GC_roots[10] = & Glob, GC_roots[11] = & Macros,
+        GC_roots[12] = & Rts, GC_roots[13] = & Acc, GC_roots[14] = & E0, GC_roots[15] = & Ep, GC_roots[16] = & Argv, GC_roots[17] = & Tmp, GC_roots[18] = & Tmp_car,
+        GC_roots[19] = & Tmp_cdr, GC_roots[20] = & Files, GC_roots[21] = & Outstr, GC_roots[22] = & Nullvec,
+        GC_roots[23] = & Nullstr, GC_roots[24] = & Blank, GC_roots[25] = & Zero, GC_roots[26] = & One, GC_roots[27] = & Ten, GC_roots[28] = NULL ;
+    //Image_vars[0] = & Freelist, Image_vars[1] = & Freevec, Image_vars[2] = & Symbols, Image_vars[3] = & Symhash, Image_vars[4] = & Symptr, 
+    //Image_vars[5] = & Rts, Image_vars[6] = & Glob, Image_vars[7] = & Macros, Image_vars[8] = & Obhash, Image_vars[9] = & Obarray, Image_vars[10] = & Obmap, 
+    //Image_vars[11] = NULL ;
+}
+
+#if 0
+
+int
+main ( int argc, char **argv )
 {
     int i, j, k, usrimg, doload ;
     char *s ;
     char *imgfile ;
 
-    CSL_L9_Init ( ) ;
-    cli = false ;
-    imgfile = "-" ; //IMAGEFILE ;
+    imgfile = IMAGEFILE ;
     usrimg = 0 ;
     doload = 1 ;
     if ( setjmp ( Restart ) != 0 ) exit ( EXIT_FAILURE ) ;
@@ -6493,8 +6634,8 @@ l9_main ( int argc, char **argv )
     }
     else
     {
-        //if ( setjmp ( Restart ) != 0 )
-        //    fatal ( "could not load library" ) ;
+        if ( setjmp ( Restart ) != 0 )
+            fatal ( "could not load library" ) ;
         loadfile ( IMAGESRC ) ;
     }
     if ( setjmp ( Restart ) != 0 ) exit ( EXIT_FAILURE ) ;
@@ -6533,144 +6674,54 @@ l9_main ( int argc, char **argv )
             }
         }
     }
-    bindset ( S_quiet, Quiet ? L9_TRUE : NIL ) ;
+    bindset ( S_quiet, Quiet ? TRUE : NIL ) ;
     if ( ! Quiet && NULL == argv[i] )
     {
         prints ( "LISP9 " ) ;
-        prints ( L9_VERSION ) ;
+        prints ( VERSION ) ;
         nl ( ) ;
     }
-    //Argv = NULL == argv[i] ? NIL : argvec ( &argv[i + 1] ) ;
-    Argv = NIL ;
+    Argv = NULL == argv[i] ? NIL : argvec ( &argv[i + 1] ) ;
     start ( ) ;
     if ( setjmp ( Restart ) != 0 ) exit ( EXIT_FAILURE ) ;
-#if 0    
     if ( doload && argv[i] != NULL )
     {
         loadfile ( argv[i] ) ;
         exit ( EXIT_SUCCESS ) ;
     }
-#endif    
     repl ( ) ;
+    return 0 ;
 }
+#else
 
 void
-repl ( void )
+l9_main ( int argc, char **argv )
 {
-    cell x ;
+    int i, j, k, usrimg, doload ;
+    char *s ;
+    char *imgfile ;
 
-    if ( setjmp ( Restart ) && Quiet )
-        exit ( EXIT_FAILURE ) ;
-    if ( ! Quiet ) signal ( SIGINT, kbdintr ) ;
-    cli = true ;
-    for ( ; ; )
-    {
-        reset_stdports ( ) ;
-        clrtrace ( ) ;
-        initrts ( ) ;
-        bindset ( S_errtag, NIL ) ;
-        Protected = NIL ;
-        Run = 0 ;
-        Intr = 0 ;
-
-        if ( ! Quiet )
-        {
-            //prints ( "* " ) ;
-            //flush ( ) ;
-            doPrompt ( ) ;
-        }
-        cli = 1 ;
-        ReadLine_GetLine () ;
-        x = xread ( ) ;
-        cli = 0 ;
-        if ( EOFMARK == x && ! Intr ) break ;
-        Mxlev = 0 ;
-        x = eval ( x, 0 ) ;
-        //if ( ( lic == '\r' ) || ( lic == '\n' ) ) continue ;
-        if ( x == - 1 )
-        {
-            Quiet = 1 ;
-            //break ;
-            continue ;
-        }
-        bindset ( S_starstar, x ) ;
-        l9_print ( x ) ;
-    }
-    //return 0 ;
+    CSL_L9_Init ( ) ;
+    cli = false ;
+    init ( ) ;
+    if ( setjmp ( Restart ) != 0 ) exit ( EXIT_FAILURE ) ;
+    loadfile ( "/home/dennisj/csl/ls9.ls9" ) ;
+    bindset ( S_quiet, Quiet ? L9_TRUE : NIL ) ;
+    prints ( "LISP9 20190812 - csl version : type '(quit)' or '(creturn)' to exit\n" ) ;
+    Argv = NIL ;
+    start ( ) ;
+    if ( setjmp ( Restart ) != 0 ) exit ( EXIT_FAILURE ) ;
+    ls9_repl ( ) ;
 }
+#endif
 
-int64
-l9_getChar ( FILE * f )
-{
-    if ( cli ) lic = _Lexer_NextChar ( _Lexer_ ) ;
-    else lic = fgetc ( f ) ;
-    return lic ;
-}
-
-void
-l9_ungetChar ( int c, FILE * f )
-{
-    if ( cli ) ReadLine_UnGetChar ( _ReadLiner_ ) ;
-    else ungetc ( c, f ) ;
-}
-
-void
-CSL_L9_Init ( )
-{
-    Car = NULL, Cdr = NULL ;
-    Tag = NULL ;
-    Vectors = NULL ;
-    Freelist = NIL ;
-    Freevec = 0 ;
-    Tp = 0 ;
-    Plimit = 0 ;
-    Line = 1 ;
-    Files = NIL ;
-    Handler = NIL ;
-    Inport = 0, Outport = 1, Errport = 2 ;
-    Outstr = NIL ;
-    Outmax = 0 ;
-    Outptr = 0 ;
-    Instr = NULL ;
-    Rejected = - 1 ;
-    GC_verbose = 0 ;
-    Tmp_car = NIL, Tmp_cdr = NIL ;
-    Protected = NIL ;
-    Tmp = NIL ;
-    Nullstr = NIL ;
-    Nullvec = NIL ;
-    Symhash = NIL ;
-    Symbols = NIL ;
-    Symptr = 0 ;
-    Inlist = 0 ;
-    Quoting = 0 ;
-    Obhash = NIL, Obarray = NIL, Obmap = NIL ;
-    Obptr = 0 ;
-    Readerr = NULL ;
-    Emitbuf = NIL ;
-    L9_Here = 0 ;
-    Cts = NIL ;
-    Blank = NIL ;
-    Zero = NIL ;
-    One = NIL ;
-    Ten = NIL ;
-    Macros = NIL ;
-    Mxlev = 0 ;
-    Prog = NIL ;
-    Ip = 0 ;
-    Acc = NIL ;
-    Sz = CHUNKSIZE ;
-    Rts = NIL ;
-    Sp = - 1, Fp = - 1 ;
-    E0 = NIL, Ep = NIL ;
-    Intr = 0 ;
-    Quiet = 0 ;
-}
+char * csl_buffer ;
 
 void
 CSL_Lisp9 ( )
 {
     ReadLiner * rl = _ReadLiner_ ;
+    FILE * svFile = rl->InputFile ;
     rl->InputFile = stdin ;
     ReadLine_Init ( rl, _CSL_Key ) ;
     //buf = _Lexer_->TokenBuffer ;
@@ -6678,6 +6729,7 @@ CSL_Lisp9 ( )
     byte * snp = rl->NormalPrompt, *sap = rl->AltPrompt ;
     rl->AltPrompt = ( byte* ) "l9< " ;
     rl->NormalPrompt = ( byte* ) "l9> " ;
+    csl_buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
 
     l9_main ( 1, ( char*[] ) { "l9" } ) ;
 
@@ -6685,6 +6737,10 @@ CSL_Lisp9 ( )
     if ( ! Quiet ) nl ( ) ;
     rl->NormalPrompt = snp ;
     rl->AltPrompt = sap ;
-    Printf ( "lisp9 : l9 : exiting ... " ) ;
+    rl->InputFile = svFile ;
+    if ( csl_returnValue == 2 ) DataStack_Push ( ( int64 ) csl_buffer ) ;
+    csl_returnValue = 0 ;
+    Printf ( "lisp9 : l9 : exiting ..." ) ;
+    OVT_MemListFree_LispTemp ( ) ;
 }
 

@@ -1191,7 +1191,7 @@
 (define (current-input-port) (current-input-port))
 (define (current-output-port) (current-output-port))
 (define (gensym) (gensym))
-(define (quit) (quit))
+;; (define (quit) (quit))
 ;; (define (csl_return) (csl_return))
 (define (symbols) (symbols))
 

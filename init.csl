@@ -440,7 +440,7 @@ dbgOff
 //dbgOn 
 //: fl flisp ;
 //fl //ps pause
-: s9 s9fes ; s9
+//: s9 s9fes ; //s9
 //l9
 #if Is_DebugOn forStarters ||
 

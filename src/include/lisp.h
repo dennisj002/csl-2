@@ -48,7 +48,7 @@ typedef struct _symbol_t
 enum
 {
     // special forms
-    F_FL_QUOTE = 0, F_COND, F_IF, F_AND, F_OR, F_WHILE, F_FL_LAMBDA, F_FL_MACRO, F_FL_LABEL,
+    F_QUOTE = 0, F_COND, F_IF, F_AND, F_OR, F_WHILE, F_LAMBDA, F_MACRO, F_LABEL,
     F_PROGN,
     // functions
     F_EQ, F_ATOM, F_CONS, F_CAR, F_CDR, F_READ, F_EVAL, F_PRINT, F_SET, F_NOT,

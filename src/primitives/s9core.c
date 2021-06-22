@@ -16,6 +16,7 @@
 #include "../include/csl.h"
 int s9_getChar ( FILE * f ) ;
 void s9_ungetChar ( int c, FILE * f ) ;
+void * sl9_malloc ( int size ) ;
 extern int csl_returnValue ;
 extern char * csl_buffer ;
 
@@ -3598,7 +3599,7 @@ s9_add_image_vars ( cell **v )
             ;
         for ( m = 0 ; v[m] != NULL ; m ++ )
             ;
-        nv = malloc ( ( n + m + 1 ) * sizeof (cell * ) ) ;
+        nv = sl9_malloc ( ( n + m + 1 ) * sizeof (cell * ) ) ; 
         if ( nv == NULL )
             s9_fatal ( "add_image_vars(): out of memory" ) ;
         n = 0 ;

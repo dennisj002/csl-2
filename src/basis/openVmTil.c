@@ -1,6 +1,6 @@
 
 #include "../include/csl.h"
-#define VERSION ((byte*) "0.918.910" ) 
+#define VERSION ((byte*) "0.918.970" ) 
 
 // inspired by :: Foundations of Mathematical Logic [Foml] by Haskell Curry, 
 // CT/Oop (Category Theory, Object Oriented Programming, Type Theory), 
@@ -120,7 +120,7 @@ OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     ovt->DictionarySize = 1 * M ; //100 * K ;
     ovt->CSLSize = ( 140 * K ) ;
     ovt->OpenVmTilSize = ( 6 * K ) ;
-    ovt->DataStackSize = 8 * K  ; //1 * MB ; //8 * MB ;
+    ovt->DataStackSize = 8 * K ; //1 * MB ; //8 * MB ;
     ovt->TempObjectsSize = 200 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
     ovt->WordRecylingSize = 1 * K * ( sizeof (Word ) + sizeof (WordData ) ) ; //50 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
     ovt->SessionObjectsSize = 50 * K ;
@@ -168,9 +168,8 @@ Ovt_RunInit ( OpenVmTil * ovt )
 void
 OVT_PrintStartupOptions ( OpenVmTil * ovt )
 {
-    Printf ( "\n\nOVT_GetStartupOptions :: ovt->Argv [0] = %s\n\n", ovt->Argv [0] ) ;
-    Printf ( "\n\nOVT_GetStartupOptions :: ovt->Argv [1] = %s\n\n", ovt->Argv [1] ) ;
-    Printf ( "\n\nOVT_GetStartupOptions :: ovt->Argv [2] = %s\n\n", ovt->Argv [2] ) ;
+    int i ;
+    for ( i = ovt->Argc ; i ; i -- )  Printf ( "\n\nOVT_GetStartupOptions :: ovt->Argv [%d] = %s\n\n", i, ovt->Argv [i] ) ;
     Printf ( "\n\nOVT_GetStartupOptions :: ovt->StartupFilename = %s\n\n", ovt->StartupFilename ) ;
     //if ( ovt->Verbosity > 1 ) Pause ( ) ;
 }

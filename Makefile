@@ -20,8 +20,8 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/primitives/ios.c src/primitives/parsers.c src/primitives/interpreters.c src/primitives/namespaces.c src/primitives/systems.c\
 	src/primitives/compilers.c src/primitives/words.c  src/primitives/file.c src/primitives/stacks.c \
 	src/primitives/debuggers.c src/primitives/memorys.c src/primitives/primitives.c src/primitives/contexts.c\
-	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c
-	#src/primitives/ls9.c 
+	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c src/basis/openVmTil.c\
+	src/primitives/ls9.c 
 	#src/primitives/fltlisp.c src/primitives/fltread.c src/primitives/s9.c src/primitives/s9core.c
 	
 S9_SOURCES = src/primitives/s9.c src/primitives/s9core.c
@@ -35,7 +35,7 @@ S9_INCLUDES = src/include/s9core.h src/include/s9ext.h
 OBJECTS = $(SOURCES:%.c=%.o) 
 #S9_OBJECTS = $(S9_SOURCES:%.c=%.o) 
 S9_OBJECTS = src/primitives/s9.o src/primitives/s9core.o
-ALL_OBJECTS = $(OBJECTS) $(S9_OBJECTS) 	
+ALL_OBJECTS = $(OBJECTS) #$(S9_OBJECTS) 	
 CC = gcc-10  
 #CC = g++-10 -fpermissive -Wwrite-strings
 OUT = csl-gdb
@@ -122,8 +122,11 @@ src/primitives/flisp.o : src/primitives/flisp.c src/primitives/fltlread.c
 	$(CC) $(CFLAGS) -O3 -c src/primitives/fltlisp.c -o src/primitives/fltlisp.o
 #	$(CC) $(CFLAGS) -ggdb -c src/primitives/flisp.c -o src/primitives/flisp.o
 
+src/primitives/ls9.o:	src/primitives/ls9.c #s9core.h s9import.h s9ext.h
+	$(CC) -o src/primitives/ls9.o  -ggdb $(CFLAGS_CORE) -c src/primitives/ls9.c
+
 src/primitives/s9.o:	src/primitives/s9.c #s9core.h s9import.h s9ext.h
-	$(CC) -o src/primitives/s9.o  -ggdb $(CFLAGS_CORE)-c src/primitives/s9.c
+	gcc -o src/primitives/s9.o -ggdb $(CFLAGS_CORE) -c src/primitives/s9.c
 
 src/primitives/s9core.o:    src/primitives/s9core.c #s9core.h s9.image
 	$(CC) -o src/primitives/s9core.o  -ggdb $(CFLAGS_CORE) -c src/primitives/s9core.c
@@ -209,15 +212,15 @@ all.tar.xz :
 	tar -c --xz --exclude=nbproject --exclude=objects  --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=*-gdb --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * 
 
 xz : 
-	-rm ~/csl/core
-	-rm -rf ~/backup/csl/
-	-cp -r ~/csl/ ~/backup/csl/
+	-rm ../csl/core
+	-rm -rf ../backup/csl/
+	-cp -r ../csl/ ../backup/csl/
 	make tar.xz
 
 all.xz : 
-	-rm ~/csl/core
-	-rm -rf ~/backup/csl/
-	-cp -r ~/csl/ ~/backup/csl/
+	-rm ../csl/core
+	-rm -rf ../backup/csl/
+	-cp -r ../csl/ ../backup/csl/
 	make all.tar.xz
 
 _all : realClean install
@@ -226,17 +229,27 @@ _all : realClean install
 _install : 
 	-cp ./init.csl ./namespaces/
 	-sudo rm -rf /usr/local/lib/csl/
-	-sudo cp -r ~/csl /usr/local/lib/csl/
-	-sudo cp -r ~/csl/etc /usr/local/
-	-sudo cp ~/csl/lib/* /usr/local/lib
+	-sudo cp -r ../csl /usr/local/lib/csl/
+	-sudo cp -r ../csl/etc /usr/local/
+	-sudo cp ../csl/lib/* /usr/local/lib
 	-killall csl
 	-sudo cp bin/* /usr/local/bin
 	-sudo ldconfig
 	ls -l /usr/local/bin/csl*
 
 install :
+	#make
+	make optimize 
+	make _install
+	
+install_s9fes :
 	make
 	#make optimize // so far s9fes doesn't work optimized ??
+	make _install
+	
+install_ls9 :
+	#make
+	make optimize 
 	make _install
 	
 run :

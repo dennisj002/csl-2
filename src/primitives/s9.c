@@ -5,7 +5,6 @@
  * If your country does not have a public domain, the CC0 applies:
  * https://creativecommons.org/share-your-work/public-domain/cc0/
  */
-
 #define RELEASE_DATE "2018-12-05"
 #define PATCHLEVEL 0
 
@@ -36,7 +35,7 @@ extern char * csl_buffer ;
 #endif
 
 #define IMAGE_FILE "s9.image"
-
+ 
 #ifndef IMAGE_DIR
 #define IMAGE_DIR "."
 #endif
@@ -184,17 +183,17 @@ P_eof_object_p, P_eq_p, P_equal, P_eqv_p, P_error,
 P_eval, P_even_p, P_exact_p, P_exact_to_inexact,
 P_exponent, P_expt, P_file_exists_p, P_floor, P_gensym,
 P_grtr, P_gteq, P_inexact_p, P_inexact_to_exact,
-P_input_port_p, P_integer_p, P_integer_p,
+P_input_port_p, P_integer_p, 
 P_integer_to_char, P_length, P_less, P_list, P_list_ref,
-P_list_tail, P_list_to_string, P_list_to_string,
-P_list_to_vector, P_list_to_vector, P_load, P_lteq,
+P_list_tail, P_list_to_string, 
+P_list_to_vector, P_load, P_lteq,
 P_macro_expand, P_macro_expand_1, P_make_string,
 P_make_vector, P_mantissa, P_max, P_memq, P_memv, P_min,
 P_minus, P_negative_p, P_not, P_null_p, P_odd_p,
 P_number_p, P_open_append_file, P_open_input_file,
 P_open_output_file, P_output_port_p, P_pair_p,
 P_peek_char, P_plus, P_positive_p, P_procedure_p,
-P_quit, P_quotient, P_read, P_read_char, P_real_p,
+P_quit, P_bye, P_quotient, P_read, P_read_char, P_real_p,
 P_remainder, P_reverse, P_reverse_b, P_s9_bytecode,
 P_set_car_b, P_set_cdr_b, P_set_input_port_b,
 P_set_output_port_b, P_stats, P_string_append,
@@ -204,12 +203,12 @@ P_string_equal, P_string_fill_b, P_string_grtr,
 P_string_gteq, P_string_length, P_string_less,
 P_string_lteq, P_string_p, P_string_ref, P_string_set_b,
 P_string_to_list, P_string_to_symbol, P_substring,
-P_symbol_p, P_symbol_p, P_symbol_to_string, P_symbols,
+P_symbol_p, P_symbol_to_string, P_symbols,
 P_system_command, P_throw, P_times, P_truncate,
 P_vector, P_vector_append, P_vector_copy,
 P_vector_fill_b, P_vector_length, P_vector_p,
 P_vector_ref, P_vector_set_b, P_vector_to_list, P_write,
-P_write_char, P_zero_p, P_csl_return, P_atom_p, P_csl_interpret ;
+P_write_char, P_zero_p, P_creturn, P_atom_p, P_csl_interpret ;
 
 
 /*
@@ -261,7 +260,7 @@ enum
     OP_OPEN_APPEND_FILE, OP_OPEN_INPUT_FILE,
     OP_OPEN_OUTPUT_FILE, OP_OUTPUT_PORT_P, OP_PAIR_P,
     OP_PEEK_CHAR, OP_PLUS, OP_POSITIVE_P, OP_PROCEDURE_P,
-    OP_QUIT, OP_QUOTIENT, OP_READ, OP_READ_CHAR,
+    OP_QUIT, OP_BYE, OP_QUOTIENT, OP_READ, OP_READ_CHAR,
     OP_REAL_P, OP_REMAINDER, OP_REVERSE, OP_REVERSE_B,
     OP_S9_BYTECODE, OP_SET_CAR_B, OP_SET_CDR_B,
     OP_SET_INPUT_PORT_B, OP_SET_OUTPUT_PORT_B, OP_STATS,
@@ -278,7 +277,7 @@ enum
     OP_VECTOR_APPEND, OP_VECTOR_COPY, OP_VECTOR_FILL_B,
     OP_VECTOR_LENGTH, OP_VECTOR_P, OP_VECTOR_REF,
     OP_VECTOR_SET_B, OP_VECTOR_TO_LIST, OP_WRITE,
-    OP_WRITE_CHAR, OP_ZERO_P, OP_CSL_RETURN, OP_ATOM_P, OP_CSL_INTERPRET 
+    OP_WRITE_CHAR, OP_ZERO_P, OP_CRETURN, OP_ATOM_P, OP_CSL_INTERPRET 
 } ;
 
 /*
@@ -394,7 +393,7 @@ closure ( cell i, cell e )
 #define closure_prog(c) cadddr(c)
 
 cell
-catch ( void )
+s9_catch ( void )
 {
     cell n ;
 
@@ -415,7 +414,7 @@ catch ( void )
         (!s9_special_p(n) && (tag(n) & S9_ATOM_TAG) && T_CATCH_TAG == car(n))
 
 int
-throw ( cell ct, cell v )
+s9_throw ( cell ct, cell v )
 {
     ct = cdr ( ct ) ;
     Ip = fixval ( car ( ct ) ) ;
@@ -513,7 +512,7 @@ void
 rehash ( void )
 {
     unsigned int i ;
-    cell *v, n, p, new ;
+    cell *v, n, p, s9_new ;
     unsigned int h, k ;
 
     if ( NIL == Hash )
@@ -532,14 +531,14 @@ rehash ( void )
         vector ( Hash )[h % k + 1] = n ;
         i ++ ;
     }
-    new = mkfix ( i ) ;
-    vector ( Hash )[0] = new ;
+    s9_new = mkfix ( i ) ;
+    vector ( Hash )[0] = s9_new ;
 }
 
 void
 addhash ( cell x )
 {
-    cell n, new ;
+    cell n, s9_new ;
     unsigned int h, i, k ;
 
     if ( NIL == Hash )
@@ -558,8 +557,8 @@ addhash ( cell x )
     n = cons ( x, mkfix ( i ) ) ;
     n = cons ( n, vector ( Hash )[h % k + 1] ) ;
     vector ( Hash )[h % k + 1] = n ;
-    new = mkfix ( i + 1 ) ;
-    vector ( Hash )[0] = new ;
+    s9_new = mkfix ( i + 1 ) ;
+    vector ( Hash )[0] = s9_new ;
 }
 
 int
@@ -913,7 +912,7 @@ cell
 string_to_list ( cell x )
 {
     char *s ;
-    cell n, a, new ;
+    cell n, a, s9_new ;
     int k, i ;
 
     k = string_len ( x ) ;
@@ -929,8 +928,8 @@ string_to_list ( cell x )
         }
         else
         {
-            new = cons ( make_char ( s[i] ), NIL ) ;
-            cdr ( a ) = new ;
+            s9_new = cons ( make_char ( s[i] ), NIL ) ;
+            cdr ( a ) = s9_new ;
             a = cdr ( a ) ;
         }
     }
@@ -941,7 +940,7 @@ string_to_list ( cell x )
 cell
 vector_to_list ( cell x )
 {
-    cell n, a, new ;
+    cell n, a, s9_new ;
     int k, i ;
 
     k = vector_len ( x ) ;
@@ -956,8 +955,8 @@ vector_to_list ( cell x )
         }
         else
         {
-            new = cons ( vector ( x )[i], NIL ) ;
-            cdr ( a ) = new ;
+            s9_new = cons ( vector ( x )[i], NIL ) ;
+            cdr ( a ) = s9_new ;
             a = cdr ( a ) ;
         }
     }
@@ -1017,7 +1016,7 @@ make_library_path ( void )
 {
     char path[TOKEN_LENGTH + 1], *s ;
     int i, j ;
-    cell n, new ;
+    cell n, s9_new ;
 
     save ( n = NIL ) ;
     s = getenv ( "S9FES_LIBRARY_PATH" ) ;
@@ -1028,9 +1027,9 @@ make_library_path ( void )
         if ( '\0' == s[i] || ':' == s[i] )
         {
             path[j] = 0 ;
-            new = make_string ( path, j ) ;
+            s9_new = make_string ( path, j ) ;
             j = 0 ;
-            n = cons ( new, n ) ;
+            n = cons ( s9_new, n ) ;
             car ( Stack ) = n ;
             if ( '\0' == s[i] ) break ;
             i ++ ;
@@ -1150,13 +1149,15 @@ init ( void )
     S_starstar = symbol_ref ( "**" ) ;
     S_unquote = symbol_ref ( "unquote" ) ;
     S_unquote_splicing = symbol_ref ( "unquote-splicing" ) ;
-    P_csl_return = symbol_ref ( "csl_return" ) ;
+    //P_csl_return = symbol_ref ( "csl_return" ) ;
+    //P_csl_return = symbol_ref ( "cslr" ) ;
+    P_creturn = symbol_ref ( "creturn" ) ;
     P_abs = symbol_ref ( "abs" ) ;
     P_append = symbol_ref ( "append" ) ;
     P_assq = symbol_ref ( "assq" ) ;
     P_assv = symbol_ref ( "assv" ) ;
     P_bit_op = symbol_ref ( "bit-op" ) ;
-    P_boolean_p = symbol_ref ( "boolean?" ) ;
+    P_boolean_p = symbol_ref ( "boolean?" ) ;  
     P_caaaar = symbol_ref ( "caaaar" ) ;
     P_caaadr = symbol_ref ( "caaadr" ) ;
     P_caaar = symbol_ref ( "caaar" ) ;
@@ -1283,7 +1284,7 @@ init ( void )
     P_positive_p = symbol_ref ( "positive?" ) ;
     P_procedure_p = symbol_ref ( "procedure?" ) ;
     P_quit = symbol_ref ( "quit" ) ;
-    P_quit = symbol_ref ( "bye" ) ;
+    P_bye = symbol_ref ( "bye" ) ;
     P_quotient = symbol_ref ( "quotient" ) ;
     P_read = symbol_ref ( "read" ) ;
     P_read_char = symbol_ref ( "read-char" ) ;
@@ -1312,7 +1313,7 @@ init ( void )
     P_string_less = symbol_ref ( "string<?" ) ;
     P_string_lteq = symbol_ref ( "string<=?" ) ;
     P_string_p = symbol_ref ( "string?" ) ;
-    P_csl_interpret = symbol_ref ( "csl_interpret" ) ;
+    //P_csl_interpret = symbol_ref ( "csl_interpret" ) ;
     P_csl_interpret = symbol_ref ( "csli" ) ;
     P_atom_p = symbol_ref ( "atom?" ) ;
     P_string_ref = symbol_ref ( "string-ref" ) ;
@@ -1388,7 +1389,7 @@ load_initial_image ( char *image )
     }
     if ( strcmp ( image, "-" ) == 0 )
     {
-        loadfile ( "s9.scm" ) ;
+        loadfile ( "/usr/local/share/s9fes/s9.scm" ) ;
     }
     else if ( exists_p ( path ) != FALSE )
     {
@@ -1431,7 +1432,7 @@ read_list ( int flags, int delim )
 {
     cell n, m, a ;
     int c ;
-    cell new ;
+    cell s9_new ;
     char badpair[] = "malformed pair" ;
     char msg[80] ;
 
@@ -1492,8 +1493,8 @@ read_list ( int flags, int delim )
         else
             a = cdr ( a ) ;
         car ( a ) = n ;
-        new = cons3 ( NIL, NIL, flags ) ;
-        cdr ( a ) = new ;
+        s9_new = cons3 ( NIL, NIL, flags ) ;
+        cdr ( a ) = s9_new ;
         c ++ ;
     }
     Level -- ;
@@ -2575,13 +2576,13 @@ cell cconv ( cell x, cell e, cell a ) ;
 cell
 mapconv ( cell x, cell e, cell a )
 {
-    cell n, new ;
+    cell n, s9_new ;
 
     save ( n = NIL ) ;
     while ( pair_p ( x ) )
     {
-        new = cconv ( car ( x ), e, a ) ;
-        n = cons ( new, n ) ;
+        s9_new = cconv ( car ( x ), e, a ) ;
+        n = cons ( s9_new, n ) ;
         car ( Stack ) = n ;
         x = cdr ( x ) ;
     }
@@ -2739,7 +2740,7 @@ liftnames ( cell m )
  *   (let ((fv   (free (car x)))
  *         (fn   (car x))
  *         (args (cdr x)))
- *     (for-each new-symbol! fv)
+ *     (for-each s9_new-symbol! fv)
  *     (let ((m (initmap fv e a)))
  *       `((%closure ,(append (pick-vars m) (cadr fn))
  *                    #f
@@ -2976,8 +2977,10 @@ subr0p ( cell x )
     if ( x == P_current_output_port ) return OP_CURRENT_OUTPUT_PORT ;
     if ( x == P_gensym ) return OP_GENSYM ;
     if ( x == P_quit ) return OP_QUIT ;
+    if ( x == P_bye ) return OP_BYE ;
     if ( x == P_symbols ) return OP_SYMBOLS ;
-    if ( x == P_csl_return ) return OP_CSL_RETURN ;
+    //if ( x == P_csl_return ) return OP_CSL_RETURN ;
+    if ( x == P_creturn ) return OP_CRETURN ;
     return - 1 ;
 }
 
@@ -3759,14 +3762,14 @@ cell expand ( cell x, int all ) ;
 cell
 mapexp ( cell x, int all )
 {
-    cell p, n, new ;
+    cell p, n, s9_new ;
 
     save ( x ) ;
     save ( n = NIL ) ;
     for ( p = x ; pair_p ( p ) ; p = cdr ( p ) )
     {
-        new = expand ( car ( p ), all ) ;
-        n = cons ( new, n ) ;
+        s9_new = expand ( car ( p ), all ) ;
+        n = cons ( s9_new, n ) ;
         car ( Stack ) = n ;
     }
     if ( p != NIL ) error ( "improper list in program", x ) ;
@@ -4053,7 +4056,7 @@ apply ( int tail )
 int
 applis ( int tail )
 {
-    cell a, p, new ;
+    cell a, p, s9_new ;
     int k, i ;
 
     a = arg ( 0 ) ;
@@ -4065,12 +4068,12 @@ applis ( int tail )
     for ( p = a ; p != NIL ; p = cdr ( p ) )
     {
         if ( atom_p ( p ) ) error ( "apply: improper list", a ) ;
-        new = box ( car ( p ) ) ;
-        stackset ( i, new ) ;
+        s9_new = box ( car ( p ) ) ;
+        stackset ( i, s9_new ) ;
         i -- ;
     }
-    new = mkfix ( k ) ;
-    stackset ( Sp, new ) ;
+    s9_new = mkfix ( k ) ;
+    stackset ( Sp, s9_new ) ;
     return apply ( tail ) ;
 }
 
@@ -4094,7 +4097,7 @@ void
 entcol ( int fix )
 {
     int n, na, i, s, d ;
-    cell a, x, new ;
+    cell a, x, s9_new ;
 
     na = fixval ( stackref ( Sp - 2 ) ) ;
     if ( na < fix )
@@ -4119,8 +4122,8 @@ entcol ( int fix )
     a = unsave ( 1 ) ;
     if ( na > fix )
     {
-        new = box ( a ) ;
-        stackset ( Sp - fix - 3, new ) ;
+        s9_new = box ( a ) ;
+        stackset ( Sp - fix - 3, s9_new ) ;
     }
     else
     {
@@ -4129,10 +4132,10 @@ entcol ( int fix )
         d = Sp - na - 2 ;
         for ( i = na + 2 ; i >= 0 ; i -- )
             stackset ( d + i, stackref ( s + i ) ) ;
-        new = mkfix ( 1 + fix ) ;
-        stackset ( Sp - 2, new ) ;
-        new = box ( NIL ) ;
-        stackset ( Sp - fix - 3, new ) ;
+        s9_new = mkfix ( 1 + fix ) ;
+        stackset ( Sp - 2, s9_new ) ;
+        s9_new = box ( NIL ) ;
+        stackset ( Sp - fix - 3, s9_new ) ;
     }
     push ( mkfix ( Fp ) ) ;
     Fp = Sp - 4 ;
@@ -4249,7 +4252,7 @@ cxr ( char *op, cell x )
 cell
 append ( cell a, cell b )
 {
-    cell n, p, pn, new ;
+    cell n, p, pn, s9_new ;
 
     if ( NIL == a ) return b ;
     if ( NIL == b ) return a ;
@@ -4261,9 +4264,9 @@ append ( cell a, cell b )
         pn = n ;
         if ( pair_p ( cdr ( p ) ) )
         {
-            new = cons ( NIL, NIL ) ;
-            cdr ( n ) = new ;
-            n = new ;
+            s9_new = cons ( NIL, NIL ) ;
+            cdr ( n ) = s9_new ;
+            n = s9_new ;
         }
     }
     if ( p != NIL ) error ( "append: improper list", a ) ;
@@ -5159,7 +5162,7 @@ run ( cell x )
     Prog = x ;
     if ( setjmp ( Error_tag ) != 0 )
     {
-        Ip = throw ( Error_handler, getbind ( S_error_value ) ) ;
+        Ip = s9_throw ( Error_handler, getbind ( S_error_value ) ) ;
         if ( Ip < 0 ) longjmp ( Restart, 1 ) ;
     }
     for ( Running = 1 ; Running ; )
@@ -5293,16 +5296,15 @@ run ( cell x )
                 Acc = gensym ( ) ;
                 skip ( 1 ) ;
                 break ;
+            case OP_BYE:
             case OP_QUIT:
+                csl_returnValue = 1 ;
                 //reset_tty ( ) ;
                 //bye ( 0 ) ;
-                //DataStack_Push ( ( int ) sprint ( lv ) ) ;
-                csl_returnValue = 1 ;
                 skip ( 1 ) ;
                 break ;
-            case OP_CSL_RETURN:
-                //reset_tty ( ) ;
-                //bye ( 0 ) ;
+            case OP_CRETURN:
+            //case OP_CSL_RETURN:
                 csl_returnValue = 2 ;
                 skip ( 1 ) ;
                 break ;
@@ -5330,7 +5332,7 @@ run ( cell x )
                 skip ( 1 ) ;
                 break ;
             case OP_CATCH:
-                push ( box ( catch ( ) ) ) ;
+                push ( box ( s9_catch ( ) ) ) ;
                 push ( mkfix ( 1 ) ) ;
                 skip ( 1 ) ;
                 break ;
@@ -5979,7 +5981,7 @@ run ( cell x )
                 skip ( 1 ) ;
                 break ;
             case OP_THROW:
-                Ip = throw ( Acc, arg ( 0 ) ) ;
+                Ip = s9_throw ( Acc, arg ( 0 ) ) ;
                 break ;
             case OP_MAX:
                 if ( real_p ( Acc ) || real_p ( arg ( 0 ) ) ) stackset ( Sp - 1, TRUE ) ;
@@ -6362,6 +6364,7 @@ repl ( void )
             if ( csl_returnValue == 2 )  csl_buffer [0] = 0, print_form ( lv ) ;
             break ;
         }
+        csl_returnValue = 0 ;
     }
     if ( ! O_quiet ) nl ( ) ;
 }
@@ -6479,6 +6482,62 @@ cmdarg ( char *s )
     return s ;
 }
 
+void CSL_S9Core_Init ( ) ;
+
+void
+CSL_S9_Init ( )
+{
+    if ( csl_returnValue ) CSL_S9Core_Init ( ) ;
+    Tmp = NIL ;
+    Env = NIL,
+        Envp = NIL ;
+    Glob = NIL,
+        Hash = NIL ;
+    Macros = NIL ;
+    Tp = 0 ;
+    Prog = NIL ;
+    Here = 0 ;
+    Cts = NIL,
+        Rts = NIL ;
+    Running = 1 ;
+    Intr = 0 ;
+    Stats = 0 ;
+    Acc = NIL ;
+    E0 = NIL,
+        Ep = NIL ;
+    Ip = 0,
+        Sp = - 1,
+        Fp = - 1 ;
+    Sz = CHUNK_SIZE ;
+    Argv = NIL ;
+    Srcfile [TOKEN_LENGTH ] = 0 ;
+    Line_no = 1 ;
+    Level = 0 ;
+    Opening_line = 0 ;
+    Displaying = 0 ;
+    Expand_level = 0 ;
+    O_quiet = 0 ;
+    Emitbuf = 0 ;
+    //Restart = 0 ;
+    //Error_tag = 0 ;
+    Error_handler = 0 ;
+    Report_to_stderr = 0 ;
+    S9_zero = S9_one = S9_two = S9_ten = 0 ; //
+    //S9_ports = 0 ;
+    S9_primitives = 0 ;
+    S9_gc_stkptr = 0 ;
+    S9_gc_stack = 0 ;
+    S9_stack = 0, S9_vectors = 0 ;
+    S9_car = S9_cdr = 0 ;
+    S9_tag = 0 ;
+    S9_input_port = S9_output_port = S9_error_port = 0 ;
+    GC_roots [0] = & Prog, GC_roots[1] = & Env, GC_roots[2] = & Cts, GC_roots[3] = & Emitbuf, GC_roots[4] = & Glob, GC_roots[5] = & Hash,
+        GC_roots[6] = & Macros, GC_roots[7] = & Rts, GC_roots[8] = & Acc, GC_roots[9] = & Ep, GC_roots[10] = & E0, GC_roots[11] = & Argv,
+        GC_roots[12] = & Tmp, GC_roots[13] = NULL ;
+    Image_vars[0] = & Glob, Image_vars[1] = & Hash, Image_vars[2] = & Macros, Image_vars[3] = NULL ;
+    csl_returnValue = 0 ;
+    I_arg = 0, I_closure = 0, I_ref = 0, I_a = 0, I_e = 0 ;
+}
 int
 s9_main ( int argc, char **argv )
 {
@@ -6489,6 +6548,8 @@ s9_main ( int argc, char **argv )
     CSL_S9_Init ( ) ;
     if ( setjmp ( Restart ) != 0 ) bye ( 1 ) ;
     init ( ) ;
+    loadfile ( "/usr/local/lib/csl/s9.scm" ) ;
+#if 0    
     i = 1 ;
     if ( argc > 2 && strcmp ( argv[1], "-i" ) == 0 )
     {
@@ -6609,7 +6670,7 @@ s9_main ( int argc, char **argv )
         dump_image ( dump, S9magic ) ;
         bye ( 0 ) ;
     }
-#if 0    
+//#if 0    
     if ( argv[i] != NULL && strcmp ( argv[i], "--" ) )
     {
         if ( setjmp ( Restart ) != 0 ) bye ( 1 ) ;
@@ -6631,59 +6692,5 @@ s9_main ( int argc, char **argv )
     return 0 ;
 }
 
-void CSL_S9Core_Init ( ) ;
 
-void
-CSL_S9_Init ( )
-{
-    if ( csl_returnValue ) CSL_S9Core_Init ( ) ;
-    Tmp = NIL ;
-    Env = NIL,
-        Envp = NIL ;
-    Glob = NIL,
-        Hash = NIL ;
-    Macros = NIL ;
-    Tp = 0 ;
-    Prog = NIL ;
-    Here = 0 ;
-    Cts = NIL,
-        Rts = NIL ;
-    Running = 1 ;
-    Intr = 0 ;
-    Stats = 0 ;
-    Acc = NIL ;
-    E0 = NIL,
-        Ep = NIL ;
-    Ip = 0,
-        Sp = - 1,
-        Fp = - 1 ;
-    Sz = CHUNK_SIZE ;
-    Argv = NIL ;
-    Srcfile [TOKEN_LENGTH ] = 0 ;
-    Line_no = 1 ;
-    Level = 0 ;
-    Opening_line = 0 ;
-    Displaying = 0 ;
-    Expand_level = 0 ;
-    O_quiet = 0 ;
-    Emitbuf = 0 ;
-    //Restart = 0 ;
-    //Error_tag = 0 ;
-    Error_handler = 0 ;
-    Report_to_stderr = 0 ;
-    S9_zero = S9_one = S9_two = S9_ten = 0 ; //
-    //S9_ports = 0 ;
-    S9_primitives = 0 ;
-    S9_gc_stkptr = 0 ;
-    S9_gc_stack = 0 ;
-    S9_stack = 0, S9_vectors = 0 ;
-    S9_car = S9_cdr = 0 ;
-    S9_tag = 0 ;
-    S9_input_port = S9_output_port = S9_error_port = 0 ;
-    GC_roots [0] = & Prog, GC_roots[1] = & Env, GC_roots[2] = & Cts, GC_roots[3] = & Emitbuf, GC_roots[4] = & Glob, GC_roots[5] = & Hash,
-        GC_roots[6] = & Macros, GC_roots[7] = & Rts, GC_roots[8] = & Acc, GC_roots[9] = & Ep, GC_roots[10] = & E0, GC_roots[11] = & Argv,
-        GC_roots[12] = & Tmp, GC_roots[13] = NULL ;
-    Image_vars[0] = & Glob, Image_vars[1] = & Hash, Image_vars[2] = & Macros, Image_vars[3] = NULL ;
-    csl_returnValue = 0 ;
-    I_arg = 0, I_closure = 0, I_ref = 0, I_a = 0, I_e = 0 ;
-}
+

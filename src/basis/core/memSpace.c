@@ -188,7 +188,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
         case CONTEXT: return _Allocate ( size, ms->ContextSpace ) ;
         case BUFFER: return _Allocate ( size, ms->BufferSpace ) ;
         case LISP_TEMP: return _Allocate ( size, ms->LispTempSpace ) ;
-        //case LISP_COPY: return _Allocate ( size, ms->LispCopySpace ) ;
+            //case LISP_COPY: return _Allocate ( size, ms->LispCopySpace ) ;
         case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
         case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
         case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
@@ -207,6 +207,12 @@ Mem_Allocate ( int64 size, uint64 allocType )
         default: CSL_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
     }
     return 0 ;
+}
+
+void *
+sl9_malloc ( int size )
+{
+    return (void*) Mem_Allocate ( size, LISP_TEMP ) ;
 }
 
 void

@@ -135,7 +135,15 @@ bnOff
 #endif
 "\ncsl : scheme/lisp : type \'x\' or \'exit\' or \'bye\' to exit ...\n" ps
 #if 0 //lisp
-(defun ( substt x y z )  
+(defun (fib n)
+  (fib-iter 1 0 n))
+
+(defun (fib-iter a b count)
+  (if (= count 0)
+      b
+      (fib-iter (+ a b) a (- count 1))))
+(fib 30)     
+(defun (substt x y z )  
     ( cond ((atom z)  
             (cond ( (eq z y) x )
                 ( 't z )))
@@ -147,7 +155,25 @@ bnOff
     )
  )
 (substt 'm 'b  '(a b ( a b c ) d))
-#elif
+(defun (count-change amount)                                                                                                                         
+  (cc amount 5)) 
+(defun (cc amount kinds-of-coins)                                                                                                                        
+  (cond ((= amount 0) 1)                                                                                                                                  
+        ((or (< amount 0) (= kinds-of-coins 0)) 0)                                                                                                        
+        (1 (+ (cc amount                                                                                                                               
+                     (- kinds-of-coins 1))                                                                                                                
+                 (cc (- amount                                                                                                                            
+                        (first-denomination kinds-of-coins))
+                     kinds-of-coins)))))
+ 
+(defun (first-denomination kinds-of-coins)
+  (cond ((= kinds-of-coins 1) 1)
+        ((= kinds-of-coins 2) 5)
+        ((= kinds-of-coins 3) 10)
+        ((= kinds-of-coins 4) 25)
+        ((= kinds-of-coins 5) 50))) 
+(count-change 100)     
+#elif 0
 (define substt ( lambda (x y z )  
     ( cond ((atom? z)  
             (cond ( (eq? z y) x )
@@ -160,7 +186,25 @@ bnOff
     )
  ) )
 (substt 'm 'b  '(a b ( a b c ) d))
-
+#elif 0
+(defn count-change ( amount)                                                                                                                         
+  (cc amount 5)) 
+(defn cc (amount kinds-of-coins)                                                                                                                        
+  (cond ((= amount 0) 1)                                                                                                                                  
+        ((or (< amount 0) (= kinds-of-coins 0)) 0)                                                                                                        
+        (1 (+ (cc amount                                                                                                                               
+                     (- kinds-of-coins 1))                                                                                                                
+                 (cc (- amount                                                                                                                            
+                        (first-denomination kinds-of-coins))
+                     kinds-of-coins)))))
+ 
+(defn first-denomination (kinds-of-coins)
+  (cond ((= kinds-of-coins 1) 1)
+        ((= kinds-of-coins 2) 5)
+        ((= kinds-of-coins 3) 10)
+        ((= kinds-of-coins 4) 25)
+        ((= kinds-of-coins 5) 50))) 
+(count-change 100)     
 #endif
 (define (substt x y z )  
     ( cond ((atom z)  
@@ -173,7 +217,5 @@ bnOff
         )
     )
  )
-
- 
 //(substt 'm 'b  '(a b ( a b c ) d))
 

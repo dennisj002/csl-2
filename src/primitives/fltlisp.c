@@ -393,14 +393,14 @@ apply_builtin:
         switch ( intval ( f ) )
         {
                 // special forms
-            case F_FL_QUOTE:
+            case F_QUOTE:
                 v = cdr_ ( FL_Stack[saveSP] ) ;
                 if ( ! iscons ( v ) )
                     lerror ( "quote: error: expected argument\n" ) ;
                 v = car_ ( v ) ;
                 break ;
-            case F_FL_MACRO:
-            case F_FL_LAMBDA:
+            case F_MACRO:
+            case F_LAMBDA:
                 v = FL_Stack[saveSP] ;
                 if ( *penv != FL_NIL )
                 {
@@ -410,11 +410,11 @@ apply_builtin:
                     argsyms = & FL_Stack[SP - 1] ;
                     FL_PUSH ( car ( cdr_ ( v ) ) ) ;
                     body = & FL_Stack[SP - 1] ;
-                    v = cons_ ( intval ( f ) == F_FL_LAMBDA ? &FL_LAMBDA : &FL_MACRO,
+                    v = cons_ ( intval ( f ) == F_LAMBDA ? &FL_LAMBDA : &FL_MACRO,
                         cons ( argsyms, cons ( body, penv ) ) ) ;
                 }
                 break ;
-            case F_FL_LABEL:
+            case F_LABEL:
                 v = FL_Stack[saveSP] ;
                 if ( *penv != FL_NIL )
                 {
