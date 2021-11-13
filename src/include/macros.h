@@ -68,12 +68,12 @@
 
 #define Set_CompileMode( tf ) SetState ( _Compiler_, (COMPILE_MODE), tf ) //; _LC_ ? SetState ( _LC_, LC_COMPILE_MODE, tf ) : 0 ; 
 #define Get_CompileMode() GetState ( _Compiler_, (COMPILE_MODE) )  //|| ( _LC_ ? GetState ( _LC_, LC_COMPILE_MODE ) : 0 ) ) 
-#define CompileMode GetState ( _Compiler_, (COMPILE_MODE) )  //|| ( _LC_ && GetState ( _LC_, ( LC_COMPILE_MODE ) ) ) ) : 0)
+#define _LC_CompileMode( lc ) GetState( lc, LC_COMPILE_MODE ) 
+#define LC_CompileMode _LC_CompileMode( _LC_ )
+#define CompileMode GetState ( _Compiler_, (COMPILE_MODE) || ( _LC_ ? _LC_CompileMode( _LC_ ) : 0 ) ) 
 #define CompileModeOff Set_CompileMode ( false ) 
 #define CompileModeOn Set_CompileMode ( true ) 
 #define Compiling CompileMode
-#define _LC_CompileMode( lc ) GetState( lc, LC_COMPILE_MODE ) 
-#define LC_CompileMode _LC_CompileMode( _LC_ )
 #define ImmediateWord( word) (word->W_MorphismAttributes & IMMEDIATE)
 #define CPrimitiveWord( word) (word->W_MorphismAttributes & CPRIMITIVE)
 

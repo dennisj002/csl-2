@@ -1,33 +1,5 @@
 #include "../../include/csl.h"
 
-ListObject *
-LC_SpecialFunction ( )
-{
-    LambdaCalculus * lc = _LC_ ;
-    ListObject * lfirst = lc->Lfirst, *macro, *lnext, *l1 = lc->L0 ;
-    LC_Debug ( lc, LC_SPECIAL_FUNCTION, 1 ) ;
-    if ( lfirst )
-    {
-        while ( lfirst && ( lfirst->W_LispAttributes & T_LISP_MACRO ) )
-        {
-            lnext = _LO_Next ( lfirst ) ;
-            macro = lfirst ;
-            macro->W_LispAttributes &= ~ T_LISP_MACRO ; // prevent short recursive loop calling of this function thru LO_Eval below
-            l1 = LC_Eval ( macro, lc->Locals, 1 ) ;
-            macro->W_LispAttributes |= T_LISP_MACRO ; // restore to its true type
-            lfirst = lnext ;
-        }
-        if ( lfirst && lfirst->Lo_CSL_Word && IS_MORPHISM_TYPE ( lfirst->Lo_CSL_Word ) )
-        {
-            if ( lfirst->W_MorphismAttributes & COMBINATOR ) LC_InitForCombinator ( lc ) ;
-            lc->Lfirst = lfirst ;
-            l1 = ( ( ListFunction0 ) ( lfirst->Lo_CSL_Word->Definition ) ) ( ) ; // ??? : does adding extra parameters to functions not defined with them mess up the the c runtime return stack
-        }
-        else l1 = LC_Eval ( lc->L0, lc->Locals, 1 ) ;
-    }
-    LC_Debug ( lc, LC_SPECIAL_FUNCTION, 0 ) ;
-    return l1 ;
-}
 //===================================================================================================================
 //| LO_SpecialFunction(s) 
 //===================================================================================================================
@@ -241,8 +213,6 @@ LC_Define ( )
     return lc->L1 ;
 }
 
-// definec
-
 ListObject *
 LC_Define_Scheme ( )
 {
@@ -311,8 +281,9 @@ IFTRUE : LIST | ATOM
 CONDITIONAL : ( cond ( <cond clause>+ )
 COND_FUNC : '(' 'cond' ( CONDITIONAL )+ ( IFTRUE | 'else' IFTRUE ) ? ')'
  * r7r2 : formal syntax
-The following extensions to BNF are used to make the description more concise: 
- *<thing>* means zero or more occurrences of <thing>; and <thing>+ means at least one <thing>.
+The following extensions to BNF are used to make the de-
+scription more concise: <thing>* means zero or more occur-
+rences of <thing>; and <thing>+ means at least one <thing>.
 <expression> : <identifier>
     | <literal>
     | <procedure call>
@@ -323,7 +294,8 @@ The following extensions to BNF are used to make the description more concise:
     | <macro use>
     |<macro block>
     | <includer>
-<conditional> : (if <test> <sequence> <alternate>)
+<conditional> : (if <test> <consequent> <alternate>)
+<test> : <expression>
 <test> : <expression> 
 <command> : <expression>
 <sequence> : <command>* <expression> 
@@ -338,107 +310,92 @@ LO_Cond ( )
     Compiler * compiler = _Context_->Compiler0 ;
     ListObject *condClause, *nextCondClause, * test, *sequence, * resultNode = nil, * result = nil, *testResult ;
     ListObject * idLo = lc->Lfirst, *locals = lc->Locals ;
-    if ( idLo )
+    int64 timt = 0 ; // timt : test is morphism type 
+    int64 ifFlag = ( int64 ) ( idLo->Lo_CSL_Word->W_LispAttributes & T_LISP_IF ) ;
+    int64 numBlocks, d1, d0 = Stack_Depth ( compiler->CombinatorBlockInfoStack ), testValue ;
+    //if ( GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lc->L0, "LO_Cond : lc->L0 = ", "", 1 ); //, _LO_PrintWithValue ( lc->Lread, "LO_Cond : lc->Lread = ", "", 1 ) ;
+    LC_Debug ( lc, LC_COND, 1 ) ;
+    if ( condClause = _LO_Next ( idLo ) ) // 'cond' is id node ; skip it.
     {
-        int64 timt = 0 ; // timt : test is morphism type 
-        int64 ifFlag = ( int64 ) ( idLo->Lo_CSL_Word->W_LispAttributes & T_LISP_IF ) ;
-        int64 numBlocks, d1, d0 = Stack_Depth ( compiler->CombinatorBlockInfoStack ), testValue ;
-        //if ( GetState ( lc, LC_DEBUG_ON ) ) _LO_PrintWithValue ( lc->L0, "LO_Cond : lc->L0 = ", "", 1 ); //, _LO_PrintWithValue ( lc->Lread, "LO_Cond : lc->Lread = ", "", 1 ) ;
-        //LC_Debug ( lc, LC_COND, 1 ) ;
-        if ( condClause = _LO_Next ( idLo ) ) // 'cond' is id node ; skip it.
+        do
         {
-            do
+            // first determine test and sequence
+            if ( ! ( sequence = _LO_Next ( condClause ) ) )
             {
-                // first determine test and sequence
-                //LO_Debug_Output ( condClause, "LO_Cond : condClause = " ) ;
-                if ( ! ( sequence = _LO_Next ( condClause ) ) )
+                if ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) )
                 {
-                    if ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) )
+                    do
                     {
-                        do
-                        {
-                            test = _LO_First ( condClause ) ;
-                            if ( sequence = _LO_Next ( test ) ) break ;
-                            else condClause = test ;
-                        }
-                        while ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) ) ;
+                        test = _LO_First ( condClause ) ;
+                        if ( sequence = _LO_Next ( test ) ) break ;
+                        else condClause = test ;
                     }
-                    else
-                    {
-                        resultNode = condClause ;
-                        if ( CompileMode ) result = LC_Eval ( resultNode, locals, lc->ApplyFlag ) ;
-                        break ;
-                    }
-                }
-                else test = _LO_First ( condClause ) ;
-                if ( timt = IS_COND_MORPHISM_TYPE ( test ) ) test = condClause ;
-                if ( String_Equal ( test->Name, "else" ) )
-                {
-                    resultNode = _LO_Next ( test ) ;
-                    if ( CompileMode )
-                    {
-                        result = LC_Eval ( resultNode, locals, lc->ApplyFlag ) ;
-                        resultNode = 0 ;
-                    }
-                    break ;
-                }
-                if ( sequence && ( ! ( sequence = _LO_Next ( test ) ) ) )
-                {
-                    resultNode = test ;
-                    if ( CompileMode ) result = LC_Eval ( resultNode, locals, lc->ApplyFlag ) ;
-                    else break ;
-                }
-
-                if ( ! ( nextCondClause = _LO_Next ( sequence ) ) )
-                    nextCondClause = _LO_Next ( condClause ) ;
-                // we have determined test and sequence
-                // either return result or find next condClause
-                //if ( LC_DEFINE_DBG ) CSL_Show_SourceCode_TokenLine ( test, "LC_Debug : ", 0, test->Name, "" ) ;
-                testResult = LC_Eval ( test, locals, 1 ) ;
-                testValue = ( testResult && ( testResult->Lo_Value ) ) ;
-                //LO_Debug_Output ( test, "LO_Cond : test = " ) ;
-                //LO_Debug_Output ( sequence, "LO_Cond : sequence = " ) ;
-                //LO_Debug_Output ( nextCondClause, "LO_Cond : nextCondClause = " ) ;
-                if ( CompileMode ) result = LC_Eval ( sequence, locals, lc->ApplyFlag ) ;
-                if ( testValue )
-                {
-                    if ( ! CompileMode )
-                    {
-                        resultNode = sequence ;
-                        break ;
-                    }
+                    while ( condClause->W_LispAttributes & ( LIST | LIST_NODE ) ) ;
                 }
                 else
                 {
-                    resultNode = nextCondClause ;
-                    if ( CompileMode )
-                    {
-                        result = LC_Eval ( resultNode, locals, lc->ApplyFlag ) ;
-                    }
-                    if ( ifFlag ) break ;
+                    resultNode = condClause ;
+                    if ( CompileMode ) result = LC_Eval ( resultNode, locals, lc->ApplyFlag ) ;
+                    break ;
                 }
-                condClause = nextCondClause ;
             }
-            while ( condClause ) ;
-            if ( idLo->W_MorphismAttributes & COMBINATOR )
+            else test = _LO_First ( condClause ) ;
+            if ( timt = IS_COND_MORPHISM_TYPE ( test ) ) test = condClause ;
+            if ( String_Equal ( test->Name, "else" ) )
             {
-                d1 = Stack_Depth ( compiler->CombinatorBlockInfoStack ) ;
-                numBlocks = d1 - d0 ;
-                CSL_CondCombinator ( numBlocks ) ;
-            }
-            else
-            {
-                if ( resultNode )
+                resultNode = _LO_Next ( test ) ;
+                if ( CompileMode )
                 {
                     result = LC_Eval ( resultNode, locals, lc->ApplyFlag ) ;
-                    //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : after eval : result = ", "\n", 1 ) ;
+                    resultNode = 0 ;
                 }
+                break ;
+            }
+            if ( sequence && ( ! ( sequence = _LO_Next ( test ) ) ) )
+            {
+                resultNode = test ;
+                if ( CompileMode ) result = LC_Eval ( resultNode, locals, lc->ApplyFlag ) ;
+                else break ;
+            }
+
+            if ( ! ( nextCondClause = _LO_Next ( sequence ) ) )
+                nextCondClause = _LO_Next ( condClause ) ;
+            // we have determined test, sequence and nextCondClause
+            if ( GetState ( lc, LC_DEBUG_ON ) ) CSL_Show_SourceCode_TokenLine ( test, "LC_Debug : ", 0, test->Name, "" ) ;
+            testResult = LC_Eval ( test, locals, 1 ) ;
+            //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( sequence, "\nLO_Cond : eval : sequence = ", "", 1 ) ;
+            if ( CompileMode ) result = LC_Eval ( sequence, locals, lc->ApplyFlag ) ;
+            else // if not CompileMode either return result or find next condClause
+            {
+                testValue = ( testResult && ( testResult->Lo_Value ) ) ;
+                if ( testValue )
+                {
+                    resultNode = sequence ;
+                    break ;
+                }
+                else resultNode = nextCondClause ;
+            }
+            condClause = nextCondClause ;
+        }
+        while ( condClause ) ;
+        if ( idLo->W_MorphismAttributes & COMBINATOR )
+        {
+            d1 = Stack_Depth ( compiler->CombinatorBlockInfoStack ) ;
+            numBlocks = d1 - d0 ;
+            CSL_CondCombinator ( numBlocks ) ;
+        }
+        else
+        {
+            if ( resultNode )
+            {
+                result = LC_Eval ( resultNode, locals, lc->ApplyFlag ) ;
+                //if ( LC_DEFINE_DBG ) _LO_PrintWithValue ( result, "\nLO_Cond : after eval : result = ", "\n", 1 ) ;
             }
         }
-        lc->L1 = result ;
-        //LC_Debug ( lc, LC_COND, 0 ) ;
-        return result ;
     }
+    lc->L1 = result ;
+    LC_Debug ( lc, LC_COND, 0 ) ;
+    return result ;
 }
 
 // lisp 'list' function

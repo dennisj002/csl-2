@@ -604,17 +604,20 @@ String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot
 }
 
 byte *
-String_RemoveFinalNewline ( byte * astring )
+String_RemoveFinalNewline ( char * astring )
 {
     byte character ;
     int64 index = 1 ;
-    do
+    if ( astring )
     {
-        character = astring [ Strlen ( ( char* ) astring ) - ( index ++ ) ] ;
-        if ( character == '\n' || character == '\r' || character == eof ) astring [ Strlen ( ( char* ) astring ) - 1 ] = 0 ;
-        else break ;
+        do
+        {
+            character = astring [ strlen ( astring ) - ( index ++ ) ] ;
+            if ( character == '\n' || character == '\r' || character == eof ) astring [ strlen ( astring ) - 1 ] = 0 ;
+            else break ;
+        }
+        while ( 1 ) ;
     }
-    while ( 1 ) ;
 
     return astring ;
 }

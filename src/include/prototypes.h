@@ -1504,7 +1504,7 @@ byte *String_RemoveEndWhitespace(byte *string);
 byte *String_FilterMultipleSpaces(byte *istring, int64 allocType);
 void String_InsertCharacter(CString into, int64 position, byte character);
 void String_InsertDataIntoStringSlot(byte *str, int64 startOfSlot, int64 endOfSlot, byte *data);
-byte *String_RemoveFinalNewline(byte *astring);
+byte *String_RemoveFinalNewline(char *astring);
 byte *String_N_New(byte *string, int64 n, uint64 allocType);
 byte *String_New(byte *string, uint64 allocType);
 byte *String_New_SourceCode(byte *string);
@@ -1844,6 +1844,8 @@ LambdaCalculus *LC_Init(void);
 void List_Eval(void);
 /* src/basis/lc/lcDebug.c */
 void LC_Debug(LambdaCalculus *lc, int64 state, Boolean setupFlag);
+void _LO_Debug_Output(ListObject *l0, byte *descript);
+void LO_Debug_Output(ListObject *l0, byte *descript);
 void LC_Debug_Output(LambdaCalculus *lc);
 /* src/basis/lc/apply.c */
 ListObject *LC_Apply(void);
@@ -1874,7 +1876,6 @@ ListObject *LC_Eval(ListObject *l0, ListObject *locals, Boolean applyFlag);
 ListObject *LC_EvalList(void);
 ListObject *_LC_EvalSymbol(void);
 ListObject *_LC_EvalList(void);
-ListObject *LC_SpecialFunction(void);
 /* src/basis/lc/read.c */
 ListObject *LC_Read(void);
 ListObject *_LO_Read_Do_LParen(void);
@@ -1903,6 +1904,7 @@ byte *_LO_PRINT_TO_STRING(ListObject *l0);
 byte *_LO_PRINT_TO_STRING_WITH_VALUE(ListObject *l0);
 void LO_Print(ListObject *l0);
 /* src/basis/lc/special.c */
+ListObject *LC_SpecialFunction(void);
 ListObject *_LO_Define_Scheme(ListObject *idNode);
 ListObject *_LO_Define_Lisp(ListObject *idNode);
 ListObject *_LO_MakeLambda(ListObject *lfirst);

@@ -23,6 +23,18 @@ LC_Debug ( LambdaCalculus * lc, int64 state, Boolean setupFlag )
 }
 
 void
+_LO_Debug_Output ( ListObject * l0, byte * descript )
+{
+    _LO_PrintWithValue ( l0, descript, "", 1 ) ;
+}
+
+void
+LO_Debug_Output ( ListObject * l0, byte * descript )
+{
+    if ( LC_DEFINE_DBG ) _LO_Debug_Output ( l0, descript ) ;
+}
+
+void
 LC_Debug_Output ( LambdaCalculus * lc )
 {
     int64 compiled = false ;

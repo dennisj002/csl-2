@@ -324,10 +324,10 @@ _LO_Repl ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     SetState ( compiler, LISP_MODE, true ) ;
-    Printf ( "\ncsl lisp : (type 'x' or 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.csl'\n" ) ;
-    LC_ReadInitFile ( ( byte* ) "./namespaces/lcinit.csl" ) ;
-    Printf ( "\ncsl lisp : (type 'x' or 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.0.csl'\n" ) ;
-    LC_ReadInitFile ( ( byte* ) "./namespaces/lcinit.0.csl" ) ;
+    Printf ( "\ncsl lisp : type 'exit' or 'bye' to exit\n including init file :: './namespaces/compiler/lcinit.csl'\n" ) ;
+    LC_ReadInitFile ( ( byte* ) "./namespaces/compiler/lcinit.csl" ) ;
+    //Printf ( "\ncsl lisp : (type 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.0.csl'\n" ) ;
+    //LC_ReadInitFile ( ( byte* ) "./namespaces/lcinit.0.csl" ) ;
     SetState ( _Context_, AT_COMMAND_LINE, true ) ;
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
     SetState ( compiler, LISP_MODE, false ) ;

@@ -36,7 +36,7 @@ OBJECTS = $(SOURCES:%.c=%.o)
 #S9_OBJECTS = $(S9_SOURCES:%.c=%.o) 
 S9_OBJECTS = src/primitives/s9.o src/primitives/s9core.o
 ALL_OBJECTS = $(OBJECTS) #$(S9_OBJECTS) 	
-CC = gcc-10  
+CC = gcc 
 #CC = g++-10 -fpermissive -Wwrite-strings
 OUT = csl-gdb
 
@@ -90,7 +90,7 @@ bin/csl-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb
 bin/csl-gdb : src/include/prototypes.h $(ALL_OBJECTS) 
 	$(CC) $(CFLAGS) $(ALL_OBJECTS) -o bin/csl-gdb $(LIBS)
 	strip -o bin/csl bin/csl-gdb
-	gcc-10 --version
+	gcc --version
 	
 
 cslo : oclean $(ALL_OBJECTS)

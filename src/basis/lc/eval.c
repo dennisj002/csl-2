@@ -9,7 +9,6 @@ LO_IsQuoted ( ListObject *l0 )
 ListObject *
 LC_Eval ( ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
-    //if ( _LC_->ParenLevel == 0 ) if ( ! sigsetjmp ( _LC_->LC_JmpBuf, 0 ) ) ;
     LambdaCalculus * lc = _LC_ ;
     ListObject *l1 = l0 ; // default
     lc->ApplyFlag = applyFlag ; //= ! GetState (lc, LC_DEFINE_MODE);
@@ -42,7 +41,6 @@ LC_EvalList ( )
     LC_Debug ( lc, LC_EVAL_LIST, 1 ) ;
     if ( lfirst )
     {
-        //lc->Lfunction0 = lfirst ;
         if ( lfirst->W_LispAttributes & ( T_LISP_SPECIAL | T_LISP_MACRO ) )
         {
             if ( LO_IsQuoted ( lfirst ) ) return lfirst ;
@@ -53,15 +51,6 @@ LC_EvalList ( )
         else
         {
             lfunction = LC_Eval ( lfirst, lc->Locals, lc->ApplyFlag ) ;
-#if 0            
-        if ( String_Equal ( lfunction->Name, "cc")) 
-            Printf ("") ;
-        if (( lfunction == lc->L0 ) && (  lfunction->W_LispAttributes & ( T_LC_DEFINE  ) ) ) 
-                siglongjmp ( lc->LC_JmpBuf, 1 ) ;
-        //lc->Lfunction0 = l1 ;
-            //if ( ! lc->Lfunction0 ) 
-            //if (( lc->ParenLevel == 1 ) && ( lc->Lfunction0 == lfunction ) ) //&& String_Equal (lc->Lfunction0->Name, lfunction->Name)) 
-#endif            
             lc->Largs0 = _LO_Next ( lfirst ) ;
             lc->Largs = _LC_EvalList ( ) ;
             lc->Lfunction = lfunction ;
@@ -145,31 +134,3 @@ _LC_EvalList ( )
     return l1 ;
 }
 
-ListObject *
-LC_SpecialFunction ( )
-{
-    LambdaCalculus * lc = _LC_ ;
-    ListObject * lfirst = lc->Lfirst, *macro, *lnext, *l1 = lc->L0 ;
-    LC_Debug ( lc, LC_SPECIAL_FUNCTION, 1 ) ;
-    if ( lfirst )
-    {
-        while ( lfirst && ( lfirst->W_LispAttributes & T_LISP_MACRO ) )
-        {
-            lnext = _LO_Next ( lfirst ) ;
-            macro = lfirst ;
-            macro->W_LispAttributes &= ~ T_LISP_MACRO ; // prevent short recursive loop calling of this function thru LO_Eval below
-            l1 = LC_Eval ( macro, lc->Locals, 1 ) ;
-            macro->W_LispAttributes |= T_LISP_MACRO ; // restore to its true type
-            lfirst = lnext ;
-        }
-        if ( lfirst && lfirst->Lo_CSL_Word && IS_MORPHISM_TYPE ( lfirst->Lo_CSL_Word ) )
-        {
-            if ( lfirst->W_MorphismAttributes & COMBINATOR ) LC_InitForCombinator ( lc ) ;
-            lc->Lfirst = lfirst ;
-            l1 = ( ( ListFunction0 ) ( lfirst->Lo_CSL_Word->Definition ) ) ( ) ; // ??? : does adding extra parameters to functions not defined with them mess up the the c runtime return stack
-        }
-        else l1 = LC_Eval ( lc->L0, lc->Locals, 1 ) ;
-    }
-    LC_Debug ( lc, LC_SPECIAL_FUNCTION, 0 ) ;
-    return l1 ;
-}

@@ -146,7 +146,6 @@ _LO_PrintListToString ( LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, 
             LO_strcat ( lc->outBuffer, lc->buffer ) ;
         }
         else _LO_PrintOneToString ( lc, l0, lambdaFlag, printValueFlag ) ;
-
     }
 }
 
