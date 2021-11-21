@@ -29,9 +29,9 @@ _LO_Debug_Output ( ListObject * l0, byte * descript )
 }
 
 void
-LO_Debug_Output ( ListObject * l0, byte * descript )
+LO_Debug_Output ( ListObject * l0, byte * descript, int64 force )
 {
-    if ( LC_DEFINE_DBG ) _LO_Debug_Output ( l0, descript ) ;
+    if ( LC_DEFINE_DBG || force ) _LO_Debug_Output ( l0, descript ) ;
 }
 
 void

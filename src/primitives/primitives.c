@@ -33,6 +33,7 @@ CPrimitive CPrimitives [] = {
     { "condc", 0, 0, 0, ( block ) LO_Cond, COMBINATOR, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "if", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL|T_LISP_IF, "Lisp", "Root" },// compiles
     { "cond", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
+    { "if*", 0, 0, 0, ( block ) LO_Cond, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     //{ "else", 0, 0, 0, ( block ) LO_Else, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "car", 0, 0, 0, (block) LO_Car, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "cdr", 0, 0, 0, ( block ) LO_Cdr, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },

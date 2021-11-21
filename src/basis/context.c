@@ -236,7 +236,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag, int6
         {
             ReadLiner * rl = cntx->ReadLiner0 ;
             rl->Filename = String_New ( filename, STRING_MEM ) ;
-            if ( _O_->Verbosity > 2 ) Printf ( "\nincluding %s ...\n", filename ) ;
+            if ( _O_->Verbosity ) Printf ( "\nincluding %s ...\n", filename ) ;
             cntx->ReadLiner0->InputFile = file ;
             ReadLine_SetRawInputFunction ( rl, ReadLine_GetNextCharFromString ) ;
             SetState ( cntx->System0, ADD_READLINE_TO_HISTORY, false ) ;
@@ -257,7 +257,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag, int6
         }
         else
         {
-            Printf ( "\nError : _CSL_IncludeFile : \"%s\" : not found! :: %s\n", filename,
+            Printf ( "\nError : _Context_IncludeFile : \"%s\" : not found! :: %s\n", filename,
                 _Context_Location ( ( Context* ) _CSL_->ContextStack->StackPointer [0] ) ) ;
         }
     }

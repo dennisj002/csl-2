@@ -125,8 +125,12 @@ _LO_Last ( ListObject * l0 )
 ListObject *
 _LO_Next ( ListObject * l0 )
 {
-    ListObject * l1 = ( ListObject* ) dlnode_Next ( ( dlnode* ) l0 ) ;
-    return l1 ;
+    //if ( l0 && ( ! ( l0->W_LispAttributes & ( T_NIL ) ) ) )
+    {
+        ListObject * l1 = ( ListObject* ) dlnode_Next ( ( dlnode* ) l0 ) ;
+        return l1 ;
+    }
+    //return 0 ;
 }
 
 Word *
@@ -211,6 +215,7 @@ _LO_CopyOne ( ListObject * l0, uint64 allocType )
 }
 
 // copy a whole list or a single node
+
 ListObject *
 _LO_Copy ( ListObject * l0, uint64 allocType )
 {
@@ -255,7 +260,7 @@ ListObject *
 _LC_Read_ListObject ( LambdaCalculus * lc, int64 parenLevel, int64 startReadIndex )
 {
     lc->ParenLevel = parenLevel ;
-    ListObject * l0 = LC_Read () ;
+    ListObject * l0 = LC_Read ( ) ;
     return l0 ;
 }
 
@@ -316,7 +321,7 @@ LC_ReadEvalPrint ( )
 void
 LC_ReadInitFile ( byte * filename )
 {
-    CSL_ContextNew_IncludeFile (filename, 0) ;
+    CSL_ContextNew_IncludeFile ( filename, 0 ) ;
 }
 
 void

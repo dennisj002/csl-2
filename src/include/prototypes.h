@@ -1845,7 +1845,7 @@ void List_Eval(void);
 /* src/basis/lc/lcDebug.c */
 void LC_Debug(LambdaCalculus *lc, int64 state, Boolean setupFlag);
 void _LO_Debug_Output(ListObject *l0, byte *descript);
-void LO_Debug_Output(ListObject *l0, byte *descript);
+void LO_Debug_Output(ListObject *l0, byte *descript, int64 force);
 void LC_Debug_Output(LambdaCalculus *lc);
 /* src/basis/lc/apply.c */
 ListObject *LC_Apply(void);

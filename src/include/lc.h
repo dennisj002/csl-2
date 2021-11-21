@@ -26,6 +26,8 @@
 #define csl_cons_p(lo) ( lo->W_LispAttributes & ( LIST | LIST_NODE ) ) 
 #define csl_car( lo ) csl_cons_p(lo)?  dllist_First ( ( dllist* ) ( dllist * ) l0->Lo_List ) : 0
 #define csl_cdr( lo ) dlnode_Next ( ( dlnode* ) lo )
+//#define lc_eval( lo ) LO_CopyOne ( LC_Eval ( lo, 0, 1) )
+#define lc_eval( lo ) LC_Eval ( lo, 0, 1) 
 
 
 

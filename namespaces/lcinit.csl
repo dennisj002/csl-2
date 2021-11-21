@@ -1,4 +1,4 @@
-d: (load "./namespaces/lcinit.0.csl")
+;;; (load "./namespaces/lcinit.0.csl")
 
 #if 0
 bnOff lcOn

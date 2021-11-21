@@ -94,6 +94,10 @@ _LO_Define_Scheme ( ListObject * idNode )
     return l1 ;
 }
 
+// (define fn ( lambda ( args ) ( fnbody) ) ) 
+// eg. : (define yfac (lambda (yy n) (if (< n 2) (n) (* n (yy yy (- n 1))))))
+// eg. : (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+
 ListObject *
 _LO_Define_Lisp ( ListObject * idNode )
 {
@@ -331,6 +335,8 @@ The following extensions to BNF are used to make the description more concise:
 <derived expression> : (cond <cond clause>+ ) | (cond <cond clause>* (else <sequence>)) | ...
  */
 #define IS_COND_MORPHISM_TYPE(word) ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK|T_LAMBDA ) || ( word->W_LispAttributes & ( T_LAMBDA ) ) )
+// LO_Cond is not very understandable??
+
 ListObject *
 LO_Cond ( )
 {
@@ -494,19 +500,19 @@ ListObject *
 LO_Car ( )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject * l1 = _LO_Next ( lc->Lfirst ) ;
-    if ( l1->W_LispAttributes & ( LIST_NODE | LIST ) ) return LO_CopyOne ( _LO_First ( l1 ) ) ; //( ListObject * ) l1 ;
-    else return LO_CopyOne ( l1 ) ;
+    ListObject * l1 = lc_eval ( _LO_Next ( lc->Lfirst ) ) ; // lc->Lfirst : should be 'car'
+    if ( l1 && ( l1->W_LispAttributes & ( LIST_NODE | LIST ) ) ) return  lc_eval ( _LO_First ( l1 ) ) ; //( ListObject * ) l1 ;
+    else return l1 ;
 }
 
 ListObject *
 LO_Cdr ( )
 {
     LambdaCalculus * lc = _LC_ ;
-    ListObject * l1 = _LO_Next ( lc->Lfirst ) ;
-    if ( l1->W_LispAttributes & ( LIST_NODE | LIST ) ) return _LO_Next ( _LO_First ( l1 ) ) ; //( ListObject * ) l1 ;
-    return ( ListObject * ) _LO_Next ( l1 ) ;
-}
+    ListObject * l1 = lc_eval ( _LO_Next ( lc->Lfirst ) ) ; // lc->Lfirst : should be 'cdr'
+    if ( l1 && (l1->W_LispAttributes & ( LIST_NODE | LIST ) ) ) return lc_eval ( _LO_Next ( _LO_First ( l1 ) ) ) ; //( ListObject * ) l1 ;
+    else return l1 ;
+ }
 
 ListObject *
 LO_Eval ( )

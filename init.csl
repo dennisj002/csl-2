@@ -536,3 +536,7 @@ ld: (define (sq-iter guess x) (if (good-enough? guess x) guess (sq-iter (improve
 bnOff
 
 #endif // lisp test
+#if 0
+tc demo
+lisp
+#endif

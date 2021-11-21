@@ -9,6 +9,7 @@ LO_IsQuoted ( ListObject *l0 )
 ListObject *
 LC_Eval ( ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
+    l0 = LO_CopyOne ( l0 ) ;
     LambdaCalculus * lc = _LC_ ;
     ListObject *l1 = l0 ; // default
     lc->ApplyFlag = applyFlag ; //= ! GetState (lc, LC_DEFINE_MODE);
@@ -129,6 +130,7 @@ _LC_EvalList ( )
 #endif            
             le = LC_Eval ( lnode, locals, lc->ApplyFlag ) ; // lc->Locals could be changed by eval
             LO_AddToTail ( l1, LO_CopyOne ( le ) ) ;
+            //LO_AddToTail ( l1, le ) ;
         }
     }
     return l1 ;

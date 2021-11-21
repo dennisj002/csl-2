@@ -7,15 +7,15 @@
 (yfacc yfacc 20) 
 (yfacc yfacc 7) nl 
 //pause
-(definec fibc (lambda ( n ) (ifc (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2)))))) 
-pwi fibc
+//(define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2)))))) 
+(define fibc ( lambda ( n ) ( ifElse ( < n 2 ) n ( + ( fibc ( - n 1 ) ) ( fibc ( - n 2 ) ) ) ) ) )
+pwi LispDefines.fibc
 "\nfibc 30 = " ps
 (fibc 30) //pause
-
 (definec (fibc1 n ) (ifc (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2)))))
 //(define fibc1 ( lambda ( n ) (ifc (< n 2) (n) ( + (fibc1 (- n 1)) (fibc1 (- n 2)) ) ) ) )
 (definec fibc2 ( lambda ( n ) (ifc (< n 2) n ( + (fibc2 (- n 1)) (fibc2 (- n 2)) ) ) ) )
-pwi fibc1
+pwi LispDefines.fibc1
 "\nfibc1 30 = " ps
 (fibc1 30) 
 (fibc2 30) 
@@ -128,7 +128,7 @@ bnOff
 ;;; SECTION 1.2.5
 "\nfib 30 =" ps (fib 30)
 #endif    
-//(ld:)  (load "namespaces/schemeTest2.csl")            
+// (load "namespaces/schemeTest2.csl")            
 #endif
 "\ncsl : scheme/lisp : type \'x\' or \'exit\' or \'bye\' to exit ...\n" ps
 #if 0 //lisp
@@ -203,6 +203,7 @@ bnOff
         ((= kinds-of-coins 5) 50))) 
 (count-change 100)     
 #endif
+
 (define (substt x y z )  
     ( cond ((atom z)  
             (cond ( (eq z y) x )
@@ -214,5 +215,9 @@ bnOff
         )
     )
  )
-//(substt 'm 'b  '(a b ( a b c ) d))
-
+;;; ld: ( substt 'm 'b  '(a b ( a b c ) d) ) ;ld
+(define z1 ( 1 ( 2 3 4 ) 5 ) )
+( cdr ( cdr z1 ))
+(cdr z1)
+(define z2 ( 1 (2 (3 4)) )) 
+(cdr (cdr (cdr z2))) 
