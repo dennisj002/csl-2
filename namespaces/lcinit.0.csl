@@ -203,7 +203,7 @@ bnOff
         ((= kinds-of-coins 5) 50))) 
 (count-change 100)     
 #endif
-
+#if 0 //l9
 (define (substt x y z )  
     ( cond ((atom z)  
             (cond ( (eq z y) x )
@@ -216,8 +216,23 @@ bnOff
     )
  )
 ;;; ld: ( substt 'm 'b  '(a b ( a b c ) d) ) ;ld
+#endif
 (define z1 ( 1 ( 2 3 4 ) 5 ) )
 ( cdr ( cdr z1 ))
 (cdr z1)
 (define z2 ( 1 (2 (3 4)) )) 
 (cdr (cdr (cdr z2))) 
+#if 1
+(define (substt x y z )  
+    ( cond ((atom z)  
+            (cond ( (eq z y) x )
+                ( 't z )))
+        ( 't 
+            ( cons ( substt x y ( car z) ) 
+                      ( substt x y ( cdr z ) )
+            )
+        )
+    )
+ )
+( substt 'm 'b  '(a b ( a b c ) d) ) 
+#endif

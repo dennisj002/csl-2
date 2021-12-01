@@ -494,6 +494,7 @@ pwi fac5
 cOff
 #endif 
 #endif    
+
 2 + 7 assertStkChk //d: // stack checking 
 //"namespaces/test2c.csl" include
 //100 count_changec p
@@ -534,9 +535,6 @@ ld: (define (sq-iter guess x) (if (good-enough? guess x) guess (sq-iter (improve
 (sqrt 2) 
 (sqrt (sqrt (sqrt 9) ))
 bnOff
-
 #endif // lisp test
-#if 0
-tc demo
-lisp
-#endif
+
+//tc demo lisp
