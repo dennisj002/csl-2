@@ -258,7 +258,7 @@ byte *_CSL_EndBlock2(BlockInfo *bi);
 void CSL_EndBlock(void);
 BlockInfo *BlockInfo_New(void);
 /* src/basis/compiler/blocks.c */
-BlockInfo *BI_Block_Copy(BlockInfo *bi, byte *dstAddress, byte *srcAddress, int64 bsize, Boolean optimzeSpecial);
+BlockInfo *BI_Block_Copy(BlockInfo *bi, byte *dstAddress, byte *srcAddress, int64 bsize);
 void Compile_BlockLogicTest(BlockInfo *bi);
 byte *Block_OptimizeJCC(BlockInfo *bi, Boolean jccFlag, byte *jmpToAddr);
 byte *Block_CopyCompile(byte *srcAddress, int64 bindex, Boolean jccFlag, byte *jmpToAddr);

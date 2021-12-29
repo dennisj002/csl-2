@@ -203,22 +203,6 @@ typedef
 Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
 typedef struct _Identifier // _Symbol
 {
-#if 0
-    union
-    {
-        struct Namespace Namespace ;
-        struct Vocabulary Vocabulary ;
-        struct Class Class ;
-        struct DynamicObject DynamicObject ;
-        struct DObject DObject ;
-        struct ListObject ListObject ;
-        struct Symbol Symbol ;
-        struct MemChunk MemChunk
-        struct HistoryStringNode HistoryStringNode ;
-        struct Buffer Buffer ;
-        struct CaseNode CaseNode ;
-    }
-#else    
     DLNode S_Node ;
     int64 CodeSize ;
     byte * S_Name ;
@@ -252,7 +236,6 @@ typedef struct _Identifier // _Symbol
         dlnode * S_Node3 ;
         byte * S_pb_Data3 ;
     } ;
-#endif
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer, CaseNode ;
 #define S_Car S_Node.n_DLNode.n_After
@@ -359,6 +342,22 @@ typedef union
 } TypeSignatureInfo ;
 typedef struct _WordData
 {
+#if 0
+    union
+    {
+        struct Namespace Namespace ;
+        struct Vocabulary Vocabulary ;
+        struct Class Class ;
+        struct DynamicObject DynamicObject ;
+        struct DObject DObject ;
+        struct ListObject ListObject ;
+        struct Symbol Symbol ;
+        struct MemChunk MemChunk
+        struct HistoryStringNode HistoryStringNode ;
+        struct Buffer Buffer ;
+        struct CaseNode CaseNode ;
+    }
+#endif
     uint64 RunType ;
     Namespace * TypeNamespace ;
     byte * CodeStart ; // set at Word allocation 

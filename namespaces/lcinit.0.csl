@@ -69,6 +69,7 @@ bnOff
         ((= kinds-of-coins 4) 25)
         ((= kinds-of-coins 5) 50))) 
 (count-change 100)     
+(count-change 1000)     
 (define ( A x y) 
     (cond 
         (( = y 0 ) 0 )
@@ -233,6 +234,6 @@ bnOff
             )
         )
     )
- )
+)
 ( substt 'm 'b  '(a b ( a b c ) d) ) 
 #endif

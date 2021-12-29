@@ -219,7 +219,7 @@ _CSL_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
                 _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC, 0 ) ;
                 if ( lispMode )
                 {
-                    Compile_Move_Reg_To_Reg ( RegParameterOrder ( ( *i ) ++ ), ACC, 0 ) ;
+                    Compile_Move_Reg_To_Reg ( RegParameterOrder (( *i ) ++ ), ACC, 0 ) ;
                     //_Debugger_->PreHere = baseObject->Coding ;
                 }
                 else _Word_CompileAndRecord_PushReg ( baseObject, ACC, true ) ;

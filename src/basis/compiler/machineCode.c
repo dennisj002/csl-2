@@ -84,16 +84,30 @@ _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Bool
     if ( imm || ( controlFlags & IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags & IMM_B ) ) ;
     if ( _DBI || ( _O_->Dbi > 1 ) )
     {
-        d1 ( Debugger_UdisOneInstruction (_Debugger_, 0, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
-        d0 ( _Debugger_Disassemble (_Debugger_, 0, ( byte* ) here, Here - here, 1 ) ) ;
+        d1 ( Debugger_UdisOneInstruction ( _Debugger_, 0, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
+        d0 ( _Debugger_Disassemble ( _Debugger_, 0, ( byte* ) here, Here - here, 1 ) ) ;
     }
 }
 
 Boolean
 RegParameterOrder ( Boolean n )
 {
+#if 0  // trying to get factorial to use RAX as its reg var
+    Compiler * compiler = _Compiler_ ;
+    if ( ( ( compiler->NumberOfNonRegisterArgs + compiler->NumberOfNonRegisterLocals ) == 0 ) && ( ( compiler->NumberOfArgs + compiler->NumberOfLocals ) == 1 ) ) //nonRegVars )
+    {
+        Boolean regOrder [] = { RAX, RSI, RDX, RCX, R8D, R9D, R10D, R11D } ;
+        return regOrder [n] ;
+    }
+    else
+    {
+        Boolean regOrder [] = { RDI, RSI, RDX, RCX, R8D, R9D, R10D, R11D } ;
+        return regOrder [n] ;
+    }
+#else
     Boolean regOrder [] = { RDI, RSI, RDX, RCX, R8D, R9D, R10D, R11D } ;
     return regOrder [n] ;
+#endif    
 }
 
 // some checks of the internal consistency of the instruction bits
@@ -645,12 +659,19 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         if ( one->W_ObjectAttributes & REGISTER_VARIABLE ) _Compile_Group5 ( op, REG, one->RegToUse, 0, 0, 0 ) ;
         else
         {
+            //DBI_ON ;
+#if 0            
             Compile_GetVarLitObj_RValue_To_Reg ( one, ACC, 0 ) ;
             //_Compile_Group5 ( int8 code, int8 mod, int8 rm, int8 sib, int64 disp, int8 size )
             Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
             _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
             // ++ == += :: -- == -= so :
             _Compile_SetVarLitObj_With_Reg ( one, ACC, OREG ) ;
+#else
+            //_Compile_Group5 ( Boolean code, Boolean mod, Boolean rm, Boolean sib, int64 disp, Boolean size )
+            _Compile_Group5 ( op, MEM, FP, 0, LocalOrParameterVar_Disp ( one ), 0 ) ;
+#endif            
+            //DBI_OFF ;
             return ;
         }
     }

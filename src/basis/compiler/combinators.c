@@ -22,7 +22,7 @@ CSL_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     _CSL_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
     bi->CombinatorEndsAt = Here ;
     if ( moveFlag && Compiling ) BI_Block_Copy (bi, bi->OriginalActualCodeStart,
-        bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt, 1) ; // 0 : can't generally peephole optimize (arrayTest.csl problems) ??
+        bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt ) ; // 0 : can't generally peephole optimize (arrayTest.csl problems) ??
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
     if ( GetState ( compiler, LC_COMBINATOR_MODE ) )
     {

@@ -444,7 +444,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
             if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables ++] = '_' ;
             if ( regFlag == true )
             {
-                word->RegToUse = RegParameterOrder ( regToUseIndex ++ ) ;
+                word->RegToUse = RegParameterOrder ( regToUseIndex ++ ) ; //, numberOfVariables ) ;
                 if ( word->W_ObjectAttributes & PARAMETER_VARIABLE )
                 {
                     if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;

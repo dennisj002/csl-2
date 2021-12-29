@@ -293,7 +293,7 @@ sp
 sp
 Lisp
 #if doBigNum    
-//bnOn
+bnOn
 (define xyfac 10)
 (define yfac (lambda (yy n) (if (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 "\nyfac : 10 factorial = " ps (yfac yfac 10) 
