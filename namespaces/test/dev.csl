@@ -114,19 +114,35 @@ faccs ( REG n | REG rec )
 ' faccs find wdiss
 faccs ( 7 ) dup p 5040 _assert 
 sp
-
+int
+faccs1 ( REG n | REG rec ) 
+{
+    rec = 1 ; 
+    if ( n > 1 )
+   {
+        do
+        { 
+            rec = rec * n ;  n-- ; 
+        } 
+        while ( n > 1 ) ;
+    }
+    return rec ;
+}
+' faccs1 find wdiss
+faccs1 ( 7 ) dup p 5040 _assert 
+sp
 int
 fac40 ( n  | facc ) 
 { 
-    int facc = 1 ;
-#if 1
+    facc = 1 ;
+#if 0
     while ( n > 1 ) facc = n -- * facc ;
 #else
     while ( n > 1 ) facc *= n -- ;
 #endif
     return facc ;
 } 
-
+pwi fac40 //pause
 int
 fac5 ( REG n  | REG facc ) 
 { 
@@ -264,9 +280,12 @@ User
 "cfactorial_O3" ffx
 "cfactorial2_O3" ffx
 "cfactorial3_O3" ffx
+"cfactorial4_O3" ffx
 //pause
 using 
 "faccs" ffx
+"faccs1" ffx
+"faccs2" ffx
 "fac5" ffx
 "fac40" ffx
 sp

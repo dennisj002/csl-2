@@ -102,7 +102,7 @@ _Do_Compile_Variable ( Word * word )
         if ( GetState ( cntx, IS_RVALUE ) ) Compile_GetVarLitObj_RValue_To_Reg ( word, ACC, 0 ) ;
         else
         {
-            Compiler_Word_SCHCPUSCA ( word, 1 ) ;
+            Compiler_Word_SCHCPUSCA ( word, 0 ) ;
             if ( ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) ) _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC, 0 ) ;
             else // this compilation is delayed to _CSL_C_Infix_Equal/Op
             {
@@ -216,7 +216,7 @@ Compile_C_FunctionDeclaration ( byte * token1 )
     CSL_C_Syntax_On ( ) ;
     Word * word = Word_New ( token1 ) ; // "("
     CSL_WordList_PushWord ( word ) ;
-    Compiler_Word_SCHCPUSCA ( word, 1 ) ;
+    Compiler_Word_SCHCPUSCA ( word, 0 ) ;
     DataStack_Push ( ( int64 ) word ) ;
     CSL_BeginBlock ( ) ; // nb! before CSL_LocalsAndStackVariablesBegin
     CSL_LocalsAndStackVariablesBegin ( ) ;

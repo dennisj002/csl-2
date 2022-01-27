@@ -48,11 +48,11 @@ _Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi 
     Word * word = 0 ;
     Lexer_ParseObject ( lexer, token ) ;
     lexer->ParsedToken = token ;
-    if ( lexer->L_ObjectAttributes & T_RAW_STRING ) 
+    if ( lexer->L_ObjectAttributes & T_RAW_STRING )
     {
         if ( ( GetState ( _O_, AUTO_VAR ) && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) ) )
             word = Lexer_Do_MakeItAutoVar ( lexer, token, tsrli, scwi ) ;
-        else Printf ( "\nWarning : %s : word \'%s\' not found! Pushing \'%s\' as a string onto the stack.\n", Context_Location (), token, token ) ;
+        else Printf ( "\nWarning : %s : word \'%s\' not found! Pushing \'%s\' as a string onto the stack.\n", Context_Location ( ), token, token ) ;
     }
     if ( ! word ) word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, lexer->Literal, 0, 0, tsrli, scwi ) ;
     if ( word )
@@ -83,7 +83,7 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
             }
         }
         else word = lword ;
-        if ( ! word ) 
+        if ( ! word )
         {
             word = _Lexer_ParseToken_ToWord ( lexer, token, - 1, - 1 ) ;
         }
@@ -136,7 +136,7 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
     lexer->SC_Index = _CSL_->SC_Index ;
-    if ( delimiters )  Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
+    if ( delimiters ) Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
     else
     {
         if ( cntx->SpecialDelimiterCharSet )
@@ -230,6 +230,7 @@ Lexer_Token_New ( byte * token )
 }
 
 // ??? this word and it's callees needs to be improved ??? : not as functional as it could be
+
 int64
 _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag )
 {
@@ -318,8 +319,11 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
     int64 svReadIndex = rl->ReadIndex, svSC_Index = lexer->SC_Index, svTokenStart_ReadLineIndex = lexer->TokenStart_ReadLineIndex ;
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     CSL_PushToken_OnTokenList ( token ) ;
-    if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
-    lexer->SC_Index = svSC_Index, lexer->TokenStart_ReadLineIndex = svTokenStart_ReadLineIndex ; // this is peek so we want to keep actual values for debugger show words
+    if ( svReadIndexFlag )
+    {
+        rl->ReadIndex = svReadIndex ;
+        lexer->SC_Index = svSC_Index, lexer->TokenStart_ReadLineIndex = svTokenStart_ReadLineIndex ;
+    }// this is peek so we want to keep actual values for debugger show words
     return token ;
 }
 
@@ -578,7 +582,7 @@ NonTerminatingMacro ( Lexer * lexer )
     if ( lexer->TokenWriteIndex == 1 )
     {
         byte chr = ReadLine_PeekNextChar ( rl ) ;
-        if (( chr == 't') || (chr =='f')  ) 
+        if ( ( chr == 't' ) || ( chr == 'f' ) )
             return ;
         if ( ( chr == 'd' ) && ( _ReadLine_PeekOffsetChar ( rl, 1 ) == 'e' ) ) Lexer_FinishTokenHere ( lexer ) ; // #define
         else if ( chr == '$' )
@@ -982,7 +986,7 @@ Lexer_CheckIfDone ( Lexer * lexer, int64 flags )
 // the non-string lexer char input function
 
 byte
-_Lexer_NextChar ( Lexer * lexer ) 
+_Lexer_NextChar ( Lexer * lexer )
 {
     ReadLiner * rl = lexer->ReadLiner0 ;
     return lexer->CurrentChar = ReadLine_NextChar ( rl ) ;

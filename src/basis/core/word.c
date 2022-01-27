@@ -325,13 +325,13 @@ void
 _Word_ShowSourceCode ( Word * word0 )
 {
     Word * word = Word_UnAlias ( word0 ) ;
-    if ( word && word->W_WordData ) //&& word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
+    if ( word && word->W_WordData ) //&& word->W_OriginalCodeText ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
     {
         byte * name, *scd ;
-        if ( ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) ) && word->W_SourceCode )
+        if ( ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) ) && word->W_OriginalCodeText )
         {
             byte * sc = Buffer_Data_Cleared ( _CSL_->ScratchB1 ) ;
-            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode, BUFFER_IX_SIZE ) ;
+            sc = _String_ConvertStringToBackSlash ( sc, word->W_OriginalCodeText, BUFFER_IX_SIZE ) ;
             scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
         }
         else scd = ( byte* ) "C Primitive" ;
@@ -343,7 +343,7 @@ _Word_ShowSourceCode ( Word * word0 )
 byte *
 Word_GetLocalsSourceCodeString ( Word * word, byte * buffer )
 {
-    byte * start, * sc = word->W_SourceCode ;
+    byte * start, * sc = word->W_OriginalCodeText ;
     int64 s, e ;
     // find and reconstruct locals source code in a buffer and parse it with the regular locals parse code
     for ( s = 0 ; sc [ s ] && sc [ s ] != '(' ; s ++ ) ;

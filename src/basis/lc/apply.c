@@ -487,7 +487,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
             DefaultColors ;
         }
     }
-    _Word_DefinitionStore ( word, ( block ) code ) ; // not _Word_InitFinal because this is already CSL->CurrentWordCompiling with W_SourceCode, etc.
+    _Word_DefinitionStore ( word, ( block ) code ) ; // not _Word_InitFinal because this is already CSL->CurrentWordCompiling with W_OriginalCodeText, etc.
     SetState ( lc, ( LC_BLOCK_COMPILE | LC_COMPILE_MODE ), false ) ; // necessary !!
     return code ;
 }

@@ -100,7 +100,7 @@ _CSL_Word_ClassStructure_PrintData ( Word * typedefWord0, Word * word )
     Word * typedefWord = Word_UnAlias ( typedefWord0 ) ;
     CSL_NewLine ( ) ;
     byte * dataBits = ( word->W_ObjectAttributes & ( STRUCTURE_TYPE ) ) ? ( byte* ) word->W_Value : ( byte* ) word ; //STRUCTURE_TYPE not quite right ??
-    if ( typedefWord && word ) Object_PrintStructuredData ( dataBits, typedefWord->W_SourceCode ) ;
+    if ( typedefWord && word ) Object_PrintStructuredData ( dataBits, typedefWord->W_OriginalCodeText ) ;
 }
 
 void

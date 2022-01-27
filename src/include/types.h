@@ -395,7 +395,7 @@ typedef struct _WordData
     union
     {
         int64 * WD_ArrayDimensions ;
-        byte *WD_SourceCode ; // arrays don't have source code
+        byte *WD_OriginalCodeText ; // arrays don't have source code
     } ;
     int64 WD_ArrayNumberOfDimensions ;
     Stack * WD_NamespaceStack ; // arrays don't have runtime debug code
@@ -411,7 +411,7 @@ typedef struct _WordData
         //byte * LogicTestCode ;
     } ;
     dllist * SourceCodeWordList ;
-    byte * SourceCoding ; //
+    //byte * SourceCoding ; //
     int64 SourceCodeMemSpaceRandMarker ;
     dllist * DebugWordList ;
     int64 StartCharRlIndex ;
@@ -422,7 +422,7 @@ typedef struct _WordData
 // to keep using existing code without rewriting ...
 #define CodeStart W_WordData->CodeStart // set at Word allocation 
 #define Coding W_WordData->Coding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
-#define SourceCoding W_WordData->SourceCoding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
+#define SourceCoding Coding //W_WordData->SourceCoding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
 #define Offset W_WordData->Offset // used by ClassField
 #define W_NumberOfNonRegisterArgs W_WordData->NumberOfNonRegisterArgs 
 #define W_NumberOfNonRegisterLocals W_WordData->NumberOfNonRegisterLocals 
@@ -437,7 +437,7 @@ typedef struct _WordData
 #define ObjectCode W_WordData->Coding // used by objects/class words
 #define W_OurLocation W_WordData->OurLocation
 #define StackPushRegisterCode W_WordData->StackPushRegisterCode // used by Optimize
-#define W_SourceCode W_WordData->WD_SourceCode 
+#define W_OriginalCodeText W_WordData->WD_OriginalCodeText 
 //#define W_TokenEnd_ReadLineIndex W_WordData->CursorEndPosition 
 #define W_TokenStart_LineIndex W_WordData->TokenStart_LineIndex 
 #define S_FunctionTypesArray W_WordData->FunctionTypesArray

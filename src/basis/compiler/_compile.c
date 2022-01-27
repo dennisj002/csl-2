@@ -102,7 +102,7 @@ void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg, int size )
 {
     if ( ! size ) size = word->CompiledDataFieldByteSize ; 
-    Compiler_Word_SCHCPUSCA ( word, 1 ) ;
+    Compiler_Word_SCHCPUSCA ( word, 0 ) ;
     if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
         return ;
@@ -173,7 +173,7 @@ void
 _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg, int size )
 {
     if ( ! size ) size = word->CompiledDataFieldByteSize ; 
-    Compiler_Word_SCHCPUSCA ( word, 1 ) ;
+    Compiler_Word_SCHCPUSCA ( word, 0 ) ;
     if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;

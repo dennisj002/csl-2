@@ -498,7 +498,7 @@ TDSCI_Print_StructField ( )
     //TDSCI_DebugPrintWord ( cntx, tdsci->Tdsci_Field_Type_Namespace ) ;
     TDSCI_Print_StructNameEtc ( ) ;
     Word * word = Word_UnAlias ( tdsci->Tdsci_Field_Type_Namespace ) ;
-    Object_PrintStructuredData ( &tdsci->DataPtr [ word->Offset ], word->W_SourceCode ) ;
+    Object_PrintStructuredData ( &tdsci->DataPtr [ word->Offset ], word->W_OriginalCodeText ) ;
     //CSL_NewLine ( ) ;
 }
 

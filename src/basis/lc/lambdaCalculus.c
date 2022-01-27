@@ -91,7 +91,7 @@ _LO_New ( uint64 lispAttributes, uint64 morphismAttributes, uint64 objectAttribu
         //Word * word = Compiler_CopyDuplicatesAndPush ( word0, tsrli, scwi ) ;
         l0->Lo_CSL_Word = word ;
         word->Lo_CSL_Word = word ;
-        l0->W_SourceCode = word->W_SourceCode ;
+        l0->W_OriginalCodeText = word->W_OriginalCodeText ;
         word->W_SC_Index = scwi ;
         word->W_RL_Index = tsrli ;
     }

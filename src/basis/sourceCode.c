@@ -18,12 +18,12 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
             list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CSL_->CSL_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _O_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //CSL->CompilerWordList ;
             if ( list )
             {
-                sourceCode = scWord->W_SourceCode ; //? scWord->W_SourceCode : String_New ( CSL->SC_Buffer, TEMPORARY ) ;
+                sourceCode = scWord->W_OriginalCodeText ; //? scWord->W_OriginalCodeText : String_New ( CSL->SC_Buffer, TEMPORARY ) ;
                 if ( ! String_Equal ( sourceCode, "" ) )
                 {
                     storeFixed = 0 ;
                     //if ( Is_DebugOn ) SC_WordList_Show ( list, scWord, 0, 0, 0 ) ;
-                    word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
+                    word = DWL_Find (list, 0, address, 0, 0, 0 ) ;
                     if ( word )
                     {
                         if ( ( scWord->W_TypeAttributes & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )
@@ -89,13 +89,13 @@ SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( Word * word )
  * 
  */
 Word *
-DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFirstFind, byte * newAddress, int64 fromFirstFlag ) // nb fromTop is from the end of the list because it is the top 'push'
+DWL_Find (dllist * list, Word * iword, byte * address, byte* name, int64 takeFirstFind, int64 fromFirstFlag ) // nb fromTop is from the end of the list because it is the top 'push'
 {
     byte * naddress ;
     Word *aFoundWord = 0, *foundWord = 0, *maybeFoundWord = 0 ;
     dlnode * anode = 0 ;
     int64 numFound = 0, i, iuFlag ;
-    int64 fDiff = 0, minDiffFound = 0, scwi, lastScwi = _Debugger_->LastScwi ? _Debugger_->LastScwi : 0 ;
+    int64 fDiff = 0, scwi, lastScwi = _Debugger_->LastScwi ? _Debugger_->LastScwi : 0 ;
     if ( list && ( iword || name || address ) )
     {
         for ( i = 0, anode = ( fromFirstFlag ? dllist_First ( list ) : dllist_Last ( list ) ) ; anode ;
@@ -108,17 +108,18 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
             naddress = aFoundWord->SourceCoding ;
             if ( iword && ( aFoundWord == iword ) ) return aFoundWord ;
-            if ( ( _O_->Verbosity > 3 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "afound", 0 ) ;
+            if ( ( _O_->Verbosity > 3 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "found", 0 ) ;
             if ( address && ( address == naddress ) )
             {
                 numFound ++ ;
                 fDiff = abs ( scwi - lastScwi ) ;
                 aFoundWord->W_SC_Index = scwi ; // not sure exactly why this is necessary but it is important for now??
-                if ( ( _O_->Verbosity > 2 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", 0 ) ;
+                if ( ( _O_->Verbosity > 2 ) ) 
+                    DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", 0 ) ;
                 if ( ( aFoundWord->W_ObjectAttributes & LITERAL ) && ( aFoundWord->Coding[1] == 0xb9 ) )
                 {
                     foundWord = aFoundWord ;
-                    minDiffFound = fDiff ;
+                    //minDiffFound = fDiff ;
                 }
                 else if ( ( aFoundWord->W_MorphismAttributes & CATEGORY_PLUS_PLUS_MINUS_MINUS ) && ( aFoundWord->Coding[1] == 0xff ) )
                 {
@@ -128,20 +129,22 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                 else if ( SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )
                 {
                     foundWord = aFoundWord ;
-                    minDiffFound = fDiff ;
+                    //minDiffFound = fDiff ;
                 }
+#if 0                
                 else if ( ( fDiff < minDiffFound ) && SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )//|| SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( foundWord ) || ( ! SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) ) )
                 {
                     foundWord = aFoundWord ;
                     minDiffFound = fDiff ;
                 }
+#endif                
                 else if ( ! foundWord ) maybeFoundWord = aFoundWord ;
                 if ( takeFirstFind ) break ;
             }
         }
         if ( ( ! foundWord ) && maybeFoundWord ) foundWord = maybeFoundWord ;
     }
-    if ( ( ! newAddress ) && ( numFound ) )
+    if ( numFound )
     {
         if ( ( foundWord ) && ( _O_->Verbosity > 2 ) )
         {
@@ -414,8 +417,8 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
         }
         else //if ( index )
         {
-            Printf ( "\n WordList : index %3d : word = 0x%08x : \'%-12s\' : sourceCoding = 0x%08x : scwi = %03d : inUse = %s",
-                index, word, name, sourceCoding, scwi, biuFlag ) ;
+            Printf ( "\n %s :: index %3d : word = 0x%08x : \'%-12s\' : sourceCoding = 0x%08x : scwi = %03d : inUse = %s",
+                prefix, index, word, name, sourceCoding, scwi, biuFlag ) ;
         }
 #if 0        
 else //if ( scwiDiff )
@@ -640,7 +643,7 @@ CSL_Finish_WordSourceCode ( CSL * csl, Word * word, Boolean force )
 {
     if ( word )
     {
-        if ( ( ! word->W_SourceCode ) || force ) word->W_SourceCode = _CSL_GetSourceCode ( ) ;
+        if ( ( ! word->W_OriginalCodeText ) || force ) word->W_OriginalCodeText = _CSL_GetSourceCode ( ) ;
         Lexer_SourceCodeOff ( _Lexer_ ) ;
         //word->SC_FileIndex_Start = csl->SCI.SciFileIndexScStart ;
         //word->SC_FileIndex_End = csl->SCI.SciFileIndexScEnd ;
@@ -704,7 +707,7 @@ FindSourceCodeWord ( Word * word )
     {
         do
         {
-            if ( word->W_SourceCode ) return word ;
+            if ( word->W_OriginalCodeText ) return word ;
             if ( word == word->W_MySourceCodeWord ) break ;
             else word = word->W_MySourceCodeWord ;
         }

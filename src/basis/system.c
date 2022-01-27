@@ -318,7 +318,7 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
             {
                 _Word_ShowSourceCode ( aword ) ;
             }
-            if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
+            if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_OriginalCodeText ) ;
             if ( word->W_WordData->Filename ) Printf ( "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, 
                 word->W_WordData->Filename, word->W_WordData->LineNumber, word->W_TokenStart_LineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
             if ( ( word->W_LispAttributes & T_LC_DEFINE ) && ( ! ( word->W_LispAttributes & T_LISP_COMPILED_WORD ) ) ) Printf ( "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here

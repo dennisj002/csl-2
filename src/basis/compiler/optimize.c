@@ -25,7 +25,7 @@
  * 15 total total combinations
  * 
  */
-// remember this is rpn code so arg 1 is lower on the stack (STACK_1) than arg2 (STACK_0)
+// remember this is rpn code so arg 1, the first arg, is lower on the stack (STACK_1) than arg2, the second arg, (STACK_0)
 // need to consider also REGISTER args/parameters !!
 // but we still need to consider types (sizes) and type checking
 // and ARM cpu adjustments

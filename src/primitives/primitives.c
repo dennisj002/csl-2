@@ -95,7 +95,7 @@ CPrimitive CPrimitives [] = {
     { "cfactorial_O3", 0, 0, 0, CFactorial_O3, 0, 0, 0, "C", "Root" },
     { "cfactorial2_O3", 0, 0, 0, CFactorial2_O3, 0, 0, 0, "C", "Root" },
     { "cfactorial3_O3", 0, 0, 0, CFactorial3_O3, 0, 0, 0, "C", "Root" },
-    { "cfactorial3_O3", 0, 0, 0, CFactorial3_O3, 0, 0, 0, "C", "Root" },
+    { "cfactorial4_O3", 0, 0, 0, CFactorial4_O3, 0, 0, 0, "C", "Root" },
     { "count_changec", 0, 0, 0, CSL_CountChange, 0, 0, 0, "C", "Root" },
     { "c_prefix", 0, 0, 0, CSL_C_Prefix, IMMEDIATE, 0, 0, "C", "Root" },
     //{ "c_return", 0, 0, 0, CSL_C_Return, IMMEDIATE, 0, 0, "C", "Root" },

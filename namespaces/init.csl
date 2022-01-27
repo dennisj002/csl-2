@@ -289,7 +289,7 @@ System
 : stk stack ; //debugWord 
 : ti timerInit ;
 : ahalt stop ;
-: vb ( n ) verbosity n @ = ; : vb4 4 vb ; : vb3 3 vb ; : vb2 2 vb ; : vb1 1 vb ; : vb0 0 vb ;
+: vb ( n ) verbosity n @ = ; : vb5 5 vb ; : vb4 4 vb ; : vb3 3 vb ; : vb2 2 vb ; : vb1 1 vb ; : vb0 0 vb ;
 : sOff vb1 inlineOff optimizeOff ;
 : sOn vb3 inlineOn optimizeOn ;
 "ahOn" ' addToHistoryOn find alias
@@ -457,7 +457,7 @@ System C
 tc
 #endif
 
-#if doLisp @
+#if 0 //doLisp @
 lisp 
 lcOff    
 doLispTest 0 =
@@ -481,6 +481,7 @@ Shell
 rtw
 
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
+
 #if forStarters 
 d: : hi0 ( n m ) n @ m @ - dup <dbg> p return tos ; pwi hi0 13 2 d: hi0 11 _assert
 #if 1

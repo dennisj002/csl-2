@@ -669,6 +669,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             _Compile_SetVarLitObj_With_Reg ( one, ACC, OREG ) ;
 #else
             //_Compile_Group5 ( Boolean code, Boolean mod, Boolean rm, Boolean sib, int64 disp, Boolean size )
+            Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
             _Compile_Group5 ( op, MEM, FP, 0, LocalOrParameterVar_Disp ( one ), 0 ) ;
 #endif            
             //DBI_OFF ;

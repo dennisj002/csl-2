@@ -4,7 +4,7 @@
 Boolean
 DBG_Interpret_Loop_Test ( Debugger * debugger )
 {
-    Boolean rtn = ( ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) && (GetState ( debugger, DBG_STEPPING ) || 
+    Boolean rtn = ( ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || (GetState ( debugger, DBG_STEPPING ) || 
         ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ) ;
     return rtn ;
 }
@@ -683,7 +683,7 @@ Debugger_New ( uint64 type )
     //debugger->LocalsNamespacesStack = Stack_New ( 32, type ) ;
 
     Debugger_TableSetup ( debugger ) ;
-    SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
+    SetState ( debugger, DBG_INTERPRET_LOOP_DONE, false ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
     Debugger_UdisInit ( debugger ) ;
     debugger->TerminalLineWidth = 120 ; // (tw > 145) ? tw : 145 ;

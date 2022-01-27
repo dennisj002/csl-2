@@ -201,7 +201,7 @@ void
 CSL_DoReturnWord ( Word * word )
 {
     Compiler * compiler = _Compiler_ ;
-    Word * word1 = CSL_Parse_KeywordOperand ( word, 1 ) ;
+    Word * word1 = CSL_Parse_Interpret_KeywordOperand ( word, 1 ) ;
     if ( word1 )
     {
         compiler->ReturnLParenVariableWord = word1 ;
@@ -216,7 +216,6 @@ CSL_DoReturnWord ( Word * word )
         byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ; //mov [r14], rax
         if ( memcmp ( mov_r14_rax, Here - 3, 3 ) )
         {
-            Compiler_Word_SCHCPUSCA ( word, 0 ) ;
             compiler->ReturnWord = Compiler_CopyDuplicatesAndPush ( compiler->ReturnWord, -1, -1 ) ; // want to have a copy because 'return may be responsible for another code output in Compiler_RemoveLocalFrame
             Compiler_Word_SCHCPUSCA (  compiler->ReturnWord, 0 ) ;
             Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
@@ -279,7 +278,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
                 return ;
             }
         }
-        Compiler_Word_SCHCPUSCA ( compiler->ReturnWord, 0 ) ;
+        //Compiler_Word_SCHCPUSCA ( compiler->ReturnLParenVariableWord, 0 ) ;
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
 }

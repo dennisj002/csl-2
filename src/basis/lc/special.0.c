@@ -57,7 +57,7 @@ _LO_Define_Scheme ( ListObject * idNode )
     l1 = DataObject_New ( T_LC_NEW, 0, word->Name, word->W_MorphismAttributes,
         word->W_ObjectAttributes, word->W_LispAttributes, 0, ( int64 ) value, 0, LISP, - 1, - 1 ) ; // all words are symbols
     l1->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
-    l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
+    l1->W_OriginalCodeText = word->W_OriginalCodeText = lc->LC_SourceCode ;
     if ( LC_CompileMode ) l1->W_SC_WordList = word->W_SC_WordList = lc->Lambda_SC_WordList ;
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     _CSL_FinishWordDebugInfo ( l1 ) ;
@@ -121,7 +121,7 @@ _LO_Define_Lisp ( ListObject * idNode )
     l1 = DataObject_New ( T_LC_NEW, 0, word->Name, word->W_MorphismAttributes,
         word->W_ObjectAttributes, word->W_LispAttributes, 0, ( int64 ) value, 0, LISP, - 1, - 1 ) ; // all words are symbols
     l1->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
-    l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
+    l1->W_OriginalCodeText = word->W_OriginalCodeText = lc->LC_SourceCode ;
     if ( LC_CompileMode ) l1->W_SC_WordList = word->W_SC_WordList = lc->Lambda_SC_WordList ;
     _CSL_FinishWordDebugInfo ( l1 ) ;
     _Word_Finish ( l1 ) ;
@@ -483,7 +483,7 @@ _LO_Semi ( Word * word )
         block blk = ( block ) DataStack_Pop ( ) ;
         Word_InitFinal ( word, ( byte* ) blk ) ;
         word->W_LispAttributes |= T_LISP_CSL_COMPILED ;
-        word->W_SourceCode = lc->LC_SourceCode ;
+        word->W_OriginalCodeText = lc->LC_SourceCode ;
         word->W_SC_WordList = lc->Lambda_SC_WordList ;
         lc->Lambda_SC_WordList = 0 ;
     }
@@ -573,7 +573,7 @@ _LO_CSL ( )
 #if 0            
             // in case we have more than one ":" on our list ...
             ListObject *ldata1 = _LO_Next ( ldata ) ; // bump ldata to account for name
-            word->W_SourceCode = String_New_SourceCode ( _CSL_->SC_Buffer ) ;
+            word->W_OriginalCodeText = String_New_SourceCode ( _CSL_->SC_Buffer ) ;
             if ( ldata1 && String_Equal ( ldata1->Name, ( byte * ) ":" ) )
             {
                 CSL_InitSourceCode_WithName ( _CSL_, ( byte* ) "(", 1 ) ;

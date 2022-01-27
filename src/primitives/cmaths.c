@@ -79,6 +79,21 @@ CFactorial3_O3 ( void )
     TOS = rec1 ;
 }
 
+void
+CFactorial4_O3 ( void ) 
+{
+    int64 rec = 1, n = TOS ;
+    if ( n > 1 )
+   {
+        do
+        { 
+            rec = rec * n ;  n-- ; 
+        } 
+        while ( n > 1 ) ;
+    }
+    TOS = rec ;
+}
+
 int64
 _CFib ( int64 n )
 {

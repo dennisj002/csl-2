@@ -150,11 +150,9 @@ CSL_Return ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     Word* wordr = CSL_WordList ( 0 ) ; // 'return
-    Compiler_Word_SCHCPUSCA ( wordr, 0 ) ;
     compiler->ReturnWord = wordr ;
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ; 
-    Word_SetTsrliScwi ( word, -1, -1 ) ;
     SetState ( _Compiler_, DOING_RETURN, true ) ;
     CSL_DoReturnWord ( word ) ;
     SetState ( _Compiler_, DOING_RETURN, false ) ;

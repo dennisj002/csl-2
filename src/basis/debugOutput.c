@@ -494,18 +494,18 @@ PSCS_Using_ReadlinerInputString ( byte* il, byte * token1, byte* token0, int64 s
 byte *
 DBG_PrepareShowInfoString ( Word * scWord, Word * word, byte* token0, byte* il, int tvw, int rlIndex, Boolean useScFlag ) // otoken : original token; il : instruction line ; tvw text view window
 {
-    // usingSC == 1 denotes il string is from word->W_SourceCode else il is copied from rl->InputLineString
+    // usingSC == 1 denotes il string is from word->W_OriginalCodeText else il is copied from rl->InputLineString
     Debugger * debugger = _Debugger_ ;
     byte * cc_line = ( byte* ) "", *scs = 0 ;
     if ( ! scWord )
     {
         if ( ( _LC_ && _LC_->Sc_Word ) && word && ( word->W_MySourceCodeWord == _LC_->Sc_Word ) ) scWord = _LC_->Sc_Word ;
     }
-    scs = scWord ? scWord->W_SourceCode : 0 ;
+    scs = scWord ? scWord->W_OriginalCodeText : 0 ;
     if ( ( ! scs ) && useScFlag )
     {
         scWord = Get_SourceCodeWord ( word ) ;
-        scs = scWord ? scWord->W_SourceCode : 0 ;
+        scs = scWord ? scWord->W_OriginalCodeText : 0 ;
     }
 
 
