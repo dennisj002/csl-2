@@ -438,12 +438,12 @@ CSL_Parse_Interpret_KeywordOperand ( Word * word, Boolean otherwiseFlag )
     if ( word && ( word->Name [0] == '(' ) ) // remember this was a peeked word
     {
         token = Lexer_ReadToken ( _Lexer_ ) ; // remember this was a peeked word
-        while ( token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ), ( token [0] != ')' ) ) CSL_CheckDo_KeywordOperand () ;
+        while ( token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0), ( token [0] != ')' ) ) CSL_CheckDo_KeywordOperand () ;
         //Lexer_ReadToken ( _Lexer_ ) ; // read final ')' which was just peeked
     }
     else if ( otherwiseFlag ) //&& ( ! ( word->W_MorphismAttributes & ( T_TOS ) ) ) )
     {
-        while ( token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ), ( ( token [0] != '{' ) && ( token [0] != '}' ) && ( token [0] != ';' ) ) )
+        while ( token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0), ( ( token [0] != '{' ) && ( token [0] != '}' ) && ( token [0] != ';' ) ) )
             CSL_CheckDo_KeywordOperand () ;
     }
     //if (token) Lexer_ReadToken ( _Lexer_ ) ; // read final ')' which was just peeked

@@ -3,7 +3,8 @@ Int
 bnOff
 5
 "\nstarting lisp.csl\n" ddps
-Lisp
+//Lisp
+lcOn
 #if 0 // debug
 : sp stack pause ; sp
 #else
@@ -26,7 +27,7 @@ decimal
 (+ 1 6) 
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 ) 21 )  // == 777
 ( define f ( lambda x ( + x 1 2 ) ) ) 
-tick f find wdiss
+tick f find wdiss //pause
 ( f 4 )
 ( begin ( define f ( lambda ( x ) ( + x 1 2 ) ) ) ( f 4 ) )
 ( + 1 2 4 )
@@ -194,6 +195,7 @@ stack //pause
 (yfac yfac 10) 
 (yfac yfac 7) 
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+tick fibc find wdiss
 #if 0 // ifc currently doesn't work with lambda
 //(define fibc1 (lambda ( n ) (ifc (< n 2) n (+ (fibc1 (- n 1)) (fibc1 (- n 2))))))
 #endif

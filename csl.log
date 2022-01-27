@@ -1,0 +1,8 @@
+
+ 
+
+./init.csl : 257.19
+[i]  :: [34;49m./init.csl : 257.19[34;49m : System :> [33;40mpause[34;49m <: cprimitive :> [34;49mpwi logWrite [34;49m[33;40mpause[34;49m[34;49m[34;49m
+
+[39;49mpause[34;49m : at ./init.csl : 257.19 :: [39;49m[34;49m'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\' or <key> (i)interpret, <return> loop[39;49m
+-> [34;49m

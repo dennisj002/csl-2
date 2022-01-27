@@ -79,7 +79,8 @@ _Debugger_ShouldWeShow ( Debugger * debugger, Word * word, Boolean stepFlag, int
 {
     uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _DspReg_ = debugger->cs_Cpu->R14d ) : _DspReg_ ;
     if ( ! dsp ) CSL_Exception ( STACK_ERROR, 0, QUIT ) ;
-    if ( Is_DebugOn && ( !_LC_ ) && ( _CSL_->DebugLevel >= debugLevel ) && ( force || stepFlag || ( word && ( word != debugger->LastShowEffectsWord ) ) ||
+    //if ( Is_DebugOn && ( !_LC_ ) && ( _CSL_->DebugLevel >= debugLevel ) && ( force || stepFlag || ( word && ( word != debugger->LastShowEffectsWord ) ) ||
+    if ( Is_DebugOn && ( _CSL_->DebugLevel >= debugLevel ) && ( force || stepFlag || ( word && ( word != debugger->LastShowEffectsWord ) ) ||
         ( debugger->PreHere && ( Here > debugger->PreHere ) ) ) )
     {
         return true ;
@@ -193,7 +194,7 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
     if ( ( _O_->SigSegvs < 2 ) && GetState ( debugger, DBG_STEPPING ) )
     {
         Printf ( "\nDebug Stepping Address : 0x%016lx", ( uint64 ) debugger->DebugAddress ) ;
-        Debugger_UdisOneInstruction (debugger, 0, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
+        Debugger_UdisOneInstruction ( debugger, 0, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
     }
     if ( ( ! sif ) && ( ! GetState ( debugger, DBG_STEPPING ) ) && ( GetState ( debugger, DBG_INFO ) ) ) _Debugger_ShowInfo ( debugger, prompt, signal, 1 ) ;
     if ( prompt == _O_->ExceptionMessage ) _O_->ExceptionMessage = 0 ;
@@ -236,7 +237,7 @@ Debugger_ShowState ( Debugger * debugger, byte * prompt )
         if ( word ) _CSL_Source ( word, 0 ) ;
 
         if ( GetState ( debugger, DBG_STEPPING ) )
-            Debugger_UdisOneInstruction (debugger, 0, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ; // current insn
+            Debugger_UdisOneInstruction ( debugger, 0, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ; // current insn
     }
 }
 
@@ -269,9 +270,9 @@ Debugger_DoState ( Debugger * debugger )
         if ( GetState ( debugger, DBG_START_STEPPING ) ) Printf ( "\n ... Next stepping instruction ..." ) ;
         SetState ( debugger, DBG_START_STEPPING, false ) ;
         debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
-        Debugger_UdisOneInstruction (debugger, debugger->w_Word, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+        Debugger_UdisOneInstruction ( debugger, debugger->w_Word, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     }
-    if ( _LC_ && _LC_->DebuggerState && GetState ( debugger, DBG_LC_DEBUG ) ) LC_Debug_Output (_LC_) ;
+    if ( _LC_ && _LC_->DebuggerState && GetState ( debugger, DBG_LC_DEBUG ) ) LC_Debug_Output ( _LC_ ) ;
 }
 
 int64
@@ -430,64 +431,68 @@ PSCS_Using_WordSC ( byte* scs, byte * token, int64 index, int64 tvw ) // scs : s
 byte *
 PSCS_Using_ReadlinerInputString ( byte* il, byte * token1, byte* token0, int64 scswci, int64 tvw ) // scs : source code string ; tvw : text view sliding window 
 {
-    byte *nvw ;
-    // ts : tokenStart ; tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
-    int64 slt0, slt1, lef, leftBorder, ts, rightBorder, ref, slil ;
-    int64 totalBorder, idealBorder, nws, nts, slNvw, lbm ;
-    slil = strlen ( ( char* ) il ) ;
-    nvw = Buffer_New_pbyte ( ( slil > BUFFER_SIZE ) ? slil : BUFFER_SIZE ) ;
-    slt0 = strlen ( token0 ) ;
-    slt1 = Strlen ( token1 ) ;
-    totalBorder = ( tvw - slt1 ) ; // the borders allow us to slide token within the window of tvw
-    idealBorder = ( totalBorder / 2 ) ;
-    leftBorder = idealBorder ; // tentatively set leftBorder/rightBorder as ideally equal
-    rightBorder = idealBorder ; // tentatively set leftBorder/rightBorder as ideally equal
-    nws = scswci - idealBorder ;
-    nts = idealBorder ;
-    if ( nws < 0 )
+    if ( il ) // there is at least one case where we need to test for this!
     {
-        nws = 0 ;
-        nts = leftBorder = scswci ;
-        rightBorder = totalBorder - leftBorder ;
-    }
-    else if ( ( lbm = slil - ( scswci + slt1 + idealBorder ) ) > 0 )
-    {
-        nws = slil - tvw ;
-        rightBorder = slil - ( scswci + slt1 ) ; // nb! : try to keep all on right beyond token - the cutoff should be on the left side
+        byte *nvw ;
+        // ts : tokenStart ; tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
+        int64 slt0, slt1, lef, leftBorder, ts, rightBorder, ref, slil ;
+        int64 totalBorder, idealBorder, nws, nts, slNvw, lbm ;
+        slil = strlen ( ( char* ) il ) ;
+        nvw = Buffer_New_pbyte ( ( slil > BUFFER_SIZE ) ? slil : BUFFER_SIZE ) ;
+        slt0 = strlen ( token0 ) ;
+        slt1 = Strlen ( token1 ) ;
+        totalBorder = ( tvw - slt1 ) ; // the borders allow us to slide token within the window of tvw
+        idealBorder = ( totalBorder / 2 ) ;
+        leftBorder = idealBorder ; // tentatively set leftBorder/rightBorder as ideally equal
+        rightBorder = idealBorder ; // tentatively set leftBorder/rightBorder as ideally equal
+        nws = scswci - idealBorder ;
+        nts = idealBorder ;
         if ( nws < 0 )
         {
             nws = 0 ;
-            rightBorder += ( tvw - slil ) ;
+            nts = leftBorder = scswci ;
+            rightBorder = totalBorder - leftBorder ;
         }
-        leftBorder = totalBorder - rightBorder ;
-        nts = leftBorder ; //+ (ins ? (slt/2 + 1) : 0 ) ;
-    }
-    //else { use the defaults above }
+        else if ( ( lbm = slil - ( scswci + slt1 + idealBorder ) ) > 0 )
+        {
+            nws = slil - tvw ;
+            rightBorder = slil - ( scswci + slt1 ) ; // nb! : try to keep all on right beyond token - the cutoff should be on the left side
+            if ( nws < 0 )
+            {
+                nws = 0 ;
+                rightBorder += ( tvw - slil ) ;
+            }
+            leftBorder = totalBorder - rightBorder ;
+            nts = leftBorder ; //+ (ins ? (slt/2 + 1) : 0 ) ;
+        }
+        //else { use the defaults above }
 #if 1   
-    if ( GetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ) ) )
-    {
-        Strncpy ( nvw, &il[nws], leftBorder ) ; //scswci ) ; // tvw ) ; // copy the the new view window to buffer nvw
-        Strncat ( nvw, token1, slt1 ) ; // tvw ) ; // copy the the new view window to buffer nvw
-        //Strncat ( nvw, &il[nws + slt0], tvw ) ; // tvw ) ; // copy the the new view window to buffer nvw
-        Strncat ( nvw, &il[nws + leftBorder + slt0], rightBorder ) ; // - slt1 ) ; // tvw ) ; // copy the the new view window to buffer nvw
-    }
-    else
+        if ( GetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ) ) )
+        {
+            Strncpy ( nvw, &il[nws], leftBorder ) ; //scswci ) ; // tvw ) ; // copy the the new view window to buffer nvw
+            Strncat ( nvw, token1, slt1 ) ; // tvw ) ; // copy the the new view window to buffer nvw
+            //Strncat ( nvw, &il[nws + slt0], tvw ) ; // tvw ) ; // copy the the new view window to buffer nvw
+            Strncat ( nvw, &il[nws + leftBorder + slt0], rightBorder ) ; // - slt1 ) ; // tvw ) ; // copy the the new view window to buffer nvw
+        }
+        else
 #endif    
-        Strncpy ( nvw, &il[nws], tvw ) ; // copy the the new view window to buffer nvw
-    slNvw = Strlen ( nvw ) ;
-    if ( slNvw > ( tvw + 8 ) ) // is there a need for ellipsis
-    {
-        if ( ( scswci - leftBorder ) < 4 ) lef = 0, ref = 1 ;
-        else lef = ref = 1 ;
+            Strncpy ( nvw, &il[nws], tvw ) ; // copy the the new view window to buffer nvw
+        slNvw = Strlen ( nvw ) ;
+        if ( slNvw > ( tvw + 8 ) ) // is there a need for ellipsis
+        {
+            if ( ( scswci - leftBorder ) < 4 ) lef = 0, ref = 1 ;
+            else lef = ref = 1 ;
+        }
+        else if ( slNvw > ( tvw + 4 ) ) // is there a need for one ellipsis
+        {
+            if ( ( scswci - leftBorder ) < 4 ) lef = 0, ref = 1 ;
+            else lef = 1, ref = 0 ; // choose lef as preferable
+        }
+        else lef = ref = 0 ;
+        ts = nts ;
+        return String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token1, token0, rightBorder, ref ) ;
     }
-    else if ( slNvw > ( tvw + 4 ) ) // is there a need for one ellipsis
-    {
-        if ( ( scswci - leftBorder ) < 4 ) lef = 0, ref = 1 ;
-        else lef = 1, ref = 0 ; // choose lef as preferable
-    }
-    else lef = ref = 0 ;
-    ts = nts ;
-    return String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token1, token0, rightBorder, ref ) ;
+    else return "" ;
 }
 // ...source code source code TP source code source code ... EOL
 
@@ -507,12 +512,10 @@ DBG_PrepareShowInfoString ( Word * scWord, Word * word, byte* token0, byte* il, 
         scWord = Get_SourceCodeWord ( word ) ;
         scs = scWord ? scWord->W_OriginalCodeText : 0 ;
     }
-
-
     if ( ( word || token0 ) )
     {
         byte *token = ( word ? word->Name : token0 ), * token1, *token2 ;
-        int64 slt, index ;
+        int64 slt, index, index0 ;
         if ( GetState ( debugger, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) )
         {
             token1 = debugger->SubstitutedWord ? debugger->SubstitutedWord->Name : token0 ? token0 : word->Name ;
@@ -520,8 +523,14 @@ DBG_PrepareShowInfoString ( Word * scWord, Word * word, byte* token0, byte* il, 
         else token1 = token0 ;
         token2 = String_ConvertToBackSlash ( token1 ) ;
         slt = Strlen ( token2 ) ;
-        index = scs ? word->W_SC_Index : rlIndex ; //word->W_SC_Index ;
-        index = String_FindStrnCmpIndex ( scs ? scs : il, token2, index, slt, slt ) ;
+        index0 = scs ? word->W_SC_Index : rlIndex ; //word->W_SC_Index ;
+        if ( debugger->w_AliasOf )
+        {
+            token2 = word->Name ;
+            slt = Strlen ( word->Name ) ;
+            index = String_FindStrnCmpIndex ( scs ? scs : il, word->Name, index0, slt, slt ) ;
+        }
+        else index = String_FindStrnCmpIndex ( scs ? scs : il, token2, index0, slt, slt ) ;
         if ( index != - 1 ) // did we find token in scs
         {
             // these two functions maybe should be integrated ; the whole series of 'ShowInfo' functions could be reworked
@@ -573,32 +582,6 @@ CSL_Show_SourceCode_TokenLine ( Word * word, byte * prompt, int64 signal, byte *
     strncpy ( buffer, prompt, BUFFER_IX_SIZE ) ;
     strncat ( buffer, compileOrInterpret, 32 ) ;
     prompt = ( byte* ) buffer ;
-#if 0    
-    if ( word )
-    {
-        if ( word->W_MorphismAttributes & CPRIMITIVE )
-        {
-            snprintf ( ( char* ) obuffer, BUFFER_IX_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
-                prompt, signal ? ( char* ) signalAscii : " ", cc_location, word->W_LineNumber, word->W_TokenStart_LineIndex,
-                word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>",
-                cc_Token ) ;
-        }
-        else
-        {
-            snprintf ( ( char* ) obuffer, BUFFER_IX_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: 0x%016lx :> ", // <:: " INT_FRMT "." INT_FRMT " ",
-                prompt, signal ? ( char* ) signalAscii : " ", cc_location, word->W_LineNumber, word->W_TokenStart_LineIndex,
-                word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
-                ( char* ) cc_Token, ( uint64 ) word ) ;
-        }
-        //fflush ( stdout ) ;
-    }
-    else
-    {
-        snprintf ( ( char* ) obuffer, BUFFER_IX_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <::> ", // <:: " INT_FRMT "." INT_FRMT " ",
-            prompt, signal ? signalAscii : ( byte* ) " ", cc_location, word->W_LineNumber, word->W_TokenStart_LineIndex,
-            "<literal>", cc_Token ) ; //, _O_->StartedTimes, _O_->SignalExceptionsHandled ) ;
-    }
-#else
     if ( word )
     {
         if ( word->W_MorphismAttributes & CPRIMITIVE )
@@ -623,7 +606,6 @@ CSL_Show_SourceCode_TokenLine ( Word * word, byte * prompt, int64 signal, byte *
             prompt, signal ? signalAscii : ( byte* ) " ", cc_location,
             "<literal>", cc_Token ) ; //, _O_->StartedTimes, _O_->SignalExceptionsHandled ) ;
     }
-#endif    
     byte *cc_line = ( char* ) CSL_PrepareDbgShowInfoString ( word, token1, ( int64 ) Strlen ( obuffer ) ) ;
     if ( cc_line ) strncat ( obuffer, cc_line, BUFFER_IX_SIZE ) ;
     _Printf ( "%s", obuffer ) ;

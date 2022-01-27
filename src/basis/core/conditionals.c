@@ -48,7 +48,7 @@ _CS_Case ( uint64 allocType )
 {
     Interpreter * interp = _Interpreter_ ;
     int64 caseValue = 0 ;
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0) ;
     Word * word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
     word = CSL_Parse_Interpret_KeywordOperand ( word, 1 ) ;
     SetState ( _Compiler_, DOING_CASE, true ) ;
@@ -66,7 +66,7 @@ _CS_Match ( uint64 allocType )
 {
     Word * word ;
     byte * token ;
-    token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+    token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0) ;
     word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
     CSL_Parse_Interpret_KeywordOperand ( word, 1 ) ;
     if ( GetState ( _Context_, C_SYNTAX ) ) CSL_Interpret_C_Blocks ( 1, 0, 0 ) ;

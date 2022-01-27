@@ -32,7 +32,7 @@ Lexer_Do_MakeItAutoVar ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
         //if ( ! _Compiler_->AutoVarTypeNamespace ) 
         _Namespace_ActivateAsPrimary ( compiler->LocalsNamespace ) ;
         word = DataObject_New ( LOCAL_VARIABLE, 0, token, 0, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
-        token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
+        token2 = Lexer_Peek_Next_NonDebugTokenWord (lexer, 1) ;
         if ( ! _String_EqualSingleCharString ( token2, '=' ) ) return lexer->TokenWord = 0 ; // don't interpret this word
     }
     else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
@@ -313,17 +313,15 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 #endif
 
 byte *
-Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svReadIndexFlag )
+Lexer_Peek_Next_NonDebugTokenWord (Lexer * lexer, Boolean evalFlag)
 {
     ReadLiner * rl = _ReadLiner_ ;
-    int64 svReadIndex = rl->ReadIndex, svSC_Index = lexer->SC_Index, svTokenStart_ReadLineIndex = lexer->TokenStart_ReadLineIndex ;
+    //int64 svReadIndex, svSC_Index, svTokenStart_ReadLineIndex ;
+    //if ( svReadIndexFlag ) svReadIndex = rl->ReadIndex, svSC_Index = lexer->SC_Index, svTokenStart_ReadLineIndex = lexer->TokenStart_ReadLineIndex ;
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     CSL_PushToken_OnTokenList ( token ) ;
-    if ( svReadIndexFlag )
-    {
-        rl->ReadIndex = svReadIndex ;
-        lexer->SC_Index = svSC_Index, lexer->TokenStart_ReadLineIndex = svTokenStart_ReadLineIndex ;
-    }// this is peek so we want to keep actual values for debugger show words
+    //if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex, lexer->SC_Index = svSC_Index, lexer->TokenStart_ReadLineIndex = svTokenStart_ReadLineIndex ;
+    // this is peek so we want to keep actual values for debugger show words
     return token ;
 }
 

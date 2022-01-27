@@ -149,7 +149,7 @@ optimize :
 	#-rm bin/csl*
 	#make optimize1
 	#make optimize2
-	make optimize3
+	make -j 24 optimize3
 	make csls
 	make oclean
 	#make

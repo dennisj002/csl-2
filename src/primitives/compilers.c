@@ -151,7 +151,7 @@ CSL_Return ( )
     Compiler * compiler = cntx->Compiler0 ;
     Word* wordr = CSL_WordList ( 0 ) ; // 'return
     compiler->ReturnWord = wordr ;
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0) ;
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ; 
     SetState ( _Compiler_, DOING_RETURN, true ) ;
     CSL_DoReturnWord ( word ) ;

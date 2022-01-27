@@ -368,6 +368,7 @@ typedef struct _WordData
     int64 NumberOfNonRegisterArgs ;
     int64 NumberOfNonRegisterLocals ;
     int64 NumberOfVariables ;
+    //int64 NumberOfRegisterVariables ;
 
     byte * ObjectCode ; // used by objects/class words
     byte * StackPushRegisterCode ; // used by the optInfo

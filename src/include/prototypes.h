@@ -709,7 +709,7 @@ int64 _Lexer_ConsiderDebugAndCommentTokens(byte *token, int64 evalFlag);
 byte *_Lexer_Next_NonDebugOrCommentTokenWord(Lexer *lexer, byte *delimiters, Boolean evalFlag, Boolean peekFlag);
 Boolean Lexer_IsNextWordLeftParen(Lexer *lexer);
 Boolean Lexer_IsWordPrefixing(Lexer *lexer, Word *word);
-byte *Lexer_Peek_Next_NonDebugTokenWord(Lexer *lexer, Boolean evalFlag, Boolean svReadIndexFlag);
+byte *Lexer_Peek_Next_NonDebugTokenWord(Lexer *lexer, Boolean evalFlag);
 void _Lexer_DoChar(Lexer *lexer, byte c);
 void Lexer_DoChar(Lexer *lexer, byte c);
 void Lexer_DoNextChar(Lexer *lexer);
@@ -1703,6 +1703,7 @@ void CSL_DoReturnWord(Word *word);
 void Compiler_RemoveLocalFrame(Compiler *compiler);
 void CSL_LocalsAndStackVariablesBegin(void);
 void CSL_LocalVariablesBegin(void);
+Boolean ScanParametersForREGvars(void);
 Namespace *_CSL_Parse_LocalsAndStackVariables(int64 svf, int64 lispMode, ListObject *args, Stack *nsStack, Namespace *localsNs);
 /* src/basis/debugger.c */
 Boolean DBG_Interpret_Loop_Test(Debugger *debugger);

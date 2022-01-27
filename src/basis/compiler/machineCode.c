@@ -821,12 +821,15 @@ CalculateAddressFromOffset ( byte * compileAtAddress, int32 offset )
 void
 _SetOffsetForCallOrJump ( byte * offsetAddress, byte * jmpToAddr, byte insn )
 {
-    byte * insnAddr = offsetAddress - 1 ;
-    insn = insn ? insn : * insnAddr ;
-    int32 offset = _CalculateOffsetForCallOrJump ( offsetAddress, jmpToAddr, insn ) ;
-    if ( ( insn != JMPI32 ) && ( insn != JCC32 ) && ( abs ( offset ) < 127 ) ) * ( ( int8* ) offsetAddress ) = ( byte ) offset ;
-    else if ( insn == JMPI32 ) * ( ( int32* ) offsetAddress ) = offset ; //offset ;
-    else if ( insn == JCC32 ) * ( ( int32* ) ( offsetAddress + 1 ) ) = offset ; //offset ;
+    if ( offsetAddress )
+    {
+        byte * insnAddr = offsetAddress - 1 ;
+        insn = insn ? insn : * insnAddr ;
+        int32 offset = _CalculateOffsetForCallOrJump ( offsetAddress, jmpToAddr, insn ) ;
+        if ( ( insn != JMPI32 ) && ( insn != JCC32 ) && ( abs ( offset ) < 127 ) ) * ( ( int8* ) offsetAddress ) = ( byte ) offset ;
+        else if ( insn == JMPI32 ) * ( ( int32* ) offsetAddress ) = offset ; //offset ;
+        else if ( insn == JCC32 ) * ( ( int32* ) ( offsetAddress + 1 ) ) = offset ; //offset ;
+    }
 }
 
 void

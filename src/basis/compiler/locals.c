@@ -343,7 +343,12 @@ CSL_LocalVariablesBegin ( )
 // compiler can use the slot number in the function being compiled
 // compile a local variable such that when used at runtime it pushes
 // the slot address on the DataStack
-
+Boolean
+ScanParametersForREGvars ()
+{
+    byte * ils = String_New ( _ReadLiner_->InputLineString, TEMPORARY ) ;
+    return ( strstr ( ils, "REG" ) || strstr ( ils, "REG" ) ) ;
+}
 Namespace *
 _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // svf : stack variables flag
 {
@@ -356,7 +361,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
     byte * svDelimiters = lexer->TokenDelimiters ;
     Word * word ;
     int64 objectAttributes = 0, lispAttributes = 0, numberOfRegisterVariables = 0, numberOfVariables = 0 ;
-    int64 svff = 0, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
+    int64 svff = 0, getReturn = 0, regToUseIndex = 0 ;
     Boolean regFlag = false ;
     byte *token ;
     Namespace *typeNamespace = 0, *objectTypeNamespace = 0, *saveInNs = _CSL_->InNamespace ;
@@ -367,7 +372,12 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
     if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, 1 ) ;
     if ( lispMode == 2 ) args = ( ListObject * ) args ;
     else if ( lispMode ) args = ( ListObject * ) args->Lo_List->Head ;
-
+#if 0 // use all reg vars ?? need to save regs before function calls and restore on return    
+    Boolean rFlag = ScanParametersForREGvars () ;
+    if ( ( ! rFlag ) && GetState ( _CSL_, OPTIMIZE_ON ) && (! (Namespace_IsUsing ( ( byte* ) "BigNum" ) )))
+        regFlag = true ;
+#endif
+    
     while ( ( lispMode ? ( int64 ) ( args = _LO_Next ( args ) ) : 1 ) )
     {
         if ( lispMode )
@@ -449,6 +459,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
                     if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
                     _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
                 }
+                //if ( rFlag ) 
                 regFlag = false ;
             }
             if ( objectTypeNamespace )
@@ -467,7 +478,7 @@ _CSL_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * arg
     compiler->State |= getReturn ;
 
     // we support nested locals and may have locals in other blocks so the indices are cumulative
-    if ( numberOfRegisterVariables ) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ;
+    if ( numberOfRegisterVariables ) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ; // word->NumberOfRegisterVariables = numberOfRegisterVariables
 
     finder->FoundWord = 0 ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;

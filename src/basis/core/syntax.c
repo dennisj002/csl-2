@@ -77,7 +77,7 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                     Interpret_C_Block_EndBlock ( ( byte* ) ")", 1 ) ;
                     //CSL_TypeStack_Pop ( ) ; // the logic word
                     //if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
-                    byte *token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 0, 0) ;
+                    byte *token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 0) ;
                     if ( token && ( ! ( ( String_Equal ( ( char* ) token, ( char* ) "{" ) || ( String_Equal ( ( char* ) token, ( char* ) ";" ) ) ) ) ) )
                     {
                         Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
@@ -272,7 +272,7 @@ CSL_IncDec ( int64 op ) // ++/--
         Word *two = 0, *one = ( Word* ) CSL_WordList ( 1 ) ;
         if ( GetState ( _Context_, C_SYNTAX ) && ( one->W_MorphismAttributes & CATEGORY_OP )
             && ( ! ( one->W_MorphismAttributes & CATEGORY_OP_LOAD ) ) ) one = two = CSL_WordList ( 2 ) ;
-        byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 1, 0) ;
+        byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 1) ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         if ( nextWord && IS_MORPHISM_TYPE ( nextWord )
             && ( nextWord->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) )

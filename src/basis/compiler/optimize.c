@@ -188,7 +188,7 @@ Compiler_Optimize ( Compiler * compiler, Word * word )
 {
     if ( word )
     {
-        if ( Is_DebugOn ) _CSL_SC_WordList_Show ( 0, 0, 0 ) ;
+        if ( Is_DebugOn && ( _O_->Verbosity > 1 ) ) _CSL_SC_WordList_Show ( 0, 0, 0 ) ;
         _Compiler_GetWordStackState ( compiler, word ) ;
         Compiler_SetStandardPreHere_ForDebugDisassembly ( compiler ) ;
         Compiler_SetupArgsToStandardLocations ( compiler ) ;

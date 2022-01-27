@@ -149,12 +149,12 @@ fac5 ( REG n  | REG facc )
     facc = 1 ;
     while ( n > 1 ) 
     {
-        facc = facc * (n --) ; // parenthesis a must for now ??
+        facc = facc * n -- ; 
     }
     return facc ;
 }
 //wdiss ( ' fac5 find ) 
-fac5 ( 7 ) dup p 5040 _assert  
+fac5 ( 7 ) dup p 5040 _assert //pause
 sp
 int
 faccs2 ( REG n | REG rec ) 
