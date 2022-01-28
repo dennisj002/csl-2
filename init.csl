@@ -507,3 +507,5 @@ lcOff
 2 + 7 assertStkChk //d: // stack checking 
 
 //tc demo lisp
+
+//"d: : hi 1 2 + p ; hi" addToHistory

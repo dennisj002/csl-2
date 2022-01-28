@@ -341,7 +341,7 @@ Debugger_ShowChange ( Debugger * debugger, Word * word, Boolean stepFlag, uint64
         if ( dsp && ( debugger->SaveTOS != TOS ) ) op = ( char* ) "changed" ;
         else op = ( char* ) "set" ;
         snprintf ( ( char* ) c, BUFFER_IX_SIZE, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
-        snprintf ( ( char* ) b, BUFFER_IX_SIZE, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
+        snprintf ( ( char* ) b, BUFFER_IX_SIZE, ( char* ) "%s %s to %s.", DataStack_Depth ( ) ? "[TOS]" : "TOS", op, c_gd ( c ) ) ;
         strncat ( ( char* ) pb_change, ( char* ) b, 299 ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_O_->Default ) ) ;
         name = word->Name ;
         if ( name ) name = String_ConvertToBackSlash ( name ) ;

@@ -57,9 +57,9 @@ Word_Eval ( Word * word )
                 _Context_->CurrentEvalWord = 0 ;
                 _Context_->LastEvalWord = word ;
             }
-            SetState ( word, STEPPED, false ) ;
         }
         else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+        SetState ( word, STEPPED, false ) ;
     }
 }
 

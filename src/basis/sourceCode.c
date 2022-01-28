@@ -418,7 +418,7 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
         else //if ( index )
         {
             Printf ( "\n %s :: index %3d : word = 0x%08x : \'%-12s\' : sourceCoding = 0x%08x : scwi = %03d : inUse = %s",
-                prefix, index, word, name, sourceCoding, scwi, biuFlag ) ;
+                (prefix ? prefix : (byte*) "-"), index, word, name, sourceCoding, scwi, biuFlag ) ;
         }
 #if 0        
 else //if ( scwiDiff )
