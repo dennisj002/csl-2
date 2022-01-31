@@ -30,7 +30,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
     if ( GetState ( debugger, ( DBG_SETUP_ADDRESS ) ) )
     {
         SetState ( debugger, ( DBG_SETUP_ADDRESS ), false ) ;
-        SetState ( debugger->w_Word, STEPPED, true ) ;
+        SetState ( debugger->w_Word, W_STEPPED, true ) ;
         _Set_DataStackPointers ( debugger->AddressModeSaveDsp ) ;
     }
     else if ( GetState ( debugger, DBG_STEPPED ) && ( ! Stack_Depth ( debugger->ReturnStack ) ) )
@@ -410,7 +410,7 @@ Debugger_Continue ( Debugger * debugger )
             else return ; //goto doneOrStopContinue ;
         }
         SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_STEPPING | DBG_AUTO_MODE | DBG_CONTINUE_MODE | DBG_RUNTIME_BREAKPOINT ) ;
-        SetState ( debugger->w_Word, STEPPED, true ) ;
+        SetState ( debugger->w_Word, W_STEPPED, true ) ;
     }
     else _Debugger_Eval ( debugger, 1 ) ;
 }

@@ -71,13 +71,13 @@ OpenVmTil_AddStringToHistory ( )
 void
 OpenVmTil_AddStringToHistoryOn ( )
 {
-    SetState ( _Context_->ReadLiner0, ADD_TO_HISTORY, true ) ;
+    SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
 }
 
 void
 OpenVmTil_AddStringToHistoryOff ( )
 {
-    SetState ( _Context_->ReadLiner0, ADD_TO_HISTORY, false ) ;
+    SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, false ) ;
 }
 
 #if 0

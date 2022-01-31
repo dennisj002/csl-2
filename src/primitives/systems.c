@@ -332,6 +332,7 @@ CSL_Dump ( )
     Printf ( "\n" ) ;
 }
 
+#if 1 
 void
 CSL_Source_AddToHistory ( )
 {
@@ -353,6 +354,7 @@ CSL_Source_DontAddToHistory ( )
     }
     //else CSL_Exception ( NOT_A_KNOWN_OBJECT, QUIT ) ;
 }
+#endif
 
 void
 CSL_AllocateNew ( )

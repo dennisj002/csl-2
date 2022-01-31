@@ -183,13 +183,14 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     Context * cntx = _Context_ ;
     if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Save_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     Namespace *sns, * ns ;
-    int64 size = 0 ;
+    int64 size ;
     byte * token ;
     sns = _CSL_Namespace_InNamespaceGet ( ) ;
     ns = _Namespace_Find ( name, sns, 0 ) ;
     if ( ! ns )
     {
         if ( cloneFlag ) size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
+        else size = 0 ;
         ns = _DObject_New ( name, 0, IMMEDIATE, CLASS | objectType, 0, objectType, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
         Namespace_Do_Namespace ( ns ) ; // before "size", "this"
         Word *ws = _CSL_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone

@@ -32,6 +32,13 @@ Parse_Identifier ( int64 t_type )
     byte *identifier = tdsci->TdsciToken ;
     Word * id, *addToNs ;
 
+#if 0 // debug
+    if ( String_Equal ( identifier, "T_ChunkSize" ) )
+        //if ( String_Equal ( identifier, "n_InUseFlag" ) ) //"T_ChunkSize" ) )
+        Printf ( "" ) ;
+#endif    
+    //A_Parser_Debug ( ) ;
+    tdsci->FieldName = identifier ;
     if ( GetState ( tdsci, TDSCI_PRINT ) )
     {
         if ( t_type == TD_TYPE_FIELD ) TDSCI_Print_Field ( t_type, tdsci->Tdsci_Field_Size ) ;
@@ -50,23 +57,28 @@ Parse_Identifier ( int64 t_type )
         Class_Size_Set ( id, tdsci->Tdsci_Field_Size ) ; //+=  ( tdsci->Tdsci_Field_Size % 8 ) ) ;
         id->Offset = tdsci->Tdsci_Offset ;
     }
-    else if ( t_type == POST_STRUCTURE_ID ) //&& GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
-    {
-        if ( tdsci->Tdsci_StructureUnion_Namespace ) id = Parse_Do_IdentifierAlias ( identifier, tdsci->Tdsci_StructureUnion_Size ) ;
-        else tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS_CLONE, 0, identifier, 0, 0, 0, 0, 0, tdsci->Tdsci_InNamespace, 0, - 1, - 1 ) ;
-        Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ; //+= ( tdsci->Tdsci_StructureUnion_Size % 8 ) ) ;
-        id->W_ObjectAttributes |= ( STRUCT | NAMESPACE ) ; //??
-        id->Offset = tdsci->Tdsci_Offset - tdsci->Tdsci_StructureUnion_Size ;
-    }
     else if ( t_type == PRE_STRUCTURE_ID )
     {
         tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS, 0, identifier, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
         id->W_ObjectAttributes |= ( STRUCT | NAMESPACE ) ; //??
         id->Offset = tdsci->Tdsci_Offset ;
+        tdsci->StructureUnionName = identifier ;
+
+    }
+    else if ( t_type == POST_STRUCTURE_ID ) //&& GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
+    {
+        if ( tdsci->Tdsci_StructureUnion_Namespace ) id = Parse_Do_IdentifierAlias ( identifier, tdsci->Tdsci_StructureUnion_Size ) ;
+        else tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS, 0, identifier, 0, 0, 0, 0, 0, tdsci->Tdsci_InNamespace, 0, - 1, - 1 ) ;
+        Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ; //+= ( tdsci->Tdsci_StructureUnion_Size % 8 ) ) ;
+        id->W_ObjectAttributes |= ( STRUCT | NAMESPACE ) ; //??
+        id->Offset = tdsci->Tdsci_Offset ; //- tdsci->Tdsci_StructureUnion_Size ; // ??
+        _CSL_Set_WordSourceCode ( _CSL_, tdsci->Tdsci_StructureUnion_Namespace, 1 ) ;
+        //SetState ( tdsci, TDSCI_POST_STRUCT, true ) ;
     }
     else CSL_Parse_Error ( "Parse_Identifier : No identifier type given", identifier ) ;
 
     if ( _O_->Verbosity > 1 ) TDSCI_DebugPrintWord ( id ) ; // print class field
+    //A_Parser_Debug ( ) ;
 }
 
 void
@@ -93,7 +105,7 @@ Parse_Array ( )
         }
         else
         {
-            if ( i ) 
+            if ( i )
             {
                 tdsci->Tdsci_Field_Object->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64 ), DICTIONARY ) ; //tdsci->Tdsci_Field_Size, DICTIONARY ) ;
                 MemCpy ( tdsci->Tdsci_Field_Object->ArrayDimensions, arrayDimensions, i * sizeof (int64 ) ) ; //tdsci->Tdsci_Field_Size ) ;
@@ -126,7 +138,7 @@ Parse_TypeNamespace_CheckForPointer ( int64 t_type )
                 token = TDSCI_ReadToken ( ) ;
             }
         }
-        if ( ( token [0] == '*' ) || ( ( token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 0) ), ( token [0] == '*' ) ) )
+        if ( ( token [0] == '*' ) || ( ( token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0 ) ), ( token [0] == '*' ) ) )
         {
             if ( ( ! type0 ) && ( t_type == TD_TYPE_FIELD ) && ( ! tdsci->Tdsci_Field_Type_Namespace ) )
             {
@@ -157,6 +169,7 @@ Parse_Identifier_Or_Array_Field ( int64 t_type )
         token = TDSCI_ReadToken ( ) ;
         if ( token && ( token [0] == '[' ) ) Parse_Array ( ) ;
         if ( t_type == TD_TYPE_FIELD ) Parse_IntraStructFieldAccounting ( ) ;
+        SetState ( tdsci, TDSCI_POINTER, false ) ;
     }
 }
 
@@ -171,7 +184,7 @@ Parse_Identifier_Fields ( int64 t_type )
         if ( tdsci->TdsciToken )
         {
             if ( tdsci->TdsciToken[0] == ',' ) token = TDSCI_ReadToken ( ) ;
-            if ( tdsci->TdsciToken[0] == ';' ) break ;
+            if ( tdsci->TdsciToken[0] == ';' ) break ; //{ token = TDSCI_ReadToken ( ) ; break ; }
         }
         else break ;
     }
@@ -214,7 +227,10 @@ Parse_StructUnionDef ( ) // 'struct' or 'union'
     TDSCI * tdsci = TDSCI_GetTop ( ) ;
     byte * token = tdsci->TdsciToken ;
     if ( ! token ) token = TDSCI_ReadToken ( ) ; //nb! for class ":{" 
-    if ( String_Equal ( token, "struct" ) || String_Equal ( token, "union" ) ) token = TDSCI_ReadToken ( ) ;
+    if ( String_Equal ( token, "struct" ) || String_Equal ( token, "union" ) )
+    {
+        token = TDSCI_ReadToken ( ) ;
+    }
     if ( ( token [0] == '{' ) || ( token[1] == '{' ) || ( token[2] == '{' ) ) TDSCI_ReadToken ( ) ; // consider ":{" and +:{" tokens
     do
     {
@@ -224,7 +240,10 @@ Parse_StructUnionDef ( ) // 'struct' or 'union'
     }
     while ( tdsci->TdsciToken && ( tdsci->TdsciToken [0] != '}' ) ) ;
 
-    if ( tdsci->TdsciToken[1] != ';' ) token = TDSCI_ReadToken ( ) ; //Parse_Identifier ( POST_STRUCTURE_ID ) ;// handled by TDSCI_Finalize ( ) ;
+    //if ( tdsci->TdsciToken[1] != ';' ) 
+    token = TDSCI_ReadToken ( ) ; //Parse_Identifier ( POST_STRUCTURE_ID ) ;// handled by TDSCI_Finalize ( ) ;
+    if ( token[0] != ';' ) Parse_Post_Struct_Identifiers ( ) ;
+    //else TDSCI_ReadToken ( ) ; 
 }
 
 // SEMI :: ';'
@@ -251,11 +270,10 @@ Parse_StructUnionDef ( ) // 'struct' or 'union'
 // 'struct' or 'union' tokens should have already been parsed
 
 void
-Parse_StructOrUnion_Field ( Namespace * ns, int64 state )
+Parse_StructOrUnion_Field ( Namespace * ns, int64 structOrUnionTypeFlag )
 {
-    TDSCI * tdsci = Parse_PreStruct_Accounting ( ns, state ) ;
-    byte * token = ( tdsci->TdsciToken ? tdsci->TdsciToken : TDSCI_ReadToken ( ) ) ;
-    if ( String_Equal ( token, "struct" ) || String_Equal ( token, "union" ) ) token = TDSCI_ReadToken ( ) ;
+    TDSCI * tdsci = Parse_PreStruct_Accounting ( ns, structOrUnionTypeFlag ) ;
+    byte * token = tdsci->TdsciToken ; //( tdsci->TdsciToken ? tdsci->TdsciToken : TDSCI_ReadToken ( ) ) ;
     if ( token )
     {
         if ( ( token [0] != '{' ) && ( token[1] != '{' ) )
@@ -265,8 +283,8 @@ Parse_StructOrUnion_Field ( Namespace * ns, int64 state )
         }
         Parse_StructUnionDef ( ) ;
     }
+    Parse_PostStructUnion_Accounting ( ) ;
     SetState ( tdsci, TDSCI_UNION | TDSCI_STRUCT, false ) ;
-    Parse_PostStruct_Accounting ( ) ;
 }
 
 // SEMI :: ';'
@@ -294,24 +312,24 @@ void
 Parse_Field ( )
 {
     TDSCI * tdsci = TDSCI_GetTop ( ) ;
-    Namespace * type0 = 0 ;
-    int64 structOrUnionState = 0 ;
-    byte * token = tdsci->TdsciToken, * token1 ;
-    if ( ! token ) token = TDSCI_ReadToken ( ) ;
+    Namespace * type0 ;
+    int64 structOrUnionTypeFlag = 0 ;
+    byte *token1, * token = tdsci->TdsciToken ? tdsci->TdsciToken : TDSCI_ReadToken ( ) ;
     if ( token && token[0] != ';' )
     {
-        if ( String_Equal ( ( char* ) token, "struct" ) ) structOrUnionState = TDSCI_STRUCT ;
-        else if ( String_Equal ( ( char* ) token, "union" ) ) structOrUnionState = TDSCI_UNION ;
-        if ( structOrUnionState && ( ! ( Parse_TypeNamespace_CheckForPointer ( TD_TYPE_FIELD ) ) ) )
+        if ( String_Equal ( ( char* ) token, "struct" ) ) structOrUnionTypeFlag = TDSCI_STRUCT ;
+        else if ( String_Equal ( ( char* ) token, "union" ) ) structOrUnionTypeFlag = TDSCI_UNION ;
+        if ( ( structOrUnionTypeFlag & TDSCI_UNION ) && GetState ( tdsci, TDSCI_PRINT ) ) Printf ( "\n%s", token ) ;
+        if ( structOrUnionTypeFlag && ( ! ( Parse_TypeNamespace_CheckForPointer ( TD_TYPE_FIELD ) ) ) )
         {
             token1 = tdsci->TdsciToken ;
             if ( ( token1[0] == '{' ) || ( ! ( type0 = _Namespace_Find ( token1, 0, 0 ) ) || ( GetState ( tdsci, TDSCI_PRINT ) ) ) )
             {
-                Parse_StructOrUnion_Field ( 0, structOrUnionState ) ;
-                return ;
+                Parse_StructOrUnion_Field ( 0, structOrUnionTypeFlag ) ;
+                //return ;
             }
         }
-        Parse_Type_Field ( ) ;
+        else Parse_Type_Field ( ) ;
     }
 }
 
@@ -321,7 +339,9 @@ CSL_Parse_A_Typed_Field ( )
     Word * word = _Context_->CurrentEvalWord ;
     TDSCI * tdsci = TDSCI_Start ( word, 0, 0 ) ;
     Parse_Field ( ) ;
-    tdsci = TDSCI_Finalize ( ) ;
+    //if ( tdsci->TdsciToken[0] == ';' ) TDSCI_ReadToken ( ) ;
+    //tdsci = 
+    TDSCI_Finalize ( ) ;
 
     return tdsci->Tdsci_StructureUnion_Size ;
 }
@@ -329,75 +349,114 @@ CSL_Parse_A_Typed_Field ( )
 // Struct : in functions here refers to struct or union types
 
 TDSCI *
-Parse_PreStruct_Accounting ( Namespace * ns, int64 state )
+Parse_PreStruct_Accounting ( Namespace * ns, int64 structUnionTypeFlag )
 {
-    TDSCI * ctdsci = 0, *tdsci ;
+    TDSCI * ctdsci = 0, *ntdsci ;
     Context * cntx = _Context_ ;
     SetState ( cntx->Compiler0, TDSCI_PARSING, true ) ;
-    int64 depth = Stack_Depth ( _CONTEXT_TDSCI_STACK ) ;
+    //int64 depth = Stack_Depth ( _CONTEXT_TDSCI_STACK ) ;
     ctdsci = TDSCI_GetTop ( ) ; // current -> previous
-    tdsci = TDSCI_Push_New ( ) ; // adding one to the Stack
-    if ( ns ) tdsci->Tdsci_StructureUnion_Namespace = ns ;
+    ntdsci = TDSCI_Push_New ( ) ; // adding one to the Stack
+    if ( ns ) ntdsci->Tdsci_StructureUnion_Namespace = ns ;
     if ( ctdsci ) // previous tdsci - Tdsci_PreStructureUnion_Namespace
     {
-        tdsci->Tdsci_Offset = ctdsci->Tdsci_Offset ;
-        tdsci->TdsciToken = ctdsci->TdsciToken ;
-        tdsci->State = ctdsci->State ;
-        tdsci->State &= ~ ( TDSCI_UNION | TDSCI_STRUCT ) ; // transfer the non - struct/union state only
-        tdsci->Tdsci_InNamespace = ctdsci->Tdsci_StructureUnion_Namespace ? ctdsci->Tdsci_StructureUnion_Namespace : ctdsci->Tdsci_InNamespace ; //_CSL_Namespace_InNamespaceGet ( ) ;
-        if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = ctdsci->Tdsci_StructureUnion_Namespace ;
-        tdsci->DataPtr = ctdsci->DataPtr ;
+        ntdsci->Tdsci_Offset = ctdsci->Tdsci_Offset ;
+        ntdsci->TdsciToken = ctdsci->TdsciToken ;
+        ntdsci->State = ctdsci->State & ( ~ ( TDSCI_UNION | TDSCI_STRUCT ) ) ; // transfer the non - struct/union state only
+        //ntdsci->State &= ~ ( TDSCI_UNION | TDSCI_STRUCT ) ; // transfer the non - struct/union state only
+        ntdsci->Tdsci_InNamespace = ctdsci->Tdsci_StructureUnion_Namespace ? ctdsci->Tdsci_StructureUnion_Namespace : ctdsci->Tdsci_InNamespace ; //_CSL_Namespace_InNamespaceGet ( ) ;
+        if ( ! ntdsci->Tdsci_StructureUnion_Namespace ) ntdsci->Tdsci_StructureUnion_Namespace = ctdsci->Tdsci_StructureUnion_Namespace ;
+        ntdsci->DataPtr = ctdsci->DataPtr ;
     }
-    tdsci->State |= state ;
+    ntdsci->State |= structUnionTypeFlag ;
 
-    return tdsci ;
+    return ntdsci ;
 }
 
-TDSCI *
-Parse_PostStruct_Accounting ( )
+void
+_Parse_PostStructUnion_Accounting ( TDSCI * jf_tdsci )
 {
-    TDSCI * ctdsci = 0, *tdsci ;
-    int64 depth = Stack_Depth ( _CONTEXT_TDSCI_STACK ) ;
-    if ( depth > 1 ) ctdsci = TDSCI_Pop ( ) ;
-    tdsci = TDSCI_GetTop ( ) ;
-    if ( ctdsci ) // always should be there but check anyway
+    TDSCI * sctdsci ;
+    int64 offset = 0, sd ;
+    do
     {
-        ctdsci->Tdsci_StructureUnion_Size = ctdsci->Tdsci_StructureUnion_Size ? ( ctdsci->Tdsci_StructureUnion_Size + ( ctdsci->Tdsci_StructureUnion_Size % 8 ) ) : 0 ; // % 8 : round up to even multiple of int64
-        if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = ctdsci->Tdsci_StructureUnion_Namespace ;
-        if ( GetState ( tdsci, TDSCI_UNION ) )
+        if ( ( sd = Stack_Depth ( _CONTEXT_TDSCI_STACK ) ) > offset )
         {
-            if ( ctdsci->Tdsci_StructureUnion_Size > tdsci->Tdsci_StructureUnion_Size ) tdsci->Tdsci_StructureUnion_Size = ctdsci->Tdsci_StructureUnion_Size ;
+            sctdsci = TDSCI_Pick ( offset ++ ) ;
+            if ( sctdsci && GetState ( sctdsci, TDSCI_UNION ) )
+            {
+                if ( jf_tdsci->Tdsci_StructureUnion_Size > sctdsci->Tdsci_StructureUnion_Size )
+                    sctdsci->Tdsci_StructureUnion_Size = jf_tdsci->Tdsci_StructureUnion_Size ;
+            }
+            else break ;
         }
-        else tdsci->Tdsci_StructureUnion_Size += ctdsci->Tdsci_StructureUnion_Size ;
-        tdsci->Tdsci_Offset = tdsci->Tdsci_StructureUnion_Size ;
-        tdsci->TdsciToken = ctdsci->TdsciToken ;
-        tdsci->Tdsci_Field_Size = 0 ;
-        tdsci->DataPtr = ctdsci->DataPtr ;
+        else break ;
     }
-    return tdsci ;
+    while ( sctdsci ) ;
+}
+
+void
+Parse_PostStructUnion_Accounting ( )
+{
+    TDSCI * jf_tdsci = 0, *ctdsci ;
+    int64 depth = Stack_Depth ( _CONTEXT_TDSCI_STACK ) ;
+    if ( depth > 1 ) jf_tdsci = TDSCI_Pop ( ) ; // just finished TDSCI
+    ctdsci = TDSCI_GetTop ( ) ; // now 'current'
+    //A_Parser_Debug ( ) ;
+    if ( jf_tdsci && ( ! GetState ( ctdsci, TDSCI_POST_STRUCT ) ) ) // always should be there but check anyway
+    {
+        //if ( ( ! ctdsci->Tdsci_StructureUnion_Namespace ) && jf_tdsci->Tdsci_StructureUnion_Namespace )
+        //    ctdsci->Tdsci_StructureUnion_Namespace = jf_tdsci->Tdsci_StructureUnion_Namespace ;
+        if ( GetState ( jf_tdsci, TDSCI_UNION ) ) //|| GetState ( ctdsci, TDSCI_UNION ) )
+        {
+            if ( GetState ( ctdsci, TDSCI_UNION ) ) _Parse_PostStructUnion_Accounting ( jf_tdsci ) ;
+            else
+            {
+                ctdsci->Tdsci_StructureUnion_Size += jf_tdsci->Tdsci_StructureUnion_Size ;
+            }
+            if ( GetState ( ctdsci, TDSCI_PRINT ) ) Printf ( "\n" ) ;
+        }
+        else if ( GetState ( jf_tdsci, TDSCI_STRUCT ) )
+        {
+            if ( GetState ( ctdsci, TDSCI_UNION ) ) _Parse_PostStructUnion_Accounting ( jf_tdsci ) ;
+            else
+            {
+                ctdsci->Tdsci_StructureUnion_Size += jf_tdsci->Tdsci_StructureUnion_Size ;
+            }
+        }
+        ctdsci->Tdsci_Offset = ctdsci->Tdsci_StructureUnion_Size ;
+        ctdsci->Tdsci_Structure_Size = ctdsci->Tdsci_StructureUnion_Size ;
+        ctdsci->TdsciToken = jf_tdsci->TdsciToken ;
+        //ctdsci->Tdsci_Field_Size = 0 ;
+    }
+    //A_Parser_Debug ( ) ;
 }
 
 void
 Parse_IntraStructFieldAccounting ( )
 {
     TDSCI * tdsci = TDSCI_GetTop ( ) ;
-    if ( GetState ( tdsci, TDSCI_UNION ) )
+    //A_Parser_Debug ( ) ;
+    if ( ! GetState ( tdsci, TDSCI_POST_STRUCT ) )
     {
-        if ( tdsci->Tdsci_Field_Size > tdsci->Tdsci_StructureUnion_Size ) tdsci->Tdsci_StructureUnion_Size = tdsci->Tdsci_Field_Size ;
+        if ( GetState ( tdsci, TDSCI_UNION ) )
+        {
+            if ( tdsci->Tdsci_Field_Size > tdsci->Tdsci_StructureUnion_Size ) tdsci->Tdsci_StructureUnion_Size = tdsci->Tdsci_Field_Size ;
+        }
+        else // not TDSCI_UNION // field may be a struct
+        {
+            tdsci->Tdsci_StructureUnion_Size += tdsci->Tdsci_Field_Size ;
+        }
+        tdsci->Tdsci_Offset = tdsci->Tdsci_StructureUnion_Size ;
+        SetState ( tdsci, TDSCI_POINTER, false ) ;
     }
-    else // not TDSCI_UNION // field may be a struct
-    {
-        tdsci->Tdsci_Offset += tdsci->Tdsci_Field_Size ;
-        tdsci->Tdsci_StructureUnion_Size += tdsci->Tdsci_Field_Size ;
-    }
-    SetState ( tdsci, TDSCI_POINTER, false ) ;
+    //A_Parser_Debug ( ) ;
 }
 
 void
 TDSCI_Init ( TypeDefStructCompileInfo * tdsci )
 {
     //tdsci->State = 0 ;
-
     tdsci->Tdsci_InNamespace = _CSL_Namespace_InNamespaceGet ( ) ;
 }
 
@@ -446,19 +505,22 @@ void
 Parse_Post_Struct_Identifiers ( )
 {
     TDSCI * tdsci = TDSCI_GetTop ( ) ;
-    byte * token = tdsci->TdsciToken ;
-    if ( token && ( token[0] != ';' ) && ( ! String_Equal ( token, "};" ) ) ) Parse_Identifier_Fields ( POST_STRUCTURE_ID ) ;
+    SetState ( tdsci, TDSCI_POST_STRUCT, true ) ;
+    byte * token = tdsci->TdsciToken ; //TDSCI_ReadToken ( ) ; //tdsci->TdsciToken ;
+    if ( token && ( token[0] != ';' ) && ( ! String_Equal ( token, "struct" ) ) && ( ! String_Equal ( token, "union" ) ) )
+        Parse_Identifier_Fields ( POST_STRUCTURE_ID ) ;
+    SetState ( tdsci, TDSCI_POST_STRUCT, false ) ;
 }
 
 TDSCI *
 TDSCI_Finalize ( )
 {
-    Parse_Post_Struct_Identifiers ( ) ;
-    TDSCI * tdsci = TDSCI_GetTop ( ) ;
+    //Parse_Post_Struct_Identifiers ( ) ;
+    TDSCI * tdsci = TDSCI_GetTop ( ) ; //TDSCI_Pick ( 1 ) ; // top was dummy //TDSCI_GetTop ( ) ;
     CSL_Finish_WordSourceCode ( _CSL_, tdsci->Tdsci_StructureUnion_Namespace, 1 ) ;
     if ( ! GetState ( tdsci, TDSCI_PRINT ) ) Class_Size_Set ( tdsci->Tdsci_StructureUnion_Namespace ? tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_InNamespace, tdsci->Tdsci_StructureUnion_Size ) ;
     SetState ( _Compiler_, TDSCI_PARSING, false ) ;
-    return tdsci ; // should return the initial tdsci from TDSCI_Start with the final fields filled in
+    return 0 ; //tdsci ; // should return the initial tdsci from TDSCI_Start with the final fields filled in
 }
 
 TDSCI *
@@ -466,6 +528,13 @@ TDSCI_GetTop ( )
 {
     TDSCI * tdsci ;
     return tdsci = ( TDSCI * ) Stack_Top ( _CONTEXT_TDSCI_STACK ) ;
+}
+
+TDSCI *
+TDSCI_Pick ( int64 offset )
+{
+    TDSCI * tdsci ;
+    return tdsci = ( TDSCI * ) _Stack_Pick ( _CONTEXT_TDSCI_STACK, offset ) ;
 }
 
 TDSCI *
@@ -486,7 +555,8 @@ TDSCI_Print_StructNameEtc ( )
 {
     TDSCI * tdsci = TDSCI_GetTop ( ) ;
     Printf ( "\n\t%16s : %s : size = %d : at %016lx",
-        tdsci->Tdsci_Field_Type_Namespace->Name, tdsci->TdsciToken, CSL_GetAndSet_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
+        tdsci->Tdsci_Field_Type_Namespace->Name, tdsci->TdsciToken,
+        ( int64 ) _CSL_VariableValueGet ( tdsci->Tdsci_Field_Type_Namespace->Name, ( byte* ) "size" ), //CSL_GetAndSet_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
         &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
 }
 
@@ -498,7 +568,8 @@ TDSCI_Print_StructField ( )
     //TDSCI_DebugPrintWord ( cntx, tdsci->Tdsci_Field_Type_Namespace ) ;
     TDSCI_Print_StructNameEtc ( ) ;
     Word * word = Word_UnAlias ( tdsci->Tdsci_Field_Type_Namespace ) ;
-    Object_PrintStructuredData ( &tdsci->DataPtr [ word->Offset ], word->W_OriginalCodeText ) ;
+    //Object_PrintStructuredData ( &tdsci->DataPtr [ word->Offset ], word->W_OriginalCodeText ) ;
+    Object_PrintStructuredData ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ], word->W_OriginalCodeText ) ;
     //CSL_NewLine ( ) ;
 }
 
@@ -548,7 +619,8 @@ TDSCI_Print_Field ( int64 t_type, int64 size )
                     break ;
                 }
             }
-            byte * dataPtr = tdsci->Tdsci_Field_Object ? &tdsci->DataPtr [ tdsci->Tdsci_Field_Object->Offset ] : &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ;
+            //byte * dataPtr = tdsci->Tdsci_Field_Object ? &tdsci->DataPtr [ tdsci->Tdsci_Field_Object->Offset ] : &tdsci->DataPtr [ tdsci->Tdsci_Offset ] ;
+            byte * dataPtr = & tdsci->DataPtr [ tdsci->Tdsci_Offset ] ;
             if ( size == 1 )
             {
                 Printf ( format, dataPtr, tdsci->Tdsci_Field_Type_Namespace->Name,
@@ -592,6 +664,20 @@ Parser_Check_Do_Debug_Token ( byte * token )
     return Parser_Check_Do_CommentWord ( word ) ;
 }
 
+void
+A_Parser_Debug ( )
+{
+    TDSCI * tdsci = TDSCI_GetTop ( ) ; // current -> previous
+    Namespace * ins = Namespace_Find ( "_Identifier" ) ;
+    if ( ins && ( ins == tdsci->Tdsci_StructureUnion_Namespace ) )
+    {
+        int64 size = _Namespace_VariableValueGet ( ins, ( byte* ) "size" ) ;
+        if ( size || tdsci->Tdsci_StructureUnion_Size ) Printf ( "\n%s : size = %d : struct size = %d", ins->Name, size, tdsci->Tdsci_StructureUnion_Size ) ;
+        //if ( ( size >= 184 ) || ( tdsci->Tdsci_StructureUnion_Size >= 184 ) )
+        //    Pause ( ) ;
+    }
+}
+
 byte *
 TDSCI_ReadToken ( )
 {
@@ -599,6 +685,7 @@ TDSCI_ReadToken ( )
     TDSCI * tdsci = TDSCI_GetTop ( ) ;
     //if ( Is_DebugOn )
     {
+        //A_Parser_Debug ( ) ;
         do
         {
             tdsci->TdsciToken = Lexer_ReadToken ( cntx->Lexer0 ) ;
@@ -606,13 +693,13 @@ TDSCI_ReadToken ( )
             DEBUG_SETUP_TOKEN ( tdsci->TdsciToken, 0 ) ;
             //if ( Is_DebugOn ) _Printf ( "%s ", tdsci->TdsciToken ) ;
         }
-
         while ( Parser_Check_Do_Debug_Token ( tdsci->TdsciToken ) ) ;
-        tdsci->LineNumber = cntx->Lexer0->LineNumber ;
-        tdsci->Token_StartIndex = cntx->Lexer0->TokenStart_FileIndex ;
-        tdsci->Token_EndIndex = cntx->Lexer0->TokenEnd_FileIndex ;
     }
     //else tdsci->TdsciToken = Lexer_ReadToken ( cntx->Lexer0 ) ;
+    //tdsci->LineNumber = cntx->ReadLiner0->LineNumber ;
+    //tdsci->Token_StartIndex = cntx->Lexer0->TokenStart_FileIndex ;
+    //tdsci->Token_EndIndex = cntx->Lexer0->TokenEnd_FileIndex ;
+    tdsci->NextChar = _ReadLine_pb_NextChar ( cntx->ReadLiner0 ) ;
     return tdsci->TdsciToken ;
 }
 
@@ -633,6 +720,7 @@ _CSL_TypedefAlias ( Word * word0, byte * name, Namespace * addToNs, int64 size )
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
         alias->ObjectByteSize = word->ObjectByteSize = size ;
+        Class_Size_Set ( alias, size ) ;
     }
     else Exception ( USEAGE_ERROR, ABORT ) ;
 
@@ -658,7 +746,7 @@ CSL_Parse_Error ( byte * msg, byte * token )
 }
 
 TDSCI *
-_Object_Continue_PrintStructuredData ( Context * cntx, byte * objectBits )
+_Object_Continue_PrintStructuredData ( byte * objectBits )
 {
     TDSCI * tdsci = TDSCI_Start ( 0, objectBits, TDSCI_PRINT ) ;
     byte * token = TDSCI_ReadToken ( ) ; // read 'typedef' token
@@ -680,7 +768,7 @@ Object_PrintStructuredData ( byte * objectBits, byte * typedefString )
 
         Readline_Setup_OneStringInterpret ( rl, typedefString ) ;
 
-        tdsci = _Object_Continue_PrintStructuredData ( cntx, objectBits ) ;
+        tdsci = _Object_Continue_PrintStructuredData ( objectBits ) ;
 
         Readline_Restore_InputLine_State ( rl ) ;
         CSL_Context_PopDelete ( _CSL_ ) ;

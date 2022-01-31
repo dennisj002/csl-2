@@ -11,7 +11,7 @@ CSL_ClassStructureEnd ( void )
 void
 Class_Size_Set ( Namespace * classNs, int64 size )
 {
-    OVT_Assert ( classNs > 0, (byte * )"Class_Size_Set : No classNs." ) ;
+    //OVT_Assert ( classNs > 0, (byte * )"Class_Size_Set : No classNs." ) ;
     if ( classNs )
     {
         _Namespace_VariableValueSet ( classNs, ( byte* ) "size", size ) ;

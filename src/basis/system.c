@@ -183,6 +183,7 @@ Convert_RestartCondtion ( int64 restartCondition )
 void
 _CSL_SystemState_Print ( int64 pflag )
 {
+    Printf ( "\nSystem State :\n==================" ) ;
     Finder * finder = _Finder_ ;
     byte * buf = Buffer_Data ( _CSL_->ScratchB1 ) ;
     buf = _CSL_GetSystemState_String0 ( buf ) ;

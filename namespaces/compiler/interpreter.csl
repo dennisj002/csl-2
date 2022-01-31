@@ -26,8 +26,14 @@ infixOn
 #define xhi0() 1 + 2 p
 
 c_syntaxOn
+// note syntax is tolerant
 #define xhii( n ) p (1 + 2 + n) 
 #define xhi( n ) ps ( "\nxhi = " ), p ( 1 + 2 + n ) 
+#define xxhi( n ) ps ( "\nxxhi : " ) xhi ( n ) xhii ( n ) 
+#define yhi( n ) ps ("\nyhi : " ) ; p ( 1 + 2 + n ) xxhi ( n )
+#define zhi( n ) ps ("\nzhi : " ) ; yhi(4) ; p ( 1 + 2 + n ) ; xxhi ( n ) ;
+xxhi ( 4 ) ; yhi ( 4 ) ; zhi(4) ;
+//pause
 
 void
 testc1 () 

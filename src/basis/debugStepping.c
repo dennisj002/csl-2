@@ -161,7 +161,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 SetState ( _Debugger_, DBG_INFIX_PREFIX, false ) ;
                 Word_DbgBlock_Eval ( word, word->Definition ) ;
                 DEBUG_SHOW ( word, 0, 0 ) ;
-                SetState ( word, STEPPED, true ) ;
+                SetState ( word, W_STEPPED, true ) ;
                 SetState ( debugger, ( DBG_STEPPED | DBG_STEPPING ), false ) ; // no longjmp needed at end of Interpreter_Loop
                 _Set_DataStackPointers ( svDsp ) ;
                 return ; 
@@ -497,7 +497,6 @@ Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
         debugger->CopyRSP = 0 ;
         if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
         else SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING | DBG_SETUP_ADDRESS ) ;
-        //if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
         debugger->DebugAddress = 0 ;
         SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
         Set_DataStackPointers_FromDebuggerDspReg ( ) ;

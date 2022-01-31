@@ -437,7 +437,7 @@ doLisp 0 =
     
 dbgOff
 //lisp
-//dbgOn 
+dbgOn 
 //: fl flisp ;
 //fl //ps pause
 //: s9 s9fes ; //s9
@@ -508,4 +508,35 @@ lcOff
 
 //tc demo lisp
 
+#if 0
+addToHistoryOn
+d: : hi 1 2 + p ; hi
 //"d: : hi 1 2 + p ; hi" addToHistory
+#endif
+
+#if 0
+: wtdInclude "namespaces/wordTypeDef.csl" include ;
+wtdInclude 
+C.Experimental 
+cOn
+printf ( "\nIdentifier = %lx, Identifier.size = %d, WordData.size = %d, Stack.size = %d", Identifier, Identifier.size, WordData.size, Experimental.Stack.size ) ;
+printf ( "\nTypeInfo.size = %d, DLNode.size = %d, dllist.size = %d, dlnode.size = %d\n\n", TypeInfo.size, DLNode.size, dllist.size, dlnode.size ) ;
+//cOff
+'wtdInclude find Word size dump
+//pause
+//'wtdInclude find 'dlnode find wordStructPrint  
+//pause
+//'wtdInclude find '_DLNode find wordStructPrint  
+//pause
+//'wtdInclude find 'DLNode find wordStructPrint  
+//pause
+'wtdInclude find dup hex p 'C.Experimental.Word find d: wordStructPrint  
+//cOn
+//printf ( "\n_Identifier.CodeSize = %lx, _Identifier.CodeSize = %d", _Identifier.CodeSize, _Identifier.CodeSize ) ;
+printf ( "\nIdentifier.size = %d, WordData.size = %d, Stack.size = %d", Identifier.size, WordData.size, Experimental.Stack.size ) ;
+printf ( "\nTypeInfo.size = %d, DLNode.size = %d, dllist.size = %d, dlnode.size = %d\n\n", TypeInfo.size, DLNode.size, dllist.size, dlnode.size ) ;
+cOff
+stateAll
+//pause
+'C.Experimental notUsing
+#endif

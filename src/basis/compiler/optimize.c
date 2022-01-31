@@ -25,7 +25,14 @@
  * 15 total total combinations
  * 
  */
-// remember this is rpn code so arg 1, the first arg, is lower on the stack (STACK_1) than arg2, the second arg, (STACK_0)
+// remember this is rpn code so arg 1, the first (linearly) arg, is lower on the stack (STACK_1) than arg2, the second arg, (STACK_0)
+// eg:
+//      : test arg1 arg2 op ;  
+// stack conventions :
+// ________
+// | arg2 | TOS : OREG : RCX
+// | arg1 | NOS : ACC  : RAX
+// --------
 // need to consider also REGISTER args/parameters !!
 // but we still need to consider types (sizes) and type checking
 // and ARM cpu adjustments

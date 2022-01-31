@@ -94,27 +94,27 @@ OpenVmTil_Print_DataSizeofInfo ( int64 flag )
         Printf ( "DLNode size : %d bytes, ", sizeof ( DLNode ) ) ;
         Printf ( "AttributeInfo size : %d bytes, ", sizeof (AttributeInfo ) ) ;
         //Printf ( "\nObject size : %d bytes, ", sizeof (Object ) ) ;
-        Printf ( "Symbol size : %d bytes, ", sizeof (Symbol ) ) ;
-        Printf ( "\nWord size : %d bytes, ", sizeof (Word ) ) ;
+        Printf ( "\nSymbol size : %d bytes, ", sizeof (Symbol ) ) ;
+        Printf ( "Word size : %d bytes, ", sizeof (Word ) ) ;
         Printf ( "ListObject size : %d bytes, ", sizeof ( ListObject ) ) ;
         Printf ( "WordData size : %d bytes, ", sizeof (WordData ) ) ;
         Printf ( "Context size : %d bytes, ", sizeof (Context ) ) ;
-        Printf ( "System size : %d bytes, ", sizeof (System ) ) ;
-        Printf ( "\nDebugger size : %d bytes, ", sizeof (Debugger ) ) ;
+        Printf ( "\nSystem size : %d bytes, ", sizeof (System ) ) ;
+        Printf ( "Debugger size : %d bytes, ", sizeof (Debugger ) ) ;
         Printf ( "MemorySpace size : %d bytes, ", sizeof (MemorySpace ) ) ;
         Printf ( "ReadLiner size : %d bytes, ", sizeof (ReadLiner ) ) ;
         Printf ( "Lexer size : %d bytes, ", sizeof (Lexer ) ) ;
-        Printf ( "Interpreter size : %d bytes, ", sizeof (Interpreter ) ) ;
-        Printf ( "\nFinder size : %d bytes, ", sizeof (Finder ) ) ;
+        Printf ( "\nInterpreter size : %d bytes, ", sizeof (Interpreter ) ) ;
+        Printf ( "Finder size : %d bytes, ", sizeof (Finder ) ) ;
         Printf ( "Compiler size : %d bytes, ", sizeof (Compiler ) ) ;
         Printf ( "ByteArray size : %d bytes, ", sizeof (ByteArray ) ) ;
         Printf ( "NamedByteArray size : %d bytes, ", sizeof (NamedByteArray ) ) ;
-        Printf ( "MemChunk size : %d bytes", sizeof ( MemChunk ) ) ;
-        Printf ( "\nCSL size : %d bytes, ", sizeof (CSL ) ) ;
+        Printf ( "\nMemChunk size : %d bytes", sizeof ( MemChunk ) ) ;
+        Printf ( "CSL size : %d bytes, ", sizeof (CSL ) ) ;
         Printf ( "OpenVimTil size : %d bytes, ", sizeof (OpenVmTil ) ) ;
         Printf ( "OVT_Static size : %d bytes, ", sizeof (OVT_Static ) ) ;
         Printf ( "OS_Chunk size : %d bytes, ", sizeof (OS_Chunk ) ) ;
-        Printf ( "OS_Node size : %d bytes, ", sizeof (OS_Node ) ) ;
+        Printf ( "\nOS_Node size : %d bytes, ", sizeof (OS_Node ) ) ;
         Printf ( "Stack size : %d bytes", sizeof (Stack ) ) ;
     }
 }

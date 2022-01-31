@@ -369,6 +369,7 @@ cOff
 #endif
 
 
+ihalt
 'doWp var 
 doWp 1 =
 #if doWp @
@@ -377,19 +378,25 @@ wtdInclude
 cOn
 C.Experimental 
 'wtdInclude find Word size dump
+//pause
+'wtdInclude find 'dlnode find wordStructPrint  
+//pause
+'wtdInclude find 'C.Experimental._DLNode find wordStructPrint  
+//pause
+'wtdInclude find 'C.Experimental.DLNode find wordStructPrint  
+//pause
 'wtdInclude find 'C.Experimental.Word find wordStructPrint  
 printf ( "\nWord.size = %d, WordData.size = %d, Stack.size = %d", Word.size, WordData.size, Experimental.Stack.size ) ;
-printf ( "\nWord.size = %d, WordData.size = %d, Stack.size = %d", Word.size, WordData.size, C.Experimental.Stack.size ) ;
+printf ( "\nTypeInfo.size = %d, DLNode.size = %d, dllist.size = %d, dlnode.size = %d\n\n", TypeInfo.size, DLNode.size, dllist.size, dlnode.size ) ;
 cOff
+stateAll
+//pause
 C.Experimental.Stack.size @ p
 Experimental.Stack.size @ p
 Experimental 
 Stack.size @ p
-stateAll
-//pause
 'C.Experimental notUsing 
 #endif
-ihalt
 #if 1
 cOn
 typecheckOn

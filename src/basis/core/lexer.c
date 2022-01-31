@@ -32,7 +32,7 @@ Lexer_Do_MakeItAutoVar ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
         //if ( ! _Compiler_->AutoVarTypeNamespace ) 
         _Namespace_ActivateAsPrimary ( compiler->LocalsNamespace ) ;
         word = DataObject_New ( LOCAL_VARIABLE, 0, token, 0, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
-        token2 = Lexer_Peek_Next_NonDebugTokenWord (lexer, 1) ;
+        token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1 ) ;
         if ( ! _String_EqualSingleCharString ( token2, '=' ) ) return lexer->TokenWord = 0 ; // don't interpret this word
     }
     else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
@@ -313,7 +313,7 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 #endif
 
 byte *
-Lexer_Peek_Next_NonDebugTokenWord (Lexer * lexer, Boolean evalFlag)
+Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag )
 {
     ReadLiner * rl = _ReadLiner_ ;
     //int64 svReadIndex, svSC_Index, svTokenStart_ReadLineIndex ;
@@ -905,6 +905,17 @@ Dot ( Lexer * lexer ) //  '.':
 #endif
 
 void
+RightCurlyBracket ( Lexer * lexer )
+{
+    if ( GetState ( _Compiler_, TDSCI_PARSING ) )
+    {
+        Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
+        Lexer_FinishTokenHere ( lexer ) ;
+    }
+    else Lexer_Default ( lexer ) ;
+}
+
+void
 Comma ( Lexer * lexer )
 {
     if ( GetState ( _Context_, ASM_SYNTAX | C_SYNTAX | INFIX_MODE ) || GetState ( _Compiler_, TDSCI_PARSING ) ) //&& lexer->TokenWriteIndex )
@@ -1055,6 +1066,7 @@ CSL_LexerTables_Setup ( CSL * csl )
     csl->LexerCharacterTypeTable [ ESC ].CharFunctionTableIndex = 20 ;
     csl->LexerCharacterTypeTable [ 'm' ].CharFunctionTableIndex = 21 ;
     csl->LexerCharacterTypeTable [ '!' ].CharFunctionTableIndex = 22 ;
+    csl->LexerCharacterTypeTable [ '}' ].CharFunctionTableIndex = 23 ;
 
     csl->LexerCharacterFunctionTable [ 0 ] = Lexer_Default ;
     csl->LexerCharacterFunctionTable [ 1 ] = _Zero ;
@@ -1080,6 +1092,7 @@ CSL_LexerTables_Setup ( CSL * csl )
     csl->LexerCharacterFunctionTable [ 20 ] = Escape ;
     csl->LexerCharacterFunctionTable [ 21 ] = EndEscapeSequence ;
     csl->LexerCharacterFunctionTable [ 22 ] = Exclam ;
+    csl->LexerCharacterFunctionTable [ 23 ] = RightCurlyBracket ;
 }
 
 int64

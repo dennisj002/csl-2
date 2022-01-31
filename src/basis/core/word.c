@@ -43,7 +43,7 @@ Word_Eval ( Word * word )
     {
         if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // siglongjmp from _Debugger_InterpreterLoop
         {
-            if ( ! ( GetState ( word, STEPPED ) ) )
+            if ( ! ( GetState ( word, W_STEPPED ) ) )
             {
                 _Context_->CurrentEvalWord = word ;
                 if ( IS_MORPHISM_TYPE ( word ) ) CSL_Typecheck ( word ) ;
@@ -59,7 +59,7 @@ Word_Eval ( Word * word )
             }
         }
         else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
-        SetState ( word, STEPPED, false ) ;
+        SetState ( word, W_STEPPED, false ) ;
     }
 }
 
@@ -70,12 +70,12 @@ Word_DbgBlock_Eval ( Word * word, block blck )
     {
         Context_PreWordRun_Init ( _Context_, word ) ;
         _Debug_Setup ( word, 0, ( byte* ) blck, 0, 1 ) ;
-        if ( ! GetState ( _Debugger_->w_Word, STEPPED ) )
+        if ( ! GetState ( _Debugger_->w_Word, W_STEPPED ) )
         {
             _Block_Eval ( blck ) ;
             DEBUG_SHOW ( word, 0, 1 ) ;
         }
-        SetState ( _Debugger_->w_Word, STEPPED, false ) ;
+        SetState ( _Debugger_->w_Word, W_STEPPED, false ) ;
         Context_PostWordRun_Init ( _Context_, word ) ;
     }
 }
@@ -227,6 +227,10 @@ Word_SetLocation ( Word * word )
 Word *
 _Word_New ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispType, Boolean addToInNs, Namespace * addToNs, uint64 allocType )
 {
+#if 0 // debug    
+    if ( String_Equal ( name, "Identifier")) 
+        Printf ( "");
+#endif    
     Word * word = _Word_Create ( name, morphismType, objectType, lispType, allocType ) ; // csl_WORD : csl compiled words as opposed to C compiled words
     _Compiler_->Current_Word_New = word ;
     Word_SetLocation ( word ) ;

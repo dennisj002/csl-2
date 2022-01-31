@@ -704,7 +704,7 @@
 #define NON_MORPHISM_WORD ( (uint64) 1 << 14 )
 #define W_INFIX_MODE ( (uint64) 1 << 15 )
 #define W_C_SYNTAX ( (uint64) 1 << 16 )
-#define STEPPED ( (uint64) 1 << 17 )
+#define W_STEPPED ( (uint64) 1 << 17 )
 #define W_SOURCE_CODE_MODE ( (uint64) 1 << 18 )
 #define W_INITIALIZED ( (uint64) 1 << 19 )
 #define NOT_USING ( (uint64) 1 << 24 )

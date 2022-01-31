@@ -584,7 +584,7 @@ CSL_GetAndSet_ObjectByteSize ( Word * word )
     else
     {
         if ( typeNamespace = TypeNamespace_Get ( word ) )
-            objectByteSize = ( int64 ) _CSL_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) ;
+            objectByteSize = ( int64 ) _CSL_VariableValueGet ( typeNamespace->Name, ( byte* ) "size" ) ;
         else objectByteSize = word->CompiledDataFieldByteSize ? word->CompiledDataFieldByteSize : 8 ;
     }
     return word->ObjectByteSize = objectByteSize ;

@@ -342,7 +342,7 @@ typedef union
 } TypeSignatureInfo ;
 typedef struct _WordData
 {
-#if 0
+#if 0 // possibly a better use of space 
     union
     {
         struct Namespace Namespace ;
@@ -708,20 +708,21 @@ typedef struct
 } CompileOptimizeInfo, COI ;
 typedef struct TypeDefStructCompileInfo
 {
-    int64 State, Tdsci_Offset, Tdsci_StructureUnion_Size, Tdsci_Field_Size ;
+    int64 State, Tdsci_Offset, Tdsci_StructureUnion_Size, Tdsci_Structure_Size, Tdsci_Union_Size, Tdsci_Field_Size ;
     int64 LineNumber, Token_EndIndex, Token_StartIndex ;
     Namespace *Tdsci_InNamespace, * Tdsci_StructureUnion_Namespace, * Tdsci_Field_Type_Namespace ;
     Word * Tdsci_Field_Object ;
-    byte *DataPtr, * TdsciToken ;
+    byte *NextChar, *DataPtr, * TdsciToken, *FieldName, *StructureUnionName ;
 } TypeDefStructCompileInfo, TDSCI ;
 //TypeDefStructCompileInfo State flags
 #define TDSCI_CLONE_FLAG                    ( (uint64) 1 << 0 ) 
 #define TDSCI_STRUCT                        ( (uint64) 1 << 1 ) 
 #define TDSCI_UNION                         ( (uint64) 1 << 2 ) 
-#define TDSCI_STRUCTURE_COMPLETED           ( (uint64) 1 << 3 ) 
+//#define TDSCI_STRUCTURE_COMPLETED           ( (uint64) 1 << 3 ) 
 #define TDSCI_PRINT                         ( (uint64) 1 << 4 ) 
 #define TDSCI_POINTER                       ( (uint64) 1 << 5 ) 
 #define TDSCI_UNION_PRINTED                 ( (uint64) 1 << 6 ) 
+#define TDSCI_POST_STRUCT                   ( (uint64) 1 << 7 ) 
 typedef struct
 {
     uint64 State ;

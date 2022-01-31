@@ -36,8 +36,8 @@ Word_ObjectRun ( Word * word )
 void
 _DataObject_Run ( Word * word0 )
 {
-    Context * cntx = _Context_ ;
-    Word * word = _Context_CurrentWord ( cntx ) ; // seems we don't need to compile definition code for object type words
+    //Context * cntx = _Context_ ;
+    Word * word = _Context_CurrentWord ( _Context_ ) ; // seems we don't need to compile definition code for object type words
     Word_ObjectRun ( word ) ;
 }
 
