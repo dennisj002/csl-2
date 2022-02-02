@@ -42,7 +42,6 @@ _Compile_Stack_Push ( uint8 stackReg, uint8 thruReg, int64 obj )
     //Compile_MoveImm ( REG, reg, 0, n * CELL, obj, CELL ) ;
     Compile_MoveImm_To_Reg ( thruReg, obj, CELL ) ;
     _Compile_Stack_PushReg ( stackReg, thruReg ) ;
-
 }
 #endif
 // push a stack at an rvalue using an lvalue

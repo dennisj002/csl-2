@@ -241,7 +241,6 @@ pwi faccs2 // why not in c syntax here and in next line ??
 faccs2 (7) dup p 5040 _assert0 
 sp 
 
-i3halt sp // code to exit interpret3
 void
 interpret4 ( | atoken aword ) 
 {
@@ -262,8 +261,8 @@ interpret4 ( | atoken aword )
         }
     }
 }
-// apparently we are not able to compile an interpreter with a compiled interpreter yet ; r15 is set improperly and stuff is left on the stack ??
 //pause
+i3halt sp // code to exit interpret3
 interpret4
 C
 int
@@ -322,6 +321,7 @@ $$ etc/lispScript ;
 $$ls -al /usr/local ; 
 $$ ls -al . ;
 #endif
+
 C
 sp
 verbosity 1 =
@@ -370,14 +370,25 @@ cOff
 
 
 ihalt
-'doWp var 
-doWp 1 =
-#if doWp @
+sp
+cOff
+'fw var
 : wtdInclude "namespaces/wordTypeDef.csl" include ;
 wtdInclude 
+pwi wtdInclude
+'wtdInclude find dup dup fw store hp Word size @ dump fw hp fw @ hp
+sp
+fw @ hp fw->Definition hp 
+sp
 cOn
 C.Experimental 
-'wtdInclude find Word size dump
+printf ( "\nIdentifier = %lx, Identifier.size = %d, WordData.size = %d, Stack.size = %d", Identifier, Identifier.size, WordData.size, Experimental.Stack.size ) ;
+printf ( "\nTypeInfo.size = %d, DLNode.size = %d, dllist.size = %d, dlnode.size = %d\n\n", TypeInfo.size, DLNode.size, dllist.size, dlnode.size ) ;
+void tfw ( w ) { hp ( w->Definition ) ; } 
+cOff
+'C_Syntax.tfw find wdiss 
+fw @ tfw
+sp
 //pause
 'wtdInclude find 'dlnode find wordStructPrint  
 //pause
@@ -386,10 +397,12 @@ C.Experimental
 'wtdInclude find 'C.Experimental.DLNode find wordStructPrint  
 //pause
 'wtdInclude find 'C.Experimental.Word find wordStructPrint  
+cOn
 printf ( "\nWord.size = %d, WordData.size = %d, Stack.size = %d", Word.size, WordData.size, Experimental.Stack.size ) ;
 printf ( "\nTypeInfo.size = %d, DLNode.size = %d, dllist.size = %d, dlnode.size = %d\n\n", TypeInfo.size, DLNode.size, dllist.size, dlnode.size ) ;
 cOff
 stateAll
+sp
 //pause
 C.Experimental.Stack.size @ p
 Experimental.Stack.size @ p
@@ -397,6 +410,8 @@ Experimental
 Stack.size @ p
 'C.Experimental notUsing 
 #endif
+sp
+
 #if 1
 cOn
 typecheckOn
@@ -448,6 +463,7 @@ bttt ( bt ) ;  //pause // error size not considered
 cOff
 //pause    
 #endif
+sp
 
 #if doWp @
 C.Experimental
@@ -462,6 +478,7 @@ pwi Word
 //pause
 #endif    
 c_syntaxOff 
+sp
 
 bnOff
 infixOn

@@ -231,7 +231,7 @@ Compile_C_FunctionDeclaration ( byte * token1 )
                 break ;
             }
             else if ( token [ 0 ] == '{' ) break ; // take nothing else (would be Syntax Error ) -- we have already done CSL_BeginBlock
-            else _Lexer_ConsiderDebugAndCommentTokens (token, 1 ) ;
+            else _Lexer_ConsiderDebugAndCommentTokens ( token, 1 ) ;
         }
     }
     while ( token ) ;
@@ -287,7 +287,7 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
             if ( token1 )
             {
                 Word * word0 = _Interpreter_TokenToWord ( interp, token1, - 1, - 1 ) ;
-                word = Compiler_CopyDuplicatesAndPush (word0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index) ;
+                word = Compiler_CopyDuplicatesAndPush ( word0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
                 if ( word )
                 {
                     word->ObjectByteSize = CSL_GetAndSet_ObjectByteSize ( word ) ;
@@ -300,9 +300,9 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
         {
             Ovt_AutoVarOn ( ) ;
             Namespace * ns = Compiler_LocalsNamespace_New ( _Compiler_ ) ;
-            word = Lexer_Do_MakeItAutoVar ( _Lexer_, token0, -1, -1 ) ;
+            word = Lexer_Do_MakeItAutoVar ( _Lexer_, token0, - 1, - 1 ) ;
             Compiler_Set_LHS ( word ) ;
-            Interpreter_DoWord ( interp, word, -1, -1 ) ;
+            Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
             _Compile_C_TypeDeclaration ( ) ;
         }
         Ovt_AutoVarOff ( ) ;
@@ -316,8 +316,8 @@ _Namespace_Do_C_Type ( Namespace * ns )
     byte * token1, *token2 ;
     if ( ! Compiling ) _Namespace_ActivateAsPrimary ( ns ) ;
     SetState ( _Compiler_, DOING_C_TYPE_DECLARATION, true ) ;
-    token1 = _Lexer_Next_NonDebugOrCommentTokenWord (lexer, 0, 1, 0 ) ;
-    token2 = Lexer_Peek_Next_NonDebugTokenWord (lexer, 1) ;
+    token1 = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, 1, 0 ) ;
+    token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1 ) ;
     if ( token2 && ( token2 [0] == '(' ) ) Compile_C_FunctionDeclaration ( token1 ) ;
     else
     {
@@ -361,7 +361,7 @@ CSL_Do_C_Type ( Namespace * ns )
     }
     else Namespace_Do_Namespace ( ns ) ;
 }
-
+#if 1
 void
 CSL_Do_ClassField ( Word * word )
 {
@@ -381,6 +381,37 @@ CSL_Do_ClassField ( Word * word )
 
 }
 
+#else
+void
+CSL_Do_ClassField ( Word * word )
+{
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
+    byte * offsetPtr = 0 ;
+    cntx->Interpreter0->CurrentObjectNamespace = word ; // update this namespace 
+    compiler->ArrayEnds = 0 ;
+
+    if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) )
+    {
+        if ( ( ! compiler->LHS_Word )
+            && ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) && ( ! GetState ( cntx, IS_RVALUE ) ) ) Compiler_Set_LHS ( word ) ;
+        if ( word->Offset ) offsetPtr = Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
+        if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) ) CSL_Do_AccumulatedAddress ( word, ( byte* ) TOS, word->Offset ) ;
+        if ( GetState ( cntx, IS_FORWARD_DOTTED ) ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
+        if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) ) CSL_Do_AccumulatedAddress ( word, ( byte* ) TOS, word->Offset ) ;
+        word->W_BaseObject = cntx->BaseObject ;
+        CSL_TypeStack_SetTop ( word ) ;
+        Word_SetSourceCoding ( word, offsetPtr - 3 ) ; // 3 : sizeof add immediate insn with rex
+    }
+    if ( Compiling )
+    {
+        _Compile_Move_Literal_Immediate_To_Reg ( ACC, ( int64 ) word->Offset, 0 ) ;
+        _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
+    }
+    else DataStack_Push ( ( int64 ) word->Offset ) ;
+    CSL_TypeStackPush ( word ) ;
+}
+#endif
 // a constant is, of course, a literal
 
 void

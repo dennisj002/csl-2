@@ -105,7 +105,11 @@ Parse_Array ( )
         }
         else
         {
-            if ( i )
+            if ( GetState ( tdsci, TDSCI_PRINT ) )
+            {
+                __CSL_Dump ( &tdsci->DataPtr [ tdsci->Tdsci_Offset ], tdsci->Tdsci_Field_Size, 16 ) ;
+            }
+            else if ( i )
             {
                 tdsci->Tdsci_Field_Object->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64 ), DICTIONARY ) ; //tdsci->Tdsci_Field_Size, DICTIONARY ) ;
                 MemCpy ( tdsci->Tdsci_Field_Object->ArrayDimensions, arrayDimensions, i * sizeof (int64 ) ) ; //tdsci->Tdsci_Field_Size ) ;

@@ -601,7 +601,7 @@ CSL_InitSourceCode_WithCurrentInputChar ( CSL * csl, Boolean force )
     {
         Lexer * lexer = _Context_->Lexer0 ;
         _CSL_InitSourceCode ( csl ) ;
-        _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
+        _Lexer_AppendByteToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
     }
 }
 

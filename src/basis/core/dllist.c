@@ -760,6 +760,7 @@ Tree_Map_OneNamespace ( Word * word, MapFunction_1 mf, int64 one )
         //if ( Is_DebugOn ) _Printf ( " %s.%s", word->ContainingNamespace ? word->ContainingNamespace->Name : (byte*) "", word->Name ) ;
         //d0 ( CSL->FindWordCount ++ ) ;
         if ( mf ( ( Symbol* ) word, one ) ) return word ;
+        //if ( word == nextWord ) return (Word *) -1 ; // circular list ?!
     }
     return 0 ;
 }

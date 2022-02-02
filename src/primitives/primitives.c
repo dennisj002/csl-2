@@ -85,6 +85,7 @@ CPrimitive CPrimitives [] = {
     { "?<", 0, 0, 0, CSL_If_ConditionalExpression, IMMEDIATE, 0, 0, "C", "Root" },
     { "++", "I.I", 5, INC, CSL_PlusPlus, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_PLUS_PLUS_MINUS_MINUS, 0, 0, "C", "Root" },
     { "--", "I.I", 5, DEC, CSL_MinusMinus, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_PLUS_PLUS_MINUS_MINUS, 0, 0, "C", "Root" },
+    { "->", 0, 0, 0, CSL_Pointer, ( IMMEDIATE ), 0, 0, "C", "Root" }, // avoid name clash with '&&' and '&' 
     { "cfib", 0, 0, 0, CFib, 0, 0, 0, "C", "Root" },
     { "cfactorial", 0, 0, 0, CFactorial, 0, 0, 0, "C", "Root" },
     { "cfactorial2", 0, 0, 0, CFactorial2, 0, 0, 0, "C", "Root" },

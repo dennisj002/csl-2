@@ -77,7 +77,7 @@ CSL_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolo
                     Interpret_C_Block_EndBlock ( ( byte* ) ")", 1 ) ;
                     //CSL_TypeStack_Pop ( ) ; // the logic word
                     //if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
-                    byte *token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 0) ;
+                    byte *token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0 ) ;
                     if ( token && ( ! ( ( String_Equal ( ( char* ) token, ( char* ) "{" ) || ( String_Equal ( ( char* ) token, ( char* ) ";" ) ) ) ) ) )
                     {
                         Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
@@ -272,7 +272,7 @@ CSL_IncDec ( int64 op ) // ++/--
         Word *two = 0, *one = ( Word* ) CSL_WordList ( 1 ) ;
         if ( GetState ( _Context_, C_SYNTAX ) && ( one->W_MorphismAttributes & CATEGORY_OP )
             && ( ! ( one->W_MorphismAttributes & CATEGORY_OP_LOAD ) ) ) one = two = CSL_WordList ( 2 ) ;
-        byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 1) ;
+        byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1 ) ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         if ( nextWord && IS_MORPHISM_TYPE ( nextWord )
             && ( nextWord->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) )
@@ -298,7 +298,7 @@ CSL_IncDec ( int64 op ) // ++/--
         {
             if ( GetState ( _Context_, C_SYNTAX ) )
             {
-                if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) ) 
+                if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
                     _CSL_WordList_PopWords ( 1 ) ; // op
                     if ( GetState ( _CSL_, OPTIMIZE_ON ) && ( ! two ) ) SetHere ( one->Coding, 1 ) ;
@@ -344,12 +344,12 @@ CSL_C_ConditionalExpression ( )
         }
         byte * compiledAtAddress = Compile_UninitializedJumpEqualZero ( ) ;
         Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
-        byte * token = Interpret_C_Until_NotIncluding_Token5 (interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", "#", 0, 0 , 1) ;
+        byte * token = Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", "#", 0, 0, 1 ) ;
         if ( token && _String_EqualSingleCharString ( token, ':' ) )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CSL_Else ( ) ;
-            Interpret_C_Until_NotIncluding_Token5 (interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", "]", 0, 0 , 1) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+            Interpret_C_Until_NotIncluding_Token5 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", "]", 0, 0, 1 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
             CSL_EndIf ( ) ;
         }
         else if ( ! String_Equal ( token, "#" ) ) SyntaxError ( 1 ) ;
@@ -546,3 +546,29 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
     return false ;
 }
 
+// one '->' Offset = S_Value
+
+void
+CSL_Pointer ( )
+{
+    Interpreter * interp = _Interpreter_ ;
+    byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
+    Word * word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
+    if ( Compiling )
+    {
+        Word *one = CSL_WordList ( 1 ) ;
+        SetHere ( one->StackPushRegisterCode, 1 ) ; //StackPushRegisterCode, 1 ) ;
+        Compiler_Word_SCHCPUSCA ( word, 1 ) ;
+        Compile_MoveImm_To_Reg ( RCX, ( int64 ) word->Offset, CELL ) ;
+        Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
+        _Compile_X_Group1 ( ADD, REG, REG, RAX, RCX, 0, 0, CELL_SIZE ) ; // result is on TOS
+        Compile_Move_Rm_To_Reg ( RAX, RAX, 0, 0 ) ;
+        _Compile_Stack_PushReg ( DSP, ACC ) ;
+    }
+    else
+    {
+        Word *one = ( Word * ) CSL_WordList ( 1 ) ;
+        uint64 * ptr = ( uint64* ) ( ( ( byte* ) one->S_Value ) + word->Offset ) ;
+        _DspReg_ [ 0 ] = * ptr ;
+    }
+}
