@@ -404,12 +404,12 @@ Root
 
 //================================================================================
 
-#if startupMacros
-stringMacrosOn
-#endif
 Root
 // rtw : recycle some test/debug words 
 : rtw "test" purgeAll "hi" purge "hey" purge "heey" purgeAll "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
+#if startupMacros
+stringMacrosOn
+#endif
 : tCSL "namespaces/ninit.csl" include ; // namespaces init
 : tc 1 ti lispOff tCSL rtw 1 time ;
 : x64 "namespaces/compiler/x64.csl" include ; 
@@ -505,7 +505,6 @@ tick fibc find wdiss
 lcOff
 #endif
 
-2 + 7 assertStkChk //d: // stack checking 
 
 //tc demo lisp
 
@@ -522,13 +521,19 @@ cOff
 wtdInclude 
 pwi wtdInclude
 'wtdInclude find dup dup fw store hp Word size @ dump fw hp fw @ hp
-fw @ hp fw->Definition hp nl Definition dp //pause
+fw @ hp fw->Definition hp 
 cOn
 C.Experimental 
 printf ( "\nIdentifier = %lx, Identifier.size = %d, WordData.size = %d, Stack.size = %d", Identifier, Identifier.size, WordData.size, Experimental.Stack.size ) ;
 printf ( "\nTypeInfo.size = %d, DLNode.size = %d, dllist.size = %d, dlnode.size = %d\n\n", TypeInfo.size, DLNode.size, dllist.size, dlnode.size ) ;
-C.Experimental
-void tfw ( w ) { hp ( w->Definition ) ; } 
+void tfw ( w ) { hp ( w->Definition ) ; ps ( w->S_Name ) ; } 
+#if 1 // not working yet 
+//: tm: W_Filename W_WordData->Filename ;
+#define Name S_Name
+void tfw1 ( w ) { hp ( w->Definition ) ; ps ( w->S_Name ) ; ps ( w->Name ) ; } //hp ( w->W_Filename ) ; } 
+pwi tfw1
+tfw1 ( fw ) ; pause
+#endif
 cOff
 'C_Syntax.tfw find wdiss 
 fw @ tfw
@@ -550,3 +555,5 @@ stateAll
 //pause
 'C.Experimental notUsing
 #endif
+stringMacrosOff
+2 + 7 assertStkChk //d: // stack checking 

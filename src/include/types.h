@@ -229,12 +229,14 @@ typedef struct _Identifier // _Symbol
         uint64 S_Value2 ;
         dlnode * S_Node2 ;
         byte * S_pb_Data2 ;
+        byte * StringMacroValue ;
     } ;
     union
     {
         uint64 S_Value3 ;
         dlnode * S_Node3 ;
         byte * S_pb_Data3 ;
+        byte * TextMacroValue ;
     } ;
     struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer, CaseNode ;

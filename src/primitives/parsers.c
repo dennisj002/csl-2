@@ -101,10 +101,8 @@ _CSL_Word_ClassStructure_PrintData ( Word * typedefWord0, Word * word )
     //CSL_NewLine ( ) ;
     //Printf ( "\n%s", typedefWord->Name ) ;
     byte * dataBits = ( word->W_ObjectAttributes & ( STRUCTURE_TYPE ) ) ? ( byte* ) word->W_Value : ( byte* ) word ; //STRUCTURE_TYPE not quite right ??
-    Printf ( "\n\t%16s :: size = %d :: at : %016lx",
-        typedefWord->Name, //tdsci->TdsciToken, 
-        ( int64 ) _CSL_VariableValueGet ( typedefWord->Name, ( byte* ) "size" ),
-        dataBits ) ; //CSL_GetAndSet_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
+    Printf ( "\n\t%16s :: size = %d :: at : %016lx", typedefWord->Name, //tdsci->TdsciToken, 
+        ( int64 ) _CSL_VariableValueGet ( typedefWord->Name, ( byte* ) "size" ), dataBits ) ; //CSL_GetAndSet_ObjectByteSize ( tdsci->Tdsci_Field_Type_Namespace ),
         //&tdsci->DataPtr [ tdsci->Tdsci_Offset ] ) ;
     if ( typedefWord && word ) Object_PrintStructuredData ( dataBits, typedefWord->W_OriginalCodeText ) ;
 }

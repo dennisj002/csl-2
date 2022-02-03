@@ -239,7 +239,7 @@ Parse_Macro ( int64 type )
         value = Lexer_ReadToken ( lexer ) ;
         while ( ! String_Equal ( ";", ( char* ) Lexer_ReadToken ( lexer ) ) ) ; // nb. we take only the first string all else ignored
     }
-    else if ( type == TEXT_MACRO )
+    else if ( type == TEXT_MACRO ) // until ';' or ' ' 
     {
         int64 n = 0 ;
         byte nc, *buffer = Buffer_Data ( _CSL_->ScratchB1 ) ;
@@ -247,7 +247,7 @@ Parse_Macro ( int64 type )
         do
         {
             nc = _ReadLine_GetNextChar ( _Context_->ReadLiner0 ) ;
-            if ( nc == ';' )
+            if (( nc == ';' )|| ( nc == ' ' ))
             {
                 buffer [ n ] = 0 ;
                 break ;
@@ -282,7 +282,7 @@ _Lexer_ParseTerminatingMacro ( Lexer * lexer, byte termChar, Boolean includeTerm
     _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
     _CSL_->SC_QuoteMode = false ;
     SetState ( lexer, LEXER_DONE, true ) ;
-    if ( GetState ( _CSL_, STRING_MACROS_ON ) && GetState ( &_CSL_->Sti, STI_INITIALIZED ) ) _CSL_StringMacros_Do ( lexer->TokenBuffer ) ;
+    if ( GetState ( _CSL_, STRING_MACROS_ON ) && GetState ( &_CSL_->Sti, STI_INITIALIZED ) ) CSL_StringMacros_Do ( lexer->TokenBuffer ) ;
     token = String_New ( lexer->TokenBuffer, STRING_MEM ) ;
     if ( termChar == '\"' )
     {

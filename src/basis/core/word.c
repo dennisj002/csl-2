@@ -435,9 +435,9 @@ _CSL_Macro ( int64 mtype, byte * function )
 {
     byte * name = _Word_Begin ( ), *macroString ;
     macroString = Parse_Macro ( mtype ) ;
-    byte * code = String_New ( macroString, STRING_MEM ) ;
+    byte * mstr = String_New ( macroString, STRING_MEM ) ;
     //_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
-    _DObject_New ( name, ( uint64 ) code, IMMEDIATE, 0, 0, mtype, function, 0, 1, 0, DICTIONARY ) ;
+    _DObject_New ( name, ( uint64 ) mstr, IMMEDIATE, mtype, 0, 0, function, 0, 1, 0, DICTIONARY ) ;
 }
 
 Word *

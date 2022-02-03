@@ -99,6 +99,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
     byte inChar ;
     if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
     {
+start:
         ResetOutputPrintBuffer ( ) ;
         Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ; // preserve state across init ??
         lexer->State |= state ;
@@ -112,6 +113,14 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         if ( lexer->TokenWriteIndex && ( ! GetState ( lexer, LEXER_RETURN_NULL_TOKEN ) ) )
         {
             _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
+            if ( GetState ( _Context_, C_SYNTAX ) && GetState ( _CSL_, DEFINES_MACROS_ON ) ) 
+            {
+                if ( StringMacros_Do ( rl->InputLine, "Defines", lexer->TokenBuffer, lexer->TokenStart_ReadLineIndex, rl->ReadIndex ) )
+                {
+                    rl->ReadIndex = lexer->TokenStart_ReadLineIndex ;
+                    goto start ;
+                }
+            }
             lexer->OriginalToken = String_New ( lexer->TokenBuffer, SESSION ) ; // not TEMPORARY or strings on the stack are deleted at each newline after startup
         }
         else lexer->OriginalToken = ( byte * ) 0 ; // why not goto restartToken ? -- to allow user to hit newline and get response

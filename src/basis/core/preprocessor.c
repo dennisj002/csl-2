@@ -350,35 +350,41 @@ CSL_PP_Define ( )
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
+    ReadLiner * rl = cntx->ReadLiner0 ;
     Word * word ;
-    SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
+    byte * macroStr ;
+    Namespace * svns = CSL_In_Namespace ( ) ;
+    Namespace * ns = Namespace_New ( "Defines", Namespace_Find ( "C" ) ) ;
     CSL_Colon ( ) ;
-#if 1    
-    Interpret_ToEndOfLine ( interp ) ;
-    int64 locals = Compiler_IsFrameNecessary ( _Compiler_ ) ;
-#else    
-    int64 locals = (int64) _Compiler_->LocalsNamespace ; //Compiler_IsFrameNecessary ( _Compiler_ ) ;
-    if ( locals ) Interpret_ToEndOfLine ( interp ) ;
-    else
+    SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
+    Boolean locals = Compiler_IsFrameNecessary ( _Compiler_ ) ;
+    if ( locals ) SetState ( _CSL_, DEFINES_MACROS_ON, false ) ; 
+    else 
     {
-        byte * token = String_New ( &rl->InputLine [ rl->ReadIndex ], DICTIONARY ) ;
-        String_RemoveFinalNewline ( token ) ;
-        //ReadLiner_CommentToEndOfLine ( _Context_->ReadLiner0 ) ;
-        CSL_CommentToEndOfLine ( ) ; 
-        Interpreter_InterpretAToken ( _Interpreter_, token, - 1, - 1 ) ;
+        macroStr = String_New ( &rl->InputLine [ rl->ReadIndex ], DICTIONARY ) ;
+        String_RemoveFinalNewline ( macroStr ) ;
+        SetState ( _CSL_, DEFINES_MACROS_ON, true ) ;
+        _CSL_SetAsInNamespace ( ns ) ;
     }
-#endif    
+    Interpret_ToEndOfLine ( interp ) ;
     SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
     CSL_SemiColon ( ) ;
     if ( locals ) CSL_Prefix ( ) ; // if we have local variables make it a prefix word ; maybe : if ( GetState ( _Context_, C_SYNTAX ) ) 
     else
     {
         word = _CSL_->LastFinished_Word ;
-        if ( word ) word->W_ObjectAttributes |= ( LITERAL | CONSTANT ) ;
+        if ( word )
+        {
+            word->W_ObjectAttributes |= ( LITERAL | CONSTANT ) ;
+            word->TextMacroValue = macroStr ;
+            word->W_ObjectAttributes |= TEXT_MACRO ;
+            Namespace_DoAddWord ( ns, word ) ;
+        }
     }
     CSL_Inline ( ) ;
     CSL_SaveDebugInfo ( _CSL_->LastFinished_Word, 0 ) ; // how would this kind of thing work with an inline word??
     CSL_SourceCode_Init ( ) ; //don't leave the define in sc
+    _CSL_Namespace_InNamespaceSet ( svns ) ;
 }
 
 int64
@@ -438,7 +444,7 @@ CSL_C_Include_PreProcessor ( )
                 _CSL_Contex_NewRun_3 ( _CSL_, _Context_IncludeFile, afn, 2, 0 ) ;
             }
         }
-        else CSL_ContextNew_IncludeFile (afn, 0) ;
+        else CSL_ContextNew_IncludeFile ( afn, 0 ) ;
         SetDataStackPointer ( svStackPointer ) ;
     }
 }

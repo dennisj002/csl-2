@@ -300,6 +300,7 @@
 #define T_OBJECT            ( (uint64) 1 << 17 )
 //#define T_MORPHISM          ( (uint64) 1 << 18 )
 #define DOBJECT_FIELD        ( (uint64) 1 << 18 )
+#define DEFINES_MACRO        ( (uint64) 1 << 19 )
 #define RECYCLABLE_COPY     ( (uint64) 1 << 21 )
 #define RECYCLABLE_LOCAL    ( (uint64) 1 << 22 )
 #define T_TYPE_VARIABLE     ( (uint64) 1 << 23 )
@@ -551,6 +552,7 @@
 #define DEBUG_SHTL_OFF ( (uint64) 1 << 12 ) // SHTL == _String_HighlightTokenInputLine
 #define SC_debugLevel_PUSH ( (uint64) 1 << 13 )
 #define DBG_TYPECHECK_ON ( (uint64) 1 << 14 )
+#define DEFINES_MACROS_ON ( (uint64) 1 << 15 )
 //#define TYPECHECK_OFF ( (uint64) 1 << 15 )
 
 // State Flags --

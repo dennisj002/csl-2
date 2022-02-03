@@ -115,11 +115,11 @@ CSL_Do_DynamicObject ( DObject * dobject0, Boolean reg )
 }
 
 void
-_DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte * function, int64 arg )
+_DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
 // using a variable that is a type or a function 
 {
     word->W_PtrToValue = & word->W_Value ; // lvalue
-    if ( objType & BLOCK )
+    if ( ftype & BLOCK )
     {
         word->Definition = ( block ) ( function ? function : ( byte* ) value ) ; 
         word->CodeStart = ( byte* ) word->Definition ;

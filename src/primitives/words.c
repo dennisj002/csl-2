@@ -193,12 +193,16 @@ CSL_Eval_C_Rtl_ArgList ( ) // C : x86 : ABI = 32 : protocol : right to left argu
 }
 #endif
 
+//invokes ultimately _CSL_StringMacros_Do in _Lexer_ParseTerminatingMacro
+// not fully implemented or utilized
 void
 CSL_TextMacro ( )
 {
     _CSL_Macro ( TEXT_MACRO, ( byte* ) Do_TextMacro ) ;
 }
 
+//invokes ultimately _CSL_StringMacros_Do in _Lexer_ParseTerminatingMacro
+// not fully implemented or utilized
 void
 CSL_StringMacro ( )
 {

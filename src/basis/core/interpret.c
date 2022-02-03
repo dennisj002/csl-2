@@ -158,7 +158,7 @@ Interpreter_ReadNextTokenToWord ( Interpreter * interp )
 Boolean
 Word_IsSyntactic ( Word * word )
 {
-    if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) )
+    if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) //&& ( ! ( word->W_ObjectAttributes & DEFINES_MACRO ) )
         && ( ( word->W_TypeAttributes & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || ( Lexer_IsWordPrefixing ( _Lexer_, word )
         || ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) ) )
     {

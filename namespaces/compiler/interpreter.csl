@@ -2,7 +2,7 @@
 C
 scOn
 Root
-: sp ; //stack pause ; sp
+: sp  ; sp
 lispOff
 //optimizeOff
 
@@ -50,6 +50,7 @@ testc1 ()
 } prefix
 'testc1 find wdiss sp
 testc1 () ; sp 
+
 #if 1
 C libc
 #if 1
@@ -104,6 +105,7 @@ interpret ( | atoken aword )
 //<dbg>
 }
 
+
 #endif
 interpret 
 pwi interpret //' interpret2 find wdiss
@@ -126,8 +128,9 @@ sp
 sp
 #endif
 
+
 c_syntaxOff 
 2 + 7 assertStkChk // stack checking
-//stack pause
+//
 1 ? "hi" ps : "error" ps ;
-//stack pause
+//

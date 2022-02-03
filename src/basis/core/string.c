@@ -723,10 +723,10 @@ _CSL_StrTok ( byte * inBuffer )
 }
 
 byte *
-StringMacro_Run ( byte * pb_namespaceName, byte * str )
+_StringMacro_Run ( byte * pb_namespaceName, byte * str )
 {
     byte *nstr ;
-    Word * sword ;
+    Word * sword = 0 ;
     Namespace * ns ;
     if ( pb_namespaceName )
     {
@@ -736,9 +736,12 @@ StringMacro_Run ( byte * pb_namespaceName, byte * str )
     else sword = Finder_FindWord_AnyNamespace ( _Finder_, str ) ;
     if ( sword )
     {
-        Word_Morphism_Run ( sword ) ;
-        nstr = ( byte* ) DataStack_Pop ( ) ;
-
+        if ( sword->W_ObjectAttributes & TEXT_MACRO ) nstr = sword->TextMacroValue ;
+        else //if ( sword->W_ObjectAttributes & STRING_MACRO )
+        {
+            Word_Morphism_Run ( sword ) ;
+            nstr = ( byte* ) DataStack_Pop ( ) ;
+        }
         return nstr ;
     }
     return 0 ;
@@ -749,11 +752,11 @@ _CSL_StringMacros_Init ( )
 {
     StrTokInfo * sti = & _CSL_->Sti ;
     //byte * pb_nsn = StringMacro_Run ( "Root", "_SMN_" ) ; // _SMN_ StringMacrosNamespace
-    byte * pb_nsn = StringMacro_Run ( 0, ( byte* ) "_SMN_" ) ; // _SMN_ StringMacrosNamespace
+    byte * pb_nsn = _StringMacro_Run ( 0, ( byte* ) "_SMN_" ) ; // _SMN_ StringMacrosNamespace
     if ( pb_nsn )
     {
         sti->SMNamespace = pb_nsn ;
-        byte * delimiters = StringMacro_Run ( pb_nsn, ( byte* ) "Delimiters" ) ;
+        byte * delimiters = _StringMacro_Run ( pb_nsn, ( byte* ) "Delimiters" ) ;
         if ( ! delimiters ) delimiters = _Context_->Lexer0->TokenDelimiters ;
         //memset ( sti, 0, sizeof (StrTokInfo ) ) ;
         // sti->In will be set in _CSL_StrTok
@@ -766,20 +769,30 @@ _CSL_StringMacros_Init ( )
     else SetState ( sti, STI_INITIALIZED, false ) ;
 }
 
+byte *
+StringMacros_Do ( byte * buffer, byte * namespace, byte * str, int64 startIndex, int64 endIndex ) // buffer :: the string to which we apply any set macros also cf. .init.csl beginning for how to initialize 
+{
+    byte * nstr = _StringMacro_Run ( namespace, str ) ;
+
+    if ( nstr )
+    {
+        _Lexer_AppendByteToSourceCode ( _Lexer_, ':', 0 ) ;
+        String_InsertDataIntoStringSlot ( buffer, startIndex, endIndex, nstr ) ; // use the original buffer for the total result of the macro
+    }
+    return nstr ;
+}
 // _CSL_StringMacros_Do ::
 // get first string delimited by the initialized Delimiters variable in 'buffer' variable, find its macro 
 // in the initialized Namespace and substitute/insert it into the original string - 'buffer' : (in place - 
 // string must have room for expansion) 
 
 void
-_CSL_StringMacros_Do ( byte * buffer ) // buffer :: the string to which we apply any set macros also cf. .init.csl beginning for how to initialize 
+CSL_StringMacros_Do ( byte * buffer ) // buffer :: the string to which we apply any set macros also cf. .init.csl beginning for how to initialize 
 {
     StrTokInfo * sti = & _CSL_->Sti ;
     if ( _CSL_StrTok ( buffer ) ) // ==> sti->Out :: get first string delimited by the initialized Delimiters variable, find its macro and substitute/insert it in the string
     {
-        byte * nstr = StringMacro_Run ( sti->SMNamespace, sti->Out ) ; // sti->Out is the macro pre-expanded string, the arg to the macro function if it exists in SMNamespace
-
-        if ( nstr ) String_InsertDataIntoStringSlot ( buffer, sti->StartIndex, sti->EndIndex, nstr ) ; // use the original buffer for the total result of the macro
+        StringMacros_Do ( buffer, sti->SMNamespace, sti->Out, sti->StartIndex, sti->EndIndex ) ; // buffer :: the string to which we apply any set macros also cf. .init.csl beginning for how to initialize 
     }
 }
 

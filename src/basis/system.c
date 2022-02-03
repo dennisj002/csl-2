@@ -263,7 +263,15 @@ _CSL_Source ( Word *word, int64 addToHistoryFlag )
         }
         else if ( word->W_ObjectAttributes & TEXT_MACRO )
         {
-            Printf ( "%s <:> %s", name, "macro" ) ;
+            Printf ( "%s <:> %s", name, "text macro" ) ;
+        }
+        else if ( word->W_ObjectAttributes & STRING_MACRO )
+        {
+            Printf ( "%s <:> %s", name, "string macro" ) ;
+        }
+        else if ( word->W_ObjectAttributes & DEFINES_MACRO )
+        {
+            Printf ( "%s <:> %s", name, "defines macro" ) ;
         }
         else if ( word->W_ObjectAttributes & LOCAL_VARIABLE )
         {

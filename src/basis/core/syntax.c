@@ -552,23 +552,32 @@ void
 CSL_Pointer ( )
 {
     Interpreter * interp = _Interpreter_ ;
+    Word *one = ( Word * ) CSL_WordList ( 1 ) ;
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
     Word * word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
-    if ( Compiling )
+    if ( word->W_ObjectAttributes & (OBJECT_FIELD|TEXT_MACRO) )
     {
-        Word *one = CSL_WordList ( 1 ) ;
-        SetHere ( one->StackPushRegisterCode, 1 ) ; //StackPushRegisterCode, 1 ) ;
-        Compiler_Word_SCHCPUSCA ( word, 1 ) ;
-        Compile_MoveImm_To_Reg ( RCX, ( int64 ) word->Offset, CELL ) ;
-        Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-        _Compile_X_Group1 ( ADD, REG, REG, RAX, RCX, 0, 0, CELL_SIZE ) ; // result is on TOS
-        Compile_Move_Rm_To_Reg ( RAX, RAX, 0, 0 ) ;
-        _Compile_Stack_PushReg ( DSP, ACC ) ;
+        if ( Compiling )
+        {
+            Word *one = CSL_WordList ( 1 ) ;
+            SetHere ( one->StackPushRegisterCode, 1 ) ; 
+            Compiler_Word_SCHCPUSCA ( word, 1 ) ;
+            Compile_MoveImm_To_Reg ( RCX, ( int64 ) word->Offset, CELL ) ;
+            Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
+            _Compile_X_Group1 ( ADD, REG, REG, RAX, RCX, 0, 0, CELL_SIZE ) ; // result is on TOS
+            Compile_Move_Rm_To_Reg ( RAX, RAX, 0, 0 ) ;
+            _Compile_Stack_PushReg ( DSP, ACC ) ;
+        }
+        else
+        {
+            uint64 * ptr = ( uint64* ) ( ( ( byte* ) one->S_Value ) + word->Offset ) ;
+            _DspReg_ [ 0 ] = * ptr ;
+        }
     }
-    else
+    else // not working !?
     {
-        Word *one = ( Word * ) CSL_WordList ( 1 ) ;
-        uint64 * ptr = ( uint64* ) ( ( ( byte* ) one->S_Value ) + word->Offset ) ;
-        _DspReg_ [ 0 ] = * ptr ;
+        Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+        Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
+        CSL_Plus ( ) ;
     }
 }
