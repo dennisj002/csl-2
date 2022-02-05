@@ -165,7 +165,7 @@ void
 interpret3 ( | atoken aword ) 
 {
     testc1 () ; //pause () ;
-    //nl () ; tab () ; 
+    nl () ; tab () ; 
     ps ( "interpret3 :> " ) ; nl () ;
     while ( 1 )
     {   
@@ -385,9 +385,17 @@ C.Experimental
 printf ( "\nIdentifier = %lx, Identifier.size = %d, WordData.size = %d, Stack.size = %d", Identifier, Identifier.size, WordData.size, Experimental.Stack.size ) ;
 printf ( "\nTypeInfo.size = %d, DLNode.size = %d, dllist.size = %d, dlnode.size = %d\n\n", TypeInfo.size, DLNode.size, dllist.size, dlnode.size ) ;
 void tfw ( w ) { hp ( w->Definition ) ; } 
+void tfw ( w ) { hp ( w->Definition ) ; ps ( w->S_Name ) ; } 
+#define W_Filename W_WordData->Filename 
+#define Name S_Name
+void tfw1 ( w ) { hp ( w->Definition ) ; ps ( w->S_Name ) ; ps ( w->Name ) ; hp ( w->W_Filename ) ; ps ( w->W_Filename ) ; ps ( w->W_WordData->Filename ) ; } 
+pwi tfw1
+wdiss ( 'tfw1 find ) ;
+tfw (fw); tfw1 ( fw ) ; //pause
 cOff
 'C_Syntax.tfw find wdiss 
 fw @ tfw
+fw @ tfw1
 sp
 //pause
 'wtdInclude find 'dlnode find wordStructPrint  
@@ -408,6 +416,13 @@ C.Experimental.Stack.size @ p
 Experimental.Stack.size @ p
 Experimental 
 Stack.size @ p
+infixOn
+: ftfw1 ( w ) nl w->Definition hp w->S_Name ps w->Name ps w->W_Filename ps w->W_Filename ps w->W_WordData->Filename ps ;
+infixOff
+Infix
+fw @ ->W_Filename ps //pause 
+fw @ ftfw1
+//pause
 'C.Experimental notUsing 
 #endif
 sp

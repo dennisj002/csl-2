@@ -113,7 +113,8 @@ start:
         if ( lexer->TokenWriteIndex && ( ! GetState ( lexer, LEXER_RETURN_NULL_TOKEN ) ) )
         {
             _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
-            if ( GetState ( _Context_, C_SYNTAX ) && GetState ( _CSL_, DEFINES_MACROS_ON ) ) 
+            //if ( GetState ( _Context_, C_SYNTAX ) && GetState ( _CSL_, DEFINES_MACROS_ON ) ) 
+            if ( GetState ( _CSL_, DEFINES_MACROS_ON ) )
             {
                 if ( StringMacros_Do ( rl->InputLine, "Defines", lexer->TokenBuffer, lexer->TokenStart_ReadLineIndex, rl->ReadIndex ) )
                 {
@@ -145,21 +146,18 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
     lexer->SC_Index = _CSL_->SC_Index ;
-    if ( delimiters ) Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
+    if ( cntx->SpecialDelimiterCharSet )
+    {
+        lexer->DelimiterCharSet = cntx->SpecialDelimiterCharSet ;
+        lexer->TokenDelimiters = cntx->SpecialTokenDelimiters ;
+        lexer->DelimiterOrDotCharSet = cntx->SpecialDelimiterOrDotCharSet ;
+    }
+    else if ( delimiters ) Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
     else
     {
-        if ( cntx->SpecialDelimiterCharSet )
-        {
-            lexer->DelimiterCharSet = cntx->SpecialDelimiterCharSet ;
-            lexer->TokenDelimiters = cntx->SpecialTokenDelimiters ;
-            lexer->DelimiterOrDotCharSet = cntx->SpecialDelimiterOrDotCharSet ;
-        }
-        else
-        {
-            lexer->DelimiterCharSet = cntx->DefaultDelimiterCharSet ;
-            lexer->TokenDelimiters = cntx->DefaultTokenDelimiters ;
-            lexer->DelimiterOrDotCharSet = cntx->DefaultDelimiterOrDotCharSet ;
-        }
+        lexer->DelimiterCharSet = cntx->DefaultDelimiterCharSet ;
+        lexer->TokenDelimiters = cntx->DefaultTokenDelimiters ;
+        lexer->DelimiterOrDotCharSet = cntx->DefaultDelimiterOrDotCharSet ;
     }
     lexer->State = state & ( ~ LEXER_RETURN_NULL_TOKEN ) ;
     SetState ( lexer, KNOWN_OBJECT | LEXER_DONE | END_OF_FILE | END_OF_STRING | END_OF_LINE | LEXER_ALLOW_DOT, false ) ;
@@ -709,31 +707,18 @@ _MultipleEscape ( Lexer * lexer )
 void
 DoubleQuote ( Lexer * lexer )
 {
-    TerminatingMacro ( lexer ) ;
+    if ( Lexer_IsCurrentInputCharADelimiter ( lexer ) ) //_IsChar_Delimiter ( lexer->TokenDelimiters, lexer->TokenInputCharacter ) )
+    {
+        do Lexer_AppendCharToTokenBuffer ( lexer, lexer->TokenInputByte ) ;
+        while ( ( lexer->TokenInputByte = lexer->NextChar ( lexer ) ) != '"' ) ;
+        Lexer_AppendCharToTokenBuffer ( lexer, lexer->TokenInputByte ) ;
+        SetState ( lexer, LEXER_DONE, true ) ;
+    }
+    else TerminatingMacro ( lexer ) ;
 }
 
 
 // '->' for pointers within a string and without surrounding spaces 
-#if 0
-
-void
-Minus ( Lexer * lexer ) // '-':
-{
-    byte nextChar ;
-    if ( lexer->TokenWriteIndex )
-    {
-        nextChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
-        if ( ( nextChar == '-' ) || ( nextChar == '>' ) )
-        {
-            ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '--' as next token
-            SetState ( lexer, LEXER_DONE, true ) ;
-            return ;
-        }
-    }
-    Lexer_AppendInputedToTokenBuffer ( lexer ) ;
-}
-#else
-
 void
 Minus ( Lexer * lexer ) // '-':
 {
@@ -752,7 +737,6 @@ Minus ( Lexer * lexer ) // '-':
     }
     Lexer_AppendInputedToTokenBuffer ( lexer ) ;
 }
-#endif
 
 void
 Plus ( Lexer * lexer ) // '+':
@@ -964,10 +948,12 @@ Comma ( Lexer * lexer )
             Lexer_MakeItTheNextToken ( lexer ) ;
             return ;
         }
+#if 0        
         else
         {
             CSL_C_Comma ( ) ;
         }
+#endif        
     }
     else if ( ! GetState ( _Context_->Compiler0, LC_ARG_PARSING ) )
     {

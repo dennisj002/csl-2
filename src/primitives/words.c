@@ -11,7 +11,7 @@ _CSL_Colon ( Boolean initSC )
     CSL_BeginBlock ( ) ;
 
     byte c = Lexer_NextPrintChar ( _Lexer_ ) ;
-    if ( ( c == '(' ) && ( ! GetState ( _Interpreter_, PREPROCESSOR_DEFINE ) ) )
+    if ( ( c == '(' ) ) //&& ( ! GetState ( _Interpreter_, PREPROCESSOR_DEFINE ) ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;
         CSL_LocalsAndStackVariablesBegin ( ) ;

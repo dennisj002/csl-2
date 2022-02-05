@@ -372,7 +372,8 @@ CSL_Do_ClassField ( Word * word )
     cntx->Interpreter0->CurrentObjectNamespace = word ; // update this namespace 
     compiler->ArrayEnds = 0 ;
 
-    if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! compiler->LHS_Word ) && ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) && ( ! GetState ( cntx, IS_RVALUE ) ) ) Compiler_Set_LHS ( word ) ;
+    if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! compiler->LHS_Word ) 
+        && ( ! GetState ( cntx, IS_FORWARD_DOTTED ) ) && ( ! GetState ( cntx, IS_RVALUE ) ) ) Compiler_Set_LHS ( word ) ;
     if ( word->Offset ) offsetPtr = Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
     if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) ) CSL_Do_AccumulatedAddress ( word, ( byte* ) TOS, word->Offset ) ;
     if ( GetState ( cntx, IS_FORWARD_DOTTED ) ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
@@ -444,6 +445,7 @@ Do_AccumulatedAddress ( byte * accumulatedOffsetPointer, int64 offset, byte size
         if ( size == 1 ) TOS = ( int64 ) ( ( * ( byte* ) accumulatedOffsetPointer ) ) ; // C rvalue
         else if ( size == 2 ) TOS = ( int64 ) ( ( * ( int16* ) accumulatedOffsetPointer ) ) ; // C rvalue
         else if ( size == 4 ) TOS = ( int64 ) ( ( * ( int32* ) accumulatedOffsetPointer ) ) ; // C rvalue
+        //else if ( size == 8 ) TOS = ( int64 ) ( ( * ( int64* ) accumulatedOffsetPointer ) ) ; // C rvalue
         else TOS = ( * ( int64* ) accumulatedOffsetPointer ) ; // default and 8 bytes - cell
     }
     else TOS = ( uint64 ) accumulatedOffsetPointer ; // C lvalue
@@ -452,9 +454,10 @@ Do_AccumulatedAddress ( byte * accumulatedOffsetPointer, int64 offset, byte size
 void
 CSL_Do_AccumulatedAddress ( Word * word, byte * accumulatedAddress, int64 offset )
 {
-    Context * cntx = _Context_ ;
-    Namespace * ns ;
-    byte size = ( ( ns = TypeNamespace_Get ( word ) ) ? ( int64 ) _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) : CELL ) ;
+    //Context * cntx = _Context_ ;
+    Namespace * ns = TypeNamespace_Get ( word ) ; byte size ;
+    if ( ns->W_ObjectAttributes & T_POINTER ) size = 8 ; 
+    else size = ( ns ? ( int64 ) _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) : CELL ) ;
     Do_AccumulatedAddress ( accumulatedAddress, offset, size ) ;
 }
 

@@ -355,16 +355,37 @@ CSL_PP_Define ( )
     byte * macroStr ;
     Namespace * svns = CSL_In_Namespace ( ) ;
     Namespace * ns = Namespace_New ( "Defines", Namespace_Find ( "C" ) ) ;
+    Boolean locals ;
+    Context_SetSpecialTokenDelimiters ( cntx, " \n\r\t\"", CONTEXT ) ;
+
+    //_CSL_SetAsInNamespace ( ns ) ;
+#if 0    
     CSL_Colon ( ) ;
+#else
+    CSL_RightBracket ( ) ;
+    CSL_SourceCode_Init ( ) ;
+    CSL_Token ( ) ;
+    CSL_Word_New ( ) ;
+    CSL_BeginBlock ( ) ;
+
+    byte c = Lexer_NextPrintChar ( _Lexer_ ) ;
+    if ( ( c == '(' ) ) //&& ( ! GetState ( _Interpreter_, PREPROCESSOR_DEFINE ) ) )
+    {
+        Lexer_ReadToken ( _Lexer_ ) ;
+        CSL_LocalsAndStackVariablesBegin ( ) ;
+        locals = true ;
+    }
+    else locals = false ;
+#endif    
     SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
-    Boolean locals = Compiler_IsFrameNecessary ( _Compiler_ ) ;
-    if ( locals ) SetState ( _CSL_, DEFINES_MACROS_ON, false ) ; 
-    else 
+    //Boolean locals = Compiler_IsFrameNecessary ( _Compiler_ ) ;
+    SetState ( _CSL_, DEFINES_MACROS_ON, true ) ;
+    if ( ! locals ) 
     {
         macroStr = String_New ( &rl->InputLine [ rl->ReadIndex ], DICTIONARY ) ;
         String_RemoveFinalNewline ( macroStr ) ;
-        SetState ( _CSL_, DEFINES_MACROS_ON, true ) ;
-        _CSL_SetAsInNamespace ( ns ) ;
+        //SetState ( _CSL_, DEFINES_MACROS_ON, true ) ;
+        //_CSL_SetAsInNamespace ( ns ) ;
     }
     Interpret_ToEndOfLine ( interp ) ;
     SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
@@ -381,10 +402,11 @@ CSL_PP_Define ( )
             Namespace_DoAddWord ( ns, word ) ;
         }
     }
-    CSL_Inline ( ) ;
+    //CSL_Inline ( ) ;
     CSL_SaveDebugInfo ( _CSL_->LastFinished_Word, 0 ) ; // how would this kind of thing work with an inline word??
     CSL_SourceCode_Init ( ) ; //don't leave the define in sc
     _CSL_Namespace_InNamespaceSet ( svns ) ;
+    Context_SetSpecialTokenDelimiters ( cntx, 0, CONTEXT ) ;
 }
 
 int64

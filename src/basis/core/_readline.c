@@ -229,6 +229,12 @@ ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
                         return true ;
                     break ;
                 }
+                case '-':
+                {
+                    if ( *( nc + 1 ) == '>' )// watch for (double/triple) dot ellipsis
+                        return true ;
+                    break ;
+                }
                 case '"':
                 {
                     //if ( i > index ) 

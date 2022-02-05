@@ -167,7 +167,8 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 return ; 
             }
             Debugger_SetupStepping ( debugger ) ;
-            SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_AUTO_MODE, false ) ;
+            //SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_AUTO_MODE, false ) ;
+            SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_AUTO_MODE, false ) ;
         }
     }
     else SetState_TrueFalse ( debugger, DBG_NEWLINE, DBG_STEPPING ) ;

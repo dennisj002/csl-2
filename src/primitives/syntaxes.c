@@ -51,7 +51,7 @@ CSL_C_Syntax_On ( )
     Namespace_DoNamespace_Name ( ( byte* ) "Infix" ) ;
     Namespace_DoNamespace_Name ( ( byte* ) "C_Syntax" ) ;
     Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-    Context_SetSpecialTokenDelimiters ( cntx, ( byte* ) " ,\n\r\t", CONTEXT ) ;
+    //Context_SetSpecialTokenDelimiters ( cntx, ( byte* ) " ,\n\r\t", CONTEXT ) ;
     //CSL_TypeCheckOn ( ) ;
 }
 
@@ -87,7 +87,8 @@ CSL_C_Semi ( )
 void
 CSL_C_Comma ( void )
 {
-    //noop
+    //Context_ClearQidInNamespace ( ) ;
+    //_Compiler_->LHS_Word = 0 ; // nb. : after NEW_INTERPRET
 }
 
 void

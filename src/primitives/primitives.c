@@ -85,6 +85,7 @@ CPrimitive CPrimitives [] = {
     { "?<", 0, 0, 0, CSL_If_ConditionalExpression, IMMEDIATE, 0, 0, "C", "Root" },
     { "++", "I.I", 5, INC, CSL_PlusPlus, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_PLUS_PLUS_MINUS_MINUS, 0, 0, "C", "Root" },
     { "--", "I.I", 5, DEC, CSL_MinusMinus, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_PLUS_PLUS_MINUS_MINUS, 0, 0, "C", "Root" },
+    //{ "->", 0, 0, 0, CSL_Pointer, ( IMMEDIATE | INFIXABLE ), 0, 0, "C", "Root" }, // avoid name clash with '&&' and '&' 
     { "->", 0, 0, 0, CSL_Pointer, ( IMMEDIATE ), 0, 0, "C", "Root" }, // avoid name clash with '&&' and '&' 
     { "cfib", 0, 0, 0, CFib, 0, 0, 0, "C", "Root" },
     { "cfactorial", 0, 0, 0, CFactorial, 0, 0, 0, "C", "Root" },
@@ -102,16 +103,16 @@ CPrimitive CPrimitives [] = {
     //{ "c_return", 0, 0, 0, CSL_C_Return, IMMEDIATE, 0, 0, "C", "Root" },
     { "void_return", 0, 0, 0, CSL_Void_Return, IMMEDIATE, 0, 0, "C", "Root" },
     { "rax_return", 0, 0, 0, CSL_RAX_Return, IMMEDIATE, 0, 0, "C", "Root" },
-    { ",", 0, 0, 0, CSL_C_Comma, IMMEDIATE | NO_OP_WORD | RIGHT_PAREN | KEYWORD, 0, 0, "C", "Root" },
+    { ",", 0, 0, 0, CSL_C_Comma, IMMEDIATE | RIGHT_PAREN | KEYWORD, 0, 0, "C", "Root" },
     { "wordNameStructPrint", 0, 0, 0, CSL_Word_Name_ClassStructure_PrintData, 0, 0, 0, "C", "Root" },
     { "wordStructPrint", 0, 0, 0, CSL_Word_ClassStructure_PrintData, 0, 0, 0, "C", "Root" },
 
-    { ",", 0, 0, 0, CSL_C_Comma, IMMEDIATE | NO_OP_WORD | RIGHT_PAREN | KEYWORD, 0, 0, "Asm", "Root" },
+    { ",", 0, 0, 0, CSL_C_Comma, IMMEDIATE | RIGHT_PAREN | KEYWORD, 0, 0, "Asm", "Root" },
     
     { "{", 0, 0, 0, CSL_Begin_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
     { "}", 0, 0, 0, CSL_End_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
     { ";", 0, 0, 0, CSL_C_Semi, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "C_Syntax", "C" },
-    { ",", 0, 0, 0, CSL_C_Comma, IMMEDIATE | NO_OP_WORD | RIGHT_PAREN | KEYWORD, 0, 0, "C_Syntax", "C" },
+    { ",", 0, 0, 0, CSL_C_Comma, IMMEDIATE | RIGHT_PAREN | KEYWORD, 0, 0, "C_Syntax", "C" },
     { "!", 0, 0, TEST, CSL_LogicalNot, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC | PREFIX | LOGIC_NEGATE, 0, 0, "C_Syntax", "C" },
     { "?", 0, 0, 0, CSL_C_ConditionalExpression, COMBINATOR | IMMEDIATE, 0, 0, "C_Syntax", "C" },
     { "c_class", 0, 0, 0, ( block ) CSL_C_Class_New, 0, 0, 0, "C_Syntax", "C" },

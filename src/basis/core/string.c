@@ -591,14 +591,15 @@ String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot
     byte * b = Buffer_DataCleared ( _CSL_->StringInsertB2 ) ;
     if ( ( Strlen ( ( char* ) str ) + Strlen ( ( char* ) data ) ) < BUFFER_IX_SIZE )
     {
-        if ( Strlen ( ( char* ) str ) > startOfSlot ) //( endOfSlot - startOfSlot ) )
+        //if ( Strlen ( ( char* ) str ) > ( endOfSlot - startOfSlot ) ) //startOfSlot ) //
         {
             strncpy ( ( char* ) b, ( char* ) str, BUFFER_IX_SIZE ) ;
             strncpy ( ( char* ) & b [ startOfSlot ], ( char* ) data, BUFFER_IX_SIZE ) ; // watch for overlapping ??
+            //if ( str [endOfSlot ] = ' ' ) strcat ( ( char* ) b, " " ) ;
             strncat ( ( char* ) b, ( char* ) &str [ endOfSlot ], BUFFER_IX_SIZE ) ;
             strncpy ( ( char* ) str, ( char* ) b, BUFFER_IX_SIZE ) ;
         }
-        else strncat ( ( char* ) str, ( char* ) data, BUFFER_IX_SIZE ) ;
+        //else strncat ( ( char* ) str, ( char* ) data, BUFFER_IX_SIZE ) ;
     }
     else CSL_Exception ( BUFFER_OVERFLOW, 0, 1 ) ;
 }

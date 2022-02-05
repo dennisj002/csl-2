@@ -50,7 +50,7 @@ testc1 ()
 } prefix
 'testc1 find wdiss sp
 testc1 () ; sp 
-
+//pause
 #if 1
 C libc
 #if 1

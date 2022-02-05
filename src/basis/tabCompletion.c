@@ -7,7 +7,8 @@ RL_TabCompletion_Run ( ReadLiner * rl, Word * rword )
     TabCompletionInfo * tci = rl->TabCompletionInfo0 ;
     tci->StartFlag = 0 ;
     Word * nextWord = TC_Tree_Map ( tci, ( MapFunction ) _TabCompletion_Compare, rword ) ; // new
-    tci->NextWord = nextWord ; // wrap around
+    if ( nextWord ) tci->NextWord = nextWord ; // wrap around
+    else tci->NextWord = (Word *) dllist_First ( tci->OriginalContainingNamespace->S_SymbolList ) ; //tci->NextWord->S_ContainingNamespace->S_SymbolList ) ;
 }
 
 TabCompletionInfo *
@@ -24,7 +25,7 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
     Stack_Init ( rl->TciNamespaceStack ) ;
     Stack * nsStk = rl->TciNamespaceStack ;
     Namespace *ns ;
-    byte * nsName, *c_udDot = 0 ; //( CString ) c_dd ( "." ) ;
+    byte * nsName, *c_gdDot = 0 ; //( CString ) c_dd ( "." ) ;
     int64 i, dot = 0, notUsing = 0 ; //, strlenUnAdorned = 0 ; //, ow = 0 ;
 
     String_Init ( b0 ) ;
@@ -34,10 +35,10 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
         {
             notUsing = 1 ;
         }
-        _Stack_Push ( nsStk, ( int64 ) ( ( ns->State & NOT_USING ) ? c_ud ( ns->Name ) : ( ns->Name ) ) ) ;
+        _Stack_Push ( nsStk, ( int64 ) ( ( ns->State & NOT_USING ) ? c_gd ( ns->Name ) : ( ns->Name ) ) ) ;
         //strlenUnAdorned += strlen ( ns->Name ) ;
     }
-    if ( notUsing ) c_udDot = ( byte* ) c_ud ( "." ) ;
+    if ( notUsing ) c_gdDot = ( byte* ) c_gd ( "." ) ;
     for ( i = Stack_Depth ( nsStk ) ; i ; i -- )
     {
         nsName = ( byte* ) _Stack_Pop ( nsStk ) ;
@@ -53,8 +54,8 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
     //if ( ( ! Is_NamespaceType ( w ) ) && ( ! String_Equal ( nsName, w->Name ) ) )
     if ( ! Is_NamespaceType ( w ) ) //&& ( ! String_Equal ( nsName, w->Name ) ) )
     {
-        if ( ! dot ) strncat ( ( CString ) b0, ( CString ) notUsing ? ( CString ) c_udDot : ( CString ) ".", BUFFER_IX_SIZE ) ;
-        strncat ( ( char* ) b0, notUsing ? ( char* ) c_ud ( w->Name ) : ( char* ) w->Name, BUFFER_IX_SIZE ) ; // namespaces are all added above
+        if ( ! dot ) strncat ( ( CString ) b0, ( CString ) notUsing ? ( CString ) c_gdDot : ( CString ) ".", BUFFER_IX_SIZE ) ;
+        strncat ( ( char* ) b0, notUsing ? ( char* ) c_gd ( w->Name ) : ( char* ) w->Name, BUFFER_IX_SIZE ) ; // namespaces are all added above
         //strlenUnAdorned += strlen ( w->Name ) ;
     }
     //ReadLine_SetCursorPosition ( rl, strlenUnAdorned ) ;
@@ -338,6 +339,7 @@ doReturn:
     }
     //if ( (int64) rword == 1 ) return 0 ;
         //_Printf ("") ;
+    //if ( rword ) tci->LastFoundWord = rword ;
     return rword ;
 }
 
