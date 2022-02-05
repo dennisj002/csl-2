@@ -426,7 +426,7 @@ Do_StringMacro ( )
 {
     Interpreter * interp = _Context_->Interpreter0 ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
-    String_InsertDataIntoStringSlot ( rl->InputLine, rl->ReadIndex, rl->ReadIndex, _String_UnBox ( ( byte* ) interp->w_Word->W_Value ) ) ; // size in bytes
+    String_InsertDataIntoStringSlot (rl->InputLine, rl->ReadIndex, rl->ReadIndex, _String_UnBox ( ( byte* ) interp->w_Word->W_Value ), 0)  ; // size in bytes
     SetState ( interp, END_OF_LINE | END_OF_FILE | END_OF_STRING | DONE, false ) ; // reset a possible read newline
 }
 

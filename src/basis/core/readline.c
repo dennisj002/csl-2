@@ -374,7 +374,7 @@ ReadLine_SaveCharacter ( ReadLiner * rl )
 void
 _ReadLine_InsertStringIntoInputLineSlotAndShow ( ReadLiner * rl, int64 startOfSlot, int64 endOfSlot, byte * data )
 {
-    String_InsertDataIntoStringSlot ( rl->InputLine, startOfSlot, endOfSlot, data ) ; // size in bytes
+    String_InsertDataIntoStringSlot (rl->InputLine, startOfSlot, endOfSlot, data , 0) ; // size in bytes
     ReadLine_ClearAndShowLineWithCursor ( rl ) ;
 }
 
@@ -382,7 +382,7 @@ void
 ReadLiner_InsertTextMacro ( ReadLiner * rl, Word * word )
 {
     int64 nlen = ( Strlen ( ( char* ) word->Name ) + 1 ) ;
-    String_InsertDataIntoStringSlot ( rl->InputLine, rl->ReadIndex - nlen, rl->ReadIndex, ( byte* ) word->W_Value ) ; // size in bytes
+    String_InsertDataIntoStringSlot (rl->InputLine, rl->ReadIndex - nlen, rl->ReadIndex, ( byte* ) word->W_Value , 0) ; // size in bytes
     rl->ReadIndex -= nlen ;
     _CSL_UnAppendFromSourceCode_NChars ( _CSL_, nlen ) ;
 }

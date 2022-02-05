@@ -586,16 +586,17 @@ String_Wrap ( CString in, CString s, CString pre, CString post )
 // insert data into slot ( startOfSlot, endOfSlot ) in buffer
 
 void
-String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot, byte * data ) // size in bytes
+String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot, byte * nstr, byte * ostr ) // size in bytes
 {
     byte * b = Buffer_DataCleared ( _CSL_->StringInsertB2 ) ;
-    if ( ( Strlen ( ( char* ) str ) + Strlen ( ( char* ) data ) ) < BUFFER_IX_SIZE )
+    int64 slo = ostr ? Strlen ( ostr ) : 0 ; 
+    if ( ( Strlen ( ( char* ) str ) + Strlen ( ( char* ) nstr ) ) < BUFFER_IX_SIZE )
     {
         //if ( Strlen ( ( char* ) str ) > ( endOfSlot - startOfSlot ) ) //startOfSlot ) //
         {
             strncpy ( ( char* ) b, ( char* ) str, BUFFER_IX_SIZE ) ;
-            strncpy ( ( char* ) & b [ startOfSlot ], ( char* ) data, BUFFER_IX_SIZE ) ; // watch for overlapping ??
-            //if ( str [endOfSlot ] = ' ' ) strcat ( ( char* ) b, " " ) ;
+            strncpy ( ( char* ) & b [ startOfSlot ], ( char* ) nstr, BUFFER_IX_SIZE ) ; // watch for overlapping ??
+            if ( str [ startOfSlot + slo ] == ' ' ) strcat ( ( char* ) b, " " ) ;
             strncat ( ( char* ) b, ( char* ) &str [ endOfSlot ], BUFFER_IX_SIZE ) ;
             strncpy ( ( char* ) str, ( char* ) b, BUFFER_IX_SIZE ) ;
         }
@@ -771,14 +772,14 @@ _CSL_StringMacros_Init ( )
 }
 
 byte *
-StringMacros_Do ( byte * buffer, byte * namespace, byte * str, int64 startIndex, int64 endIndex ) // buffer :: the string to which we apply any set macros also cf. .init.csl beginning for how to initialize 
+StringMacros_Do ( byte * buffer, byte * namespace, byte * ostr, int64 startIndex, int64 endIndex ) // buffer :: the string to which we apply any set macros also cf. .init.csl beginning for how to initialize 
 {
-    byte * nstr = _StringMacro_Run ( namespace, str ) ;
+    byte * nstr = _StringMacro_Run ( namespace, ostr ) ;
 
     if ( nstr )
     {
         //_Lexer_AppendByteToSourceCode ( _Lexer_, ':', 0 ) ;
-        String_InsertDataIntoStringSlot ( buffer, startIndex, endIndex, nstr ) ; // use the original buffer for the total result of the macro
+        String_InsertDataIntoStringSlot ( buffer, startIndex, endIndex, nstr, ostr ) ; // use the original buffer for the total result of the macro
     }
     return nstr ;
 }
