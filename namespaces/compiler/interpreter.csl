@@ -18,13 +18,10 @@ System Interpreter
             + n @ \
             + p 
 #define xhi01 xhe0 xhe1()
-#define xhi1 1 2 + p 
+#define xhi1 p (1 + 2 + 4) 
 // #define is in the preprocessor vocabulary and can be used anywhere
- 
-infixOn
-
-#define xhi0() 1 + 2 p
-
+infixOn 
+#define xhi0 p (1 + 2 + 4) 
 c_syntaxOn
 // note syntax is tolerant
 #define xhii( n ) p (1 + 2 + n) 
@@ -46,11 +43,11 @@ testc1 ()
     ps ( "\ntdbg4 =" ) ; p ( tdbg4 ) ; 
     ps ( "\ntdbg5 =" ) ; p ( tdbg5 ) ; 
     ps ( "\ntdbg6 =" ) ; p ( tdbg6 ) ; //_pause () ;
-    ps ( "\nxhii =" ) ; xhii (4) ; xhi (4) ; xhi0(); xhi1 () ; xhi( 4 ); xhi01 ; xhi1 ; xhi2(8) ; xhi2a ( "xhi2a =", 8 ) ; 
+    ps ("\nlast line"); ps ( "\nxhii =" ) ; xhii (4) ; xhi (4) ; xhi0; xhi1 () ; xhi( 4 ); xhi01 ; xhi1 ; xhi2(8) ; xhi2a ( "xhi2a =", 8 ) ; 
 } prefix
 'testc1 find wdiss sp
 testc1 () ; sp 
-//pause
+pause
 #if 1
 C libc
 #if 1

@@ -777,7 +777,7 @@ StringMacros_Do ( byte * buffer, byte * namespace, byte * str, int64 startIndex,
 
     if ( nstr )
     {
-        _Lexer_AppendByteToSourceCode ( _Lexer_, ':', 0 ) ;
+        //_Lexer_AppendByteToSourceCode ( _Lexer_, ':', 0 ) ;
         String_InsertDataIntoStringSlot ( buffer, startIndex, endIndex, nstr ) ; // use the original buffer for the total result of the macro
     }
     return nstr ;
