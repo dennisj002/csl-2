@@ -555,5 +555,5 @@ stateAll
 //pause
 'C.Experimental notUsing
 #endif
-stringMacrosOff
+//stringMacrosOff
 2 + 7 assertStkChk //d: // stack checking 
