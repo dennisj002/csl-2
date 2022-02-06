@@ -4,6 +4,8 @@
 int64
 GetTerminalWidth ( )
 {
+  int fd;
+
 #ifdef TIOCGSIZE
     struct ttysize ts ;
     ioctl ( STDIN_FILENO, TIOCGSIZE, &ts ) ;
@@ -12,8 +14,11 @@ GetTerminalWidth ( )
     return ts.ts_cols ;
 #elif defined(TIOCGWINSZ)
     struct winsize ts ;
-    ioctl ( STDIN_FILENO, TIOCGWINSZ, &ts ) ;
-    //ioctl ( STDOUT_FILENO, TIOCGWINSZ, &ts ) ;
+  //fd = open("/dev/tty", O_RDWR);
+  //if(fd < 0 || ioctl(fd, TIOCGWINSZ, &ts) < 0) Error ("/dev/tty", 0);
+  //close(fd) ;
+    //ioctl ( STDIN_FILENO, TIOCGWINSZ, &ts ) ;
+    ioctl ( STDOUT_FILENO, TIOCGWINSZ, &ts ) ;
     //cols = ts.ws_col ;
     //lines = ts.ws_row;
     return ts.ws_col ;

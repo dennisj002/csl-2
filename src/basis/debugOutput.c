@@ -557,7 +557,7 @@ CSL_PrepareDbgShowInfoString ( Word * word, byte* token, int64 twAlreayUsed )
         byte * il = Buffer_Data_Cleared ( _CSL_->StringInsertB6 ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
         strncpy ( il, rl->InputLineString, BUFFER_IX_SIZE ) ;
         String_RemoveEndWhitespace ( ( byte* ) il ) ;
-        int64 fel, tw = GetTerminalWidth ( ), tvw ;
+        int64 fel, tvw, tw = GetTerminalWidth ( ) ;
         fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
         //tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
         tvw = tw - ( ( twAlreayUsed > fel ) ? ( twAlreayUsed - fel ) : fel ) ; //subtract the formatting chars which don't add to visible length
@@ -606,6 +606,7 @@ CSL_Show_SourceCode_TokenLine ( Word * word, byte * prompt, int64 signal, byte *
             prompt, signal ? signalAscii : ( byte* ) " ", cc_location,
             "<literal>", cc_Token ) ; //, _O_->StartedTimes, _O_->SignalExceptionsHandled ) ;
     }
+    //int columns = atoi(getenv("COLUMNS"));
     byte *cc_line = ( char* ) CSL_PrepareDbgShowInfoString ( word, token1, ( int64 ) Strlen ( obuffer ) ) ;
     if ( cc_line ) strncat ( obuffer, cc_line, BUFFER_IX_SIZE ) ;
     _Printf ( "%s", obuffer ) ;

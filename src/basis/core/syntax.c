@@ -553,8 +553,6 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
 }
 
 // one '->' Offset = S_Value
-#if 1
-// one '->' Offset = S_Value
 
 void
 CSL_Pointer ( )
@@ -567,14 +565,23 @@ CSL_Pointer ( )
     {
         if ( Compiling )
         {
-            Word *one = CSL_WordList ( 1 ) ;
-            SetHere ( one->StackPushRegisterCode, 1 ) ;
+            word = Compiler_CopyDuplicatesAndPush ( word, - 1, - 1 ) ;
+            if ( one ) SetHere ( one->StackPushRegisterCode, 1 ) ;
             Compiler_Word_SCHCPUSCA ( word, 1 ) ;
-            Compile_MoveImm_To_Reg ( RCX, ( int64 ) word->Offset, CELL ) ;
-            Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-            _Compile_X_Group1 ( ADD, REG, REG, RAX, RCX, 0, 0, CELL_SIZE ) ; // result is on TOS
+            Compiler_WordStack_SCHCPUSCA ( 1, 1 ) ;
+            _Compile_X_Group1_Immediate ( ADD, REG, RAX, 0, word->Offset, 0 ) ;
             Compile_Move_Rm_To_Reg ( RAX, RAX, 0, 0 ) ;
-            _Compile_Stack_PushReg ( DSP, ACC ) ;
+#if 0            
+            int64 rlIndex = _ReadLiner_->ReadIndex ;
+            token = Lexer_ReadToken ( interp->Lexer0 ) ;
+            _ReadLiner_->ReadIndex = rlIndex ;
+#else
+            token = Lexer_Peek_Next_NonDebugTokenWord ( interp->Lexer0, 0 ) ;
+#endif            
+            if ( ! String_Equal ( token, "->" ) )
+            {
+                _Compile_Stack_PushReg ( DSP, ACC ) ;
+            }
         }
         else
         {
@@ -592,97 +599,3 @@ CSL_Pointer ( )
         CSL_Plus ( ) ;
     }
 }
-#else
-
-void
-CSL_Pointer ( )
-{
-    Interpreter * interp = _Interpreter_ ;
-    Word *one, * zero ;
-    uint64 base, offset ;
-    byte * token ;
-    //if ( ! GetState ( _Context_, C_SYNTAX ) ) Error ( "\nPointer (->) should used with C_Syntax on - 'c_syntaxOn'\n", 0 )  ;
-    int64 cis = GetState ( _Context_, ( C_SYNTAX | INFIX_MODE ) ) ; //Error ( "\nPointer (->) should used with C_Syntax on - 'c_syntaxOn'\n", 0 )  ;
-    if ( cis ) //|| Compiling )
-    {
-        if ( Compiling )
-        {
-            one = ( Word * ) CSL_WordList ( 2 ) ;
-            //byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
-            zero = ( Word * ) CSL_WordList ( 1 ) ; //_Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
-            //Word *one = CSL_WordList ( 1 ) ;
-            SetHere ( one->StackPushRegisterCode, 1 ) ;
-            Compiler_Word_SCHCPUSCA ( zero, 1 ) ;
-            Compile_MoveImm_To_Reg ( RCX, ( int64 ) zero->Offset, CELL ) ;
-            Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-            _Compile_X_Group1 ( ADD, REG, REG, RAX, RCX, 0, 0, CELL_SIZE ) ; // result is on TOS
-            Compile_Move_Rm_To_Reg ( RAX, RAX, 0, 0 ) ;
-            _Compile_Stack_PushReg ( DSP, ACC ) ;
-
-        }
-        else
-        {
-            token = Lexer_ReadToken ( interp->Lexer0 ) ;
-            if ( String_Equal ( "->", token ) )
-            {
-                // accumulated offset should be TOS
-                base = _DspReg_ [ 0 ] ;
-                _DspReg_ [ 0 ] = * ( uint64* ) base ; //+ _DspReg_ [ 0 ] ;
-                token = Lexer_ReadToken ( interp->Lexer0 ) ;
-                //base = _DspReg_ [ 2 ] ;
-                //zero = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
-                Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-                //offset = zero->Offset ;
-                //base = (* (uint64*) _DspReg_ [ 0 ]) ;
-                //_DspReg_ [ 0 ] = base + zero->Offset; //+ _DspReg_ [ 0 ] ;
-            }
-            else
-            {
-                base = _DspReg_ [ 1 ] ;
-                offset = _DspReg_ [ 0 ] ;
-                _DspReg_ [ 0 ] = base + offset ;
-            }
-        }
-    }
-    else
-    {
-        if ( Compiling )
-        {
-            Error ( "\nNot implemented : Pointer (->) should used with C_Syntax on - 'c_syntaxOn'\n", 0 ) ;
-        }
-        else
-        {
-            //token = Lexer_ReadToken ( interp->Lexer0 ) ;
-            base = _DspReg_ [ 0 ] ;
-            _DspReg_ [ 0 ] = * ( uint64* ) base ;
-            token = Lexer_ReadToken ( interp->Lexer0 ) ;
-            //zero = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
-            Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-            //Interpreter_InterpretNextToken ( interp ) ; //_DspReg_ [ 0 ] = (*(uint64*) base) + offset ; //+ _DspReg_ [ 0 ] ;
-        }
-        //    word = Compiling ? CSL_WordList ( 0 ) : ( Word* ) _DspReg_ [ 1 ] ;
-    }
-#if 0    
-    //if ( word->W_ObjectAttributes & ( OBJECT_FIELD | TEXT_MACRO ) )
-    {
-        if ( Compiling )
-        {
-        }
-        else
-        {
-            uint64 * ptr = ( uint64* ) ( ( ( byte* ) one->S_Value ) + zero->Offset ) ;
-            _DspReg_ [ 0 ] = * ptr ;
-        }
-    }
-    //#if 0    
-    else // not working !?
-    {
-        Interpreter_DoWord ( interp, zero, - 1, - 1 ) ;
-        Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-        CSL_Plus ( ) ;
-    }
-#endif    
-    //}
-    //else Error ( "\nPointer (->) should used with C_Syntax on - 'c_syntaxOn'\n", 0 )  ;
-}
-#endif
