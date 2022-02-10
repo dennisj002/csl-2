@@ -5,6 +5,8 @@ C
 Root
 #if 0 // debug
 : sp stack pause ; sp
+C
+: sp stack pause ; sp
 #else
 : sp ; //stack pause ; sp
 #endif 
@@ -24,7 +26,6 @@ libc.printf ("\nhello %d\n", 7) //pause
 C
 User
 Class
-//: sp ; //stack pause ; 
 //verbosity 3 =
 
 c_syntaxOn
@@ -395,7 +396,8 @@ cOff
 'C_Syntax.tfw find wdiss 
 fw @ tfw
 infixOn
-: ftfw1 ( w ) nl w->Definition hp w->S_Name ps d: w->Name ps w->W_Filename ps w->W_Filename ps w->W_WordData->Filename ps ;
+: ftfw1 ( w ) nl w->Definition hp w->S_Name ps w->Name ps w->W_Filename ps w->W_Filename ps w->W_WordData->Filename ps ;
+: ftfw1 ( w ) nl w->Definition hp w->S_Name ps w->Name ps w->W_Filename ps w->W_Filename ps w->W_WordData->Filename ps ;
 infixOff
 Infix
 fw @ ->W_Filename ps //pause 
@@ -416,6 +418,27 @@ printf ( "\nIdentifier.size = %d, WordData.size = %d, Stack.size = %d", Identifi
 printf ( "\nTypeInfo.size = %d, DLNode.size = %d, dllist.size = %d, dlnode.size = %d\n\n", TypeInfo.size, DLNode.size, dllist.size, dlnode.size ) ;
 cOff
 stateAll
+: tt ( fw | w ) fw @ hp w fw @ = nl w @ ->Definition hp w @ ->S_Name ps w @ ->Name ps w @ ->W_Filename ps w @ ->W_Filename ps w @ ->W_WordData->Filename ps ;
+nl 'wtdInclude find dup hp tt //pause
+infixOn
+: tti ( wrd ) "\ntti" ps wrd->Definition hp wrd->S_Name ps wrd->Name ps wrd->W_Filename ps wrd->W_Filename ps wrd->W_WordData->Filename ps ;
+'ttfw var
+nl 'tti find dup hp tti //pause
+infixOff
+cOn
+void ctti ( w | p l ) 
+{ 
+    ps ( "\nctti" ) ; l = w->Definition ; 
+    printf ( "\nDefinition = %lx", l ) ; p = w->S_Name ; ps(p) ; p = w->Name ; ps(p) ; 
+    p = w->W_Filename ;  ps(p) ; p = w->W_Filename ; ps (p) ; 
+    p = w->W_WordData->Filename ; ps (p) ; 
+}
+ctti ( find ( 'ctti ) ) ; //pause () ;
+cOff
+C_Syntax
+pwi ctti
+'ctti find fw store fw @ ctti 
+_find ( 'ctti ) ctti 
 //pause
 'C.Experimental notUsing
 #endif

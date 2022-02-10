@@ -269,14 +269,14 @@ CSL_Find ( )
 }
 
 void
-CSL_Postfix_Find_Using ( )
+CSL_Find_Using ( )
 {
     Word * word = Finder_Word_Find ( _Context_->Finder0, ( byte* ) DataStack_Pop ( ), USING, 0 ) ;
     DataStack_Push ( ( int64 ) word ) ;
 }
 
 void
-CSL_Postfix_Find_Any ( )
+CSL_Find_Any ( )
 {
     Word * word = Finder_Word_Find ( _Context_->Finder0, ( byte* ) DataStack_Pop ( ), ANY, 0 ) ;
     DataStack_Push ( ( int64 ) word ) ;

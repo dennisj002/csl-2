@@ -561,16 +561,21 @@ CSL_Pointer ( )
     Word *one = ( Word * ) CSL_WordList ( 1 ) ;
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
     Word * word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
+    Boolean regToUse = RAX ;
     if ( word->W_ObjectAttributes & OBJECT_FIELD )
     {
         if ( Compiling )
         {
             word = Compiler_CopyDuplicatesAndPush ( word, - 1, - 1 ) ;
-            if ( one ) SetHere ( one->StackPushRegisterCode, 1 ) ;
+            if ( one ) 
+            {
+                SetHere ( one->StackPushRegisterCode, 1 ) ;
+                regToUse = word->RegToUse ;
+            }
             Compiler_Word_SCHCPUSCA ( word, 1 ) ;
             Compiler_WordStack_SCHCPUSCA ( 1, 1 ) ;
-            _Compile_X_Group1_Immediate ( ADD, REG, RAX, 0, word->Offset, 0 ) ;
-            Compile_Move_Rm_To_Reg ( RAX, RAX, 0, 0 ) ;
+            _Compile_X_Group1_Immediate ( ADD, REG, regToUse, 0, word->Offset, 0 ) ;
+            Compile_Move_Rm_To_Reg ( regToUse, regToUse, 0, 0 ) ;
 #if 0            
             int64 rlIndex = _ReadLiner_->ReadIndex ;
             token = Lexer_ReadToken ( interp->Lexer0 ) ;
@@ -580,7 +585,7 @@ CSL_Pointer ( )
 #endif            
             if ( ! String_Equal ( token, "->" ) )
             {
-                _Compile_Stack_PushReg ( DSP, ACC ) ;
+                _Compile_Stack_PushReg ( DSP, regToUse ) ;
             }
         }
         else

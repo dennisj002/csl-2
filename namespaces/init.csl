@@ -25,8 +25,8 @@ optimizeOn inlineOn
 optimizeOff inlineOff
 #endif
 Root 
-'find '_findUsing _findUsing alias immediate
-: findAny _findAny ; immediate
+'find '_findUsing _findUsing alias immediate 
+: findAny _findAny ; immediate 
 'tick ' _tick find alias immediate
 : ' _tick ; immediate
 'ndrop '_ndrop find alias immediate 

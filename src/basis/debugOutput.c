@@ -168,6 +168,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
     }
     else SetState_TrueFalse ( _Debugger_, DBG_AUTO_MODE_ONCE, true ) ;
     SetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ), false ) ;
+    debugger->w_AliasOf = 0 ;
 }
 
 void
@@ -201,10 +202,15 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
 }
 
 void
-CSL_ShowInfo ( Word * word, byte * prompt, int64 signal )
+CSL_ShowInfo (Debugger * debugger, Word * word, byte * prompt, int64 signal )
 {
+    if ( word && ( word->W_AliasOf ) )
+    {
+        debugger->w_Alias = word ;
+        debugger->w_AliasOf = Word_UnAlias ( word ) ;
+    }
     _Debugger_->w_Word = Word_UnAlias ( word ) ;
-    _Debugger_ShowInfo ( _Debugger_, prompt, signal, 1 ) ;
+    _Debugger_ShowInfo ( debugger, prompt, signal, 1 ) ;
 }
 
 void

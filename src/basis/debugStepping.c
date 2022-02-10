@@ -41,8 +41,8 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     _Debugger_StepOneInstruction ( debugger ) ;
     if ( showExtraFlag ) Debug_ExtraShow ( Here - svHere, 0 ) ; //showExtraFlag ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) && ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
-    else _Debugger_ShowEffects (debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), 0, showExtraFlag ) ;
-    if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_UdisOneInstruction (debugger, 0, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+    else _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), 0, showExtraFlag ) ;
+    if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_UdisOneInstruction ( debugger, 0, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     if ( Compiling ) _Debugger_DisassembleWrittenCode ( debugger ) ;
     debugger->DebugAddress = nextInsn ;
 }
@@ -125,6 +125,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
 // simply : copy the current insn to a ByteArray buffer along with
 // prefix and postfix instructions that restore and
 // save the cpu state; then run that ByteArray code buffer
+// control flow logic is not good here !?
 
 void
 Debugger_PreStartStepping ( Debugger * debugger )
@@ -132,26 +133,34 @@ Debugger_PreStartStepping ( Debugger * debugger )
     Word * word = debugger->w_Word ;
     if ( word )
     {
+        uint64 * svDsp = _DspReg_ ;
         //debugger->WordDsp = _Dsp_ ; // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
-        Debugger_CanWeStep ( debugger, word ) ;
         // we would at least need to save/restore our registers to step thru native c code
+        Debugger_CanWeStep ( debugger, word ) ;
         if ( ! GetState ( debugger, DBG_CAN_STEP ) )
         {
-            Printf ( "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%016lx : (e)valuating",
-                c_ud ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "<literal> " ),
-                word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_gu ( word->Name ),
-                GetState ( debugger, DBG_AUTO_MODE ) ? " : automode turned off" : "",
-                debugger->DebugAddress ) ;
-            debugger->DebugAddress = 0 ;
-            _Debugger_Eval ( debugger, 0 ) ;
-            SetState ( _Debugger_, DBG_AUTO_MODE, false ) ;
+            if ( word->Definition == CSL_BlockRun )
+            {
+                _Debugger_SetupStepping ( debugger, 0, ( byte* ) DataStack_Pop ( ), 0 ) ;
+                SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_AUTO_MODE, false ) ;
+            }
+            else
+            {
+                Printf ( "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%016lx : (e)valuating",
+                    c_ud ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "<literal> " ),
+                    word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_gu ( word->Name ),
+                    GetState ( debugger, DBG_AUTO_MODE ) ? " : automode turned off" : "",
+                    debugger->DebugAddress ) ;
+                debugger->DebugAddress = 0 ;
+                _Debugger_Eval ( debugger, 0 ) ;
+                SetState ( _Debugger_, DBG_AUTO_MODE, false ) ;
+            }
             return ;
         }
         else
         {
             if ( Word_IsSyntactic ( word ) ) //&& ( ! GetState ( word, STEPPED ) ) )
             {
-                uint64 * svDsp = _DspReg_ ;
                 Interpreter * interp = _Interpreter_ ;
                 interp->w_Word = word ;
                 SetState ( _Debugger_, DBG_INFIX_PREFIX, true ) ;
@@ -164,9 +173,9 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 SetState ( word, W_STEPPED, true ) ;
                 SetState ( debugger, ( DBG_STEPPED | DBG_STEPPING ), false ) ; // no longjmp needed at end of Interpreter_Loop
                 _Set_DataStackPointers ( svDsp ) ;
-                return ; 
+                return ;
             }
-            Debugger_SetupStepping ( debugger ) ;
+            else Debugger_SetupStepping ( debugger ) ;
             //SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_AUTO_MODE, false ) ;
             SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_AUTO_MODE, false ) ;
         }
@@ -417,12 +426,12 @@ Debug_ExtraShow ( int64 size, Boolean force )
         if ( force || ( _O_->Verbosity > 4 ) )
         {
             Printf ( "\n\ndebugger->SaveCpuState" ) ;
-            _Debugger_Disassemble (debugger, 0, ( byte* ) debugger->SaveCpuState, 1000, 1 ) ; //137, 1 ) ;
+            _Debugger_Disassemble ( debugger, 0, ( byte* ) debugger->SaveCpuState, 1000, 1 ) ; //137, 1 ) ;
             Printf ( "\n\ndebugger->RestoreCpuState" ) ;
-            _Debugger_Disassemble (debugger, 0, ( byte* ) debugger->RestoreCpuState, 1000, 2 ) ; //100, 0 ) ;
+            _Debugger_Disassemble ( debugger, 0, ( byte* ) debugger->RestoreCpuState, 1000, 2 ) ; //100, 0 ) ;
         }
         Printf ( "\n\ndebugger->StepInstructionBA->BA_Data" ) ;
-        _Debugger_Disassemble (debugger, 0, ( byte* ) debugger->StepInstructionBA->BA_Data, size, 0 ) ;
+        _Debugger_Disassemble ( debugger, 0, ( byte* ) debugger->StepInstructionBA->BA_Data, size, 0 ) ;
     }
 }
 
@@ -492,8 +501,8 @@ Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
     else
     {
         //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
-        if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) 
-            Debugger_UdisOneInstruction (debugger, 0, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+        if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) )
+            Debugger_UdisOneInstruction ( debugger, 0, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
         SetState ( debugger, DBG_STACK_OLD, true ) ;
         debugger->CopyRSP = 0 ;
         if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
@@ -510,12 +519,12 @@ _Debugger_CASOI_Do_JmpOrCall_Insn ( Debugger * debugger, byte * jcAddress )
 {
     Word *word, * word0 = Word_GetFromCodeAddress ( jcAddress ) ;
     word = Word_UnAlias ( word0 ) ;
-    
+
     if ( word && ( word->W_MorphismAttributes & ( DEBUG_WORD | RT_STEPPING_DEBUG ) ) )
     {
         SetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ), false ) ;
         // we are already stepping here and now, so skip
-        Printf ( "\nskipping over a debug word : %s : at 0x%-8x", (word ? ( char* ) c_gd ( word->Name ) : (char*) "<dbg>"), debugger->DebugAddress ) ;
+        Printf ( "\nskipping over a debug word : %s : at 0x%-8x", ( word ? ( char* ) c_gd ( word->Name ) : ( char* ) "<dbg>" ), debugger->DebugAddress ) ;
         //Pause () ;
         debugger->DebugAddress += 3 ; // 3 : sizeof call reg insn
         //goto end ; // skip it

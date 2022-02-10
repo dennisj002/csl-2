@@ -904,7 +904,6 @@ DLList_CheckRecycledForAllocation ( dllist * list, int64 size )
         node->n_DLNode.n_InUseFlag = N_IN_USE ;
         return ( byte* ) node ;
     }
-
     else return 0 ;
 }
 

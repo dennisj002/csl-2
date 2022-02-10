@@ -707,7 +707,7 @@ void
 TSI_ShowTypeErrorStatus ( TSI *tsi )
 {
     byte * warning = "Apparent TypeMismatch : " ;
-    CSL_ShowInfo ( tsi->OpWord, warning, 0 ) ;
+    CSL_ShowInfo (_Debugger_, tsi->OpWord, warning, 0 ) ;
     TSI_TypeStatus_Print ( tsi ) ;
     CSL_TypeStackReset ( ) ;
 }

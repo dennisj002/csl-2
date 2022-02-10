@@ -1,7 +1,9 @@
 5
-#if 0
+#if 0 // debug flag
 //"sp" purge 
 Root
+: sp stack pause ; 
+C
 : sp stack pause ; 
 #else
 : sp ; //stack pause ; 
@@ -255,7 +257,7 @@ lcOff
 Root.List
 _((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList printList s lispOff
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
-'bexp3 find wdiss 7 bexp3 p //pause
+'bexp3 find wdiss 7 bexp3 p sp
 c_syntaxOn
 int
 fac5 ( REG n  | REG facc ) 
@@ -263,7 +265,7 @@ fac5 ( REG n  | REG facc )
     facc = 1 ;
     while ( n > 1 ) 
     {
-#if 1
+#if 0
         facc = facc * (n --) ;
 #else
         facc *= n -- ;
